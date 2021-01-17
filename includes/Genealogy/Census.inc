@@ -73,6 +73,7 @@ use \Iterator;
  *		                Census is not defined in table                  *
  *		2020/03/08      add method getDomains                           *
  *		2020/09/28      add field EnumMonth                             *
+ *		2020/12/02      protect against XSS                             *
  *																		*
  *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
@@ -222,7 +223,8 @@ class Census extends Record
 				{		// act on specific field names
 				    $warn		.= "<p>Census::__construct: " .
 								   __LINE__ .
-						" Invalid Census field name $field='$value'</p>\n";
+                                   " Invalid Census field name $field='" .
+                                   htmlspecialchars($value) . "'</p>\n";
 				    $this->extras[$fieldLc]	= $value;
 				}		// act on specific field names
 		    }			// loop through all parameters
@@ -643,7 +645,7 @@ class Census extends Record
 		    {
 		        $warn	    .= "<p>Census:getStats: " . __LINE__ .
 				               " $queryText</p>\n";
-				$warn	    .= "<p>" . print_r($row, true) . "</p>\n";
+				$warn	    .= "<p>" . htmlspecialchars(print_r($row, true)) . "</p>\n";
 		    }
 		    return $row;
         }		// successful query

@@ -142,8 +142,15 @@ use \Iterator;
  *                      for single digit con number                     *
  *      2020/07/30      do not throw exception in getId/getIdlr for     *
  *                      new record                                      *
+ *      2020/10/24      correct handling of synthesized fields          *
+ *                      county and searchname                           *
+ *      2020/12/16      correct setting of SortedLocation whenever      *
+ *                      Location is set, including during creation      *
+ *      2020/12/30      replace HTML escapes in location name           *
+ *      2021/01/03      static method getLocation extended to support   *
+ *                      using location as unique key                    *
  *                                                                      *
- *  Copyright &copy; 2020 James A. Cobban                               *
+ *  Copyright &copy; 2021 James A. Cobban                               *
  ************************************************************************/
 require_once __NAMESPACE__ . '/RecordPic.inc';
 require_once __NAMESPACE__ . '/CountySet.inc';
@@ -231,41 +238,78 @@ class Location extends RecordPic
      *  Location::$locationIndex                                        *
      *                                                                  *
      *  To save time if a specific record is requested more than once   *
-     *  during a process, maintain a table of Location records.         *
+     *  during a process, maintain a table of Location records          *
+     *  indexed by IDLR value.                                          *
      ********************************************************************/
     protected static    $locationIndex  = array();
 
     /********************************************************************
+     *  Location::$locationNames                                        *
+     *                                                                  *
+     *  To save time if a specific record is requested more than once   *
+     *  during a process, maintain a table of Location records          *
+     *  indexed by Location value.                                      *
+     ********************************************************************/
+    protected static    $locationNames  = array();
+
+    /********************************************************************
      *  static function Location::getLocation                           *
      *                                                                  *
-     *  Get an existing entry or create an instance of the class        *
-     *  Location from a row returned from a database query of the table *
-     *  'tblLR' for a value of IDLR.                                    *
+     *  Factory method to get an existing entry or if there is none     *
+     *  create a new instance of the class Location using a key.        *
      *                                                                  *
      *  Input:                                                          *
-     *      $idlr       integer identifier of a location                 *
+     *      $idlr       integer identifier of a location or             *
+     *                  location name                                   *
      *                                                                  *
      *  Returns:                                                        *
-     *      an instance of Location                                     *
+     *      an instance of Location or null                             *
      ********************************************************************/
     static function getLocation($idlr)
     {
-        if (!array_key_exists($idlr, self::$locationIndex))
-            self::$locationIndex[$idlr] = new Location(array('idlr' => $idlr));
-        return self::$locationIndex[$idlr];
+        if (is_int($idlr) || ctype_digit($idlr))
+        {
+            if (array_key_exists($idlr, self::$locationIndex))
+                $location       = self::$locationIndex[$idlr];
+            else
+            {
+                $location       = new Location(array('idlr' => $idlr));
+                self::$locationIndex[$idlr] = $location;
+                $name                       = $location['location'];
+                self::$locationNames[$name] = $location;
+            }
+            return $location;
+        }
+        else
+        if (is_string($idlr))
+        {
+            $name               = $idlr;
+            if (array_key_exists($name, self::$locationNames))
+                $location       = self::$locationNames[$name];
+            else
+            {
+                $location       = new Location(array('location' => $name));
+                self::$locationNames[$name] = $location;
+                $idlr                       = $location['idlr'];
+                self::$locationIndex[$idlr] = $location;
+            }
+            return $location;
+        }
+        else
+            return null;
     }           // static function Location::getLocation
 
     /********************************************************************
      *  function Location::__construct                                  *
      *                                                                  *
-     *  Given the identifier or database row construct a location       *
+     *  Given the identifier or database row construct a Location       *
      *  record.                                                         *
      *                                                                  *
      *  Input:                                                          *
      *      $id         a database record presented as an array         *
      *                  or an array of initializers/search parms        *
      *                  the following options are deprecated:           *
-     *                  numeric identifier of a location (key of tblLR) *
+     *                  numeric identifier of a Location (key of tblLR) *
      *                  or a string location name                       *
      *                                                                  *
      *  Returns instance of Location record.                            *
@@ -303,8 +347,11 @@ class Location extends RecordPic
                     $parms  = array('idlr' => $id);
             }
             else
+            {
+                $id         = htmlspecialchars_decode($id);
                 $parms      = array(array('location'        => $id,
                                           'shortname'       => $id));
+            }
         }           // string parameter
         else
         if (is_int($id))
@@ -388,6 +435,7 @@ class Location extends RecordPic
 
                     case 'location':
                     {
+                        $value          = htmlspecialchars_decode($value);
                         $where          .= "$and`$fldname`=?";
                         $sqlParms[]     = $value;
                         $location       = $value;
@@ -430,39 +478,6 @@ class Location extends RecordPic
                             else
                                 $depth  = 6 + 2 * substr_count($location, ',');
                             $dbrow['zoom']  = $depth;
-
-                            // check for street address to appropriately
-                            // set the sorted name so street addresses
-                            // sort within the street
-                            $rgxres     = preg_match(self::$namePattern,
-                                                     $location,
-                                                     $matches);
-                            if ($rgxres > 0)
-                            {       // street address
-                                $lotnum = strtolower($matches[2]);
-                                $con    = strtolower($matches[4]);
-                                $digit2 = substr($con, 5, 1);
-                                if (substr($con, 0, 4) == 'con ' &&
-                                    ($digit2 < '0' && $digit2 > '9'))
-                                    $con= 'con 0' . substr($con, 4);
-
-                                if (substr($lotnum, 0, 4) == 'lot ' &&
-                                    strlen($lotnum) == 5)
-                                {       // rural lot < 10
-                                    $lotnum     = 'lot 0' . substr($lotnum, 4);
-                                }       // rural lot < 10
-                                else
-                                if (strlen($lotnum) < 4)
-                                    $lotnum     = substr('0000' . $lotnum,
-                                                         strlen($lotnum));
-                                $dbrow['sortedlocation']    = $con .
-                                                    $matches[5] . ', ' .
-                                                    $lotnum . ' ' .
-                                                    $matches[1];
-                            }       // street address
-                            else
-                                $dbrow['sortedlocation']    = $location;
-                            $dbrow['shortname']             = $location;
                         }       // update fields based upon new location name
                         else
                         if ($idlr)
@@ -497,14 +512,21 @@ class Location extends RecordPic
         $this->needInsert   = $needInsert;
 
         // save a reference to existing record
-        if (!$needInsert)
+        $location           = $this->row['location'];
+        if ($needInsert)
+        {                   // new record
+            if (is_string($location))
+                $this->setName($location);  // side effects of name
+        }                   // new record
+        else
         {                   // existing record
-            $idlr           = $this['idlr'];
+            $idlr           = $this->row['idlr'];
             if ($idlr > 0)
             {               // have key
                 if (!array_key_exists($idlr, self::$locationIndex))
                 {           // not already saved
                     self::$locationIndex[$idlr]     = $this;
+                    self::$locationNames[$location] = $this;
                 }           // not already saved
             }               // have key
         }                   // existing record
@@ -577,7 +599,11 @@ class Location extends RecordPic
                     $province   = $domain->get('province');
                 }
                 else
+                {
+                    $this->extras['county']     = $county;
+                    $this->extras['searchname'] = $searchName;
                     return $searchName;
+                }
             }
 
             // the following is to strip off rural addresses that
@@ -931,7 +957,7 @@ class Location extends RecordPic
             case 'name':
             case 'location':
             {
-                return self::setName($value);
+                return self::setName(htmlspecialchars_decode($value));
             }       // location name
 
             case 'latitude':
@@ -959,21 +985,27 @@ class Location extends RecordPic
      *  appropriate values.                                             *
      *                                                                  *
      *  Input:                                                          *
-     *      value       string name                                     *
+     *      newName     string name                                     *
      ********************************************************************/
-    function setName($value)
+    function setName($newName)
     {
+        $oldName            = $this->row['location'];
+        if (array_key_exists($oldName, self::$locationNames))
+        {
+            unset(self::$locationNames[$oldName]);
+            self::$locationNames[$newName]      = $this;
+        }
         // if the short name has not been set to a different value
-        // keep it the same as the new location value
+        // make it the same as the new location value
         if ($this->row['shortname'] == $this->row['location'])
-            parent::set('shortname', $value);
+            parent::set('shortname', $newName);
 
         // determine appropriate sort value
         // for lot locations, whether on urban streets or in rural concessions
         // set the sort value so that all locations on the same street or
         // concession sort together in order by lot number
         $rgxres = preg_match(self::$namePattern,
-                             $value,
+                             $newName,
                              $matches);
         if ($rgxres > 0)
         {       // street address
@@ -983,40 +1015,41 @@ class Location extends RecordPic
             else
                 $lot6   = '';
             $con        = $matches[4];
-            $digit2     = substr($con, 5, 1);
-            if (substr($con, 0, 4) == 'con ' &&
-                ($digit2 < '0' && $digit2 > '9'))
+            if (preg_match('/^con\s+[0-9]\s/', $con))
                 $con    = 'con 0' . substr($con, 4);
-            if (strlen($lotnum) < 3)
-                $lotnum = substr('000' . $lotnum, strlen($lotnum));
-            else
-            if (substr($lotnum, 0, 4) == 'lot ' &&
-                !is_numeric($lot6))
+            if (preg_match('/^lot\s+([0-9]+)(\s.*|)$/', $lotnum, $lmatch))
             {       // rural lot < 10
-                $lotnum = 'lot 0' . substr($lotnum, 4);
+                $num    = $lmatch[1];
+                $rest   = $lmatch[2];
+                if (strlen($num) < 2)
+                    $lotnum = 'lot 0' . $num . $rest;
             }       // rural lot < 10
-            $sortedlocation = $matches[4] . $matches[5] . ', ' .
-                              $lotnum . ' ' . $matches[1];
+            else
+            if (ctype_digit($lotnum) && strlen($lotnum) < 3)
+                $lotnum = substr('000' . $lotnum, strlen($lotnum));
+
+            $sortedlocation = $con . $matches[5] . ', ' .
+                $lotnum . ' ' . $matches[1];
             parent::set('sortedlocation',$sortedlocation);
         }       // street address
         else
-            parent::set('sortedlocation', $value);
+            parent::set('sortedlocation', $newName);
 
         // determine appropriate default zoom level
         if ($this->row['zoom'] == 8 &&
             $this->row['longitude'] == 0)
         {       // coordinates not set
-            if (strpos($value,' st,') > 0 ||
-                strpos($value,' ave,') > 0 ||
-                strpos($value,' rd,') > 0)
+            if (strpos($newName,' st,') > 0 ||
+                strpos($newName,' ave,') > 0 ||
+                strpos($newName,' rd,') > 0)
                 $depth      = 15;
             else
-                $depth      = 3 + 4 * substr_count($value, ',');
+                $depth      = 3 + 4 * substr_count($newName, ',');
             parent::set('zoom', $depth);
         }       // coordinates not set
 
         // set location
-        return parent::set('location', $value);
+        return parent::set('location', $newName);
     }       // Location::setName
 
     /********************************************************************
@@ -1038,6 +1071,8 @@ class Location extends RecordPic
      ********************************************************************/
     function setLatitude($value)
     {
+        if (!is_numeric($value))
+            return $this->getLatitude();
         $value      = (double)$value;
         $negative   = $value < 0;
         $value      = abs($value);
@@ -1076,6 +1111,8 @@ class Location extends RecordPic
      ********************************************************************/
     function setLongitude($value)
     {
+        if (!is_numeric($value))
+            return $this->getLongitude();
         $value      = (double)$value;
         $negative   = $value < 0;
         $value      = abs($value);

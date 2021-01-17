@@ -96,7 +96,7 @@ function deleteBlog()
  ************************************************************************/
 function gotDelete(xmlDoc)
 {
-    //alert("UserInfo: gotDelete: " + tagToString(xmlDoc));
+    //alert("UserInfo: gotDelete: " + new XMLSerializer().serializeToString(xmlDoc));
     location.reload();
 }		// gotDelete
 
@@ -148,7 +148,7 @@ function replyBlog()
  ************************************************************************/
 function gotReply(xmlDoc)
 {
-    //alert("UserInfo: gotReply: " + tagToString(xmlDoc));
+    //alert("UserInfo: gotReply: " + new XMLSerializer().serializeToString(xmlDoc));
     location.reload();
 }		// gotReply
 

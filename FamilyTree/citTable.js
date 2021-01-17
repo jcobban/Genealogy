@@ -43,8 +43,9 @@
  *		2015/06/01		open child dialogs in other half of window		*
  *		2018/10/30      use Node.textContent rather than getText        *
  *		2019/06/29      first parameter of displayDialog removed        *
+ *      2021/01/16      use XMLSerializer for diagnostic output         *
  *																		*
- *  Copyright &copy; 2018 James A. Cobban								*
+ *  Copyright &copy; 2021 James A. Cobban								*
  ************************************************************************/
 
 /************************************************************************
@@ -289,7 +290,7 @@ function gotSources(xmlDoc)
     if (sourceSelect.options)
 		sourceSelect.options.length	= 0;	// purge old options if any
     else
-		alert("citTable.js: gotSources:" + tagToString(sourceSelect));
+		alert("citTable.js: gotSources:" + new XMLSerializer().serializeToString(sourceSelect));
 
     hideLoading();	// hide loading indicator
     // create a new HTML Option object to represent the ability to
@@ -455,7 +456,7 @@ function gotAddCit(xmlDoc)
     {
 		if (xmlRoot.nodeName == "addCit")
 		{		// valid response
-		    // alert("citTable.js: gotAddCit: " + tagToString(xmlRoot));
+		    // alert("citTable.js: gotAddCit: " + new XMLSerializer().serializeToString(xmlRoot));
 		    var	rowNum		= xmlRoot.getAttribute("row");
 		    var	formname	= xmlRoot.getAttribute("formname");
 		    var	form		= document.forms[formname];
@@ -548,7 +549,7 @@ function gotAddCit(xmlDoc)
 		}		// valid response
 		else	// unexpected response
 		    alert("citTable.js: gotAddCit: " +
-				  "xmlRoot='" + tagToString(xmlRoot) + "'");
+				  "xmlRoot='" + new XMLSerializer().serializeToString(xmlRoot) + "'");
     }
     else
 		alert("citTable.js: gotAddCit: xmlDoc='" + xmlDoc + "'");
@@ -692,7 +693,7 @@ function gotDeleteCit(xmlDoc)
     else
     {		// error unexpected document
 		if (root)
-		    msg	= tagToString(root);
+		    msg	= new XMLSerializer().serializeToString(root);
 		else
 		    msg	= xmlDoc;
 		alert ("citTable.js: gotDeleteCit: Error: " + msg);

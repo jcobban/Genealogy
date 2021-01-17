@@ -2049,10 +2049,13 @@ class Event extends RecordPic
                 {
                     $retval         .= "    <$fld>" . $value . "</$fld>\n";
                     $loc            = Location::getLocation($value);
+                    if ($loc)
+                    {
                     $value          = $loc->getName();
                     $locfld         = substr($fld,4) . 'loc';
                     $retval         .= "    <$locfld>" . htmlentities($value,ENT_XML1) .
-                                            "\n    </$locfld>\n";
+                        "\n    </$locfld>\n";
+                    }
                     break;
                 }
 

@@ -98,6 +98,7 @@ class FamilyTree implements Iterator
      *	Associative array containing existing instances of Temple       *
      ********************************************************************/
     private	$templeIndex    = array();
+    private	$templeNames    = array();
 
     /********************************************************************
      *	tree->addressIndex											    *
@@ -105,13 +106,6 @@ class FamilyTree implements Iterator
      *	Associative array containing existing instances of Address      *
      ********************************************************************/
     private	$addressIndex    = array();
-
-    /********************************************************************
-     *	tree->sourceIndex											    *
-     *																	*
-     *	Associative array containing existing instances of Source       *
-     ********************************************************************/
-    private	$sourceIndex    = array();
 
     /********************************************************************
      *	tree->citationIndex											    *
@@ -159,6 +153,9 @@ class FamilyTree implements Iterator
      *	function FamilyTree::getPerson									*
      *																	*
      *	Factory method to get an instance of Person                     *
+     *																	*
+     *	Input:															*
+     *		$idir       unique numeric key		                        *
      ********************************************************************/
     function getPerson($idir)
     {
@@ -169,16 +166,22 @@ class FamilyTree implements Iterator
      *	function FamilyTree::getLocation								*
      *																	*
      *	Factory method to get an instance of Location                   *
+     *																	*
+     *	Input:															*
+     *		$idlr       either unique numeric key or unique name		*
      ********************************************************************/
-    function getLocation($idir)
+    function getLocation($idlr)
     {
-        return Location::getLocation($idir);
+        return Location::getLocation($idlr);
     }           // FamilyTree::getLocation
 
     /********************************************************************
      *	function FamilyTree::getFamily									*
      *																	*
      *	Factory method to get an instance of Family                     *
+     *																	*
+     *	Input:															*
+     *		$idmr       unique numeric key		                        *
      ********************************************************************/
     function getFamily($idmr)
     {
@@ -191,6 +194,9 @@ class FamilyTree implements Iterator
      *	function FamilyTree::getEvent									*
      *																	*
      *	Factory method to get an instance of Event                      *
+     *																	*
+     *	Input:															*
+     *		$ider       unique numeric key		                        *
      ********************************************************************/
     function getEvent($ider)
     {
@@ -203,6 +209,9 @@ class FamilyTree implements Iterator
      *	function FamilyTree::getTemple									*
      *																	*
      *	Factory method to get an instance of Temple                     *
+     *																	*
+     *	Input:															*
+     *		$idtr       unique numeric key		                        *
      ********************************************************************/
     function getTemple($idtr)
     {
@@ -215,6 +224,9 @@ class FamilyTree implements Iterator
      *	function FamilyTree::getAddress									*
      *																	*
      *	Factory method to get an instance of Address                    *
+     *																	*
+     *	Input:															*
+     *		$idar       unique numeric key		                        *
      ********************************************************************/
     function getAddress($idar)
     {
@@ -227,18 +239,22 @@ class FamilyTree implements Iterator
      *	function FamilyTree::getSource									*
      *																	*
      *	Factory method to get an instance of Source                     *
+     *																	*
+     *	Input:															*
+     *		$idsr       either unique numeric key or unique name		*
      ********************************************************************/
     function getSource($idsr)
     {
-        if (!array_key_exists($idsr, $this->sourceIndex))
-            $this->sourceIndex[$idsr]   = new Source(array('idsr' => $idsr));
-	    return $this->sourceIndex[$idsr];
+        return Source::getSource($idsr);
     }           // FamilyTree::getSource
 
     /********************************************************************
      *	function FamilyTree::getCitation								*
      *																	*
      *	Factory method to get an instance of Citation                   *
+     *																	*
+     *	Input:															*
+     *		$idsx       unique numeric key		                        *
      ********************************************************************/
     function getCitation($idsx)
     {

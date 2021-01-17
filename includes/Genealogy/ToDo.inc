@@ -54,8 +54,10 @@ use \Exception;
  *		2017/12/18		add support for temporary fields				*
  *		2019/08/27      add username field                              *
  *		2019/12/19      replace xmlentities with htmlentities           *
+ *		2020/12/25      correct minor errors                            *
+ *		                remove throw from constructor                   *
  *																		*
- *  Copyright &copy; 2019 James A. Cobban								*
+ *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/Record.inc';
 require_once __NAMESPACE__ . '/Address.inc';
@@ -211,7 +213,8 @@ class ToDo extends Record
         global  $connection;
         global  $userid;
 
-		// reformat old-style parameters into array format
+        // reformat old-style parameters into array format
+        $parms              = $id;
         if (!is_array($parms))
         {
 			if (is_string($parms) && strtolower($parms) == 'new')
@@ -388,15 +391,15 @@ class ToDo extends Record
 				$result 	        = $stmt->fetch(PDO::FETCH_ASSOC);
 				if (is_null($result))
                 {		// no matching record
-                    $dbrow          = self::$initRow;
-		            $dbrow['openedsd']	= $sdate;
-		            $dbrow['openedd']	= $ldate;
-                    $needInsert     = true;
+                    $dbrow                  = self::$initRow;
+		            $dbrow['openedsd']	    = $sdate;
+		            $dbrow['openedd']	    = $ldate;
+                    $this->needInsert       = true;
                 }		// no matching record
                 else
                 {
-                    $dbrow          = $result;
-                    $needInsert     = false;
+                    $dbrow                  = $result;
+                    $this->needInsert       = false;
                 }
 		    }		// successful execute
 		    else
@@ -405,22 +408,20 @@ class ToDo extends Record
 							            " '$queryText', " . 
 							        print_r($stmt->errorInfo(), true) . '. ';
 		    }		// error performing query
-		}		// existing record
+		}		    // existing record
 		else
-		{		// create a new record
+		{		    // create a new record
 		    $dbrow		            = self::$initRow;
 		    $dbrow['openedsd']	    = $sdate;
 		    $dbrow['openedd']	    = $ldate;
-            $needInsert             = true;
-		}		// create new record
+            $this->needInsert             = true;
+		}		    // create new record
 
         // invoke constructor of base class
         if (!is_array($dbrow))
-            throw new Exception("ToDo::__construct: " . __LINE__ .
-                                " \$dbrow not initialized");
+            $dbrow                  = ToDo::$initRow;
 		parent::__construct($dbrow,
 						    'tblTD');
-		$this->needInsert	        = $needInsert;
 
 		// initialize field values from parameters
 		if (count($parms) < count(ToDo::$initRow))

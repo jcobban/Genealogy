@@ -11,8 +11,9 @@
  *      2019/04/13      support new tinyMCE                             *
  *      2019/08/27      add Close button                                *
  *      2020/06/03      hide right column                               *
+ *      2021/01/16      use XMLSerializer for diagnostic output         *
  *                                                                      *
- *  Copyright &copy; 2020 James A. Cobban                               *
+ *  Copyright &copy; 2021 James A. Cobban                               *
  ************************************************************************/
 
 /************************************************************************
@@ -246,7 +247,8 @@ function gotBlog(xmlDoc)
 
     if (debug.toLowerCase() == 'y')
     {
-        alert("BlogPost.js: gotBlog: xmlDoc=" + tagToString(xmlDoc));
+        alert("BlogPost.js: gotBlog: xmlDoc=" +
+              new XMLSerializer().serializeToString(xmlDoc));
     }
 
     if (root && root.nodeName == 'blog')

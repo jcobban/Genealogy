@@ -69,6 +69,8 @@ use \Iterator;
  *		                warn about truncated values in method set       *
  *		2020/03/24      ownertenant field was handled as numeric        *
  *		                add pseudo-field 'sexclass'                     *
+ *		2020/12/02      protect against XSS                             *
+ *		2020/12/12      correct invalid UTF8                            *
  *															    		*
  *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
@@ -650,8 +652,6 @@ class CensusLine extends Record
      *																	*
      *  Returns:                                                        *
      *      object containing a transcription of a census line.		    *
-     *																	*
-     *	Throws Exception if unable to complete function					*
      ********************************************************************/
     function __construct($parms,
 						 $line		= null)
@@ -685,12 +685,13 @@ class CensusLine extends Record
 				if (is_string($value)) 
 				    $warn	.= "$comma$key='$value'";
 				else
-				    $warn	.= $comma . $key . '=' . print_r($value, true);
+				    $warn	.= $comma . $key . '=' . htmlspecialchars(print_r($value, true));
 				$comma		= ',';
 		    }
 		    $warn	        .= ']';
 		    if (isset($line)) 
-				$warn	.= ", \$line=" . print_r($line, true);
+                $warn	.= ", \$line=" .
+                            htmlspecialchars(print_r($line, true));
 		    $warn	.= ")</p>\n";
 		}
 
@@ -715,7 +716,8 @@ class CensusLine extends Record
 								$province	= substr($censusId, 0, 2);
 						}			// valid census identifier
 						else
-						    $this->msg	.= "Invalid Census='$censusId'";
+                            $this->msg	.= "Invalid Census='" .
+                                    htmlspecialchars($censusId) . "'";
 				    }			// string
 				    else
 				    if ($value instanceof Census)
@@ -730,7 +732,8 @@ class CensusLine extends Record
 						    $province	= substr($censusId, 0, 2);
 				    }
 				    else
-						$this->msg	.= "Invalid Census=" . print_r($value, true);
+                        $this->msg	.= "Invalid Census=" .
+                                htmlspecialchars(print_r($value, true));
 				    break;
 				}
 
@@ -747,8 +750,8 @@ class CensusLine extends Record
 						if (count($value) == 1)
 						    $subDistID		= $value[0];
 						else
-						    throw new Exception('CensusLine.inc: ' .
-						    'SubDistrict value ' . print_r($value, true));
+						    $this->msg      .= 'SubDistrict value ' .
+                                htmlspecialchars(print_r($value, true));
 				    }
 				    else
 				        $subDistID		= $value;
@@ -781,8 +784,8 @@ class CensusLine extends Record
         {
             showTrace();
             $this->msg            	.= "Missing parameter Census. ";
-            print "<p>new Census_Line(" . print_r($parms, true) . ")</p>\n";
-            throw new Exception("Missing parameter census");
+            print "<p>new Census_Line(" . 
+                htmlspecialchars(print_r($parms, true)) . ")</p>\n";
         }
 
 		if (is_array($line))
@@ -915,16 +918,18 @@ class CensusLine extends Record
 				}		// query successful
 				else
 				{		// error performing query
-				    throw new Exception("CensusLine::__construct:" .
+				    $this->msg  .= "CensusLine::__construct:" .
 									" '$queryText', " .
-									print_r($stmt->errorInfo(),true));
+                                    print_r($stmt->errorInfo(),true) .
+                                    ". ";
 				}		// error performing query
 		    }			// numeric identifier of record
 		}			// $line is null or a line number
 		else
 		{			// invalid parameter
 		    $this->msg	.= "CensusLine::__construct: called with Line " .
-				 gettype($line) . ", value='" . print_r($line) . "'";
+                gettype($line) . ", value='" . 
+                htmlspecialchars(print_r($line,true)) . "'";
 		}			// invalid parameter
 
 		// determine year from which birth year is calculated by census
@@ -1016,7 +1021,7 @@ class CensusLine extends Record
                         $retval		= $numHands;
                 }
                 else
-                    $retval		= null;
+                    $retval		= '';
                 break;
 		    }			// interpretation depends upon employer flag
 
@@ -1044,14 +1049,24 @@ class CensusLine extends Record
 		    case 'spkfrench':
 		    case 'unemployed':
 		    {			// yes/no flags represented as char(1)
-				$value			= $this->row[$fieldLc];
+				$value			        = $this->row[$fieldLc];
 				if ($value == '1')
-				    $retval		= 'Y';
+				    $retval		        = 'Y';
 				else
 				if ($value == '0')
-				    $retval		= 'N';
-				else
-				    $retval		= $value;
+				    $retval		        = '';
+                else
+                if (is_string($value))
+                {
+                    if (strlen($value) > 1)
+                        $value          = substr($value, 0, 1);
+                    if (($value > ' ') && ($value <= '}'))
+                        $retval		    = $value;
+                    else
+                        $retval         = '';
+                }
+                else
+                    $retval             = '';
                 break;
 		    }			// yes/no flags represented as char(1)
 
@@ -1065,7 +1080,17 @@ class CensusLine extends Record
 				if ($value == '0')
 				    $retval		= '';
 				else
-				    $retval		= $value;
+                if (is_string($value))
+                {
+                    if (strlen($value) > 1)
+                        $value          = substr($value, 0, 1);
+                    if (($value > ' ') && ($value <= '}'))
+                        $retval		    = $value;
+                    else
+                        $retval         = '';
+                }
+                else
+                    $retval             = '';
                 break;
 		    }			// yes/no flags represented as M/F
 
@@ -1134,7 +1159,9 @@ class CensusLine extends Record
                 if (array_key_exists($fieldLc, $this->extras))
                     $retval     = $this->extras[$fieldLc];
 				else
-				    $retval		= null;
+                    $retval		= '';
+                if (is_null($retval))
+                    $retval     = '';
                 break;
 		    }			// other fields
         }
@@ -1212,7 +1239,9 @@ class CensusLine extends Record
 		    {	                // birth year as text
                 if (strlen($value) > 8)
                 {
-                    $warn   .= "<p>value '$value' for '$field' is truncated</p>\n";
+                    $warn   .= "<p>value '" .
+                        htmlspecialchars($value) . 
+                        "' for '$field' is truncated</p>\n";
                     $value  = substr($value, 0, 8);
                 }
 				if (preg_match("/[0-9]{4}/", $value, $matches))
@@ -1227,7 +1256,9 @@ class CensusLine extends Record
 		    {	                // age field
                 if (strlen($value) > 8)
                 {
-                    $warn   .= "<p>value '$value' for '$field' is truncated</p>\n";
+                    $warn   .= "<p>value '" .
+                        htmlspecialchars($value) . 
+                        "' for '$field' is truncated</p>\n";
                     $value  = substr($value, 0, 8);
                 }
 				if (!array_key_exists('byeartxt', $this->row) ||
@@ -1282,6 +1313,7 @@ class CensusLine extends Record
             case 'spkenglish':
             case 'ownertenant':
             case 'houseclass':
+            case 'school':
             case 'sex':
             case 'mstat':
             case 'emptype':
@@ -1294,12 +1326,14 @@ class CensusLine extends Record
                         $value          = substr($value, 0, 1);
                         error_log("CensusLine::set('$field','$value')\n");
                     }
+                    if (($value <= ' ') || ($value > '}'))
+                        $value		    = '';
                 }
                 else
                 {
                     error_log("CensusLine::set('$field'," . 
                                 var_export($value) . ")\n");
-                    $value              = null;
+                    $value              = '';
                 }
 				return parent::set($field, $value);
             }                   // single character fields
@@ -1416,9 +1450,10 @@ class CensusLine extends Record
 		
 				    case 'subdistrict':
 				    case 'division':
+				    case 'ageatdeath':
 		            {                   // 4 character fields
 		                if (strlen($value) > 4)
-		                    $value  = substr($value, 0, 2);
+		                    $value  = substr($value, 0, 4);
 						$fldnames			.= "$comma`$fld`";
 		                $values				.= "$comma:$fld"; 
 						$sqlParms[$fld]	    = $value;
@@ -1805,7 +1840,14 @@ class CensusLine extends Record
 
 				// perform the update
 				$stmt			        = $connection->prepare($update);
-				$updateText		        = debugPrepQuery($update, $sqlParms);
+                $updateText		        = debugPrepQuery($update, $sqlParms);
+                if (strlen($updateText) == 0)
+                {
+                    print "<p class='message'>CensusLine::save: " . __LINE__ . " update=" . htmlspecialchars($update) . "</p>\n";
+                    print "<p class='message'>CensusLine::save: " . __LINE__ . " sqlParms=" . var_export($sqlParms, true) . "</p>\n";
+                    if (strlen($this->msg) > 0)
+                    print "<p class='message'>CensusLine::save: " . __LINE__ . " msg=" . $this->msg . "</p>\n";
+                }
                 $this->lastSqlCmd       = $updateText;
 				if ($stmt->execute($sqlParms))
 				{
@@ -1823,8 +1865,10 @@ class CensusLine extends Record
 				{		// error updating record
 				    print "<p class='message'>CensusLine::save: " . __LINE__ .
 								" '$updateText', " .
-								print_r($stmt->errorInfo(),true) .
+								var_export($stmt->errorInfo(),true) .
 						"</p>\n";
+                    print "<p class='message'>CensusLine::save: " . __LINE__ .
+                        " row=" . var_export($this->row, true) . "</p>\n";
 				    if (strlen($updateText) > 60)
 						$updateText	= substr($updateText, 0, 50 ) . '...' .
 									  substr($updateText, -7);

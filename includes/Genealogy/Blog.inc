@@ -55,8 +55,9 @@ use \Iterator;
  *		2019/01/06      move to namespace Genealogy                     *
  *		2019/04/18      support method getLastSqlCmd                    *
  *		2019/05/20      remove throw from constructor                   *
+ *		2020/12/02      protect against XSS                             *
  *																		*
- *  Copyright &copy; 2019 James A. Cobban								*
+ *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/Record.inc';
 
@@ -167,7 +168,7 @@ class Blog extends Record
 						    $bl_index	= $value;
 				        else
 						    $this->msg  .= "Blog::__construct: " .
-				"invalid value " . print_r($value, true) . "for BL_Index";
+				"invalid value " . htmlspecialchars(print_r($value, true)) . "for BL_Index";
 						break;
 				    }		// record index
 				}		// loop through parameters
@@ -208,7 +209,7 @@ class Blog extends Record
 							        'Blogs');
 		        }		// success
 		        else
-		        {		// error performing query
+                {		// error performing query
 				    $this->msg  .= "Blog::__construct: " .
     						        "SQL error: query='$queryText', " .
     						        print_r($stmt->errorInfo(),true) . ". ";
@@ -245,8 +246,11 @@ class Blog extends Record
                             parent::set('bl_keyname', $info['prime']);
                         }
                         else
+                        {
+                            $table      = htmlspecialchars($table);
         				    $this->msg  .= "Blog::__construct: " .
-            						       "unsupported BL_Table='$table'.";
+                                "unsupported BL_Table='$table'.";
+                        }
 						break;
 				    }		// Table Name
 				    
@@ -266,7 +270,7 @@ class Blog extends Record
 		else
 		{		// unexpected parameter type
 		    $this->msg  .= 'Blog::__construct: called with ' .
-							    print_r($parms, true);
+							    htmlspecialchars(print_r($parms, true));
 		}		// unexpected parameter type
 
 		$this->needInsert	= $needInsert;

@@ -20,8 +20,9 @@
  *		                within the visible portion of the browser.      *
  *		2019/06/29      first parameter of displayDialog removed        *
  *		2020/12/08      pass lang selection to display detail script    *
+ *		2021/01/16      use ev.stopPropagation                          *
  *																		*
- *  Copyright &copy; 2020 James A. Cobban								*
+ *  Copyright &copy; 2021 James A. Cobban								*
  ************************************************************************/
 
 window.onload	= onLoad;
@@ -107,7 +108,7 @@ function showReg()
  ************************************************************************/
 function deleteReg(ev)
 {
-    stopProp(ev);
+    ev.stopPropagation();
     var	form	= this.form;
     var	rownum	= this.id.substring(6);
     var	domain	= form.RegDomain.value;
@@ -143,7 +144,7 @@ function deleteReg(ev)
  ************************************************************************/
 function confirmDelete(ev)
 {
-    stopProp(ev);
+    ev.stopPropagation();
     // get the parameter values hidden in the dialog
     var	form		= this.form;
     var	regnum		= this.id.substr(13);

@@ -81,8 +81,9 @@
  *		2019/05/16      familyTree cookie was erroneously set from      *
  *		                the idir field in the popup template            *
  *		2019/05/19      call element.click to trigger button click      *
+ *      2021/01/16      use addEventListener                            *
  *																		*
- *  Copyright &copy; 2019 James A. Cobban								*
+ *  Copyright &copy; 2021 James A. Cobban								*
  ************************************************************************/
 
 /************************************************************************
@@ -90,7 +91,7 @@
  *																		*
  *  Define the function to be called once the web page is loaded.		*
  ************************************************************************/
-window.onload	        = onLoad;
+window.addEventListener("load", onLoad);
 
 /************************************************************************
  *  function ontarioCountyNames											*
@@ -177,7 +178,7 @@ var	geocoder	        = null;
  ************************************************************************/
 function onLoad()
 {
-    addEventHandler(window, "resize", personWindowResize);
+    window.addEventListener("resize", personWindowResize);
 
     // set action methods for form
     var	invoker	            = window.opener;
@@ -525,7 +526,7 @@ function gotBlog(xmlDoc)
 
     if (msg.length > 0)
 		popupAlert(msg, messageElt);
- 
+
     location	= location;
 }		// gotBlog
 
@@ -715,7 +716,7 @@ function ancestrySearch()
 		"&catBucket=rstp" +
 		"&uidh=l88" +
 		"&cp=3"
-    
+
     var	sframe			= document.getElementById("searchFrame");
     if (!sframe)
     {
@@ -830,7 +831,7 @@ function diKeyDown(e)
 				button.click(); 
 				return false;
 		    }		// letter 'A'
-    
+
 		    case 'b':
 		    case 'B':
 		    {		// letter 'B'
@@ -854,7 +855,7 @@ function diKeyDown(e)
 				button.click(); 
 				return false;
 		    }		// letter 'E'
-    
+
 		    case 'r':
 		    case 'R':
 		    {		// letter 'R'
@@ -862,7 +863,7 @@ function diKeyDown(e)
 				button.click(); 
 				return false;
 		    }		// letter 'R'
-    
+
 		    case 's':
 		    case 'S':
 		    {		// letter 'S'

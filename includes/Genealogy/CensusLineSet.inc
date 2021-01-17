@@ -44,6 +44,7 @@ use \mb_substr;
  *		                getStatistics now returns all pages             *
  *		2020/04/16      support exact match on surname                  *
  *		2020/04/23      fill in new 1911 page from AutomatedGenealogy   *
+ *		2020/12/02      protect against XSS                             *
  *																		*
  *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
@@ -113,7 +114,6 @@ class CensusLineSet extends RecordSet
     function __construct($parms,
 						 $fields	= '*')
     {
-		global	$msg;
 		global	$debug;
 		global	$warn;
 
@@ -133,7 +133,7 @@ class CensusLineSet extends RecordSet
                         if (is_string($index))
                             $parmstext      .= "'$index' => ";
                         if (is_string($val))
-                            $parmstext      .= "'$val'";
+                            $parmstext      .= "'" . htmlspecialchars($val) . "'";
                         else
                         if (is_numeric($val))
                             $parmstext      .= $val;
@@ -176,7 +176,8 @@ class CensusLineSet extends RecordSet
 						$this->censusYear	= $censusYear;
 						$this->table		= $this->census->get('table');
 						if (!$this->census->isExisting())
-						    $msg	.= "Invalid Census='$censusId'";
+                            $this->msg	.= "Invalid Census='" .
+                                    htmlspecialchars($censusId) . "'";
 				    }		// specific census
 				    break;
 				}
@@ -245,10 +246,6 @@ class CensusLineSet extends RecordSet
      ********************************************************************/
     function getIdentifier($fieldLc, $value)
     {
-		global	$debug;
-		global	$warn;
-		global	$msg;
-
 		$where			= '';
 		if (is_array($value) && count($value) == 1)
 		    $value		= reset($value);
@@ -293,15 +290,10 @@ class CensusLineSet extends RecordSet
      *																	*
      *	Side Effects:													*
      *	    $this->sqlParms		sets substitution values to PDO exec	*
-		    $this->notPage		set to true if not a single value		*
-     *	    Errors are appended to the global $warn						*
+	 *	    $this->notPage		set to true if not a single value		*
      ********************************************************************/
     function getGivenNames($fieldLc, $value)
     {
-		global	$debug;
-		global	$warn;
-		global	$msg;
-
 		if (strlen($value) == 0)
 		    return '';
 		$where			= '';
@@ -371,7 +363,6 @@ class CensusLineSet extends RecordSet
 		global	$debug;
 		global	$warn;
 		global	$msg;
-		global	$connection;
 
 		$range		    = 5;
 		$this->orderby	= 'Surname, GivenNames, BYear';
@@ -473,7 +464,7 @@ class CensusLineSet extends RecordSet
 				    {
 						$warn	.= "<p>CensusLineSet: " . __LINE__ .
 							   " unexpected value " . 
-							   print_r($value, true) . 
+							   htmlspecialchars(print_r($value, true)) . 
 							   " for subdistrict</p>\n";
 						break;
 				    }
@@ -553,7 +544,8 @@ class CensusLineSet extends RecordSet
 						$range		= intval($value);
 				    }
 				    else
-						$msg	.= "Range '$value' must be an integer. ";
+                        $msg	.= "Range '" . htmlspecialchars($value) . 
+                                    "' must be an integer. ";
 				    break;
 				}		// "Range"
 
@@ -757,7 +749,7 @@ class CensusLineSet extends RecordSet
         if ($debug)
         {
             $warn       .= "<p>CensusLineSet::getWhere: " . __LINE__ .
-                " where='$where'</p>\n" .
+                " where='" . htmlspecialchars($where) . "'</p>\n" .
                 "<p>sqlParms=" . print_r($this->sqlParms, true) . "</p>\n";  
         }
 
@@ -828,11 +820,6 @@ class CensusLineSet extends RecordSet
      ********************************************************************/
     public function rewind()
     {
-		global	$debug;
-		global	$warn;
-		global	$msg;
-		global	$connection;
-
 		if (is_null($this->list))
 		{
 		    if ($this->district && $this->subdistrict && $this->page)
@@ -1002,7 +989,7 @@ class CensusLineSet extends RecordSet
         {
             $cells      				= $row->getElementsByTagName('td');
             $subid      				= str_replace('<','&lt;',$cells[0]->innerHTML);
-        
+
             if ($subid == $this->subdistrict)
             {
                 $link   				= $cells[2]->innerHTML;
@@ -1010,7 +997,7 @@ class CensusLineSet extends RecordSet
                 {
                     $link       		= $matches[1];
                     //$agsdpage   		= file_get_contents($link);
-                    $agsd       		= new \Templating\Template($link);
+                    $agsd       		= new \Templating\Template("$prefix/$link");
                     $sddoc      		= $agsd->getDocument();
                     $sdtbls     		= $sddoc->getElementsByTagName('table');
                     if (count($sdtbls) < 1)
@@ -1044,6 +1031,9 @@ class CensusLineSet extends RecordSet
                                     if (preg_match('/\d+/',$linecont,$matches))
                                     {           // line number
                                         $linenum    = intval($matches[0]);
+                                        if (array_key_exists($linenum,
+                                                             $this->list))
+                                        {       // line number exists
 				                        $cline      = $this->list[$linenum]	;
                                         $famnum     = $pgcells[2]->innerHTML;
                                         $cline['family']    = $famnum;
@@ -1080,6 +1070,7 @@ class CensusLineSet extends RecordSet
                                         else
                                             $byear              = 1921 - $age;
                                         $cline['byear']         = $byear;
+                                        }       // line number exists
                                     }           // line number
                                 }
                             }

@@ -1962,7 +1962,8 @@ class Name extends Record
 
                 case 'order':
                 {
-                    $retval		        .= "$comma\t\"$key\":\t$value";
+                    $retval		        .= "$comma\t\"$key\":\t" .
+                                            json_encode($value);
                     $retval             .= ",\n\t\"means\":\t";
                     if ($value == -1)
                         $retval         .= "\"Married Name\"";

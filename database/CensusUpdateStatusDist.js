@@ -15,7 +15,8 @@
  *		2013/08/25		use pageInit common function					*
  *		2018/10/30      use Node.textContent rather than getText        *
  *		2019/02/10      no longer need to call pageInit                 *
- *		2918.11.27      add support for language                        *
+ *		2019/11/27      add support for language                        *
+ *      2021/01/16      use XMLSerializer for diagnostic output         *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -260,7 +261,7 @@ function gotCopy(xmlDoc)
 		    }		// loop through all children
 		}		// correctly formatted response
 		else
-		    alert("gotCopy: xmlDoc=" + tagToString(root));
+		    alert("gotCopy: xmlDoc=" + new XMLSerializer().serializeToString(root));
     }		// XML document
     else	// not an XML document
 		alert("gotCopy: xmlDoc=" + xmlDoc);

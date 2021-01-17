@@ -208,8 +208,10 @@
  *      2020/06/17      DisplayImage moved to top folder                *
  *      2020/06/26      retain display image button so it can be        *
  *                      reissued after image closed                     *
+ *      2021/01/16      use XMLSerializer for diagnostic output         *
+ *                      use addEventListener                            *
  *                                                                      *
- *  Copyright &copy; 2020 James A. Cobban                               *
+ *  Copyright &copy; 2021 James A. Cobban                               *
  ************************************************************************/
 
 // strings for determining and changing the case of letters
@@ -1752,7 +1754,7 @@ function checkRange(fNode)
         userSelection  = window.getSelection();
         for(var attr in userSelection)
             if (userSelection[attr] instanceof HTMLTableCellElement)
-                attrs += attr + "=" + tagToString(userSelection[attr]) + ", ";
+                attrs += attr + "=" + new XMLSerializer().serializeToString(userSelection[attr]) + ", ";
             else
             if (typeof userSelection[attr] != "function")
                 attrs += attr + "=" + userSelection[attr] + ", ";
@@ -2040,7 +2042,7 @@ function initElement(element, clear)
         {   // family number
             if (element.addEventListener)
                 element.addEventListener('change', changeReplDown, false);
-            addEventHandler(element, 'keydown',   numericKeyDown);
+            element.addEventListener('keydown',   numericKeyDown);
             setClassByValue(colName,
                             rowNum,
                             form.elements);
@@ -2442,7 +2444,7 @@ function initElement(element, clear)
                 element.value  = "";
             if (element.addEventListener)
                 element.addEventListener('change', change, false);
-            addEventHandler(element, 'keydown',   numericKeyDown);
+            element.addEventListener('keydown',   numericKeyDown);
             element.checkfunc  = checkNumber;
             element.checkfunc();
             break;
@@ -2467,7 +2469,7 @@ function initElement(element, clear)
                 element.value  = "";
             if (element.addEventListener)
                 element.addEventListener('change', changeSchoolMons, false);
-            addEventHandler(element, 'keydown',   numericKeyDown);
+            element.addEventListener('keydown',   numericKeyDown);
             element.checkfunc  = checkNumber;
             element.checkfunc();
             break;
@@ -2526,7 +2528,7 @@ function initElement(element, clear)
             element.abbrTbl      = StoriesAbbrs;
             if (element.addEventListener)
                 element.addEventListener('change', change, false);
-            addEventHandler(element, 'keydown',   numericKeyDown);
+            element.addEventListener('keydown',   numericKeyDown);
             element.checkfunc  = checkNumber;
             element.checkfunc();
             break;
@@ -2562,7 +2564,7 @@ function initElement(element, clear)
                 element.value  = "";
             if (element.addEventListener)
                 element.addEventListener('change', change, false);
-            addEventHandler(element, 'keydown',   numericKeyDown);
+            element.addEventListener('keydown',   numericKeyDown);
             element.checkfunc  = checkNumber;
             element.checkfunc();
             break;
@@ -2627,7 +2629,7 @@ function initElement(element, clear)
     // override default key processing for input fields to provide
     // spreadsheet emulation
     if (element.nodeName.toUpperCase() == 'INPUT')
-        addEventHandler(element, 'keydown',   tableKeyDown);
+        element.addEventListener('keydown',   tableKeyDown);
 }   // function initElement
 
 /************************************************************************
@@ -3155,7 +3157,7 @@ function doIdir(event)
 function gotIdir(xmlDoc)
 {
     if (debug.toLowerCase() == 'y')
-        alert("CensusForm.js: gotIdir: xmlDoc=" + tagToString(xmlDoc));
+        alert("CensusForm.js: gotIdir: xmlDoc=" + new XMLSerializer().serializeToString(xmlDoc));
     var  rootNode   = xmlDoc.documentElement;
     var  buttonId   = rootNode.getAttribute("buttonId");
     var  button     = document.getElementById(buttonId);
@@ -3163,7 +3165,7 @@ function gotIdir(xmlDoc)
     {
         hideLoading();
         alert("CensusForm.js: gotIdir: unable to find element with id='" +
-                buttonId + "' rootNode=" + tagToString(rootNode));
+                buttonId + "' rootNode=" + new XMLSerializer().serializeToString(rootNode));
         return;
     }
 
@@ -3229,7 +3231,7 @@ function gotIdir(xmlDoc)
     else
     {       // have no matching entries
         var cmds  = xmlDoc.getElementsByTagName("cmd");
-        parms.cmd  = tagToString(cmds[0]).replace('<','&lt;');
+        parms.cmd  = new XMLSerializer().serializeToString(cmds[0]).replace('<','&lt;');
         return displayDialog('idirNullForm$sub',
                              parms,
                              button,
@@ -3580,7 +3582,7 @@ function closeIdirDialog(event)
  ************************************************************************/
 function gotFamily(xmlDoc)
 {
-    // alert("CensusForm.js: gotFamily: xmlDoc=" + tagToString(xmlDoc));
+    // alert("CensusForm.js: gotFamily: xmlDoc=" + new XMLSerializer().serializeToString(xmlDoc));
 
     var  rootNode   = xmlDoc.documentElement;
     var msgs      = xmlDoc.getElementsByTagName("msg");

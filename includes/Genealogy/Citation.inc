@@ -49,8 +49,6 @@ use Templating\Template;
  *				2=Probable Conclusion									*
  *				1=Marginal Evidence										*
  *				0=Have not decided yet									*
- *		    SrcMPub					    VARCHAR(100)					*
- *				(see Date) Recorded Date								*
  *		    EnteredSD				    INTEGER(10)						*
  *				(see Sort Date)											*
  *		    EnteredD				    VARCHAR(100)					*
@@ -224,6 +222,8 @@ use Templating\Template;
  *		                and left many empty lines in the output         *
  *		2020/09/12      improve implementation                          *
  *		2020/09/29      use multiple layouts for Ontario Marriage       *
+ *		2020/11/19      add support for Manitoba Registrations          *
+ *		2020/11/25      add support for FindAGrave citations            *
  *																	    *
  *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/	
@@ -296,7 +296,7 @@ class Citation extends RecordPic
     const STYPE_MAREND				= 24;	// Marriage ended **added**
 
     /********************************************************************
-     *	IDIME points to Event Record tblER.ider								*
+     *	IDIME points to Event Record tblER.ider							*
      ********************************************************************/
     const STYPE_EVENT		        = 30;	// Individual Event
     const STYPE_MAREVENT	        = 31;	// Marriage Event
@@ -344,6 +344,12 @@ class Citation extends RecordPic
 				31	        => "Marriage Event",
 				40	        => "To Do",
 				100	        => "Temporary");
+
+	const SURETY_CONVINCING			= 4;   // Convincing Evidence
+	const SURETY_ALMOSTCERTAIN		= 3;   // Almost Certain Conclusion
+	const SURETY_PROBABLE			= 2;   // Probable Conclusion
+	const SURETY_MARGINAL			= 1;   // Marginal Evidence
+    const SURETY_UNDECIDED			= 0;   // Have not decided yet
 
     /********************************************************************
      *  Identify type of record containing event details				*
@@ -646,9 +652,9 @@ class Citation extends RecordPic
 						{		// new row
 						    $dbrow		= self::$initRow;
 						    if ($idsx > 0)
-							$warn	    .= "<p>Citation::_construct: " .
+							    $warn	.= "<p>Citation::_construct: " .
 			            					__LINE__ .
-	        							" record not found for $where</p>";
+	        							" record not found for $queryText</p>";
 						    $this->needInsert	= true;
 						}		// new row
 						// invoke constructor of base class
@@ -1991,7 +1997,7 @@ class Citation extends RecordPic
     }			// function Citation::toJson
 
     /********************************************************************
-     *  function Citation::toHtml										*
+     *  function Citation::toHTML										*
      *																	*
      *  Generate the HTML to display the contents of the citation		*
      *	to the viewer.													*`
@@ -2031,6 +2037,7 @@ class Citation extends RecordPic
 		switch($title)
 		{		        // act on selected sources
 		    case 'Birth Register, CA, Ontario':
+		    case 'Birth Register, Canada, Ontario':
             {			// use detail to build link
                 $id			    = 'sourceBirth$IDSX';
 				$yyyynnnnn	= preg_match('/^\s*([0-9]{4})-([0-9]+)\s*$/',
@@ -2067,7 +2074,30 @@ class Citation extends RecordPic
 				break;
 		    }	        // Ontario Birth Registration
 
+		    case 'Birth Register, CA, MB':
+		    case 'Birth Register, Canada, Manitoba':
+            {			// use detail to build link
+                $id			    = 'sourceBirthMB$IDSX';
+                $yyyynnnnn	    = preg_match(
+                                        '/^\s*([0-9]{4})[-,]([0-9]+)/',
+								        $detail,
+								        $matches);
+				if ($yyyynnnnn == 1)
+				{		// detail matches yyyy-nnnnn
+				    $regYear	= $matches[1];
+                    $regNum	    = $matches[2];
+                    $updates    = array('REGYEAR'   => $regYear,
+                                        'REGNUM'    => $regNum,
+                                        'LANG'      => $lang,
+                                        'DETAIL'    => $detail);
+				}		// detail matches yyyy-nnnnn
+                else
+                    $updates    = array('DETAIL'    => $detail);
+				break;
+            }	        // Manitoba Birth Registration
+
 		    case 'Marriage Register, CA, Ontario':
+		    case 'Marriage Register, Canada, Ontario':
 		    {	// use detail to build link
                 $id			    = 'sourceMarriage$IDSX';
 				$yyyynnnnn	= preg_match('/^\s*([0-9]{4})-([0-9]+)\s*$/',
@@ -2161,9 +2191,32 @@ class Citation extends RecordPic
 				else
                     $updates    = array('DETAIL'    => $detail);
 				break;
-		    }		// 'Marriage Register, CA, UC, District Registers':
+            }		// 'Marriage Register, CA, UC, District Registers':
+
+		    case 'Marriage Register, CA, Manitoba':
+		    case 'Marriage Register, Canada, Manitoba':
+            {			// use detail to build link
+                $id			    = 'sourceMarriageMB$IDSX';
+                $yyyynnnnn	    = preg_match(
+                                        '/^\s*([0-9]{4})[-,]([0-9]+)/',
+								        $detail,
+								        $matches);
+				if ($yyyynnnnn == 1)
+				{		// detail matches yyyy-nnnnn
+				    $regYear	= $matches[1];
+                    $regNum	    = $matches[2];
+                    $updates    = array('REGYEAR'   => $regYear,
+                                        'REGNUM'    => $regNum,
+                                        'LANG'      => $lang,
+                                        'DETAIL'    => $detail);
+				}		// detail matches yyyy-nnnnn
+                else
+                    $updates    = array('DETAIL'    => $detail);
+				break;
+            }	        // Manitoba Marriage Registration
 
 		    case 'Death Register, CA, Ontario':
+		    case 'Death Register, Canada, Ontario':
 		    {			// use detail to build link
                 $id			    = 'sourceDeath$IDSX';
 				$yyyynnnnn	= preg_match('/^\s*([0-9]{4})-([0-9]+)\s*$/',
@@ -2199,6 +2252,28 @@ class Citation extends RecordPic
                     $updates    = array('DETAIL'    => $detail);
 				break;
 		    }		// 'Death Register, CA, Ontario':
+
+		    case 'Death Register, CA, Manitoba':
+		    case 'Death Register, Canada, Manitoba':
+            {			// use detail to build link
+                $id			    = 'sourceMarriageMB$IDSX';
+                $yyyynnnnn	    = preg_match(
+                                        '/^\s*([0-9]{4})[-,]([0-9]+)/',
+								        $detail,
+								        $matches);
+				if ($yyyynnnnn == 1)
+				{		// detail matches yyyy-nnnnn
+				    $regYear	= $matches[1];
+                    $regNum	    = $matches[2];
+                    $updates    = array('REGYEAR'   => $regYear,
+                                        'REGNUM'    => $regNum,
+                                        'LANG'      => $lang,
+                                        'DETAIL'    => $detail);
+				}		// detail matches yyyy-nnnnn
+                else
+                    $updates    = array('DETAIL'    => $detail);
+				break;
+            }	        // Manitoba Death Registration
 
 		    case '1871 Census of Canada':
 		    case '1881 Census of Canada':
@@ -2355,8 +2430,26 @@ class Citation extends RecordPic
 				break;
 		    }		// 'Canada, Post Offices and Postmasters':
 
+		    case 'Find a Grave Website':
+		    {		// Find a Grave Website
+                $id			    = 'sourceFindAGrave$IDSX';
+				$count	        = preg_match('/[0-9]+/',
+							                 $detail,
+							                 $matches);
+				if ($count == 1)
+				{	// detail matches pattern
+				    $item		= $matches[0];
+                    $updates	= array('ITEM'      => $item,
+                                        'LANG'      => $lang,
+                                        'DETAIL'    => $detail);
+				}	// detail matches pattern
+				else
+                    $updates    = array('DETAIL'    => $detail);
+				break;
+		    }		// Find a Grave Website
+
 		    default:
-		    {	// does not match any interpreted pattern
+            {	// does not match any interpreted pattern
 				$matches	    = array();
 				$result	        = preg_match('#https?://\S*#', $detail, $matches);
 				if (substr($title,0,23) == 'Cemetery Transcription,')

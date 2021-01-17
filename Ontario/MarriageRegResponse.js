@@ -18,8 +18,9 @@
  *		2019/02/10      no longer need to call pageInit                 *
  *		2019/06/29      first parameter of displayDialog removed        *
  *		2020/12/08      pass lang selection to display detail script    *
+ *      2021/01/16      use XMLSerializer for diagnostic output         *
  *																		*
- *  Copyright &copy; 2020 James A. Cobban								*
+ *  Copyright &copy; 2021 James A. Cobban								*
  ************************************************************************/
 
 window.onload	= onLoad;
@@ -218,7 +219,8 @@ function gotDeleteReg(xmlDoc)
     else
     {
 		if (topXml && typeof(topXml) == "object")
-		    alert("MarriageRegResponse.js: gotDeleteReg: " + tagToString(topXml));
+		    alert("MarriageRegResponse.js: gotDeleteReg: " +
+                    new XMLSerializer().serializeToString(topXml));
 		else
 		    alert("MarriageRegResponse.js: gotDeleteReg: '" + xmlDoc + "'");
     }

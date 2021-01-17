@@ -13,21 +13,22 @@ use \Iterator;
  *																		*
  *	CREATE TABLE `MethodistBaptisms` (                                  *
  *		`IDMB`          INT(11) NOT NULL AUTO_INCREMENT,				*
- *		`Volume`        INT(11),										*
- *		`Page`          INT(11),										*
- *		`District`      VARCHAR(128),									*
- *		`Area`          VARCHAR(128),									*
- *		`GivenName`     VARCHAR(128),									*
- *		`Surname`       VARCHAR(128),									*
- *		`Father`        VARCHAR(128),									*
- *		`Mother`        VARCHAR(128),									*
- *		`Residence`     VARCHAR(128),									*
- *		`BirthPlace`    VARCHAR(128),									*
- *		`BirthDate`     VARCHAR(128),									*
- *		`BaptismDate`   VARCHAR(128),									*
- *		`BaptismPlace`  VARCHAR(128),									*
- *		`Minister`      VARCHAR(128),									*
- *		`IDIR`          INT(11),										*
+ *		`Volume`        INT(11) DEFAULT NULL,							*
+ *		`Page`          INT(11) DEFAULT NULL,							*
+ *		`District`      VARCHAR(128) DEFAULT NULL,						*
+ *		`Area`          VARCHAR(128) DEFAULT NULL,						*
+ *		`GivenName`     VARCHAR(128) DEFAULT NULL,						*
+ *		`Surname`       VARCHAR(128) DEFAULT NULL,						*
+ *		`SoundsLike`    CHAR(4) DEFAULT NULL,                           *
+ *		`Father`        VARCHAR(128) DEFAULT NULL,						*
+ *		`Mother`        VARCHAR(128) DEFAULT NULL,						*
+ *		`Residence`     VARCHAR(128) DEFAULT NULL,						*
+ *		`BirthPlace`    VARCHAR(128) DEFAULT NULL,						*
+ *		`BirthDate`     VARCHAR(128) DEFAULT NULL,						*
+ *		`BaptismDate`   VARCHAR(128) DEFAULT NULL,						*
+ *		`BaptismPlace`  VARCHAR(128) DEFAULT NULL,						*
+ *		`Minister`      VARCHAR(128) DEFAULT NULL,						*
+ *		`IDIR`          INT(11) DEFAULT 0,								*
  *      PRIMARY KEY (`IDMB`),											*
  *		KEY `Volume` (`Volume`),										*
  *		KEY `Page` (`Page`),											*
@@ -45,8 +46,9 @@ use \Iterator;
  *		2017/05/29		treat all string parameters to search as		*
  *						regular expressions.							*
  *		2017/12/18		add support for temporary fields				*
+ *		2021/01/11      add field SoundsLike                            *
  *																		*
- *  Copyright &copy; 2017 James A. Cobban								*
+ *  Copyright &copy; 2031 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/Record.inc';
 
@@ -75,6 +77,7 @@ class MethodistBaptism extends Record
 						'area'					=> '',
 						'givenname'				=> '',
 						'surname'				=> '',
+						'soundslike'			=> '',
 						'father'				=> '',
 						'mother'				=> '',
 						'residence'				=> '',
@@ -91,13 +94,13 @@ class MethodistBaptism extends Record
      *	Description of record class                                     *
      ********************************************************************/
     protected static	$info	= array(
-                'table'     => 'MethodistBaptisms',
-                'name'      => 'MethodistBaptisms',
-                'prime'	    => 'idmb',
-	            'srvmg'     => true,
-	            'fldcount'	=> 16,
-                'order'     => 'Volume, Page, IDMB',
-                'classname' => 'MethodistBaptism');
+                		'table'     		=> 'MethodistBaptisms',
+                		'name'      		=> 'MethodistBaptisms',
+                		'prime'	    		=> 'idmb',
+	            		'srvmg'     		=> true,
+	            		'fldcount'			=> 17,
+                		'order'     		=> 'Volume, Page, IDMB',
+                		'classname' 		=> 'MethodistBaptism');
 
     /********************************************************************
      *	MethodistBaptism::$translate									*
@@ -179,6 +182,7 @@ class MethodistBaptism extends Record
 						$this->msg  .= "MethodistBaptism::__construct: " .
 								        "query='$queryText', " .
 							            print_r($stmt->errorInfo(),true);
+			            $dbrow		= self::$initRow;
 				    }		// error performing query
 				}		    // initialize from database
 		    }		        // key and optional other parms
@@ -187,6 +191,8 @@ class MethodistBaptism extends Record
 		{		            // unexpected parameter type
 		    $this->msg      .= 'MethodistBaptism::__construct: called with ' .
 							    gettype($parms);
+			$dbrow		    = self::$initRow;
+			$needInsert		= true;
 		}		            // unexpected parameter type
 
 		// invoke constructor of base class
@@ -197,5 +203,6 @@ class MethodistBaptism extends Record
 		// diagnostic output if debug is set
 		$this->dump('MethodistBaptism Record constructed:');
     }		// MethodistBaptism::__construct
+
 }		// class MethodistBaptism 
 }		// not already declared

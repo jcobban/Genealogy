@@ -10,11 +10,12 @@
  *      2019/02/21      delete requested by setting name to 'Delete'    *
  *      2019/11/28      correct addition of row and fill defaults from  *
  *                      Census record                                   *
+ *      2021/01/16      use addEventListener                            *
  *                                                                      *
- *  Copyright &copy; 2019 James A. Cobban                               *
+ *  Copyright &copy; 2021 James A. Cobban                               *
  ************************************************************************/
 
-addEventHandler(window,'load',onLoad);
+window.addEventListener('load',onLoad);
 
 /************************************************************************
  *  function onLoad                                                     *
@@ -50,8 +51,8 @@ function onLoad()
             {       // switch on column name
                 case 'censusid':
                 {   // text fields
-                    addEventHandler(element,'change',changeId);
-                    addEventHandler(element,'keydown',tableKeyDown);
+                    element.addEventListener('change',changeId);
+                    element.addEventListener('keydown',tableKeyDown);
                     break;
                 }   // text fields
 
@@ -61,22 +62,22 @@ function onLoad()
                 case 'partof':
                 case 'provinces':
                 {   // text fields
-                    addEventHandler(element,'change',change);
-                    addEventHandler(element,'keydown',tableKeyDown);
+                    element.addEventListener('change',change);
+                    element.addEventListener('keydown',tableKeyDown);
                     break;
                 }   // text fields
 
                 case 'linesperpage':
                 {   // lines per page
                     element.checkfunc   = checkNumber;
-                    addEventHandler(element,'change',change);
-                    addEventHandler(element,'keydown',tableKeyDown);
+                    element.addEventListener('change',change);
+                    element.addEventListener('keydown',tableKeyDown);
                     break;
                 }   // lines per page
 
                 case 'delete':
                 {   // delete census
-                    addEventHandler(element,'click',deleteCensus);
+                    element.addEventListener('click',deleteCensus);
                     break;
                 }   // delete census
 
@@ -87,14 +88,14 @@ function onLoad()
 
                 case 'add':
                 {   // add census
-                    addEventHandler(element,'click',addCensus);
+                    element.addEventListener('click',addCensus);
                     break;
                 }   // add census
 
                 default:
                 {   // other fields
-                    addEventHandler(element,'change',change);
-                    addEventHandler(element,'keydown',tableKeyDown);
+                    element.addEventListener('change',change);
+                    element.addEventListener('keydown',tableKeyDown);
                     break;
                 }   // other fields
             }       // switch on column name
@@ -108,8 +109,8 @@ function onLoad()
     for(i = 0; i < tblHdrRow.cells.length; i++)
     {       // loop through all cells of header row
         var th                  = tblHdrRow.cells[i];
-        addEventHandler(th,'click',columnClick);    // left button click
-        addEventHandler(th,'contextmenu',columnWiden);  // right button click
+        th.addEventListener('click',columnClick);    // left button click
+        th.addEventListener('contextmenu',columnWiden);  // right button click
     }
 
 }       // function onLoad
@@ -183,10 +184,10 @@ function addCensus()
         input.id            = name;
         input.name          = name;
         if (col == 'CensusId')
-            addEventHandler(input,'change',changeId);
+            input.addEventListener('change',changeId);
         else
-            addEventHandler(input,'change',change);
-        addEventHandler(input,'keydown',tableKeyDown);
+            input.addEventListener('change',change);
+        input.addEventListener('keydown',tableKeyDown);
     }
     body.appendChild(newRow);
     document.getElementById('CensusId' + rowNum).focus();

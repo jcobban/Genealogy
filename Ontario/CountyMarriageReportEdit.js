@@ -14,8 +14,9 @@
  *		2018/10/30      use Node.textContent rather than getText        *
  *		2019/02/10      no longer need to call pageInit                 *
  *		2020/11/21      show Image moved to shared library              *
+ *      2021/01/16      use XMLSerializer for diagnostic output         *
  *																		*
- *  Copyright &copy; 2020 James A. Cobban								*
+ *  Copyright &copy; 2021 James A. Cobban								*
  ************************************************************************/
 
 window.onload	= onLoad;
@@ -205,7 +206,7 @@ function gotDeleteReport(xmlDoc)
 		var	root	= xmlDoc.documentElement;
 		if (debug != 'n')
 		    alert("CountyMarriageReportEdit.js: gotDeleteReport: " +
-	        	  tagToString(root));
+	        	  new XMLSerializer().serializeToString(root));
 
 		var	msgs	    = root.getElementsByTagName('msg');
 		if (msgs.length > 0)

@@ -376,9 +376,16 @@ try {
 } catch(error)
 {
     alert("Your Browser: " + navigator.userAgent +
-      " is non-standard in its implementation and many services may not work. " +
+      " does not support ECMA ES2015 and many services may not work. " +
       "Upgrade to Edge version 12 or later, or use ANY other browser. " +
       "Many scripts on this site will fail or report syntax or other errors. " + error.message);
+}
+
+if (!'addEventListener' in document)
+{
+    alert("Your Browser: " + navigator.userAgent +
+      " does not support html element method addEventListener and many services may not work. " +
+      "Upgrade to Edge version 12 or later, or use ANY other browser. ");
 }
 
 /************************************************************************
@@ -589,302 +596,6 @@ function addOption(select, text, value)
     newOption.value     = value;
     return newOption;
 }       //  function addOption
-
-/************************************************************************
- *  function createNamedElement                                         *
- *                                                                      *
- *  IE<9 does not permit modifying the name attribute of an input       *
- *  element after it is created.                                        *
- *                                                                      *
- *  Parameters:                                                         *
- *      type    the type of element to create                           *
- *      name    the name to set                                         *
- *                                                                      *
- *  Returns:                                                            *
- *      The new Input object                                            *
- *                                                                      *
- ************************************************************************/
-function createNamedElement(type, name)
-{
-    let element = null;
-    // Try the IE way; this fails on standards-compliant browsers
-    try {
-        element = document.createElement('<'+type+' name="'+name+'">');
-        return element;
-    } catch (e) {
-    }
-    if (!element || element.nodeName.toUpperCase() != type.toUpperCase()) {
-      // Non-IE browser; use canonical method to create named element
-      element       = document.createElement(type);
-      element.name  = name;
-    }
-    return element;
-}       //  createNamedElement
-
-/************************************************************************
- *  function getElt                                                     *
- *                                                                      *
- *  This method finds the first instance of a child element node        *
- *  that matches the supplied tag name.  The method searches            *
- *  recursively down the tree.                                          *
- *                                                                      *
- *  Parameters:                                                         *
- *      curent  the node within which to search for a child             *
- *      tagName the name of the tag to search for.  By convention       *
- *              HTML tag names are specified in upper case,             *
- *              but the function uses a case-insensitive comparison     *
- *                                                                      *
- *  Returns:                                                            *
- *      The matching element node or null.                              *
- ************************************************************************/
-function getElt(current, tagName)
-{
-    if (current === null)
-    {
-        console.trace();
-        throw new Error("util.js: getElt: parameter is null");
-    }
-    if (current.childNodes === undefined)
-        throw new Error("util.js: getElt: parameter is not a document element");
-    if (current)
-    {       // valid current
-        for (let i = 0; i < current.childNodes.length; i++)
-        {
-            let cNode   = current.childNodes[i];
-            if (cNode.nodeType == 1)
-            {       // element node
-                if (cNode.nodeName.toUpperCase() == tagName.toUpperCase())
-                    return cNode;
-                else
-                {   // search recursively
-                    let element = getElt(cNode, tagName);
-                    if (element)
-                        return element;
-                }   // search recursively
-            }       // element node
-        }       // loop through children of current
-    }       // valid current
-    else
-    {       // no parent
-        throw "util.js: getElt(" + current + ",'" + tagName + "')";
-    }       // no parent
-    return null;
-}       // function getElt
-
-/************************************************************************
- *  function getElts                                                    *
- *                                                                      *
- *  This method finds all of the instances of a child element node      *
- *  that matches the supplied tag name.  The method searches            *
- *  recursively down the tree.                                          *
- *                                                                      *
- *  Parameters:                                                         *
- *      curent  the node within which to search for children            *
- *      tagName the name of the tag to search for.  By convention       *
- *              HTML tag names are specified in upper case,             *
- *              but the function uses a case-insensitive comparison     *
- *      retval  existing array to add elements to if not null           *
- *                                                                      *
- *  Returns:                                                            *
- *      array of matching element nodes (which may be empty)            *
- ************************************************************************/
-function getElts(current, tagName, retval)
-{
-    if (current.childNodes === undefined)
-        throw "util.js: getElts: parameter is not a document element";
-    if (retval == null)
-        retval  = [];
-    if (current)
-    {       // valid current
-        for (let i = 0; i < current.childNodes.length; i++)
-        {
-            let cNode   = current.childNodes[i];
-            if (cNode.nodeType == 1)
-            {       // element node
-                if (cNode.nodeName.toUpperCase() == tagName.toUpperCase())
-                    retval.push(cNode);
-                else
-                {   // search recursively
-                    getElts(cNode, tagName, retval);
-                }   // search recursively
-            }       // element node
-        }       // loop through children of current
-    }       // valid current
-    else
-    {       // no parent
-        throw "util.js: getElts(" + current + ",'" + tagName + "')";
-    }       // no parent
-    return retval;
-}       // function getElts
-
-/************************************************************************
- *  String.trim                                                         *
- *                                                                      *
- *  Define trim as a method of String to remove leading and             *
- *  trailing spaces.  This is required because the trim method          *
- *  defined in EcmaSscript 5.1 is not supported in Internet Explorer    *
- *  prior to release 9.                                                 *
- ************************************************************************/
-if (!String.prototype.trim)
-    String.prototype.trim = function()
-    { return this.replace(/^\s+|\s+$/g, ''); };
-
-/************************************************************************
- *  function getText                                                    *
- *                                                                      *
- *  This method accumulates the text nodes under a specified node.      *
- *  deprecated, use Node.textContent                                    *
- *                                                                      *
- *  Parameters:                                                         *
- *      element     the parent node possibly containing text nodes      *
- *                  as children                                         *
- *                                                                      *
- *  Returns:                                                            *
- *      The accumulated text from the text nodes.                       *
- ************************************************************************/
-function getText(element)
-{
-    if (element.textContent)
-        return  element.textContent;
-
-    let     text    = "";
-    if (element.childNodes === undefined)
-        throw "util.js: getText: parameter is not a document element";
-    for (let j = 0; j < element.childNodes.length; ++j)
-    {
-        let sub = element.childNodes[j];
-        if ((sub.nodeType == 3) && (sub.nodeValue))
-        {       // text node
-            if (text.length > 0)
-                text    += " ";
-            text        += sub.nodeValue;
-        }       // concatenate all text elements
-    }       // loop through children of source node
-    return text.trim();
-}       // function getText
-
-/************************************************************************
- *  function copyChildren                                               *
- *                                                                      *
- *  This method copies all of the children of one node and adds         *
- *  them to another node.                                               *
- *                                                                      *
- *  Parameters:                                                         *
- *      fromNode        the node to copy from                           *
- *      toNode          the node to copy to                             *
- *                                                                      *
- ************************************************************************/
-function copyChildren(fromNode, toNode)
-{
-    for (let j = 0; j < fromNode.childNodes.length; ++j)
-    {
-        let sub = parent.childNodes[j];
-        let newNode = sub.cloneNode(true);
-        toNode.appendChild(newNode);
-    }
-}       // function copyChildren
-
-/************************************************************************
- *  function tagToString                                                *
- *                                                                      *
- *  Extract a the string representing the XML or HTML corresponding     *
- *  to the specified node and its children.                             *
- *                                                                      *
- *  Parameters:                                                         *
- *      node    the top of the tree of nodes to be interpreted          *
- *                                                                      *
- *  Returns:                                                            *
- *      String representation of the node and its children.             *
- ************************************************************************/
-function tagToString(node)
-{
-    if (node === null)
-        return "null";
-    else
-    if (node === undefined)
-        return "undefined";
-
-    // if the node is an instance of HTMLElement then we can use
-    // the outerHTML attribute
-    if (node.outerHTML)
-        return node.outerHTML;
-
-    // otherwise we have to iterate over all of the child nodes
-    let retval;
-    if (node.nodeType == 1)
-    {       // element
-        retval  = "<" + node.nodeName;
-    }
-    else
-    if (node.nodeType == 3)
-    {       // text
-    }
-    else
-    {
-        retval  = "<nodeType=" + node.nodeType;
-    }
-
-    if (node.attributes)
-    {
-        for (let i = 0; i < node.attributes.length; i++)
-        {
-            let attrname    = node.attributes[i].name;
-            if (attrname.substr(0,2) == "on")
-                continue;       // ignore event methods
-            if (attrname.substr(0,4) == "aria")
-                continue;       // ignore M$ aria attributes
-            let value   = node.attributes[i].value;
-            if (value.length > 32)
-                value   = value.substr(0,31) + "...";
-            retval  += " " + node.attributes[i].name + "=\'"
-                + value + "\'";
-        }
-    }
-
-    if (node.nodeType == 3)
-    {       // text node
-        if (node.nodeValue !== undefined)
-            retval += node.nodeValue.trim();
-    }       // text node
-    else
-    {       // not a text node
-        retval  += ">\n";
-
-        if (node.childNodes)
-        {
-            for (let i = 0; i < node.childNodes.length; i++)
-            {       // loop through childNOdes
-                let child   = node.childNodes[i];
-                if (child.nodeType == 1)
-                    retval  += tagToString(child);
-                else
-                if (child.nodeType == 3)
-                    if (child.nodeValue !== undefined)
-                        retval += child.nodeValue.trim();
-
-            }       // loop through childNodes
-        }       // node.childNodes exists
-
-        if (node.nodeValue)
-        {       // text
-            retval += "value=\"" + node.nodeValue.trim() + "\"\n";
-        }       // text
-    }       // not a text node
-
-    if (node.nodeType == 1)
-    {       // close element
-        retval  += "</" + node.nodeName + ">\n";
-    }       // close element
-    else
-    if (node.nodeType == 3)
-    {       // close text
-    }       // close text
-    else
-    {       // close other node type
-        retval  += "</nodeType=" + node.nodeType + ">\n";
-    }       // close other node type
-    return retval;
-}       // function tagToString
 
 /************************************************************************
  *  function show                                                       *
@@ -1287,110 +998,14 @@ function displayHelp(element)
 }       // function displayHelp
 
 /************************************************************************
- *  function setDefault                                                 *
- *                                                                      *
- *  A number of fields have their value defaulted                       *
- *                                                                      *
- *  Input:                                                              *
- *      fld     an input text element                                   *
- *      value   default value if the field is empty                     *
- ************************************************************************/
-function setDefault(fld, value)
-{
-    if (fld && fld.value.length == 0)
-        fld.value   = value;
-}       // function setDefault
-
-/************************************************************************
- *  function xmlencode                                                  *
- *                                                                      *
- *  Replace all characters that have a special meaning in XML           *
- *  with their associated symbols;                                      *
- *                                                                      *
- *  Input:                                                              *
- *      string  a string to be encoded                                  *
- *                                                                      *
- *  Returns:                                                            *
- *      string with all special characters encoded                      *
- ************************************************************************/
-function xmlencode(string) {
-    return string.replace(/\&/g,'&'+'amp;').replace(/</g,'&'+'lt;')
-        .replace(/>/g,'&'+'gt;').replace(/\'/g,'&'+'apos;').replace(/\"/g,'&'+'quot;');
-}
-
-function sizeToFit()
-{
-    // no operation
-}
-
-/************************************************************************
- *  function copyXmlToHtml                                              *
- *                                                                      *
- *  Copy the node tree under an XML node and add it                     *
- *  under an HTML node.                                                 *
- *                                                                      *
- *  Parameters:                                                         *
- *      xmlNode         XML node at top of tree                         *
- *      htmlNode        target HTML node                                *
- *                                                                      *
- *  Returns:                                                            *
- *      last node element inserted                                      *
- ************************************************************************/
-function copyXmlToHtml(xmlNode,
-                       htmlNode)
-{
-    let xmlOld;
-    let htmlNew;
-    let htmlElt = null;
-
-    for (xmlOld = xmlNode.firstChild; xmlOld; xmlOld = xmlOld.nextSibling)
-    {
-        switch(xmlOld.nodeType)
-        {
-            case 1: // Element
-            {
-                htmlElt = document.createElement(xmlOld.nodeName);
-                for (let i = 0; i < xmlOld.attributes.length; i++)
-                {   // loop through attributes
-                    let attr    = xmlOld.attributes[i];
-                    if (attr.name == 'onclick')
-                    {
-                        if (attr.value.substring(0,10) == "openSignon")
-                            htmlElt.onclick = openSignon;
-                        else
-                            htmlElt.onclick = openAccount;
-                    }       // onclick
-                    else
-                    if (attr.name == 'class')
-                        htmlElt.className   = attr.value;
-                    else
-                        htmlElt.setAttribute(attr.name, attr.value);
-                }   // loop through attributes
-                copyXmlToHtml(xmlOld, htmlElt);
-                htmlNode.appendChild(htmlElt);
-                break;
-            }       // Element
-
-            case 3: // Text
-            {
-                htmlNew = document.createTextNode(xmlOld.nodeValue);
-                htmlNode.appendChild(htmlNew);
-                break;
-            }       // Text
-
-        }       // switch on source node type
-    }           // loop through children of xmlOld
-
-    return htmlElt; // last element created at this level
-}       // function copyXmlToHtml
-
-/************************************************************************
  *  function openSignon                                                 *
  *                                                                      *
  *  This method is called to open the signon dialog if the user is not  *
- *  yet signed on.                                                      *
+ *  yet signed on and requests access to a family tree.                 *
+ *                                                                      *
+ *  Called by: FamilyTree/Names.js & Person.js                          *
  ************************************************************************/
-function openSignon(ev)
+function openSignon()
 {
     let server  = location.protocol + "//" +
                   location.hostname;
@@ -1413,41 +1028,13 @@ function openSignon(ev)
 }       // function openSignon
 
 /************************************************************************
- *  function openAccount                                                *
- *                                                                      *
- *  This method is called to open the account dialog if the user is     *
- *  already signed on.                                                  *
- ************************************************************************/
-function openAccount(ev)
-{
-    let server  = location.protocol + "//" +
-                  location.hostname;
-    if (location.port.length > 0)
-        server  += ":" + location.port;
-    if (location.pathname.substring(0,12) == "/jamescobban")
-        server  += "/jamescobban/";
-    else
-        server  += "/";
-    let lang    = 'en';
-    if ('lang' in args)
-    {
-        lang    = args['lang'];
-        if (lang == 'undefined')
-        {
-            lang    = 'en';
-        }
-    }
-    window.open(server + "Account.php?lang=" + lang);
-}       // function openAccount
-
-/************************************************************************
  *  function changeDiv                                                  *
  *                                                                      *
  *  This method is called when the user selects a new division.         *
  *  It is called by the scripts ReqUpdateXxxxx.js.                      *
  *                                                                      *
  *  Input:                                                              *
- *      divNode             an XML element containing information about *
+ *      divNode         an XML element containing information about     *
  *                      a division as retrieved from the database       *
  *                      table SubDistTable.                             *
  ************************************************************************/
@@ -1622,9 +1209,9 @@ function actMouseOverHelp(element)
     if (element === undefined)
         throw "util.js: actMouseOverHelp: element is undefined";
 
-    addEventHandler(element, 'mouseover',   eltMouseOver);
-    addEventHandler(element, 'mouseout',    eltMouseOut);
-    addEventHandler(element, 'click',       popupHelpHandler);
+    element.addEventListener('mouseover',   eltMouseOver);
+    element.addEventListener('mouseout',    eltMouseOut);
+    element.addEventListener('click',       popupHelpHandler);
 }       // function actMouseOverHelp
 
 /************************************************************************
@@ -1668,7 +1255,7 @@ function displayMenu(ev)
         previous.nextAnchor = anchor;
         anchor.prevAnchor   = previous;
         previous            = anchor;
-        addEventHandler(anchor, "keydown", keyDownMenu);
+        anchor.addEventListener("keydown", keyDownMenu);
     }           // loop through children
     menu.style.display          = 'block';
     menu.style.visibility       = 'visible';
@@ -1862,7 +1449,7 @@ function displayDialog(templateId,
 
         // do not permit mouse clicks in this dialog to
         // bubble up to the click handler on <body>
-        addEventHandler(dialog, 'click', stopProp);
+        dialog.addEventListener('click', stopProp);
 
         // show the dialog if not requested to defer this until dialog complete
         if (defer === undefined)
@@ -1882,63 +1469,6 @@ function displayDialog(templateId,
 }       // function displayDialog
 
 /************************************************************************
- *  function addEventHandler                                            *
- *                                                                      *
- *  This provides a portable interface for adding event handlers.       *
- *                                                                      *
- *  Input:                                                              *
- *      element     the HTML element                                    *
- *      type        string identifying the event type                   *
- *      handler     function                                            *
- ************************************************************************/
-function addEventHandler(element, type, handler)
-{
-    if (element.addEventListener)
-    {
-        element.addEventListener(type, handler, false);
-    }
-    else if (element.attachEvent)
-        element.attachEvent('on' + type, handler);
-    else
-    switch(type.toLowerCase())
-    {                   // incredibly ancient browser
-
-        case 'click':
-            element.onclick         = handler;
-            break;
-
-        case 'keydown':
-            element.onkeydown       = handler;
-            break;
-
-        case 'mouseover':
-            element.onmouseover     = handler;
-            break;
-
-        case 'mouseout':
-            element.onmouseout      = handler;
-            break;
-
-    }                   // incredibly ancient browser
-}       // function addEventHandler
-
-/************************************************************************
- *  function stopProp                                                   *
- *                                                                      *
- *  This onclick handler receives all mouse click events from the       *
- *  area of the dialog.  It prevents them from propagating through      *
- *  to the mouse click event handler on <body>.                         *
- *                                                                      *
- *  Input:                                                              *
- *      this        the HTML element                                    *
- ************************************************************************/
-function stopProp(ev)
-{
-    ev.stopPropagation();
-    return false;
-}       // function stopProp
-
-/************************************************************************
  *  function hideDialog                                                 *
  *                                                                      *
  *  This is the default onclick action for a button in a dialog.  It    *
@@ -1955,17 +1485,6 @@ function hideDialog(ev)
     dialogDiv           = null;
     return null;
 }       // function hideDialog
-
-/************************************************************************
- *  function dialogIsDisplayed                                          *
- *                                                                      *
- *  This function is used to determine whether or not there is          *
- *  currently a modal dialog popup displayed to the user.               *
- ************************************************************************/
-function dialogIsDisplayed()
-{
-    return dialogDiv?true:false;
-}       // function dialogIsDisplayed
 
 /************************************************************************
  *  function dialogMouseDown                                            *
@@ -2217,8 +1736,8 @@ function statusChangeCallback(response)
  *      event       instance of Event containing load event             *
  *      this        instance of Window                                  *
  ************************************************************************/
-addEventHandler(window, "load",     commonInit);
-addEventHandler(window, "resize",   commonResize);
+window.addEventListener("load",     commonInit);
+window.addEventListener("resize",   commonResize);
 
 function commonInit(event)
 {
@@ -2229,15 +1748,15 @@ function commonInit(event)
     x           = w.innerWidth || e.clientWidth || g.clientWidth,
     y           = w.innerHeight|| e.clientHeight|| g.clientHeight;
 
-    addEventHandler(document, "click", documentOnClick);
-    addEventHandler(document, "keydown", keyDownPaging);
+    document.addEventListener("click", documentOnClick);
+    document.addEventListener("keydown", keyDownPaging);
 
     // set onclick action for the menu button
     let menuButton          = document.getElementById('menuButton');
     let menuWidth           = 0
     if (menuButton)
     {
-        addEventHandler(menuButton,'click', displayMenu);
+        menuButton.addEventListener('click', displayMenu);
         menuWidth           = menuButton.offsetWidth;
     }
 
@@ -2245,7 +1764,7 @@ function commonInit(event)
     let logoWidth           = 0
     if (logo)
     {
-        addEventHandler(logo,'click', displayMenu);
+        logo.addEventListener('click', displayMenu);
         logoWidth           = logo.offsetWidth;
     }
 
@@ -2423,7 +1942,7 @@ function advertAbort(evt){
  *      event       instance of Event containing resize event           *
  *      this        instance of Window                                  *
  ************************************************************************/
-addEventHandler(window, "resize",   commonResize);
+window.addEventListener("resize",   commonResize);
 
 function commonResize(event)
 {
@@ -2532,7 +2051,7 @@ function commonResize(event)
  *                  event                                               *
  *      this        instance of Window                                  *
  ************************************************************************/
-addEventHandler(window, "orientationchange",   commonOrientation);
+window.addEventListener("orientationchange",   commonOrientation);
 
 function commonOrientation(ev)
 {
@@ -2559,7 +2078,7 @@ function commonOrientation(ev)
  *      event       instance of Event containing scroll event           *
  *      this        instance of Window                                  *
  ************************************************************************/
-addEventHandler(window, "scroll",   commonScroll);
+window.addEventListener("scroll",   commonScroll);
 var scrolling               = false;
 var lastScrollY             = 0;
 var lastScrollX             = 0
@@ -3422,13 +2941,14 @@ function closeFrame(lastChoice)
 /************************************************************************
  *  function showImage													*
  *																		*
- *  This function is called when the user clicks the ShowImage button	*
+ *  This function is called when the user clicks a show image button	*
  *  with the mouse or types Alt-I.										*
  *																		*
  *  Input:																*
  *		this			<button id='ShowImage'>							*
+ *		ev              instance of 'click' Event                       *
  ************************************************************************/
-function showImage()
+function showImage(ev)
 {
     let	form		    = this.form;
     if (form.Image)
@@ -3465,18 +2985,3 @@ function showImage()
     return false;
 }		// showImage
 
-/************************************************************************
- *  polyfill for CustomEvent                                            *
- *                                                                      *
- *  Simulate support for CustomEvent constructor on IE 9                *
- ************************************************************************/
-(function () {
-    function CustomEvent ( event, params ) {
-      params = params || { bubbles: false, cancelable: false, detail: null };
-      var evt = document.createEvent( 'CustomEvent' );
-      evt.initCustomEvent( event, params.bubbles, params.cancelable, params.detail );
-      return evt;
-    }
-
-    window.CustomEvent = CustomEvent;
-})();

@@ -860,6 +860,7 @@ class Person extends RecordPic
      *  Example:                                                        *
      *      $indiv      = new Person(); or                              *
      *      $indiv      = new Person(null); or                          *
+     *      $indiv      = new Person('new'); or                         *
      *      $indiv      = new Person(array());                          *
      *          Creates a new individual with all default values.       *
      *                                                                  *
@@ -874,7 +875,8 @@ class Person extends RecordPic
      *                                                                  *
      *      $indiv      = new Person(array('idir'       => 1234));      *
      *          Creates an instance from an existing record in the      *
-     *          database.  However it is more efficient to use:         *
+     *          database.  However it is more efficient to use          *
+     *          because it returns an existing entry if one exists.     *
      *      $indiv      = Person::getPerson($idir);                     *
      ********************************************************************/
     function __construct($parms     = null,
@@ -897,16 +899,14 @@ class Person extends RecordPic
         else
         if (is_bool($parms))
         {
-            if ($parms)
-                $parmText   = 'true';
-            else
-                $parmText   = 'false';
+            $parmText       = ($parms) ? 'true' : 'else';
             $this->msg      .= "Called with unsupported parameter boolean $parmText. ";
             $parms          = array();  // create new empty record
         }
         else
         if (is_string($parms))
         {
+            $parms          = htmlspecialchars($parms);
             $parmText       = "'$parms'";
             $parms          = array($fldNameLc => $parms);
         }
@@ -920,9 +920,14 @@ class Person extends RecordPic
         if ($parms instanceof Record)
         {
             $parmText       = 'class ' . get_class($parms) . 
-                                '(' . $parms->getName() . ')';
-            $parms          = array('idir' => $parms);
-            $usefldname     = false;
+                                    '(' . $parms->getName() . ')';
+            if ($parms instanceof Person)
+            {
+                $parms      = array('idir' => $parms);
+                $usefldname = false;
+            }
+            else
+                $this->msg      .= "Called with unsupported parameter $parmText. ";
         }
         else
         if (is_array($parms))
@@ -937,9 +942,20 @@ class Person extends RecordPic
                                     '(' . $value->getName() . ')';
                 else
                 if (is_string($value))
-                    $parmText   .= "$comma'$field'=>'$value'";
-                else 
+                    $parmText   .= "$comma'$field'=>'" .
+                                    htmlspecialchars($value) . "'";
+                else
+                if (is_null($value))
+                    $parmText   .= "$comma'$field'=>null";
+                else
+                if (is_bool($value))
+                    $parmText   .= "$comma'$field'=>" .
+                                    ($value) ? 'true' : 'false';
+                else
+                if (is_numeric($value))
                     $parmText   .= "$comma'$field'=>$value";
+                else 
+                    $parmText   .= "$comma'$field'=>" . print_r($value);
                 $comma          = ', ';
             }
             $parmText       .= ']';
@@ -1009,6 +1025,7 @@ class Person extends RecordPic
                         else
                         if (is_string($value))
                         {
+                            $value          = htmlspecialchars($value);
                             if (strtolower($value) == 'new')
                                 $idir           = 0;
                             else
@@ -1031,7 +1048,7 @@ class Person extends RecordPic
                     case 'userref':
                     {       // other unique keys
                         $where              .= "$and$field=:$fieldLc";
-                        $sqlParms[$fieldLc] = $value;
+                        $sqlParms[$fieldLc] = htmlspecialchars($value);
                         $and                = ' AND ';
                         break;
                     }       // other unique keys
@@ -1049,8 +1066,8 @@ class Person extends RecordPic
                 if ($stmt->execute($sqlParms))
                 {           // valid query
                     if ($debug)
-                        $warn               .= "<p>Person.inc: " . __LINE__ .
-                                                    " '$queryText'</p>\n";
+                        $warn               .= "<p>Person.inc: " .
+                                        __LINE__ . " '$queryText'</p>\n";
 
                     $result                 = $stmt->fetch(PDO::FETCH_ASSOC);
                     if (is_array($result))
@@ -1071,7 +1088,6 @@ class Person extends RecordPic
                 }           // valid query
                 else
                 {           // error performing query
-                    $warn   .= "<p>query='$queryText'</p>\n";
                     if (strlen($queryText) > 40)
                         $queryText  = substr($queryText, 0, 30) . '...' .
                                       substr($queryText, -7);

@@ -316,7 +316,6 @@ try {
     session_start();
     if (strlen($msg) == 0 && isset($_SESSION) && count($_SESSION) > 0)
     {                       // handle session variables
-        error_log("\$_SESSION=" . var_export($_SESSION,true) . "\n");
         foreach($_SESSION as $key => $value)
         {                   // loop through all session variables
             if ($key == 'userid')
@@ -345,7 +344,6 @@ try {
     // check cookies
     if (isset($_COOKIE) && count($_COOKIE) > 0)
     {                   // handle cookies
-	    error_log("\$_COOKIE=" . var_export($_COOKIE, true) . "\n");
 	    foreach($_COOKIE as $key => $value)
 	    {               // loop through all cookie variables
 	        switch(strtolower($key))
@@ -357,8 +355,16 @@ try {
 	                    $user       = new User(array('persistence' => $value));
 	                    if ($user->isExisting())
 	                        $userid = $user['username'];
-	                    else
-	                        $user   = null;
+                        else
+                        {
+                            error_log("common.inc: " . __LINE__ .
+                                        " \$_SESSION=" . 
+                                        var_export($_SESSION,true) . "\n");
+	                        error_log("common.inc: " . __LINE__ . 
+                                        " \$_COOKIE=" .
+                                        var_export($_COOKIE, true) . "\n");
+                            $user   = null;
+                        }
 	                }
 	                setcookie($key, $value,
 	                          [ 'expires'   => time() + 60*60*24*7, 

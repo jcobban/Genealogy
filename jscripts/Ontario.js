@@ -44,6 +44,7 @@
  *                      in place because it is language specific        *
  *      2018/10/30      use Node.textContent rather than getText        *
  *      2021/01/13      drop support of IE<11, use ES2015 syntax        *
+ *      2021/01/16      use XMLSerializer for diagnostic output         *
  *                                                                      *
  *  Copyright &copy; 2021 James A. Cobban                               *
  ************************************************************************/
@@ -323,7 +324,7 @@ function gotTownship(xmlDoc)
     if (debug != 'n')
     {
         if (xmlDoc)
-            alert('Ontario.js: noTownship: ' + tagToString(xmlDoc));
+            alert('Ontario.js: noTownship: ' + new XMLSerializer().serializeToString(xmlDoc));
         else
             alert('Ontario.js: noTownship: xmlDoc is null');
     }

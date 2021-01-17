@@ -19,8 +19,9 @@ use \Iterator;
  *      2019/03/29      make given name search slightly looser by       *
  *                      ignoring the last character in longer names     *
  *      2020/07/28      do surname REGEXP against tblNR                 *
+ *      2021/01/01      improve performance of surname searches         *
  *                                                                      *
- *  Copyright &copy; 2020 James A. Cobban                               *
+ *  Copyright &copy; 2021 James A. Cobban                               *
  ************************************************************************/
 require_once __NAMESPACE__ . '/RecordSet.inc';
 require_once __NAMESPACE__ . '/Person.inc';
@@ -199,16 +200,16 @@ class PersonSet extends RecordSet
             throw new Exception("PersonSet::getWhere:: parms=" .
                                 print_r($this->parms, true));
 
-        $where      = '';
-        $and        = 'WHERE ';
-        $or     = '';
-        $needRBracket   = false;
-        $loose      = false;
-        $incMarried = false;
-        $surname    = null;
-        $givennames = null;
-        $treename   = '';
-        $message    = '';
+        $where      			= '';
+        $and        			= 'WHERE ';
+        $or     			    = '';
+        $needRBracket   		= false;
+        $loose      			= false;
+        $incMarried 			= false;
+        $surname    			= null;
+        $givennames 			= null;
+        $treename   			= '';
+        $message    			= '';
 
         if (!is_array($this->sqlParms))
             $this->sqlParms     = array();
@@ -404,7 +405,7 @@ class PersonSet extends RecordSet
 
                     case 'givenname':
                     {       // given name
-                        $givennames = $value;
+                        $givennames         = $value;
                         break;
                     }       // given name field
 
@@ -776,14 +777,19 @@ class PersonSet extends RecordSet
                         }
                         else
                         {   // only surname supplied
-                            $where      .= $and . 'tblNX.Surname>=?';
-                            $this->sqlParms[]       = $surname;
                             if (is_string($lastsurname) &&
                                 strlen($lastsurname) > 0)
                             {       // limit search
+                                $where      .= $and . 'tblNX.Surname>=?';
+                                $this->sqlParms[]       = $surname;
                                 $where      .= ' AND tblNX.Surname<=?';
                                 $this->sqlParms[]   = $lastsurname;
                             }       // limit search
+                            else
+                            {
+                                $where      .= $and . 'tblNX.Surname=?';
+                                $this->sqlParms[]       = $surname;
+                            }
                         }   // only surname supplied
                     }       // starting surname contains at least one char
                     else
@@ -810,7 +816,7 @@ class PersonSet extends RecordSet
                         }
                         else
                         {   // only empty surname supplied
-                            $where  .= $and . " tblNX.Surname>=''";
+                            $where  .= $and . " tblNX.Surname=(SELECT MIN(Surname) from tblNR)";
                         }   // only empty surname supplied
                     }           // surname is empty
                     $givennames = null;
@@ -863,7 +869,7 @@ class PersonSet extends RecordSet
                         $this->sqlParms[]   = $surname;
                     }       // surname not empty string
                     else
-                        $where      .= "''";
+                        $where      .= "(SELECT MIN(Surname) FROM tblNR)";
                 }       // close comparison for names
             }           // surname is string
 
@@ -967,6 +973,12 @@ class PersonSet extends RecordSet
                 $this->sqlParms[]   = "[[:<:]]" . $nicknamepref;
             }       // string`
         }       // loose comparison
+        else
+        if (substr($givenName, 0, 2) == '>=')
+        {
+            $expression     = "tblNX.`GivenName`>=?";
+            $this->sqlParms[]   = substr($givenName,2);
+        }
         else
         {       // exact match
             $expression     = "tblNX.`GivenName`=?";

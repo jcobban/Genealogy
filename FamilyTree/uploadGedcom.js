@@ -8,8 +8,9 @@
  *  History:															*
  *		2018/11/28		created											*
  *		2019/02/10      no longer need to call pageInit                 *
+ *      2021/01/16      use XMLSerializer for diagnostic output         *
  *																		*
- *  Copyright &copy; 2019 James A. Cobban								*
+ *  Copyright &copy; 2021 James A. Cobban								*
  ************************************************************************/
 
 var reader      = null;         // instance of FileReader
@@ -212,11 +213,11 @@ function gotAdd(xmlDoc)
     {                               // valid XML
         var statusElt               = document.getElementById('status');
         var p                       = document.createElement("p");
-        p.innerHTML                 = tagToString(root).replace(/\&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+        p.innerHTML                 = new XMLSerializer().serializeToString(root).replace(/\&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
         statusElt.appendChild(p);
     }                               // valid XML
     else
-        alert("uploadGedcom: gotAdd: " + tagToString(xmlDoc));
+        alert("uploadGedcom: gotAdd: " + new XMLSerializer().serializeToString(xmlDoc));
 
     if (next < lines.length)
         getNextTag();               // process next tag

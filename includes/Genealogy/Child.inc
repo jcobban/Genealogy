@@ -150,8 +150,9 @@ use \Iterator;
  *                      move sealed to parents event in XML and JSON    *
  *                      output                                          *
  *		2019/12/19      replace xmlentities with htmlentities           *
+ *		2020/12/02      protect against XSS                             *
  *																		*
- *  Copyright &copy; 2019 James A. Cobban								*
+ *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/Record.inc';
 require_once __NAMESPACE__ . '/Person.inc';
@@ -349,7 +350,7 @@ class Child extends Record
         {
 		    $this->msg      .= "Child::__construct: " .
                                 "called with " . gettype($id) . ' ' .
-                                print_r($id, true) . '. ';
+                                htmlspecialchars(print_r($id, true)) . '. ';
             $parms          = array();
             $parmStr        = print_r($id, true);
         }
@@ -384,7 +385,9 @@ class Child extends Record
 				    }
 				    else
                         $warn	.= "<p>Child::__construct: " . __LINE__ .
-                " Field Name 'IDCR' value '$value' unsupported.</p>\n";
+                                    " Field Name 'IDCR' value '" .
+                                    htmlspecialchars($value) . 
+                                    "' unsupported.</p>\n";
 				    break;
 				}		                // IDCR identify specific instance
 
@@ -408,7 +411,10 @@ class Child extends Record
 				    }
 				    else
                         $warn	.= "<p>Child::__construct: " . __LINE__ .
-                " Field Name 'IDMR' value " . gettype($value) . "'$value' unsupported.</p>\n";
+                                    " Field Name 'IDMR' value " . 
+                                    gettype($value) . 
+                                    "'" . htmlspecialchars($value) . 
+                                    "' unsupported.</p>\n";
 				    break;
 				}		                // IDMR identify parents
 
@@ -433,7 +439,9 @@ class Child extends Record
                     else
                     {
                         $warn	.= "<p>Child::__construct: " . __LINE__ .
-                            " Field Name 'IDIR' value '$value' unsupported. </p>\n";
+                            " Field Name 'IDIR' value '" .
+                            htmlspecialchars($value) . 
+                            "' unsupported. </p>\n";
                         $warn	.= "<p>Child::__construct: " . __LINE__ .
                                     " parms=$parmStr</p>\n";
 			            $backtrace          = debug_backtrace();
@@ -689,8 +697,8 @@ class Child extends Record
             $newval <= CHILD::STATUS_ILLEGITIMATE)
 		    return parent::set('idcs',	$newval);
 		else
-            $msg        .= "Child::setStatus: " .
-						    "called with value='$newval'. ";
+            $msg        .= "Child::setStatus: called with value='" .
+                            htmlspecialchars($newval) . "'. ";
     }		// function Child::setStatus
 
     /********************************************************************
@@ -729,8 +737,8 @@ class Child extends Record
             $newval <= Child::RELATE_ILLEGITIMATE)
 		    return parent::set('idcpdad',	$newval);
 		else
-		    $msg        .= "Child::setCPRelDad: " .
-						    "called with value='$newval'. ";
+            $msg        .= "Child::setCPRelDad: called with value='" .
+                            htmlspecialchars($newval) . "'. ";
     }		// function Child::setCPRelDad
 
     /********************************************************************
@@ -769,8 +777,8 @@ class Child extends Record
             $newval <= Child::RELATE_ILLEGITIMATE)
 		    return parent::set('idcpmom',	$newval);
 		else
-		    $msg        .= "Child::setCPRelMom: " .
-						    "called with value='$newval'. ";
+            $msg        .= "Child::setCPRelMom: called with value='" .
+                            htmlspecialchars($newval) . "'. ";
     }		// function Child::setCPRelMom
 
     /********************************************************************
@@ -829,7 +837,8 @@ class Child extends Record
 				else
 				{	                // unexpected type
                     $msg        .= "Child::set: " . "invalid value type " . 
-                        gettype($newvalue) . ' ' . print_r($newvalue, true) .
+                        gettype($newvalue) . ' ' .
+                        htlmlspecialchars(print_r($newvalue, true)) .
                         " for field '$field'. ";
 				}	                // unexpected
 
@@ -849,9 +858,9 @@ class Child extends Record
 				}		            // valid valud
 				else
 				{		            // invalid value
-				    $msg        .= "Child::set: " .
-						            "invalid value '$newvalue'" .
-						            " for field name='$field'. ";
+                    $msg        .= "Child::set: invalid value '" .
+                                    htmlspecialchars($newvalue) .
+                                    "' for field name='$field'. ";
 				}		            // invalid value
 		    }		                // true/false flags
 

@@ -328,6 +328,71 @@ class Source extends RecordPic
     );
 
     /********************************************************************
+     *  Source::$sourceIndex                                            *
+     *                                                                  *
+     *  To save time if a specific record is requested more than once   *
+     *  during a process, maintain a table of Source records            *
+     *  indexed by IDSR value.                                          *
+     ********************************************************************/
+    protected static    $sourceIndex  = array();
+
+    /********************************************************************
+     *  Source::$sourceNames                                            *
+     *                                                                  *
+     *  To save time if a specific record is requested more than once   *
+     *  during a process, maintain a table of Source records            *
+     *  indexed by Source Name.                                         *
+     ********************************************************************/
+    protected static    $sourceNames  = array();
+
+    /********************************************************************
+     *  static function Source::getSource                               *
+     *                                                                  *
+     *  Factory method to get an existing entry or if there is none     *
+     *  create a new instance of the class Source using a key.          *
+     *                                                                  *
+     *  Input:                                                          *
+     *      $idsr       integer identifier of a source or               *
+     *                  source name                                     *
+     *                                                                  *
+     *  Returns:                                                        *
+     *      an instance of Source or null                               *
+     ********************************************************************/
+    static function getSource($idsr)
+    {
+        if (is_int($idsr) || ctype_digit($idsr))
+        {
+            if (array_key_exists($idsr, self::$sourceIndex))
+                $source       = self::$sourceIndex[$idsr];
+            else
+            {
+                $source       = new Source(array('idsr' => $idsr));
+                self::$sourceIndex[$idsr]   = $source;
+                $name                       = $source['srcname'];
+                self::$sourceNames[$name]   = $source;
+            }
+            return $source;
+        }
+        else
+        if (is_string($idsr))
+        {
+            $name               = $idsr;
+            if (array_key_exists($name, self::$sourceNames))
+                $source       = self::$sourceNames[$name];
+            else
+            {
+                $source       = new Source(array('source' => $name));
+                self::$sourceNames[$name]   = $source;
+                $idsr                       = $source['idsr'];
+                self::$sourceIndex[$idsr]   = $source;
+            }
+            return $source;
+        }
+        else
+            return null;
+    }           // static function Source::getSource
+
+    /********************************************************************
      *  function Source::__construct									*
      *																	*
      *  Given the identifier extract information about a source.		*
@@ -488,21 +553,21 @@ class Source extends RecordPic
 
 				// query the database
 				if ($stmt->execute($sqlParms))
-				{		    // successful
+				{		                // successful
 					$result		= $stmt->fetchAll(PDO::FETCH_ASSOC);
 					if ($debug)
 					    $warn	.= "<p>Source.inc: " . __LINE__ .
 									    "query='$queryText'</p>\n";
 
 				    if (count($result) > 0)
-				    {		// found source record
+				    {		            // found source record
 						$dbrow		        = $result[0];
 						$needInsert	        = false;
                  		// invoke constructor of base class
     		            parent::__construct($dbrow,
     						                'tblSR');
 						foreach($parms as $fldname => $value)
-						{		// initialize any other fields
+						{		        // initialize any other fields
 						    $fldnameLc		= strtolower($fldname);
             		    	if (array_key_exists($fieldLc, self::$translate))
 	            	    	    $fieldLc	= self::$translate[$fieldLc];
@@ -529,18 +594,28 @@ class Source extends RecordPic
 									"Invalid field name='$fldname'. ";
             					    break;
                                 }
-                            }           // check specific field names
-						}		        // initialize any other fields
-				    }		// found source record
+                            }       // check specific field names
+						}		    // initialize any other fields
+			            $idsr           = $this['idsr'];
+			            $name           = $this['srcname'];
+			            if ($idsr > 0)
+			            {               // have key
+			                if (!array_key_exists($idsr, self::$sourceIndex))
+			                {           // not already saved
+			                    self::$sourceIndex[$idsr]       = $this;
+			                    self::$sourceNames[$name]       = $this;
+			                }           // not already saved
+			            }               // have key
+				    }		            // found source record
 				    else
-				    {		// create a new record
+				    {		            // create a new record
 						// set defaults
 						$dbrow			    = self::$initRow;
 						$dbrow['enteredsd']	= $sdate;
 						$dbrow['enteredd']	= $ldate;
 
 						foreach($parms as $fldname => $value)
-						{		// initialize any other fields
+						{		        // initialize any other fields
 						    $fldnameLc		= strtolower($fldname);
             		    	if (array_key_exists($fieldLc, self::$translate))
 	            	    	    $fieldLc	= self::$translate[$fieldLc];
@@ -553,27 +628,28 @@ class Source extends RecordPic
 
                                 default:
                                 {
-						    if (array_key_exists($fldnameLc, $dbrow))
-								$dbrow[$fldnameLc]	= $value;
-						    else
-								$this->msg	.= "Source::__construct: " .
-									"Invalid field name='$fldname'. ";
+								    if (array_key_exists($fldnameLc, $dbrow))
+										$dbrow[$fldnameLc]	= $value;
+								    else
+                                        $this->msg	.= 
+                                            "Source::__construct: " .
+										"Invalid field name='$fldname'. ";
             					    break;
                                 }
                             }           // check specific field names
-						}		// initialize any other fields
+						}		        // initialize any other fields
 						$needInsert	= true;
-				    }		    // create new record
-				}		        // successful
+				    }		            // create new record
+				}		                // successful
 				else
-				{		        // error performing query
+				{		                // error performing query
 				    $this->msg  .= "Source::__construct: '$queryText', " .
 								print_r($stmt->errorInfo(),true);
 					$dbrow			    = self::$initRow;
-				}		        // error performing query
-		    }			        // search for existing record
+				}		                // error performing query
+		    }			                // search for existing record
 		    else
-		    {			        // no search parameters
+		    {			                // no search parameters
 				// set defaults
 				$dbrow			        = self::$initRow;
 				$dbrow['enteredsd']	    = $sdate;
@@ -769,8 +845,6 @@ class Source extends RecordPic
      *																	*
      *	Returns:														*
      *	    previous type												*
-     *																	*
-     *	Throws Exception on bad parameter.								*
      ********************************************************************/
     function setType($newType)
     {
@@ -868,6 +942,12 @@ class Source extends RecordPic
      ********************************************************************/
     function setName($newName)
     {
+        $oldName            = $this->row['srcname'];
+        if (array_key_exists($oldName, self::$sourceNames))
+        {
+            unset(self::$sourceNames[$oldName]);
+            self::$sourceNames[$newName]    = $this;
+        }
 		return parent::set('srcname', $newName);
     }		//	function Source::setName
 

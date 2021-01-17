@@ -28,8 +28,9 @@
  *		2019/05/19      call element.click to trigger button click      *
  *		2019/06/29      first parameter of displayDialog removed        *
  *		2020/02/17      hide right column                               *
+ *      2021/01/16      use XMLSerializer for diagnostic output         *
  *																		*
- *  Copyright &copy; 2020 James A. Cobban								*
+ *  Copyright &copy; 2021 James A. Cobban								*
  ************************************************************************/
 
 /************************************************************************
@@ -333,7 +334,7 @@ function gotDelete(xmlDoc)
     {		// error
 		var	msg	= "Error: ";
 		if (root && root.childNodes)
-		    msg	+= tagToString(root)
+		    msg	+= new XMLSerializer().serializeToString(root)
 		else
 		    msg	+= xmlDoc;
 		alert (msg);

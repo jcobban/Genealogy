@@ -376,7 +376,7 @@ function gotFamily(xmlDoc)
 		}		// format with enclosing information
 		if (root.tagName == 'tblMR' || root.tagName == 'family')
 		{		// correctly formatted response
-		    //alert("commonMarriage.js: gotFamily: root=" + tagToString(root));
+		    //alert("commonMarriage.js: gotFamily: root=" + new XMLSerializer().serializeToString(root));
 		    var	childTable	= document.getElementById('children');
 		    var	eventSet	= document.getElementById('EventSet');
 		    var	famForm		= document.famForm;
@@ -533,7 +533,7 @@ function gotFamily(xmlDoc)
 		    }		// loop through all first level children
 		}		// correctly formatted response
 		else
-		    popupAlert('commonMarriage.js: gotFamily: ' + tagToString(root),
+		    popupAlert('commonMarriage.js: gotFamily: ' + new XMLSerializer().serializeToString(root),
 						this);
     }		// XML document
     else
@@ -645,7 +645,7 @@ function addChildrenFromXml(node,
 				var msg	= "";
 				for(parm in parms) { msg += parm + "='" + parms[parm] + "',"; }
 				throw "commonMarriage.js: addChildrenFromXml: parms={" + msg +  
-						"} child=" + tagToString(child);
+						"} child=" + new XMLSerializer().serializeToString(child);
 		    }
     
 		    childTable.addChildToPage(parms,
@@ -873,11 +873,11 @@ function gotDelMarr(xmlDoc)
 		    }		            // no errors detected
 		    else
 		    {		            // report message
-				alert("commonMarriage.js: gotDelMarr: " + tagToString(msgs[0]));
+				alert("commonMarriage.js: gotDelMarr: " + new XMLSerializer().serializeToString(msgs[0]));
 		    }		            // report message
 		}		                // correctly formatted response
 		else
-		    alert("commonMarriage.js: gotDelMarr: " + tagToString(root));
+		    alert("commonMarriage.js: gotDelMarr: " + new XMLSerializer().serializeToString(root));
     }		                    // XML document
     else
 		alert("commonMarriage.js: gotDelMarr: " + xmlDoc);
@@ -1652,7 +1652,7 @@ function addNewChild()
     }
     else
 		alert("commonMarriage.js: addNewChild: row=" +
-				tagToString(row));
+				new XMLSerializer().serializeToString(row));
 }	// function addNewChild
 
 /************************************************************************
@@ -1944,7 +1944,7 @@ function gotUpdatedFamily(xmlDoc)
     }
     var	root		    		= xmlDoc.documentElement;
     if (debug.toLowerCase() == 'y')
-    	alert("gotUpdatedFamily: root=" + tagToString(root));
+    	alert("gotUpdatedFamily: root=" + new XMLSerializer().serializeToString(root));
     var idmr		    		= 0;
     var spsIdir		    		= 0;
     var fatherid	    		= 0;
@@ -1987,7 +1987,7 @@ function gotUpdatedFamily(xmlDoc)
 							value + ", " + updateMarriageParms);
 						var para	= document.getElementById('MarrButtonLine');
 						para.appendChild(document.createTextNode(
-		 tagToString(root).replace('/</g', '&lt;').replace('/>/g', '&lt;')));
+		 new XMLSerializer().serializeToString(root).replace('/</g', '&lt;').replace('/>/g', '&lt;')));
 						return;
 				    }		// error message
 
@@ -2054,7 +2054,7 @@ function gotUpdatedFamily(xmlDoc)
 		else
 		{	                // unexpected root node
 		    alert("commonMarriage.js: gotUpdatedFamily: Unexpected: " +
-				  tagToString(root) + ", " + updateMarriageParms);
+				  new XMLSerializer().serializeToString(root) + ", " + updateMarriageParms);
 		}	                // unexpected root node
     }		                // XML document
     else
@@ -2533,11 +2533,11 @@ function gotDelEvent(xmlDoc)
 		    }		// no errors detected
 		    else
 		    {		// report message
-				alert('commonMarriage.js: gotDelEvent: ' + tagToString(msgs[0]));
+				alert('commonMarriage.js: gotDelEvent: ' + new XMLSerializer().serializeToString(msgs[0]));
 		    }		// report message
 		}		// correctly formatted response
 		else
-		    alert('commonMarriage.js: gotDelEvent: ' + tagToString(root));
+		    alert('commonMarriage.js: gotDelEvent: ' + new XMLSerializer().serializeToString(root));
     }		// XML document
     else
 		alert('commonMarriage.js: gotDelEvent: ' + xmlDoc);
@@ -2756,7 +2756,7 @@ function gotAddChild(xmlDoc)
 		var	root	= xmlDoc.documentElement;
 		if (root.tagName == 'child')
 		{		// correctly formatted response
-		    // alert("commonMarriage.js: gotAddChild: root=" + tagToString(root));
+		    // alert("commonMarriage.js: gotAddChild: root=" + new XMLSerializer().serializeToString(root));
 		    var	parms		= getParmsFromXml(root);
 		    var childTable	= document.getElementById('children');
 		    childTable.addChildToPage(parms);

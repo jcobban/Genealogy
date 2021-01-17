@@ -20,8 +20,9 @@
  *		2018/10/30      use Node.textContent rather than getText        *
  *		2019/02/10      no longer need to call pageInit                 *
  *		2019/06/29      first parameter of displayDialog removed        *
+ *      2021/01/16      use XMLSerializer for diagnostic output         *
  *																		*
- *  Copyright &copy; 2019 James A. Cobban								*
+ *  Copyright &copy; 2021 James A. Cobban								*
  ************************************************************************/
 
 window.onload	= onLoad;
@@ -159,7 +160,7 @@ function linkToTree()
  ************************************************************************/
 function gotIdir(xmlDoc)
 {
-    //alert("CensusForm.js: gotIdir: xmlDoc=" + tagToString(xmlDoc));
+    //alert("CensusForm.js: gotIdir: xmlDoc=" + new XMLSerializer().serializeToString(xmlDoc));
     var	rootNode	= xmlDoc.documentElement;
     var	buttonId	= rootNode.getAttribute("buttonId");
     var	button		= document.getElementById(buttonId);
@@ -168,7 +169,7 @@ function gotIdir(xmlDoc)
 		var	msgDiv	= document.getElementById('msgDiv');
 		hide(msgDiv);
 		alert("CensusForm.js: gotIdir: unable to find element with id='" +
-			buttonId + "' rootNode=" + tagToString(rootNode));
+			buttonId + "' rootNode=" + new XMLSerializer().serializeToString(rootNode));
 		return;
     }
 
@@ -675,7 +676,7 @@ function gotDelete(xmlDoc)
     else
     {			// xmlDoc is defined
 		var	root	= xmlDoc.documentElement;
-		alert("gotDelete: " + tagToString(root));
+		alert("gotDelete: " + new XMLSerializer().serializeToString(root));
 		var	parms	= root.getElementsByTagName('parms');
 		if (parms.length > 0)
 		{		// have at least 1 parms element

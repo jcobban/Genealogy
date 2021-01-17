@@ -17,8 +17,9 @@
  *		2018/10/30      use Node.textContent rather than getText        *
  *		2019/02/10      no longer need to call pageInit                 *
  *		2019/04/11      use common table pagination                     *
+ *      2021/01/16      use XMLSerializer for diagnostic output         *
  *																		*
- *  Copyright &copy; 2019 James A. Cobban								*
+ *  Copyright &copy; 2021 James A. Cobban								*
  ************************************************************************/
 
 window.onload	= onLoadUsers;
@@ -182,7 +183,7 @@ function gotReset(xmlDoc)
     {
 		if (debug.toLowerCase() == 'y')
 		{
-		    alert("Users.js:gotReset: xmlDoc=" + tagToString(root));
+		    alert("Users.js:gotReset: xmlDoc=" + new XMLSerializer().serializeToString(root));
 		}
 
 		var username	        = '';
@@ -221,7 +222,7 @@ function gotReset(xmlDoc)
     {		// error
 		var	msg	= "Error: ";
 		if (root && root.childNodes)
-		    msg	+= tagToString(root)
+		    msg	+= new XMLSerializer().serializeToString(root)
 		else
 		    msg	+= xmlDoc;
 		alert ("Users.js: gotReset: "  + msg);
@@ -281,7 +282,7 @@ function gotConfirm(xmlDoc)
     {		// error
 		var	msg	= "Error: ";
 		if (root && root.childNodes)
-		    msg	+= tagToString(root)
+		    msg	+= new XMLSerializer().serializeToString(root)
 		else
 		    msg	+= xmlDoc;
 		alert ("Users.js: gotConfirm: "  + msg);

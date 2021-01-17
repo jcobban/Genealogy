@@ -60,8 +60,9 @@
  *		2019/06/08      pass language to Pages form                     *
  *		2020/05/03      correct addition of new enumeration division    *
  *		2020/10/10      support numeric subdistrict ids for 1851,1861   *
+ *      2021/01/16      use XMLSerializer for diagnostic output         *
  *																		*
- *  Copyright &copy; 2020 James A. Cobban								*
+ *  Copyright &copy; 2021 James A. Cobban								*
  ************************************************************************/
 var lang    = 'en';
 if ('lang' in args)
@@ -926,7 +927,7 @@ function gotDel(xmlDoc)
 		    }		// loop through all children
 		}		// correctly formatted response
 		else
-		    alert("SubDistForm.js: gotDel: xmlDoc=" + tagToString(root));
+		    alert("SubDistForm.js: gotDel: xmlDoc=" + new XMLSerializer().serializeToString(root));
     }		// XML document
     else	// not an XML document
 		alert("SubDistForm.js: gotDel: xmlDoc=" + xmlDoc);

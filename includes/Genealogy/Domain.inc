@@ -182,7 +182,10 @@ class Domain extends Record
                             if (is_string($value) && strlen($value) == 2)
                                 $cc 	        = strtoupper($value);
                             else
+                            {
+                                $value          = htmlspecialchars($value);
                                 $this->msg      .= "Invalid CountryCode='$value'. ";
+                            }
                             break;
                         }		// countrycode
 

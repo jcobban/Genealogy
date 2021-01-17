@@ -137,8 +137,9 @@ use Templating\TemplateTag;
  *		2019/07/18      use Person::getPerson                           *
  *		2019/07/21      use Location::getLocation                       *
  *		2019/12/19      replace xmlentities with htmlentities           *
+ *		2020/12/06      support getLastSqlCmd method                    *
  *																		*
- *  Copyright &copy; 2019 James A. Cobban								*
+ *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/	
 require_once __NAMESPACE__ . '/Record.inc';
 require_once __NAMESPACE__ . '/LegacyDate.inc';
@@ -417,6 +418,7 @@ class Picture extends Record
 		    $queryText		    = debugPrepQuery($query, $sqlParms);
 		    if ($stmt->execute($sqlParms))
             {		// success
+                $this->lastSqlCmd   = $queryText;
                 if ($debug)
 				    $warn		.= "<p>Picture::__construct: " .
 					    		      "'$queryText'</p>\n";
@@ -454,6 +456,7 @@ class Picture extends Record
 		    $queryText	            = debugPrepQuery($query, $sqlParms);
 		    if ($stmt->execute($sqlParms))
 		    {		// success
+                $this->lastSqlCmd   = $queryText;
 				if ($debug)
 				    print "<p>Picture::__construct: '$queryText'</p>\n";
 
@@ -746,6 +749,7 @@ class Picture extends Record
 		    $queryText	= debugPrepQuery($query, $sqlParms);
 		    if ($stmt->execute($sqlParms))
 		    {		// success
+                $this->lastSqlCmd   = $queryText;
 				$bprow		= $stmt->fetch(PDO::FETCH_ASSOC);
 				if ($bprow)
 				    $website	= $bprow['picpath'];
@@ -851,6 +855,7 @@ class Picture extends Record
 		    $queryText	= debugPrepQuery($query, $sqlParms);
 		    if ($stmt->execute($sqlParms))
 		    {		// success
+                $this->lastSqlCmd   = $queryText;
 				$bprow		= $stmt->fetch(PDO::FETCH_ASSOC);
 				if ($bprow)
 				    $website	= $bprow['picpath'];
@@ -946,6 +951,7 @@ class Picture extends Record
 		$queryText	= debugPrepQuery($query, $sqlParms);
 		if ($stmt->execute($sqlParms))
 		{		// success
+            $this->lastSqlCmd   = $queryText;
 		    $ctrow			= $stmt->fetch(PDO::FETCH_NUM);
 		    $count			= $ctrow[0];
 		    $sqlParms['neworder']	= $neworder;
@@ -975,6 +981,7 @@ class Picture extends Record
 				$reorderText	= debugPrepQuery($reorder, $sqlParms);
 				if ($stmt->execute($sqlParms))
 				{		// success
+                    $this->lastSqlCmd   = $reorderText;
 				    parent::set('picorder', $neworder);
 				    $this->save(false);
 				    return $oldorder;
@@ -1061,6 +1068,7 @@ print "<p>Picture.inc: " . __LINE__ . "path='$path', filename='$filename'</p>\n"
 				$queryText	= debugPrepQuery($query, $sqlParms);
 				if ($stmt->execute($sqlParms))
 				{		// success
+                    $this->lastSqlCmd   = $queryText;
 				    $result		= $stmt->fetch(PDO::FETCH_NUM);
 				    if (is_array($result))
 				    {		// matched existing website
@@ -1075,16 +1083,18 @@ print "<p>Picture.inc: " . __LINE__ . "path='$path', filename='$filename'</p>\n"
 						$insertText	= debugPrepQuery($insert, $sqlParms);
 						if ($stmt->execute($sqlParms))
 						{		// success
-						    $count		= $stmt->rowCount();
+                            $this->lastSqlCmd   = $insertText;
+                            $count		= $stmt->rowCount();
+                            $this->lastSqlCmd   = $insertText;
 						    if ($count == 1)
 						    {		// record inserted
-							$IDBP	= $connection->lastInsertId();
+							    $IDBP	= $connection->lastInsertId();
 						    }		// record inserted
 						    else
 						    {
-							throw new Exception("Picture::splitUrl: '" .
-									    $insertText . "', " .
-									    "inserted $count records");
+							    throw new Exception("Picture::splitUrl: '" .
+								    	    $insertText . "', " .
+									        "inserted $count records");
 						    }
 						}		// success
 						else
@@ -1292,6 +1302,7 @@ print "<p>Picture.inc: " . __LINE__ . "path='$path', filename='$filename'</p>\n"
 		    $clearText	= debugPrepQuery($clear, $sqlParms);
 		    if ($stmt->execute($sqlParms))
 		    {		// success
+                $this->lastSqlCmd   = $clearText;
 				return parent::set('picpref', 1);
 		    }		// success
 		    else
@@ -1622,7 +1633,7 @@ print "<p>Picture.inc: " . __LINE__ . "path='$path', filename='$filename'</p>\n"
 		if (is_string($xml))
 		{		// string tag name
 		    $tagname	= $xml;
-		    $xml	= true;
+		    $xml	    = true;
 		}		// string tag name
 		else
 		if ($xml)
@@ -1642,16 +1653,17 @@ print "<p>Picture.inc: " . __LINE__ . "path='$path', filename='$filename'</p>\n"
 		if ($idbppic > 0)
 		{		// if required update tblBP
 		    $update	= 'UPDATE tblBP SET Used=0 ' . 
-							'WHERE IDBP=:idbppic AND ' .
+						'WHERE IDBP=:idbppic AND ' .
 								'NOT EXISTS (SELECT * FROM tblBR ' .
-							'WHERE IDBPPic=:idbppic OR IDBPSound=:idbppic)';
+						'WHERE IDBPPic=:idbppic OR IDBPSound=:idbppic)';
 		    $sqlParms	= array('idbppic', $idbppic);
 
 		    // query the database
-		    $stmt	= $connection->prepare($update);
+		    $stmt	    = $connection->prepare($update);
 		    $updateText	= debugPrepQuery($update, $sqlParms);
 		    if ($stmt->execute($sqlParms))
 		    {		// success
+                $this->lastSqlCmd   .= $updateText;
 				$result		= $stmt->rowCount();
 				if ($xml && $result > 0)
 				    print "<$tagname result='$result'>$updateText</$tagname>\n";
@@ -1667,16 +1679,17 @@ print "<p>Picture.inc: " . __LINE__ . "path='$path', filename='$filename'</p>\n"
 		if ($idbpsound > 0)
 		{		// if required update tblBP
 		    $update	= 'UPDATE tblBP SET Used=0 ' .
-							'WHERE IDBP=:idbpsound AND ' .
+					'WHERE IDBP=:idbpsound AND ' .
 							'NOT EXISTS (SELECT * FROM tblBR ' .
-						'WHERE IDBPPic=:idbpsound OR IDBPSound=:idbpsound)';
+					'WHERE IDBPPic=:idbpsound OR IDBPSound=:idbpsound)';
 		    $sqlParms	= array('idbpsound'	=> $idbpsound);
 
 		    // query the database
-		    $stmt	= $connection->prepare($update);
+		    $stmt	    = $connection->prepare($update);
 		    $updateText	= debugPrepQuery($update, $sqlParms);
 		    if ($stmt->execute($sqlParms))
 		    {		// success
+                $this->lastSqlCmd   .= $updateText;
 				$result		= $stmt->rowCount();
 				if ($xml && $result > 0)
 				    print "<$tagname result='$result'>$updateText</$tagname>\n";

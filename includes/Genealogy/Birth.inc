@@ -94,6 +94,7 @@ use \Iterator;
  *		2019/04/18      support method getLastSqlCmd                    *
  *		2019/06/12      improve validation of values assigned to Dates  *
  *		2019/12/13      remove B_ prefix from file names                *
+ *		2020/12/02      protect against XSS                             *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
@@ -362,7 +363,8 @@ class Birth extends Record
 		    }		                // valid domain
 		    else
 				$this->msg		.= "Birth::__construct: " .
-						"Domain '$domain' must be a supported two character country code followed by a 2 or 3 character character state or province code. ";
+                "Domain '" . htmlspecialchars($domain) . 
+                "' must be a supported two character country code followed by a 2 or 3 character character state or province code. ";
 
 		    // determine common ending of default addresses
 		    $addrEnd	                    = ", $pc, $cc";
@@ -370,14 +372,20 @@ class Birth extends Record
 		    if (is_string($year) && ctype_digit($year))
 				$year	                    = (int)$year;
 		    else
-		    if (!is_int($year) || $year < 1800 || $year > 2100)
-				$this->msg		.= "Birth::__construct: registration year '$year' must be a numeric year. ";
+            if (!is_int($year) || $year < 1800 || $year > 2100)
+            {
+                $year           = htmlspecialchars($yes);
+                $this->msg		.= "Birth::__construct: registration year '$year' must be a numeric year. ";
+            }
 		    
 		    if (is_string($number) && ctype_digit($number))
 				$number	                    = (int)$number;
 		    else
 		    if (!is_int($number) || $number < 1)
-				$this->msg		.= "Birth::__construct: registration number '$number' must be a positive integer. ";
+            {
+                $number         = htmlspecialchars($number);
+                $this->msg		.= "Birth::__construct: registration number '$number' must be a positive integer. ";
+            }
 
 		    // search for an existing record matching the key
 		    $query	            = "SELECT * FROM Births 

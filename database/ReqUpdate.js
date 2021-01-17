@@ -21,8 +21,9 @@
  *      2018/10/30      use Node.textContent rather than getText        *
  *      2019/02/10      no longer need to call pageInit                 *
  *      2020/05/02      use addEventListener and dispatchEvent          *
+ *      2021/01/16      use XMLSerializer for diagnostic output         *
  *                                                                      *
- *  Copyright &copy; 2020 James A. Cobban                               *
+ *  Copyright &copy; 2021 James A. Cobban                               *
  ************************************************************************/
 
     window.onload   = loadDistricts;
@@ -47,17 +48,17 @@
  ************************************************************************/
 function loadDistricts()
 {
-    var provSelect  = null;
+    let provSelect  = null;
 
     // activate functionality for individual input elements
-    for(var i = 0; i < document.forms.length; i++)
+    for(let i = 0; i < document.forms.length; i++)
     {
-        var form    = document.forms[i];
-        for(var j = 0; j < form.elements.length; j++)
+        let form    = document.forms[i];
+        for(let j = 0; j < form.elements.length; j++)
         {
-            var element = form.elements[j];
+            let element = form.elements[j];
 
-            var name    = element.name;
+            let name    = element.name;
             if (name === undefined || name.length == 0)
                 name    = element.id;
 
@@ -65,7 +66,7 @@ function loadDistricts()
             {                       // act on specific input element
                 case 'Province':
                 {
-                    var provSelect      = element;
+                    let provSelect      = element;
                     element.addEventListener('change', provChanged);
                     break;
                 }                   // Province
@@ -105,8 +106,8 @@ function loadDistricts()
     }                               // loop through all forms
 
     // act on parameters
-    var provCode    = args["province"];
-    var censusYear  = census.substring(2) - 0;
+    let provCode    = args["province"];
+    let censusYear  = census.substring(2) - 0;
     if (provCode === undefined && censusYear < 1867)
         provCode    = census.substring(0,2);
 
@@ -160,7 +161,7 @@ function doSubmit()
  ************************************************************************/
 function showStatus()
 {
-    var form    = this.form;
+    let form    = this.form;
     window.location = 'CensusUpdateStatus.php?Census=' + census;
     return false;
 }       // function showStatus
@@ -176,12 +177,12 @@ function showStatus()
  ************************************************************************/
 function provChanged()
 {
-    var form        = this.form;
-    var provSelect  = this;
-    var optIndex    = provSelect.selectedIndex;
+    let form        = this.form;
+    let provSelect  = this;
+    let optIndex    = provSelect.selectedIndex;
     if (optIndex == -1)
         return; // nothing to do
-    var optVal  = provSelect.options[optIndex].value;
+    let optVal  = provSelect.options[optIndex].value;
     loadDistsProv(provSelect, 
                   optVal);      // limit the districts selection
 }
@@ -199,7 +200,7 @@ function provChanged()
 function loadDistsProv(provSelect, 
                     prov)
 {
-    var form    = provSelect.form;
+    let form    = provSelect.form;
     // get the subdistrict information file
     HTTP.getXML("CensusGetDistricts.php?Census=" + census + 
                             "&Province=" + prov,
@@ -218,7 +219,7 @@ function loadDistsProv(provSelect,
  ************************************************************************/
 function gotDistFile(xmlDoc)
 {
-    var distSelect  = document.distForm.District;
+    let distSelect  = document.distForm.District;
     distSelect.options.length   = 0;    // clear the list
 
     // create a new HTML Option object representing
@@ -227,22 +228,22 @@ function gotDistFile(xmlDoc)
 
     try {
     // get the list of districts from the XML file
-    var newOptions  = xmlDoc.getElementsByTagName("option");
+    let newOptions  = xmlDoc.getElementsByTagName("option");
 
     // add the options to the Select
-    for (var i = 0; i < newOptions.length; ++i)
+    for (let i = 0; i < newOptions.length; ++i)
     {
         // get the source "option" node
         // note that although this has the same contents and appearance as an
         // HTML "option" statement, it is an XML Element object, not an HTML
         // Option object.
-        var node    = newOptions[i];
+        let node    = newOptions[i];
 
         // get the text value to display to the user
-        var text    = node.textContent;
+        let text    = node.textContent;
 
         // get the "value" attribute
-        var value   = node.getAttribute("value");
+        let value   = node.getAttribute("value");
         if ((value == null) || (value.length == 0))
         {       // cover our ass
             value       = text;
@@ -258,7 +259,7 @@ function gotDistFile(xmlDoc)
     catch(e)
     {
         if (xmlDoc.documentElement)
-            alert("gotSubDist: " + tagToString(xmlDoc.documentElement) + e);
+            alert("gotSubDist: " + new XMLSerializer().serializeToString(xmlDoc.documentElement) + e);
         else
             alert("gotSubDist: " + xmlDoc + e);
     }
@@ -278,18 +279,18 @@ function gotDistFile(xmlDoc)
  ************************************************************************/
 function setDist()
 {
-    var newDistCode = args["district"];
+    let newDistCode = args["district"];
     if (newDistCode === undefined)
         return true;
 
-    var distSelect  = document.distForm.District;
-    var distOpts    = distSelect.options;
-    for(var i = 0; i < distOpts.length; i++)
+    let distSelect  = document.distForm.District;
+    let distOpts    = distSelect.options;
+    for(let i = 0; i < distOpts.length; i++)
     {
         if (distOpts[i].value == newDistCode)
         {                   // found matching entry
             distSelect.selectedIndex    = i;
-            var evt                 = new Event('change',{'bubbles':true});
+            let evt                 = new Event('change',{'bubbles':true});
             distSelect.dispatchEvent(evt);
             return false;
         }                   // found matching entry
@@ -306,17 +307,17 @@ function setDist()
  ************************************************************************/
 function noDistFile()
 {
-    var form        = document.distForm;
-    var distSelect  = form.District;
+    let form        = document.distForm;
+    let distSelect  = form.District;
     distSelect.options.length   = 0;    // clear the selection
-    var tdNode      = document.getElementById("msgCell");
+    let tdNode      = document.getElementById("msgCell");
     while (tdNode.hasChildNodes())
            tdNode.removeChild(tdNode.firstChild);
-    var spanElt = document.createElement("span");
+    let spanElt = document.createElement("span");
     spanElt.setAttribute("class", "label");
     spanElt.className   = "label";
     tdNode.appendChild(spanElt);
-    var msg = document.createTextNode(
+    let msg = document.createTextNode(
         "Census summary \"CensusGetDistricts.php?Census=" + census +
                     "\" failed");
     spanElt.appendChild(msg);
@@ -334,16 +335,16 @@ function noDistFile()
 function districtChanged()
 {
     // identify the selected district
-    var distSelect  = this;
-    var form        = this.form;
-    var optIndex    = distSelect.selectedIndex;
+    let distSelect  = this;
+    let form        = this.form;
+    let optIndex    = distSelect.selectedIndex;
     if (optIndex == -1)
         optIndex    = 0;        // default to first entry
-    var optVal      = distSelect.options[optIndex].value;
+    let optVal      = distSelect.options[optIndex].value;
 
     // identify the file containing subdistrict information for
     // the selected district
-    var subFileName = "CensusGetSubDists.php?Census=" + census +
+    let subFileName = "CensusGetSubDists.php?Census=" + census +
                             "&District=" + optVal;
     
     // get the subdistrict information file
@@ -364,7 +365,7 @@ function districtChanged()
  ************************************************************************/
 function gotSubDist(xmlDoc)
 {
-    var subdistSelect       = document.distForm.SubDistrict;
+    let subdistSelect       = document.distForm.SubDistrict;
     subdistSelect.options.length    = 0;    // clear the options
     addOption(subdistSelect,
               "All Sub-Districts",
@@ -372,21 +373,21 @@ function gotSubDist(xmlDoc)
 
     try {
         // get the list of subdistricts to select from
-        var newOptions      = xmlDoc.getElementsByTagName("option");
+        let newOptions      = xmlDoc.getElementsByTagName("option");
 
-        for (var i = 0; i < newOptions.length; ++i)
+        for (let i = 0; i < newOptions.length; ++i)
         {
             // get the source "option" node
             // note that although this has the same contents and appearance as
             // an HTML "option" statement, it is an XML Element object,
             // not an HTML Option object.
-            var node    = newOptions[i];
+            let node    = newOptions[i];
     
             // get the text value to display to the user
-            var text    = node.textContent;
+            let text    = node.textContent;
     
             // get the "value" attribute
-            var value   = node.getAttribute("value");
+            let value   = node.getAttribute("value");
             if ((value == null) || (value.length == 0))
             {       // cover our ass
                 value       = text;
@@ -394,7 +395,7 @@ function gotSubDist(xmlDoc)
     
             // create a new HTML Option object and add it
             text += " [subdist " + value + "]";
-            var newOption   = addOption(subdistSelect,
+            let newOption   = addOption(subdistSelect,
                                 text,
                                 value);
             // make the additional information in the XML Option
@@ -402,7 +403,7 @@ function gotSubDist(xmlDoc)
             // appearance of the HTML Option
             newOption.xmlOption = node;
     
-            var tdNode      = document.getElementById("divCell");
+            let tdNode      = document.getElementById("divCell");
             while (tdNode.hasChildNodes())
                     tdNode.removeChild(tdNode.firstChild);
         }           // loop through source "option" nodes
@@ -413,7 +414,8 @@ function gotSubDist(xmlDoc)
     catch(e)
     {
         if (xmlDoc.documentElement)
-            alert("gotSubDist: " + tagToString(xmlDoc.documentElement));
+            alert("gotSubDist: " +
+                    new XMLSerializer().serializeToString(xmlDoc.documentElement));
         else
             alert("gotSubDist: " + xmlDoc);
     }       // function catch
@@ -427,32 +429,32 @@ function gotSubDist(xmlDoc)
  ************************************************************************/
 function setSubDist()
 {
-    var newSubDistCode      = args["subdistrict"];
+    let newSubDistCode      = args["subdistrict"];
     if (newSubDistCode === undefined)
         return true;
 
-    var subDistSelect       = document.distForm.SubDistrict;
-    var distOpts            = subDistSelect.options;
-    for(var i = 0; i < distOpts.length; i++)
+    let subDistSelect       = document.distForm.SubDistrict;
+    let distOpts            = subDistSelect.options;
+    for(let i = 0; i < distOpts.length; i++)
     {
         if (distOpts[i].value == newSubDistCode)
         {               // found matching entry
             subDistSelect.selectedIndex = i;
-            var evt         = new Event('change',{'bubbles':true});
+            let evt         = new Event('change',{'bubbles':true});
             subDistSelect.dispatchEvent(evt);
             break;
         }               // found matching entry
     }                   // search for subDistrict to select
 
     // select specific division
-    var newDivCode          = args["division"];
+    let newDivCode          = args["division"];
     if (newDivCode !== undefined)
     {                   // Division identifier supplied
-        var divSelect       = document.distForm.Division;
+        let divSelect       = document.distForm.Division;
         if (divSelect !== undefined)
         {               // SubDistrict has a Division select
-            var divOpts     = divSelect.options;
-            for(var i = 0; i < divOpts.length; i++)
+            let divOpts     = divSelect.options;
+            for(let i = 0; i < divOpts.length; i++)
             {
                 if (divOpts[i].value == newDivCode)
                 {       // found matching entry
@@ -465,10 +467,10 @@ function setSubDist()
     }                   // Division identifier supplied
 
     // select specific Page
-    var newPageCode = args["page"];
+    let newPageCode = args["page"];
     if (newPageCode !== undefined)
     {                   // Page identifier supplied
-        var pageSelect      = document.distForm.Page;
+        let pageSelect      = document.distForm.Page;
         if (pageSelect !== undefined)
         {               // Division has a Page select
             // first entry (index = 0) is for page 1
@@ -486,16 +488,16 @@ function setSubDist()
  ************************************************************************/
 function noSubDist()
 {
-    var subdistSelect   = document.distForm.SubDistrict;
+    let subdistSelect   = document.distForm.SubDistrict;
     subdistSelect.options.length    = 0;    // clear the options
-    var tdNode      = document.getElementById("divCell");
+    let tdNode      = document.getElementById("divCell");
     while (tdNode.hasChildNodes())
         tdNode.removeChild(tdNode.firstChild);
-    var spanElt = document.createElement("span");
+    let spanElt = document.createElement("span");
     spanElt.setAttribute("class", "label");
     spanElt.className   = "label";
     tdNode.appendChild(spanElt);
-    var msg = document.createTextNode("No subdistricts defined yet");
+    let msg = document.createTextNode("No subdistricts defined yet");
     spanElt.appendChild(msg);
 }
 
@@ -511,28 +513,28 @@ function noSubDist()
 function subDistChanged()
 {
     // locate cell to display response in
-    var tdNode      = document.getElementById("divCell");
+    let tdNode      = document.getElementById("divCell");
     
     // identify the selected district
-    var subDistSelect   = document.distForm.SubDistrict;
-    var optIndex    = subDistSelect.selectedIndex;
+    let subDistSelect   = document.distForm.SubDistrict;
+    let optIndex    = subDistSelect.selectedIndex;
     if (optIndex == -1)
         optIndex    = 0;        // default to first entry
-    var optElt  = subDistSelect.options[optIndex];
-    var optVal  = optElt.value;
+    let optElt  = subDistSelect.options[optIndex];
+    let optVal  = optElt.value;
     
     // remove any existing HTML from this cell
     while (tdNode.hasChildNodes())
                 tdNode.removeChild(tdNode.firstChild);
 
     // determine how many divisions there are in selected subdist
-    var xmlOpt      = optElt.xmlOption;
-    var divCt       = 0;
-    var firstDiv;
+    let xmlOpt      = optElt.xmlOption;
+    let divCt       = 0;
+    let firstDiv;
 
-    for (var i = 0; i < xmlOpt.childNodes.length; i++)
+    for (let i = 0; i < xmlOpt.childNodes.length; i++)
     {
-        var cNode   = xmlOpt.childNodes[i];
+        let cNode   = xmlOpt.childNodes[i];
         if ((cNode.nodeType == 1) && (cNode.nodeName == "div"))
         {
             if (!firstDiv)
@@ -543,18 +545,18 @@ function subDistChanged()
 
     if (divCt > 1)
     {   // add selections based upon information from XML response
-        var select      = tdNode.appendChild(document.createElement("select"));
+        let select      = tdNode.appendChild(document.createElement("select"));
         select.name     = "Division";
         select.size     = 1;
         select.addEventListener('change', divSelected);
 
-        for (var i = 0; i < xmlOpt.childNodes.length; i++)
+        for (let i = 0; i < xmlOpt.childNodes.length; i++)
         {
-            var cNode   = xmlOpt.childNodes[i];
+            let cNode   = xmlOpt.childNodes[i];
             if ((cNode.nodeType == 1) && (cNode.nodeName == "div"))
             {
-                var ident   = cNode.getAttribute("id");
-                var newOpt  = addOption(select,
+                let ident   = cNode.getAttribute("id");
+                let newOpt  = addOption(select,
                                 "division " + ident,
                                 ident);
                 newOpt.xmlNode  = cNode;
@@ -579,6 +581,6 @@ function subDistChanged()
  ************************************************************************/  
 function divSelected(evt)
 {
-    var select  = this;
+    let select  = this;
     changeDiv(select.options[select.selectedIndex].xmlNode);
 }       // function divSelected

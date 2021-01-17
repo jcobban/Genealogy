@@ -72,6 +72,7 @@ use \Exception;
  *		2019/01/19      report constructor errors through message       *
  *		2019/12/19      replace xmlentities with htmlentities           *
  *		2020/03/27      do not throw exception from constructor         *
+ *		2020/12/01      add backtrace to parameter error message        *
  *																		*
  *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
@@ -327,9 +328,16 @@ class District extends Record
 							{	    // syntax valid
 							    $distId		= $value;
 	                        }	    // syntax valid
-							else
+                            else
+                            {
 							    $this->msg  .="District::__construct: " . __LINE__ .
-	                                " Invalid District ID value '$value'. ";
+                                    " Invalid District ID value '$value'. ";
+                                $trace  = debug_backtrace();
+                                foreach($trace as $entry)
+                                {
+                                    $this->msg  .= ", " . $entry['file'] . ":" . $entry['line'];
+                                }
+                            }
                         }
 						break;
 				    }               // district identifier

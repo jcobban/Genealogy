@@ -138,8 +138,6 @@ class County extends Record
      *							with administrative domain				*
      *																	*
      *	Returns object containing a description of a county				*
-     *																	*
-     *	Throws Exception if unable to complete function					*
      ********************************************************************/
     function __construct($parms,
 						 $code	= null)
@@ -351,7 +349,6 @@ class County extends Record
 		// diagnostic output if debug is set
         $this->dump('County Record constructed:');
 
-        $msg                .= $this->msg;
     }		// function County::__construct
 
     /********************************************************************

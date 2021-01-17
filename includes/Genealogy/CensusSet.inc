@@ -13,8 +13,9 @@ use \Iterator;
  *  History:															*
  *		2017/10/16		created											*
  *		2019/01/06      move to namespace Genealogy                     *
+ *		2020/12/02      protect against XSS                             *
  *																		*
- *  Copyright &copy; 2017 James A. Cobban								*
+ *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/RecordSet.inc' ;
 require_once __NAMESPACE__ . '/Census.inc' ;
@@ -124,7 +125,8 @@ class CensusSet extends RecordSet
 				    }		// list of censuses
 				    else
 						$warn	.= "<p>Invalid `$fldname` value '" .
-								print_r($value,true) . "'.</p>\n";
+                            htmlspecialchars(print_r($value,true)) . 
+                            "'.</p>\n";
 				    break;
 				}		// census identifier
 
@@ -183,7 +185,8 @@ class CensusSet extends RecordSet
 				    }		// pattern match
 				    else
 						$warn	.= "<p>CensusSet::getWhere: " .
-							   "Invalid `$fldname` value '$value'.</p>\n";
+                        "Invalid `$fldname` value '" .
+                        htmlspecialchars($value) . "'.</p>\n";
 				    break;
 				}		// state search by pattern
 

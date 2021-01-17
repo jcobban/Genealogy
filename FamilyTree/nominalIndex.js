@@ -59,6 +59,7 @@
  *      2020/05/10      use addEventListener                            *
  *                      hideRightColumn                                 *
  *      2021/01/01      improve performance of surname searches         *
+ *      2021/01/16      use addEventListener                            *
  *                                                                      *
  *  Copyright &copy; 2021 James A. Cobban                               *
  ************************************************************************/
@@ -83,8 +84,8 @@ var loadcnt = 0;
  *                                                                      *
  *  Define the function to be called once the web page is loaded.       *
  ************************************************************************/
-addEventHandler(window, 'load',     onLoad);
-addEventHandler(window, 'resize',   onResize);
+window.addEventListener('load',     onLoad);
+window.addEventListener('resize',   onResize);
 
 /************************************************************************
  *  function onLoad                                                     *

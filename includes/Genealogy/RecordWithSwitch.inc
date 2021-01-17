@@ -1309,6 +1309,10 @@ class Record implements Iterator, ArrayAccess
         global  $msg;
         global  $connection;
 
+        $warn   .= "<p>Record::save called for table={$this->table}</p>\n";
+        $msg    .= "<p>Record::save called for table={$this->table}</p>\n";
+        error_log("Record::save called for table={$this->table}\n");
+        throw new Exception("Record::save called for table={$this->table}");
         // get current date and time for added and updated fields in record
         $now                = getdate();
         $today              = $now['year'] * 10000 +
@@ -1397,57 +1401,81 @@ class Record implements Iterator, ArrayAccess
             }
             foreach($this->row as $fld => $value)
             {
-                if ($fld == 'added')
-                {   // date added
-                    $fldnames       .= "$comma`$fld`";
-                    $values         .= "$comma:$fld";
-                    $parms[$fld]    = $today;
-                    $comma          = ', ';
-                }   // date added
-                else
-                if ($fld == 'addedtime')
-                {   // time added
-                    $fldnames       .= "$comma`$fld`";
-                    $values         .= "$comma:$fld";
-                    $parms[$fld]    = $currtime;
-                    $comma          = ', ';
-                }   // time added
-                else
-                if ($fld == 'updated')
-                {   // date updated
-                    $fldnames       .= "$comma`$fld`";
-                    $values         .= "$comma:$fld";
-                    $parms[$fld]    = $today;
-                    $comma          = ', ';
-                }   // date updated
-                else
-                if ($fld == 'updatedtime')
-                {   // time updated
-                    $fldnames       .= "$comma`$fld`";
-                    $values         .= "$comma:$fld";
-                    $parms[$fld]    = $currtime;
-                    $comma          = ', ';
-                }   // time updated
-                else
-                if (substr($fld,-7) == 'soundex')
-                {   // soundex updated
-                    $fldnames       .= "$comma`$fld`";
-                    $values         .= $comma .  "LEFT(SOUNDEX(:" .
-                                       substr($fld,0,strlen($fld)-7) . "),4)";
-                    $comma          = ', ';
-                }   // soundex updated
-                else
-                if (is_string($prime) && $fld == $prime && $srvmg)
-                {   // let SQL server manage field value
-                }   // let SQL server manage field value
-                else
-                {   // other fields
-                    $fldnames       .= "$comma`$fld`";
-                    $values         .= "$comma:$fld";
-                    $parms[$fld]    = $value;
-                    $comma          = ', ';
-                }   // other fields
-            }       // loop through all fields in record
+                error_log("Record::save: ".__LINE__." table={$this->table}, fld=$fld.\n");
+                switch($fld)
+                {
+	                case 'added':
+	                {   // date added
+	                    $fldnames       .= "$comma`$fld`";
+	                    $values         .= "$comma:$fld";
+	                    $parms[$fld]    = $today;
+	                    $comma          = ', ';
+                        break;
+	                }   // date added
+	
+	                case 'addedtime':
+	                {   // time added
+	                    $fldnames       .= "$comma`$fld`";
+	                    $values         .= "$comma:$fld";
+	                    $parms[$fld]    = $currtime;
+	                    $comma          = ', ';
+                        break;
+	                }   // time added
+	
+	                case 'updated':
+	                {   // date updated
+	                    $fldnames       .= "$comma`$fld`";
+	                    $values         .= "$comma:$fld";
+	                    $parms[$fld]    = $today;
+	                    $comma          = ', ';
+                        break;
+	                }   // date updated
+	
+	                case 'updatedtime':
+	                {   // time updated
+	                    $fldnames       .= "$comma`$fld`";
+	                    $values         .= "$comma:$fld";
+	                    $parms[$fld]    = $currtime;
+                        $comma          = ', ';
+                        break;
+	                }   // time updated
+
+                    case 'soundslike':
+                    {
+	                    $fldnames       .= "$comma`$fld`";
+                        $values         .= $comma .  
+                                            "LEFT(SOUNDEX(`Surname`),4)" .
+                        $comma          = ', ';
+                        break;
+                    }
+
+	                default:
+                    {
+		                if (substr($fld,-7) == 'soundex')
+                        {       // soundex updated
+		                    $fldnames       .= "$comma`$fld`";
+	                        $srcfld         = substr($fld,0,strlen($fld)-7);
+                            $values         .= $comma . 
+                                        "LEFT(SOUNDEX(`$srcfld`),4)";
+		                    $comma          = ', ';
+		                }       // soundex updated
+		                else
+		                if (is_string($prime) && $fld == $prime && $srvmg)
+		                {       // let SQL server manage field value
+		                }       // let SQL server manage field value
+		                else
+		                {       // other fields
+		                    $fldnames       .= "$comma`$fld`";
+		                    $values         .= "$comma:$fld";
+		                    $parms[$fld]    = $value;
+		                    $comma          = ', ';
+                        }       // other fields
+                error_log("Record::save: ".__LINE__." returning 0.\n");
+        return 0;
+                        break;
+                    }           // default
+                }               // switch
+            }                   // loop through all fields in record
 
             $insert                 = "INSERT INTO $table ($fldnames) " .
                                         "VALUES($values)";
@@ -1455,14 +1483,14 @@ class Record implements Iterator, ArrayAccess
             $insertText             = debugPrepQuery($insert, $parms);
             $this->lastSqlCmd       = $insertText;
             if ($stmt->execute($parms))
-            {       // successful
+            {               // successful
                 $count              = $stmt->rowCount();
                 if ($xml)
-                {       // XML output
+                {           // XML output
                     print "$indent<$tagname$xmlparms count='$count'>\n" .
                             "$indent\t$insertText\n" .
                             "$indent</$tagname>\n";
-                }       // XML output
+                }           // XML output
 
                 if ($debug)
                     $warn           .= "<p>$insertText</p>\n";
@@ -1472,7 +1500,7 @@ class Record implements Iterator, ArrayAccess
                 // value is set by the server
                 $primKey            = $count;
                 if ($srvmg)
-                {       // get value of prime key assigned by server
+                {           // get value of prime key assigned by server
                     if (is_string($this->prime) && strlen($this->prime) > 0)
                     {       // get value of prime key
                         $primKey    = $connection->lastInsertId();
@@ -1482,7 +1510,7 @@ class Record implements Iterator, ArrayAccess
                               "</$tagname>\n";
                         $this->row[$this->prime]    = $primKey;
                     }       // get value of prime key
-                }       // get value of prime key assigned by server
+                }           // get value of prime key assigned by server
 
                 // log the update
                 logSqlUpdate($insert,
@@ -1490,63 +1518,82 @@ class Record implements Iterator, ArrayAccess
                              $primKey,
                              '',
                              $this->toJson(false));
-            }       // successful
+            }               // successful
             else
-            {       // error inserting record
+            {               // error inserting record
                 $msg    .= htmlspecialchars($insertText) . ": " .
                            print_r($stmt->errorInfo(), true);
                 return false;
-            }       // error inserting record
-        }       // create new record
+            }               // error inserting record
+        }                   // create new record
         else
-        {       // update existing record
+        {                   // update existing record
             $set        = '';
             $comma      = '';
             $parms      = array();
             foreach($this->changed as $fld => $value)
-            {       // loop through all modified fields in record
-
-                if ($fld ==  'added')
-                {   // date added cannot change
-                }   // date added cannot change
-                if ($fld ==  'addedtime')
-                {   // time added cannot change
-                }   // time added cannot change
-                if ($fld ==  'updated')
-                {   // date updated
-                    $set            .= $comma .
-                                "`$fld`=DATE_FORMAT(CURDATE(),'%Y%m%d')";
-                    $comma          = ', ';
-                }   // date updated
-                if ($fld ==  'updatedtime')
-                {   // time updated
-                    $set            .= $comma . "`$fld`=CURTIME()";
-                    $comma          = ', ';
-                }   // time updated
-                else
-                if (substr($fld, -7) == 'surname')
-                {   // surname updated
-                    $set            .= $comma . "`$fld`=:$fld";
-                    $parms[$fld]    = $value;
-                    $comma          = ', ';
-                    if (array_key_exists($fld . 'soundex', $this->row))
-                        $set        .= $comma .
-                        "`{$fld}soundex`=LEFT(SOUNDEX(:$fld), 4)";
-                    else
-                        $set        .= $comma .
-                                   "`SoundsLike`=LEFT(SOUNDEX(:$fld), 4)";
-                }   // surname updated
-                else
-                if (substr($fld, -7) == 'soundex')
-                {   // soundex updated as part of surname change
-                }   // soundex updated as part of surname change
-                else
-                {   // other fields
-                    $set            .= $comma . "`$fld`=:$fld";
-                    $parms[$fld]    = $value;
-                    $comma          = ', ';
-                }   // other fields
-            }       // loop through all modified fields in record
+            {               // loop through all modified fields in record
+                switch($fld)
+                {
+	                case 'added':
+	                case 'addedtime':
+	                {           // time added cannot change
+	                    break;
+	                }           // time added cannot change
+	
+	                case 'updated':
+	                {           // date updated
+	                    $set            .= $comma .
+	                            "`$fld`=DATE_FORMAT(CURDATE(),'%Y%m%d')";
+	                    $comma          = ', ';
+	                    break;
+	                }           // date updated
+	
+	                case 'updatedtime':
+	                {           // time updated
+	                    $set            .= $comma . "`$fld`=CURTIME()";
+	                    $comma          = ', ';
+	                    break;
+	                }           // time updated
+	
+	                case 'soundslike':
+                    {           // surname soundex updated
+                        // ignore value supplied and build from Surname
+	                    $set            .= $comma . 
+	                            "`$fld`=LEFT(SOUNDEX(`Surname`), 4)";
+	                    $comma          = ', ';
+	                    break;
+	                }           // surname soundex updated
+	
+	                default:
+	                {
+		                if (substr($fld, -7) == 'surname')
+		                {       // surname updated
+		                    $set            .= $comma . "`$fld`=:$fld";
+		                    $parms[$fld]    = $value;
+                            $comma          = ', ';
+                            $soundex        = $fld . 'soundex';
+		                    if (array_key_exists($soundex, $this->row))
+		                        $set        .= $comma .
+		                            "`$soundex`=LEFT(SOUNDEX(:$fld), 4)";
+		                    else
+		                        $set        .= $comma .
+		                            "`SoundsLike`=LEFT(SOUNDEX(:$fld), 4)";
+		                }       // surname updated
+		                else
+		                if (substr($fld, -7) == 'soundex')
+		                {       // soundex updated by surname change
+		                }       // soundex updated by surname change
+		                else
+		                {       // other fields
+		                    $set            .= $comma . "`$fld`=:$fld";
+		                    $parms[$fld]    = $value;
+		                    $comma          = ', ';
+                        }       // other fields
+                        break;
+	                }           // default
+                }           // switch
+            }               // loop through all modified fields in record
 
             // if there are any changed fields, update the database
             if (strlen($set) > 0)
@@ -1606,13 +1653,13 @@ class Record implements Iterator, ArrayAccess
                                print_r($stmt->errorInfo(),true) . ". ";
                     return false;
                 }       // error updating record
-            }       // at least one field modified
+            }           // at least one field modified
             else
             {
                 $count              = 0;    // nothing changed
                 $this->lastSqlCmd   = '';
             }
-        }       // update existing record
+        }               // update existing record
 
         // all changes have been applied
         $this->changed  = array();  // reset

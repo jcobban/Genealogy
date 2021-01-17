@@ -8,15 +8,30 @@ use \Iterator;
 /************************************************************************
  *  Page.inc                                                            *
  *                                                                      *
- *  Definition of a class representing a single page from a census.     *
- *  This class provides                                                 *
- *  access to the information in a row of the table Pages.              *
+ *  Implementation of a class representing a single page from a census. *
+ *  This class provides access to the information in a row              *
+ *  of the table Pages.                                                 *
+ *                                                                      *
+ *  CREATE TABLE `Pages` (				                                *
+ *		`Census`        VARCHAR(6) NOT NULL DEFAULT 'CA1881',			*
+ *		`DistId`        DECIMAL(4,1) NOT NULL,				            *
+ *		`SdId`          VARCHAR(5) NOT NULL,				            *
+ *		`Div`           VARCHAR(4) NOT NULL DEFAULT '',				    *
+ *		`Sched`         CHAR(1) NOT NULL DEFAULT '1',				    *
+ *		`PageNum`       INT(4) NOT NULL DEFAULT '1',				    *
+ *		`Population`    INT(2) DEFAULT '25',				            *
+ *		`Image`         VARCHAR(255) DEFAULT '',				        *
+ *		`Transcriber`   VARCHAR(64) DEFAULT '',				            *
+ *		`ProofReader`   VARCHAR(64) DEFAULT '',				            *
+ *		PRIMARY KEY (`Census`, `DistId`, `SdId`,				        *
+ *              		`Div`, `Sched`, `PageNum`),				        *
+ *		KEY `PT_Image` (`Image`) )				                        *
  *                                                                      *
  *  History:                                                            *
  *      2013/07/13      created                                         *
  *      2013/09/08      base class renamed to Record                    *
  *      2014/04/27      correct save update                             *
- *                      set correct default for fieldPT_population      *
+ *                      set correct default for field population        *
  *      2014/12/28      send trace information to $warn                 *
  *                      support associative array parameter for         *
  *                      constructor for increased readability of code   *
@@ -33,6 +48,8 @@ use \Iterator;
  *      2017/12/18      add support for temporary fields                *
  *      2020/06/07      do not trust URL if the URL implies a zero      *
  *                      initial frame number for the SubDistrict        *
+ *      2020/10/10      remove prefix from field names                  *
+ *      2020/12/02      add method getLine                              *
  *                                                                      *
  *  Copyright &copy; 2020 James A. Cobban                               *
  ************************************************************************/
@@ -55,16 +72,16 @@ class Page extends Record
      *  Default initial row                                             *
      ********************************************************************/
     protected static $initRow   = array(
-                                        'pt_census'         => 'CA1881',
-                                        'pt_distid'         => 0,
-                                        'pt_sdid'           => '',
-                                        'pt_div'            => '',
-                                        'pt_sched'          => '1',
-                                        'pt_page'           => 0,
-                                        'pt_population'     => 25,
-                                        'pt_image'          => '',
-                                        'pt_transcriber'    => '',
-                                        'pt_proofreader'    => '');
+                                        'census'         	=> 'CA1881',
+                                        'distid'         	=> 0,
+                                        'sdid'           	=> '',
+                                        'div'               => '',
+                                        'sched'          	=> '1',
+                                        'pagenum'           => 1,
+                                        'population'     	=> 25,
+                                        'image'          	=> '',
+                                        'transcriber'    	=> '',
+                                        'proofreader'    	=> '');
 
     /********************************************************************
      *  Page::$translate                                                *
@@ -72,31 +89,32 @@ class Page extends Record
      *  Translation of alternate field names                            *
      ********************************************************************/
     protected static $translate = array(
-                                        'census'            => 'pt_census',
-                                        'censusid'          => 'pt_census',
-                                        'distid'            => 'pt_distid',
-                                        'did'               => 'pt_distid',
-                                        'district'          => 'pt_distid',
-                                        'sdid'              => 'pt_sdid',
-                                        'id'                => 'pt_sdid',
-                                        'sd'                => 'pt_sdid',
-                                        'subdistrict'       => 'pt_sdid',
-                                        'div'               => 'pt_div',
-                                        'division'          => 'pt_div',
-                                        'sched'             => 'pt_sched',
-                                        'schedule'          => 'pt_sched',
-                                        'page'              => 'pt_page',
-                                        'population'        => 'pt_population',
-                                        'image'             => 'pt_image',
-                                        'transcriber'       => 'pt_transcriber',
-                                        'proofreader'       => 'pt_proofreader');
+                                        'pt_census'         => 'census',
+                                        'censusid'          => 'census',
+                                        'pt_distid'         => 'distid',
+                                        'did'               => 'distid',
+                                        'district'          => 'distid',
+                                        'pt_sdid'           => 'sdid',
+                                        'id'                => 'sdid',
+                                        'sd'                => 'sdid',
+                                        'subdistrict'       => 'sdid',
+                                        'pt_div'            => 'div',
+                                        'division'          => 'div',
+                                        'pt_sched'          => 'sched',
+                                        'schedule'          => 'sched',
+                                        'page'              => 'pagenum',
+                                        'pt_page'           => 'pagenum',
+                                        'pt_population'     => 'population',
+                                        'pt_image'          => 'image',
+                                        'pt_transcriber'    => 'transcriber',
+                                        'pt_proofreader'    => 'proofreader');
 
     /********************************************************************
      *  Page::$defaultOrder                                             *
      *                                                                  *
      *  Definition of default order for records retrieved by RecordSet  *
      ********************************************************************/
-    protected static    $defaultOrder   = 'PT_census,PT_distid,PT_sdid,PT_div,PT_sched,PT_page';
+    protected static    $defaultOrder   = 'Census,DistId,SdId,`Div`,Sched,PageNum';
 
     /********************************************************************
      *  Page::$census                                                   *
@@ -111,8 +129,6 @@ class Page extends Record
      *  Save reference to instance of District                          *
      ********************************************************************/
     protected $district                 = null;
-
-    /********************************************************************
 
     /********************************************************************
      *  Page::$subDistrict                                              *
@@ -165,19 +181,19 @@ class Page extends Record
                     $fieldLc                = self::$translate[$fieldLc];
                 switch($fieldLc)
                 {   // act on specific parameters
-                    case 'pt_census':
+                    case 'census':
                     {
                         $censusId           = $value;
                         break;
                     }       // Census identifier
 
-                    case 'pt_distid':
+                    case 'distid':
                     {
                         $distId             = $value;
                         break;
                     }       // District identifier
 
-                    case 'pt_sdid':
+                    case 'sdid':
                     {
                         if ($value instanceof SubDistrict)
                         {   // object
@@ -194,19 +210,19 @@ class Page extends Record
                         break;
                     }       // SubDistrict identifier
 
-                    case 'pt_div':
+                    case 'div':
                     {
                         $div                = $value;
                         break;
                     }       // Division identifier
 
-                    case 'pt_sched':
+                    case 'sched':
                     {
                         $sched              = $value;
                         break;
                     }       // Schedule identifier
 
-                    case 'pt_page':
+                    case 'pagenum':
                     {
                         $page               = $value;
                         break;
@@ -245,7 +261,8 @@ class Page extends Record
         }
         else
         {       // unsupported parameter type
-            $this->msg      .= "Unsupported parameter type: $parms. ";
+            $this->msg      .= "Unsupported parameter type: " .
+                                print_r($parms, true) . ". ";
         }       // unsupported parameter type
 
         $this->subDistrict          = $subDistrict;
@@ -262,12 +279,12 @@ class Page extends Record
 
         // construct the query for an existing record
         $query  = 'SELECT * FROM Pages  ' .
-                                'WHERE PT_Census=:censusId AND  ' .
-                                      'PT_DistId=:distId AND  ' .
-                                      'PT_SdId=:sdId AND ' .
-                                      'PT_Div=:div AND ' .
-                                      'PT_Sched=:sched AND ' .
-                                      'PT_Page=:page';
+                                'WHERE Census=:censusId AND  ' .
+                                      'DistId=:distId AND  ' .
+                                      'SdId=:sdId AND ' .
+                                      '`Div`=:div AND ' .
+                                      'Sched=:sched AND ' .
+                                      'PageNum=:page';
         $sqlParms       = array('censusId'  => $censusId,
                                 'distId'    => $distId,
                                 'sdId'      => $sdId,
@@ -295,14 +312,14 @@ class Page extends Record
             {       // create a new record
                 // set defaults
                 $dbrow                  = self::$initRow;
-                $dbrow['pt_census']     = $censusId;
-                $dbrow['pt_distid']     = $distId;
-                $dbrow['pt_sdid']       = $sdId;
-                $dbrow['pt_div']        = $div;
-                $dbrow['pt_sched']      = $sched;
-                $dbrow['pt_page']       = $page;
-                $dbrow['pt_population'] = $this->census->get('linesPerPage');
-                $needInsert         = true;
+                $dbrow['census']        = $censusId;
+                $dbrow['distid']        = $distId;
+                $dbrow['sdid']          = $sdId;
+                $dbrow['div']           = $div;
+                $dbrow['sched']         = $sched;
+                $dbrow['pagenum']       = $page;
+                $dbrow['population']    = $this->census->get('linesPerPage');
+                $needInsert             = true;
             }       // create new record
 
             // invoke constructor of base class
@@ -313,18 +330,19 @@ class Page extends Record
             // if the record does not explicitly specify the associated
             // image, calculate it from information in the
             // SubDistrict record
-            $image                      = $dbrow['pt_image'];
+            $image                      = $dbrow['image'];
             if ($sched == '1' && 
                 ($image == '' ||
                 strpos($image, '00000') !== false))
             {
                 $image  = $subDistrict->getDefaultImage($page);
-                parent::set('pt_image',
+                parent::set('image',
                             $image);
             }
 
             // diagnostic output if debug is set
             $this->dump('Page Record constructed:');
+            $this->valid        = strlen($this->msg) == 0;
         }       // successful execute of prepared statement
         else
         {       // error on execute
@@ -359,23 +377,23 @@ class Page extends Record
             $fieldLc    = self::$translate[$fieldLc];
         switch($fieldLc)
         {
-            case 'pt_census':
-            case 'pt_distid':
-            case 'pt_sdid':
-            case 'pt_div':
-            case 'pt_sched':
-            case 'pt_page':
-            case 'pt_population':
-            case 'pt_image':
-            case 'pt_transcriber':
-            case 'pt_proofreader':
+            case 'census':
+            case 'distid':
+            case 'sdid':
+            case 'div':
+            case 'sched':
+            case 'pagenum':
+            case 'population':
+            case 'image':
+            case 'transcriber':
+            case 'proofreader':
             {       // no validation implemented yet
-                return parent::set($field, $value);
+                return parent::set($fieldLc, $value);
             }       // no validation implemented yet
 
             default:
             {       // no validation implemented yet
-                return parent::set($field, $value);
+                return parent::set($fieldLc, $value);
             }       // no validation implemented yet
         }           // switch on field name
     }       // function Page::set
@@ -473,18 +491,18 @@ class Page extends Record
             if (strlen($set) > 0)
             {           // changes made
                 // construct the where clause
-                $sqlParms['o_census']       = $this->former['pt_census'];
-                $sqlParms['o_distId']       = $this->former['pt_distid'];
-                $sqlParms['o_sdId']         = $this->former['pt_sdid'];
-                $sqlParms['o_div']          = $this->former['pt_div'];
-                $sqlParms['o_sched']        = $this->former['pt_sched'];
-                $sqlParms['o_page']         = $this->former['pt_page'];
-                $where      = 'PT_Census=:o_census AND ' .
-                                  'PT_DistId=:o_distId AND ' .
-                                  'PT_SdId=:o_sdId AND ' .
-                                  'PT_Div=:o_div AND ' .
-                                  'PT_Sched=:o_sched AND ' .
-                                  'PT_Page=:o_page';
+                $sqlParms['o_census']       = $this->former['census'];
+                $sqlParms['o_distId']       = $this->former['distid'];
+                $sqlParms['o_sdId']         = $this->former['sdid'];
+                $sqlParms['o_div']          = $this->former['div'];
+                $sqlParms['o_sched']        = $this->former['sched'];
+                $sqlParms['o_page']         = $this->former['pagenum'];
+                $where      = 'Census=:o_census AND ' .
+                                  'DistId=:o_distId AND ' .
+                                  'SdId=:o_sdId AND ' .
+                                  '`Div`=:o_div AND ' .
+                                  'Sched=:o_sched AND ' .
+                                  'PageNum=:o_page';
 
                 // assemble the UPDATE command
                 $update     .= $set . ' WHERE ' . $where;
@@ -552,29 +570,29 @@ class Page extends Record
         {       // have existing record
             if ($this->former)
             {       // record has been updated
-                $sqlParms['o_census']   = $this->former['pt_census'];
-                $sqlParms['o_distId']   = $this->former['pt_distid'];
-                $sqlParms['o_sdId']     = $this->former['pt_sdid'];
-                $sqlParms['o_div']      = $this->former['pt_div'];
-                $sqlParms['o_sched']    = $this->former['pt_sched'];
-                $sqlParms['o_page']     = $this->former['pt_page'];
+                $sqlParms['o_census']   = $this->former['census'];
+                $sqlParms['o_distId']   = $this->former['distid'];
+                $sqlParms['o_sdId']     = $this->former['sdid'];
+                $sqlParms['o_div']      = $this->former['div'];
+                $sqlParms['o_sched']    = $this->former['sched'];
+                $sqlParms['o_page']     = $this->former['pagenum'];
             }       // record has been updated
             else
             {       // record has not been updated
-                $sqlParms['o_census']   = $this->row['pt_census'];
-                $sqlParms['o_distId']   = $this->row['pt_distid'];
-                $sqlParms['o_sdId']     = $this->row['pt_sdid'];
-                $sqlParms['o_div']      = $this->row['pt_div'];
-                $sqlParms['o_sched']    = $this->row['pt_sched'];
-                $sqlParms['o_page']     = $this->row['pt_page'];
+                $sqlParms['o_census']   = $this->row['census'];
+                $sqlParms['o_distId']   = $this->row['distid'];
+                $sqlParms['o_sdId']     = $this->row['sdid'];
+                $sqlParms['o_div']      = $this->row['div'];
+                $sqlParms['o_sched']    = $this->row['sched'];
+                $sqlParms['o_page']     = $this->row['pagenum'];
             }           // record has not been updated
             $delete     = 'DELETE FROM Pages WHERE ' .
-                                    'PT_Census=:o_census AND ' .
-                                    'PT_DistId=:o_distId AND ' .
-                                    'PT_SdId=:o_sdId AND ' .
-                                    'PT_Div=:o_div AND ' .
-                                    'PT_Sched=:o_sched AND ' .
-                                    'PT_Page=:o_page';
+                                    'Census=:o_census AND ' .
+                                    'DistId=:o_distId AND ' .
+                                    'SdId=:o_sdId AND ' .
+                                    '`Div`=:o_div AND ' .
+                                    'Sched=:o_sched AND ' .
+                                    'PageNum=:o_page';
 
             $stmt           = $connection->prepare($delete);
             $deleteText     = debugPrepQuery($delete, $sqlParms);
@@ -609,5 +627,48 @@ class Page extends Record
         // record never written to database
         return 0;       // nothing to delete
     }       // function Page::delete
+
+    /********************************************************************
+     * function Page::getLine                                           *
+     *                                                                  *
+     *  Get an instance of CensusLine for this Page.                    *
+     *                                                                  *
+     *  Parameters:                                                     *
+     *      $linenum        line number                                 *
+     *                                                                  *
+     *  Returns:                                                        *
+     *      instance of CensusLine or null                              *
+     ********************************************************************/
+    function getLine($linenum)
+    {
+        global $debug, $warn;
+
+        if (is_string($linenum)) 
+            $line           = intval($linenum, 10);
+        else
+        if (is_int($linenum))
+            $line           = $linenum;
+        else
+            $line           = 0;
+        if ($line > 0 && 
+            $line <= $this->row['population'])
+        { 
+			$parms  = array('Census'		=> $this->row['census'],
+					        'District'		=> $this->row['distid'],
+					        'SubDistrict'	=> $this->row['sdid'],
+					        'Division'		=> $this->row['div'],
+	                        'Page'		    => $this->row['pagenum'],
+	                        'Line'          => $line);
+            return new CensusLine($parms);
+        }
+        else
+        {
+            if ($debug)
+                $warn       .= "<p>Page::getLine(" . gettype($linenum) .
+                        ' ' . htmlspecialchars(print_r($linenum, true)) .
+                        ")</p>\n";
+            return null;
+        }
+    }           // function Page::getLine
 
 }       // class Page

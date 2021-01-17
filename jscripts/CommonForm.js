@@ -148,6 +148,7 @@
  *                      to extract components of the URL                *
  *      2021/01/12      drop support for IE 9 & 10.  That is browsers   *
  *                      that or not compatible with ECMA ES6            *
+ *      2021/01/16      use XMLSerializer for diagnostic output         *
  *                                                                      *
  *  Copyright &copy; 2021 James A. Cobban                               *
  ************************************************************************/
@@ -2168,7 +2169,7 @@ function getCellRelCol( curr,
     td          = curr.parentNode;
     if (td.cellIndex === undefined)
     {
-        popupAlert("CensusForm.js: getCellRelCol: current element is not in a table cell: " + tagToString(td),
+        popupAlert("CensusForm.js: getCellRelCol: current element is not in a table cell: " + new XMLSerializer().serializeToString(td),
                     curr);
         return curr;    // curr is not contained in a table cell
     }
@@ -2178,7 +2179,7 @@ function getCellRelCol( curr,
     row         = tr.rowIndex;  // row index of current row
     tb          = tr.parentNode;// table body tag
     var msg     = "rel=" + rel + ", td.cellIndex=" + col + ", tr.rowIndex=" + row;
-    //alert("tb: " + tagToString(tb));
+    //alert("tb: " + new XMLSerializer().serializeToString(tb));
 
     // move to the requested relative row and wrap the value
     // to the table height
@@ -2206,7 +2207,7 @@ function getCellRelCol( curr,
                     curr);
     //    else
     //        popupAlert("getCellRelCol: " + msg + ", newtd: " +
-    //                  tagToString(td), curr);
+    //                  new XMLSerializer().serializeToString(td), curr);
 
     // return requested field
     return field;

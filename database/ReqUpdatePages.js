@@ -91,6 +91,56 @@ function onloadPages(ev)
 }       // function onloadPages
 
 /************************************************************************
+ *  function getElt                                                     *
+ *                                                                      *
+ *  This method finds the first instance of a child element node        *
+ *  that matches the supplied tag name.  The method searches            *
+ *  recursively down the tree.                                          *
+ *                                                                      *
+ *  Parameters:                                                         *
+ *      curent  the node within which to search for a child             *
+ *      tagName the name of the tag to search for.  By convention       *
+ *              HTML tag names are specified in upper case,             *
+ *              but the function uses a case-insensitive comparison     *
+ *                                                                      *
+ *  Returns:                                                            *
+ *      The matching element node or null.                              *
+ ************************************************************************/
+function getElt(current, tagName)
+{
+    if (current === null)
+    {
+        console.trace();
+        throw new Error("util.js: getElt: parameter is null");
+    }
+    if (current.childNodes === undefined)
+        throw new Error("util.js: getElt: parameter is not a document element");
+    if (current)
+    {       // valid current
+        for (let i = 0; i < current.childNodes.length; i++)
+        {
+            let cNode   = current.childNodes[i];
+            if (cNode.nodeType == 1)
+            {       // element node
+                if (cNode.nodeName.toUpperCase() == tagName.toUpperCase())
+                    return cNode;
+                else
+                {   // search recursively
+                    let element = getElt(cNode, tagName);
+                    if (element)
+                        return element;
+                }   // search recursively
+            }       // element node
+        }       // loop through children of current
+    }       // valid current
+    else
+    {       // no parent
+        throw "util.js: getElt(" + current + ",'" + tagName + "')";
+    }       // no parent
+    return null;
+}       // function getElt
+
+/************************************************************************
  *  function changeCensus                                               *
  *                                                                      *
  *  The change event handler of the Census selection.                   *
@@ -451,7 +501,7 @@ function gotSubDist(xmlDoc)
               "All Sub-Districts",
               "");
 
-    //alert("ReqUpdatePages.js: gotSubDist: xmlDoc=" + tagToString(xmlDoc));
+    //alert("ReqUpdatePages.js: gotSubDist: xmlDoc=" + new XMLSerializer().serializeToString(xmlDoc));
     // get the list of subdistricts to select from
     var newOptions        = xmlDoc.getElementsByTagName("option");
 
@@ -588,7 +638,7 @@ function changeSubDist(ev)
         optIndex            = 0;        // default to first entry
     var    optElt                = subDistSelect.options[optIndex];
     var    optVal                = optElt.value;
-    //alert("ReqUpdatePages.js: changeSubDist: optIndex=" + optIndex + ", optElt=" + optElt.outerHTML + ", xmlOption=" + tagToString(optElt.xmlOption));
+    //alert("ReqUpdatePages.js: changeSubDist: optIndex=" + optIndex + ", optElt=" + optElt.outerHTML + ", xmlOption=" + new XMLSerializer().serializeToString(optElt.xmlOption));
     
     // determine how many divisions there are in selected subdist
     var tdNode              = document.getElementById('DivisionCell');

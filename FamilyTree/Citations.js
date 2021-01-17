@@ -15,6 +15,7 @@
  *		2015/05/27		use absolute URLs for AJAX						*
  *		2018/10/30      use Node.textContent rather than getText        *
  *		2019/02/10      no longer need to call pageInit                 *
+ *      2021/01/16      use XMLSerializer for diagnostic output         *
  *																		*
  *  Copyright &copy; 2018 James A. Cobban								*
  ************************************************************************/
@@ -180,7 +181,7 @@ function gotSources(xmlDoc)
     if (elt.options)
 		elt.options.length	= 0;	// purge old options if any
     else
-		alert("Citations.js: gotSources:" + tagToString(elt));
+		alert("Citations.js: gotSources:" + new XMLSerializer().serializeToString(elt));
 
     // create a new HTML Option object to represent the ability to
     // create a new source and add it to the Select as the first option

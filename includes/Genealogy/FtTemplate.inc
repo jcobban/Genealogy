@@ -27,8 +27,12 @@ use Templating\escape;
  *      2020/03/12      validate language code passed to tinyMCE        *
  *                      get date format from translate table            *
  *      2020/03/31      defer loading advertisement                     *
+ *      2020/10/28      add separate messages link to header            *
+ *      2020/12/01      add method fmtMessage                           *
+ *      2020/12/03      validateLang accepted invalid string            *
+ *      2021/01/16      add error message before exception              *
  *                                                                      *
- *  Copyright &copy; 2020 James A. Cobban All Rights Reserved           *
+ *  Copyright &copy; 2021 James A. Cobban All Rights Reserved           *
  ************************************************************************/
 
 /************************************************************************
@@ -57,6 +61,7 @@ class FtTemplate extends Template
     private $lang               = 'en';
     private $formatter          = null;
     private $sateFormatter      = null;
+    private $includeSub         = null; // filename for error messages
 
     /********************************************************************
      *  FtTemplate::trtemplate                                          *
@@ -93,8 +98,11 @@ class FtTemplate extends Template
         global  $document_root;
 
         if (!is_string($include))
+        {
+            print "<p style='color: red;'>FtTemplate::__construct: first parameter is not a string</p>\n";
             throw new Exception("FtTemplate::__construct: " .
-                                "first parameter is not a string");
+                                    "first parameter is not a string");
+        }
         if (!preg_match('/(^.*)([a-z]{2,3}-[A-Z]{2,3}|[a-z]{2,3}).html$/',
                         $include,
                         $matches))
@@ -151,7 +159,10 @@ class FtTemplate extends Template
                                            $sorry);
                 }
                 else
+                {
+                    print "<p style='color: red;'>FtTemplate::__construct: cannot find template file '{$includebase}en.html' in $tempBase</p>\n";
                     throw new Exception ("FtTemplate::__construct: cannot find template file '{$includebase}en.html' in $tempBase");
+                }
             }               // try to find closest match
 
             if ($dialog)
@@ -161,6 +172,7 @@ class FtTemplate extends Template
 
             parent::includeSub($tempBase . $includeSub,
                                'MAIN');
+            $this->includeSub       = $includeSub;
         }                   // include file name
 
         if (file_exists($tempBase . "Trantab$lang.html"))
@@ -202,13 +214,31 @@ class FtTemplate extends Template
             else
                 $lang       = strtolower($matches[1]);
         }
-        else
-        {
-            if (strlen($value) >= 2)
-                $lang       = strtolower(substr($value, 0, 2));
-        }
         return $lang;
     }           // static function validateLang
+
+    /********************************************************************
+     *  function FtTemplate::fmtMessage                                 *
+     *                                                                  *
+     *  Get a message template from the page template and make          *
+     *  substitutions into it.  This is an extension of str_replace.    *
+     *                                                                  *
+     *  Parameters:                                                     *
+     *      $id         the id value of the element containing the      *
+     *                  message text template                           *
+     *      $match      either a string value of the token to replace   *
+     *                  or an array of strings                          *
+     *      $replace    either a string value or an array of string     *
+     *                  values to replace the tokens.                   *
+     *                                                                  *
+     *  Returns:                                                        *
+     *      string                                                      *
+     ********************************************************************/
+    public function fmtMessage($id, $match, $replace)
+    {
+        $text       = $this->getElementById($id)->innerHTML();
+        return str_replace($match, $replace, $text);
+    }           // function fmtMessage
 
     /********************************************************************
      *  function FtTemplate::getFormatter                               *
@@ -589,14 +619,21 @@ class FtTemplate extends Template
                 $elt                = $this['UserInfoAccount'];
                 $atemplate          = new Template($elt->innerHTML());
                 $atemplate->setFields($this->fields);
-                // determine if their are messages queued to the current user
+                // determine if there are messages queued to the current user
                 $user               = new User(array("username" => $userid));
                 $blogParms          = array('keyvalue'  => $user->get('id'),
                                             'table'     => '^Users$');
                 $bloglist           = new RecordSet('Blogs', $blogParms);
                 $blogCount          = $bloglist->getInformation()['count'];
                 if ($blogCount == 0)
-                    $atemplate['gotMail']->update(null);
+                {
+                    $messages       = $atemplate['messages'];
+                    if ($messages)
+                        $messages->update(null);
+                    else
+                        error_log("FtTemplate.inc " . __LINE__ .
+                                    " no id='messages' in 'UserInfoAccount' for template '" . $this->includeSub . "' in main '" . $this->main . "'\n");
+                }
                 $breadcrumbs        .= $atemplate->compile();
             }               // signed on
             else
@@ -743,6 +780,7 @@ class FtTemplate extends Template
             else
                 $about      = 'About this Site';
             $breadcrumbs    .= "<a href=\"/AboutHelp$lang.html\" class=\"menuitem\" target=\"help\">$about</a><br>\n";
+
             // add contact author link
             $footSection    = $this['footSection'];
             foreach($footSection->childNodes() as $child)

@@ -33,6 +33,7 @@ use \Exception;
  *		2019/12/20      created                                         *
  *		2019/12/23      add column Row                                  *
  *		2020/01/13      fix change adname column                        *
+ *		2020/12/02      protect against XSS                             *
  *																		*
  *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
@@ -140,7 +141,8 @@ class Advertiser extends Record
                 $comma          = 'array(';
                 foreach($dbrow as $key => $value)
                 {
-                    $this->msg  .= "$comma'$key'=>$value";
+                    $this->msg  .= "$comma'$key'=>" .
+                                    htmlspecialchars($value);
                     $comma      = ',';
                 }
                 $this->msg      .= "). ";
@@ -167,7 +169,8 @@ class Advertiser extends Record
 					        break 2;
 	                    }
 					    else
-					    {
+                        {
+                            $value              = htmlspecialchars($value);
                             $this->msg	        .= "Advertiser::__construct: " .
                                 "`AdName` value '$value' invalid. ";
 							$adname	            = '';
@@ -187,6 +190,8 @@ class Advertiser extends Record
                         {
                             if (is_null($value))
                                 $value          = 'NULL';
+                            else
+                                $value          = htmlspecialchars($value);
                             $this->msg	        .= "Advertiser::__construct: " .
                                 "`Row` value '$value' invalid. ";
 					    }
@@ -439,6 +444,7 @@ class Advertiser extends Record
 		}		        // successful update
 		else
 		{		// error updating record
+            $updateText          = htmlspecialchars($updateText);
 		    $this->msg	    .= "Advertiser::new: '$updateText': error=" .
                 print_r($stmt->errorInfo(),true) . ". ";
             $warn           .= $this->msg;

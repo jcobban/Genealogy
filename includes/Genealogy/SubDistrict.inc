@@ -78,6 +78,7 @@ use \Iterator;
  *      2020/06/07      notify user and administrator that the initial  *
  *                      frame number field has not been initialized.    *
  *                      correct handling of explicit no division id     *
+ *      2020/10/10      remove prefix for fields in Pages table         *
  *                                                                      *
  *  Copyright &copy; 2020 James A. Cobban                               *
  ************************************************************************/
@@ -1094,10 +1095,7 @@ class SubDistrict extends Record
             case 1921:
             {
                 $frm    = $page - $page1 + $relFrame;
-                $image  = "https://www.ancestry.ca/interactive/8991/1921_" .
-                                substr('000', 0, 3 - strlen($imageBase)) .
-                                $imageBase .
-                                "-e" .
+                $image  = "https://central.bac-lac.gc.ca/.item/?app=Census1921&op=img&id=e" .
                                 substr('000000000', 0, 9 - strlen($frm)) .
                                 $frm;
                 break;
@@ -1459,14 +1457,18 @@ class SubDistrict extends Record
      ********************************************************************/
     function getPage($page, $sched = '1')
     {
+        global  $warn;
+
         $page1          = $this->row['sd_page1'];
         $pages          = $this->row['sd_pages'];
         $bypage         = $this->row['sd_bypage'];
 
         if ($page < $page1 ||
             $page > ($page1 + $bypage * ($pages - 1)) ||
-            (($bypage == 2) && (($page - $page1) % $bypage) != 1))
+            (($bypage == 2) && (($page - $page1) % $bypage) != 0))
+        {
             return null;
+        }
 
         return new Page($this, $page, $sched);
     }           // function SubDistrict::getPage
@@ -1482,9 +1484,11 @@ class SubDistrict extends Record
      *      RecordSet of instances of Page indexed by page              *
      *      use foreach($subd->getPages() as $page)                     *
      ********************************************************************/
-    function getPages()
+    function getPages($first = 1)
     {
-        return new PageSet(array('sdid' => $this));
+        return new PageSet(array('sdid'     => $this,
+                                 'page'     => $first,
+                                 'limit'    => 50));
     }       // SubDistrict::getPages
 
     /********************************************************************
@@ -1499,9 +1503,9 @@ class SubDistrict extends Record
      *          'namecount'         number of lines with given name     *
      *          'agecount'          number of lines with age            *
      *          'idircount'         number of lines with IDIR           *
-     *          'pt_population'     total lines on page                 *
-     *          'pt_transcriber'    name of transcriber                 *
-     *          'pt_proofreader'    name of proofreader                 *
+     *          'population'        total lines on page                 *
+     *          'transcriber'       name of transcriber                 *
+     *          'proofreader'       name of proofreader                 *
      *                                                                  *
      *  Side Effects:                                                   *
      *      Errors are appended to the global $warn                     *
@@ -1530,17 +1534,17 @@ class SubDistrict extends Record
         $query  = "SELECT Page, SUM(GivenNames != '') AS namecount," .
                             "SUM(Age != '') AS agecount," .
                             "SUM(IDIR != 0) AS idircount," .
-                            "PT_Population, PT_Transcriber," .
-                            "PT_Proofreader" .
+                            "Pages.Population, Pages.Transcriber," .
+                            "Pages.Proofreader" .
                         " FROM Census$censusYear" .
-                        " JOIN Pages ON PT_Census=:censusid AND " .
-                            "PT_DistId=District AND PT_SdId=SubDistrict " .
-                            "AND PT_Div=Division AND PT_Sched='1' " .
-                            "AND PT_Page=Page " .
+                        " JOIN Pages ON Pages.Census=:censusid AND " .
+                            "Pages.DistId=District AND Pages.SdId=SubDistrict " .
+                            "AND Pages.`Div`=Division AND Pages.Sched='1' " .
+                            "AND Pages.PageNum=Page " .
                         $where .
                         " GROUP BY Page," .
-                            "PT_Population, PT_Transcriber," .
-                            "PT_Proofreader " .
+                            "Pages.Population, Pages.Transcriber," .
+                            "Pages.Proofreader " .
                         "ORDER BY Page";
 
         $stmt               = $connection->prepare( $query );
@@ -1564,13 +1568,13 @@ class SubDistrict extends Record
             {
                 if ($row === false || $row['page'] > $nextpage)
                 {
-                    $retval[]       = array('page'              => $nextpage,
-                                            'namecount'         => 0,
-                                            'agecount'          => 0,
-                                            'idircount'         => 0,
-                                            'pt_population'     => $pagesize,
-                                            'pt_transcriber'    => '',
-                                            'pt_proofreader'    => '');
+                    $retval[]       = array('page'          => $nextpage,
+                                            'namecount'     => 0,
+                                            'agecount'      => 0,
+                                            'idircount'     => 0,
+                                            'population'    => $pagesize,
+                                            'transcriber'   => '',
+                                            'proofreader'   => '');
                 }
                 else
                 {

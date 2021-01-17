@@ -158,8 +158,10 @@
  *		2019/06/29      first parameter of displayDialog removed        *
  *		2019/08/01      support tinyMCE 5.0.3                           *
  *		2020/02/17      hide right column                               *
+ *      2021/01/16      use XMLSerializer for diagnostic output         *
+ *                      use addEventListener                            *
  *																		*
- *  Copyright &copy; 2020 James A. Cobban								*
+ *  Copyright &copy; 2021 James A. Cobban								*
  ************************************************************************/
 
 /************************************************************************
@@ -213,7 +215,7 @@ function loadEdit()
     {				    // loop through all forms in page
 		var form		= document.forms[fi];
 		form.updateCitation	= updateCitation;
-		addEventHandler(form, 'click', stopProp);
+		form.addEventListener('click', stopProp);
 
 		// set action methods for form
 		if (form.name == 'evtForm')
@@ -756,7 +758,7 @@ function newEvent(xmlDoc)
 				    case 'msg':
 				    {
 					    alert('editEvent.js: newEvent: message ' +
-					          tagToString(elt));
+					          new XMLSerializer().serializeToString(elt));
 				    	break;
 				    }		// error message
 
@@ -776,7 +778,7 @@ function newEvent(xmlDoc)
 		if (xmlDoc)
 		{
 		    if (root.nodeName)
-				alert('editEvent.js: newEvent: ' + tagToString(root));
+				alert('editEvent.js: newEvent: ' + new XMLSerializer().serializeToString(root));
 		    else
 				alert('editEvent.js: newEvent: ' + root);
 		}
@@ -1014,7 +1016,7 @@ function gotEvent(xmlDoc)
     if (root && root.nodeName == 'event')
     {                       // expected response
 		if (debug.toLowerCase() == 'y')
-		    alert("editEvent.js: gotEvent: " + tagToString(root));
+		    alert("editEvent.js: gotEvent: " + new XMLSerializer().serializeToString(root));
 		var msgs	= root.getElementsByTagName("msg");
 		if (msgs.length > 0)
 		{		            // have messages in reply
@@ -1032,11 +1034,11 @@ function gotEvent(xmlDoc)
 		if (cmds.length == 0)
 		{		            // no update
 		    //alert("editEvent.js: gotEvent: database not updated" +
-		    //	tagToString(root));
+		    //	new XMLSerializer().serializeToString(root));
 		}		            // no update
 		//else
 		//    alert("editEvent.js: gotEvent: database updated" +
-		//	tagToString(root));
+		//	new XMLSerializer().serializeToString(root));
 
 		// ensure that ider and idime fields are initialized
 		var idime		= document.getElementById('idime');
@@ -1140,7 +1142,7 @@ function gotEvent(xmlDoc)
 		var	msg	= "Error: ";
 		if (root)
 		{
-		    msg	+= tagToString(root);
+		    msg	+= new XMLSerializer().serializeToString(root);
 		}
 		else
 		    msg += xmlDoc;
@@ -1234,7 +1236,7 @@ function gotDelName(xmlDoc)
     if (root && root.nodeName == 'deleted')
     {		// expected root node name
 		if (debug.toLowerCase() == 'y')
-		    alert('editEvent.js: gotDelName: ' + tagToString(root));
+		    alert('editEvent.js: gotDelName: ' + new XMLSerializer().serializeToString(root));
 		var msgs	= root.getElementsByTagName("msg");
 		if (msgs.length > 0)
 		{		// have messages in reply
@@ -1593,7 +1595,7 @@ function gotSources(xmlDoc)
     if (elt.options)
 		elt.options.length	= 0;	// purge old options if any
     else
-		alert("editEvent.js: gotSources:" + tagToString(elt));
+		alert("editEvent.js: gotSources:" + new XMLSerializer().serializeToString(elt));
 
     hideLoading();	// hide loading indicator
 
@@ -1791,7 +1793,7 @@ function gotAddCit(xmlDoc)
 		    if (msgsList.length > 0)
 		    {
 				alert("editEvent.js: gotAddCit: xmlRoot=" +
-				      tagToString(xmlRoot));
+				      new XMLSerializer().serializeToString(xmlRoot));
 		    }
 		    var	parms	= {};
 		    var	parmsList	= xmlRoot.getElementsByTagName('parms');
@@ -1842,15 +1844,15 @@ function gotAddCit(xmlDoc)
 
 				    // activate functionality of buttons
 				    var edit	= document.getElementById('editCitation'+ idsx);
-				    addEventHandler(edit, 'click', editCitation);
+				    edit.addEventListener('click', editCitation);
 				    var del	= document.getElementById('delCitation' + idsx);
-				    addEventHandler(del, 'click', deleteCitation);
+				    del.addEventListener('click', deleteCitation);
 				}		// citation created
 		    }
 		}		// valid response
 		else	// unexpected response
 		    alert("editEvent.js: gotAddCit: " +
-				  "xmlRoot='" + tagToString(xmlRoot) + "'");
+				  "xmlRoot='" + new XMLSerializer().serializeToString(xmlRoot) + "'");
     }
     else
 		alert("editEvent.js: gotAddCit: xmlDoc='" + xmlDoc + "'");
@@ -1923,7 +1925,7 @@ function addAltCitation(ev)
     }
     else
     {
-		alert("editEvent.js: addAltCitation: <input name='PageA'> not defined tRow=" + tagToString(tRow));
+		alert("editEvent.js: addAltCitation: <input name='PageA'> not defined tRow=" + new XMLSerializer().serializeToString(tRow));
     }
 
     // populate the select with the list of defined sources to 
@@ -2103,7 +2105,7 @@ function gotDeleteCit(xmlDoc)
     else
     {		        // error unexpected document
 		if (root)
-		    msg	= tagToString(root);
+		    msg	= new XMLSerializer().serializeToString(root);
 		else
 		    msg	= xmlDoc;
 		alert ("editEvent.js: gotDeleteCit: Error: " + msg);

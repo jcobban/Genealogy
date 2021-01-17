@@ -313,8 +313,10 @@
  *                      errors since only the administrator cares       *
  *      2020/05/19      correct date calculation for event insertion    *
  *      2020/09/26      fix failure to refresh for click on new Person  *
+ *      2021/01/16      use XMLSerializer for diagnostic output         *
+ *                      use addEventListener                            *
  *                                                                      *
- *  Copyright &copy; 2020 James A. Cobban                               *
+ *  Copyright &copy; 2021 James A. Cobban                               *
  ************************************************************************/
 
 /************************************************************************
@@ -531,7 +533,7 @@ var datePatt    = /\d{4}/;
 /************************************************************************
  *  Specify the function to get control once the page is loaded.        *
  ************************************************************************/
-addEventHandler(window, "load", loadEdit);
+window.addEventListener("load", loadEdit);
 
 
 /************************************************************************
@@ -2211,7 +2213,7 @@ function gotClearedEvent(xmlDoc)
     {
         if (topXml && typeof(topXml) == "object")
             console.log("editIndivid.js: 2123: gotClearedEvent: " +
-                        tagToString(topXml));
+                        new XMLSerializer().serializeToString(topXml));
         else
             console.log("editIndivid.js: 2126: gotClearedEvent: '" + xmlDoc + "'");
     }
@@ -2760,14 +2762,14 @@ function gotDeleteEvent(xmlDoc)
         else
         {
             console.log("editIndivid.js: 2518: gotDeleteEvent: " +
-                  tagToString(msglist.item(0)));
+                  new XMLSerializer().serializeToString(msglist.item(0)));
         }
     }
     else
     {       // error
         var msg = "Error: ";
         if (root && root.childNodes)
-            msg += tagToString(root)
+            msg += new XMLSerializer().serializeToString(root)
         else
             msg += xmlDoc;
         alert (msg);
@@ -2803,20 +2805,20 @@ function gotDeleteCitations(xmlDoc)
     var root    = xmlDoc.documentElement;
     if (root && root.nodeName && root.nodeName == 'deleted')
     {
-        //alert("gotDeleteCitations: root=" + tagToString(root));
+        //alert("gotDeleteCitations: root=" + new XMLSerializer().serializeToString(root));
         var msglist = root.getElementsByTagName('msg');
         var parmslist   = root.getElementsByTagName('parms');
         if (msglist.length > 0)
         {
             console.log("editIndivid.js: 2567: gotDeleteCitations: " +
-                  tagToString(msglist.item(0)));
+                  new XMLSerializer().serializeToString(msglist.item(0)));
         }
     }
     else
     {       // error
         var msg = "Error: ";
         if (root && root.childNodes)
-            msg += tagToString(root)
+            msg += new XMLSerializer().serializeToString(root)
         else
             msg += xmlDoc;
         alert (msg);

@@ -22,8 +22,9 @@
  *		2019/08/06      use addEventListener                            *
  *		2020/02/17      hide right column                               *
  *		2020/12/28      use updateNameJson.php to apply changes         *
+ *      2021/01/16      use XMLSerializer for diagnostic output         *
  *																		*
- *  Copyright &copy; 2020 James A. Cobban								*
+ *  Copyright &copy; 2021 James A. Cobban								*
  ************************************************************************/
 
 window.onload	= loadEdit;
@@ -597,7 +598,7 @@ function gotSources(xmlDoc)
     if (elt.options)
 		elt.options.length	= 0;	// purge old options if any
     else
-		alert("editName.js: gotSources:" + tagToString(elt));
+		alert("editName.js: gotSources:" + new XMLSerializer().serializeToString(elt));
 
     hideLoading();	// hide loading indicator
 
@@ -810,7 +811,7 @@ function gotAddCit(xmlDoc)
 		}		// valid response
 		else	// unexpected response
 		    alert("editName.js: gotAddCit: xmlRoot='" +
-							tagToString(xmlRoot) + "'");
+							new XMLSerializer().serializeToString(xmlRoot) + "'");
     }
     else
 		alert("editName.js: gotAddCit: xmlDoc='" + xmlDoc + "'");
@@ -922,7 +923,7 @@ function gotDeleteCit(xmlDoc)
     else
     {		// error unexpected document
 		if (root)
-		    msg	= tagToString(root);
+		    msg	= new XMLSerializer().serializeToString(root);
 		else
 		    msg	= xmlDoc;
 		alert ("editName.js: gotDeleteCit: Error: " + msg);

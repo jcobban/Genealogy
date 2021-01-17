@@ -1463,8 +1463,8 @@ class RecordSet implements Iterator, Countable, ArrayAccess
         global  $warn;
 
         // default is to generate positional insertion points (?)
-        // use name insertion points (:name) if either the $refname parameter
-        // is passed or the the constructor sets $this->usenames
+        // use name insertion points (:name) if either the $refname
+        // parameter is passed or the the constructor sets $this->usenames
         if (is_null($refname) && $this->usenames)
             $refname        = true;
 
@@ -1539,12 +1539,6 @@ class RecordSet implements Iterator, Countable, ArrayAccess
                     $or             = ' OR ';
                 }
             }               // array of simple string comparisons
-            else
-            if (strlen($pattern) == 0)
-            {               // empty string
-                $where          .= $or . "$fldname=''";
-                $or             = ' OR ';
-            }               // empty string
             else
             if (strlen($pattern) > 5 &&
                 strtoupper(substr($pattern, 0, 5) == 'LIKE '))
@@ -2609,23 +2603,23 @@ require_once __NAMESPACE__ . '/Surname.inc';
         {
             if ($this->limit == 0)
             {
-                $this->list = array();
+                $this->list     = array();
                 return false;
             }
 
             // construct a query for the specific matches
-            $query          = $this->query;
-            $queryText      = debugPrepQuery($query, $this->sqlParms);
+            $query              = $this->query;
+            $queryText          = debugPrepQuery($query, $this->sqlParms);
             if (false && strpos($queryText, 'tblIR'))
                 print "\"RecordSet_query\" : \"" . str_replace('"','\\"', $query) . "\",\n";
             // query the database for matches
-            $stmt           = $connection->prepare($query);
+            $stmt               = $connection->prepare($query);
             if ($stmt->execute($this->sqlParms))
             {       // success
-                $result     = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                $result         = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 if ($debug)
                 {
-                    $warn   .= "<p>RecordSet.inc: " . __LINE__ .
+                    $warn       .= "<p>RecordSet.inc: " . __LINE__ .
                                    " \"$queryText\"</p>\n";
                 }
 
@@ -2679,7 +2673,9 @@ require_once __NAMESPACE__ . '/Surname.inc';
                         }
                         else
                             $object         = new Record($row,$this->table);
-                        if (is_string($prime) && strlen($prime) > 0)
+                        if (is_string($prime) &&
+                            strlen($prime) > 0 &&
+                            array_key_exists($prime, $row))
                             $retval[$row[$prime]]= $object;
                         else
                             $retval[]       = $object;

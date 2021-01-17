@@ -131,8 +131,9 @@ use \Iterator;
  *		                if the content is not already HTML              *
  *		                eliminate special get methods and expand        *
  *		                functionality of method get                     *
+ *		2020/12/02      protect against XSS                             *
  *																		*
- *  Copyright &copy; 2019 James A. Cobban								*
+ *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/RecordPic.inc';
 require_once __NAMESPACE__ . '/Person.inc';
@@ -442,7 +443,7 @@ class Address extends RecordPic
 					}		        // create new record
 			    }			        // successful query
 			    else
-			    {			        // query failed
+                {			        // query failed
 					$this->msg  .= "Address::__construct: '$queryText', " .
 										print_r($stmt->errorInfo(), true) .". ";
 				    $dbrow		        = Address::$initRow;

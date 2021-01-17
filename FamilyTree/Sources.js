@@ -21,8 +21,9 @@
  *      2019/11/06      support opening windows with language           *
  *      2020/04/29      support fields and buttons for creating new     *
  *                      source and match behavior of Locations          *
+ *      2021/01/16      use XMLSerializer for diagnostic output         *
  *                                                                      *
- *  Copyright &copy; 2019 James A. Cobban                               *
+ *  Copyright &copy; 2021 James A. Cobban                               *
  ************************************************************************/
 
 window.onload           = onloadSources;
@@ -402,14 +403,14 @@ function gotDelete(xmlDoc)
 		}
 		else
 		{
-		    alert(tagToString(msglist.item(0)));
+		    alert(new XMLSerializer().serializeToString(msglist.item(0)));
 		}
     }
     else
     {                   // error
 		var  msg	        = "Error: ";
 		if (root && root.childNodes)
-		    msg             += tagToString(root)
+		    msg             += new XMLSerializer().serializeToString(root)
 		else
 		    msg             += xmlDoc;
 		alert (msg);
