@@ -81,6 +81,7 @@ $stateName		    = 'Ontario';
 $cc                 = 'CA';
 $countryName	    = 'Canada';
 $county		        = null;
+$countytext	        = null;
 $countyName		    = null;
 $lang               = 'en';
 $showTownship	    = false;

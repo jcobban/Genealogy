@@ -39,6 +39,8 @@ require_once __NAMESPACE__ . "/common.inc";
 $src                    = '';
 $lang                   = 'en';
 $fldName                = 'Image';
+$title                  = '';
+$credit                 = '';
 
 // if invoked by method=get process the parameters
 if (count($_GET) > 0)

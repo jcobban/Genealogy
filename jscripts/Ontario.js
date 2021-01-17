@@ -50,7 +50,7 @@
  ************************************************************************/
 
 // table for expanding county abbreviations to full names
-const countyNames = {
+var countyNames = {
                 'Alg'   : 'Algoma District',
                 'Brt'   : 'Brant',
                 'Bfd'   : 'Brantford City',

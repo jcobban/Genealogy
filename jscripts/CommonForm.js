@@ -1662,7 +1662,7 @@ function checkDate()
     var l0, n1, l2, l3, n3, pi, mi;
     if (matched)
     {
-        console.log('matched: ' + result.toString());
+        //console.log('matched: ' + result.toString());
         var pref        = result[1].toLowerCase();  // prefix on date or month
         l0              = pref.length;
         pi              = preTab[pref];
@@ -1701,7 +1701,7 @@ function checkDate()
 
     if (matched)
     {
-         console.log('checkDate: l0=' + l0 + ', n1=' + n1 + ', l2=' + l2 + ', l3=' + l3 + ', n3=' + n3 + ', pi=' + pi + ', mi=' + mi);
+        //console.log('checkDate: l0=' + l0 + ', n1=' + n1 + ', l2=' + l2 + ', l3=' + l3 + ', n3=' + n3 + ', pi=' + pi + ', mi=' + mi);
         matched = (((n1 > 31 && n1 < 2030 && l2 > 0 && n3 <= 31) ||  // yyyy mmm [dd]
                   (n1 <= 31 && l2 > 0 && n3 > 1000 && n3 < 2030) ||     // [dd] mmmm yyyy
                   (n1 <= 31 && l2 > 0 && l3 == 0) ||    // [dd] mmmm

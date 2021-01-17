@@ -1469,6 +1469,22 @@ function displayDialog(templateId,
 }       // function displayDialog
 
 /************************************************************************
+ *  function stopProp                                                   *
+ *                                                                      *
+ *  This onclick handler receives all mouse click events from the       *
+ *  area of the dialog.  It prevents them from propagating through      *
+ *  to the mouse click event handler on <body>.                         *
+ *                                                                      *
+ *  Input:                                                              *
+ *      this        the HTML element                                    *
+ ************************************************************************/
+function stopProp(ev)
+{
+    ev.stopPropagation();
+    return false;
+}       // function stopProp
+
+/************************************************************************
  *  function hideDialog                                                 *
  *                                                                      *
  *  This is the default onclick action for a button in a dialog.  It    *
