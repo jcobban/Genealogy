@@ -79,8 +79,11 @@ use \Iterator;
  *                      frame number field has not been initialized.    *
  *                      correct handling of explicit no division id     *
  *      2020/10/10      remove prefix for fields in Pages table         *
+ *      2021/01/24      do not initialize district pointer until        *
+ *                      object is initialized                           *
+ *      2021/02/24      fixup for divisions with bad pagination         *
  *                                                                      *
- *  Copyright &copy; 2020 James A. Cobban                               *
+ *  Copyright &copy; 2021 James A. Cobban                               *
  ************************************************************************/
 require_once __NAMESPACE__ . '/Record.inc' ;
 require_once __NAMESPACE__ . '/Census.inc' ;
@@ -261,10 +264,14 @@ class SubDistrict extends Record
         $division               = self::$initRow['sd_div'];
         $sched                  = self::$initRow['sd_sched'];
 
-        if ($debug)
-            $warn   .= "<p>SubDistrict::__construct(" . var_export($parms, true) . "<p>\n";
+        if (!is_array($parms))
+            throw new Exception("SubDistrict::__construct called with " . gettype($parms));
+        $parmstext              = '';
+        $comma                  = '';
         foreach($parms as $field => $value)
         {                           // process parameters
+            $parmstext          .= "$comma$field=";
+            $comma              = ',';
             $fieldLc            = strtolower($field);
             if (array_key_exists($fieldLc, self::$translate))
                 $fieldLc        = self::$translate[$fieldLc];
@@ -276,10 +283,12 @@ class SubDistrict extends Record
                     {               // object
                         $this->census           = $value;
                         $censusId               = $this->census['censusid'];
+                        $parmstext              .= "object Genealogy\Census($censusId)";
                         self::$formerCensus     = $this->census;
                     }               // object
                     else
                     {               // string
+                        $parmstext              .= "'$value'";
                         $censusId               = $value;
                         $formerCensus           = self::$formerCensus;
                         if ($formerCensus &&
@@ -305,6 +314,7 @@ class SubDistrict extends Record
                         $this->district         = $value;
                         self::$formerDistrict   = $value;
                         $distId                 = $this->district['id'];
+                        $parmstext              .= "object Genealogy\District($distId)";
                         $this->census           = $this->district->getCensus();
                         self::$formerCensus     = $this->census;
                         $censusId               = $this->census['censusid'];
@@ -312,6 +322,7 @@ class SubDistrict extends Record
                     else
                     if (is_array($value))
                     {
+                        $parmstext              .= print_r($value, true);
                         $this->msg      .= "SubDistrict::__construct: " .
                                             " sd_distid is " .
                                             print_r($value, true);
@@ -319,6 +330,7 @@ class SubDistrict extends Record
                     }
                     else
                     {
+                        $parmstext              .= "'$value'";
                         $distId                 = $value;
                         $formerDistrict         = self::$formerDistrict;
                         if ($formerDistrict &&
@@ -332,6 +344,7 @@ class SubDistrict extends Record
                 {                   // sub-district id
                     if (is_array($value))
                     {
+                        $parmstext              .= print_r($value, true);
                         if (count($value) == 1)
                             $sdId   = $value[0];
                         else
@@ -339,31 +352,35 @@ class SubDistrict extends Record
                                         " SD_ID=" . print_r($value, true);
                     }
                     else
+                    {
+                        $parmstext              .= "'$value'";
                         $sdId                   = $value;
+                    }
                     break;
                 }                   // sub-district id
 
                 case 'sd_div':
                 {                   // enumeration division
+                    $parmstext                  .= "'$value'";
                     $division                   = $value;
                     break;
                 }                   // enumeration division
 
                 case 'sd_sched':
                 {                   // census schedule id
+                    $parmstext                  .= "'$value'";
                     $sched                      = $value;
                     break;
                 }                   // census schedule id
 
             }                       // act on specific parameters
         }                           // process parameters
-
-        // query the database for district information
-        $this->district         = $this->getDistrict($distId);
+        if ($debug)
+            $warn   .= "<p>SubDistrict::__construct(array($parmstext))<p>\n";
 
         // construct the query for an existing record
 
-        if (!is_null($division))
+        if (is_string($division) && strlen($division) > 0)
         {                   // division included in search
             $sdQuery    = "SELECT * FROM SubDistricts " .
                                 "WHERE SD_Census=:censusId AND " .
@@ -396,17 +413,27 @@ class SubDistrict extends Record
         if ($stmt->execute($sqlParms))
         {       // success
             $result     = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            $count      = count($result);
+            if ($count != 1)
+            {
+                $warn   .= "<p>SubDistrict.inc: " . __LINE__.
+                            " query='$queryText' " .
+                            "numRows=$count</p>\n";
+                $backtrace  = debug_backtrace();
+                $warn   .= "<p>";
+                foreach($backtrace as $caller)
+                    $warn   .= $caller['file'] . ':' .
+                                $caller['line'] . ', ';
+                $warn   .= "</p>\n";
+            }
+            else
             if ($debug)
             {
                 $warn   .= "<p>SubDistrict.inc: " . __LINE__.
-                    " query='$queryText'</p>\n";
-                if (count($result) != 1)
-                {
-                    $warn   .= "<p>numRows=" . count($result) . "</p>\n";
-                }
+                            " query='$queryText'</p>\n";
             }
 
-            if (count($result) == 1)
+            if ($count >= 1)
             {       // existing record
                 $dbrow          = $result[0];
                 $needInsert     = false;
@@ -527,6 +554,9 @@ class SubDistrict extends Record
             }       // act on specific parameters
         }       // check for other initialization
 
+        // query the database for district information
+        $this->district         = $this->getDistrict($distId);
+
         // diagnostic output if debug is set
         $this->dump('SubDistrict Record constructed:');
     }       // SubDistrict::__construct
@@ -576,7 +606,6 @@ class SubDistrict extends Record
                 case 'sd_bypage':
                 {
                     if ($this->row[$fieldLc] == '' ||
-                        $this->row[$fieldLc] == 0 ||
                         is_null($this->row[$fieldLc]))
                         return 1;
                     else
@@ -913,10 +942,10 @@ class SubDistrict extends Record
      ********************************************************************/
     function getDistrict($distId = null)
     {
-        if (is_null($distId))
-            $distId                     = $this->row['sd_distid'];
         if (is_null($this->district))
         {                           // not set from parameters
+            if (is_null($distId))
+                $distId                 = $this->row['sd_distid'];
             $formerDistrict             = self::$formerDistrict;
             if ($formerDistrict &&
                 $distId == $formerDistrict['id'])
@@ -925,8 +954,8 @@ class SubDistrict extends Record
             }                       // avoid creating new instance
             else
             {                       // create new District
-                $distParms              = array('d_census'  => $this->census,
-                                                'd_id'      => $distId);
+                $distParms          = array('d_census'  => $this->census,
+                                            'd_id'      => $distId);
                 $this->district         = new District($distParms);
                 self::$formerDistrict   = $this->district;
             }                       // create new District
@@ -1558,7 +1587,11 @@ class SubDistrict extends Record
             $pagesize       = $this->census['linesperpage'];
             if ($debug)
                 $warn       .= "<p>SubDistrict::getStatistics: " . __LINE__ . " \$this->getSubDistrict()</p>\n";
-            $nextpage       = $this->row['sd_page1'];
+            $sdpage1        = $this->row['sd_page1'];
+            if ($sdpage1 == 0)
+                $nextpage   = 1;    // fixup for certain bad divisions
+            else
+                $nextpage   = $sdpage1;
             $bypage         = $this->row['sd_bypage'];
             $pages          = $this->row['sd_pages'];
 
@@ -1582,7 +1615,11 @@ class SubDistrict extends Record
                     $row            = next($result);
                 }
 
-                $nextpage           += $bypage;
+                // fixup for divisions with bad image pagination
+                if ($sdpage1 == 0 && $nextpage == 1)
+                    $nextpage       = $bypage;
+                else
+                    $nextpage       += $bypage;
             }
             return $retval;
         }       // successful query

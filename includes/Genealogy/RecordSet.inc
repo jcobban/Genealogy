@@ -112,10 +112,13 @@ use \Templating\Template;
  *                      surnames matching a regular expression rather   *
  *                      than passing the regular expression to SQL      *
  *      2020/09/06      correct handling of surnames containing '       *
+ *      2021/02/01      do not pass SQL JOIN to ReflectionClass         *
+ *      2021/02/21      improve performance of surname searches         *
  *                                                                      *
- *  Copyright &copy; 2020 James A. Cobban                               *
+ *  Copyright &copy; 2021 James A. Cobban                               *
  ************************************************************************/
 require_once __NAMESPACE__ . '/Record.inc';
+require_once __NAMESPACE__ . '/Surname.inc';
 
 /************************************************************************
  *  class RecordSet                                                     *
@@ -499,6 +502,7 @@ class RecordSet implements Iterator, Countable, ArrayAccess
                     include __NAMESPACE__ . "/" . $className . ".inc";
             }
             else
+            if (preg_match('/^\w+$/', $tableName))
             {
                 $reflection                 = new ReflectionClass($tableName);
                 if ($reflection->isSubclassOf('Record'))
@@ -506,6 +510,8 @@ class RecordSet implements Iterator, Countable, ArrayAccess
                 else
                     $this->msg              .= "class '$tableName' is not an extension of 'Record'. ";
             }
+            else
+                $this->msg                  .= "Unsupported table '$tableName'. ";
         }           // first parameter is string
         else
             $this->msg                      .= "Table name must be a string. ";
@@ -1997,21 +2003,45 @@ require_once __NAMESPACE__ . '/Surname.inc';
                                         print_r($fldname,true) .
                                         " in selection criteria</p>\n";
         }                       // loop through all parameters
-            if (strlen($surname) > 0)
-            {                   // add surname check
-                $loosetext      = 'false';
-                if ($loose)
+
+        if (strlen($surname) > 0)
+        {                   // add surname check
+            $loosetext      = 'false';
+            if ($loose)
+            {
+                $loosetext      = 'true';
+                $expression = $this->getSurnameChk($this->table,
+                                                   $surname);
+            }
+            else
+            {
+                $surnameRec     = new Surname(array('surname' => $surname));
+                $pattern            = $surnameRec['pattern'];
+                $soundslike         = $surnameRec['soundslike'];
+                if (strlen($pattern) > 0)
                 {
-                    $loosetext      = 'true';
-                    $expression = $this->getSurnameChk($this->table,
-                                                       $surname);
+                    $surnameSet     = new RecordSet('Surnames',
+                                            array('surname' => $pattern));
+                    $surname        = array();
+                    foreach($surnameSet as $record)
+                        $surname[]  = "^" . $record['surname'] . "$";
                 }
                 else
-                    $expression = $this->getWherePattern('surname',
-                        $surname);
-                $where          .= $and . $expression;
-                $and            = ' AND ';
-            }                   // add surname check
+                if (strlen($soundslike) > 0)
+                {
+                    $surnameSet     = new RecordSet('Surnames',
+                                        array('soundslike' => $soundslike));
+                    $surname        = array();
+                    foreach($surnameSet as $record)
+                        $surname[]  = "^" . $record['surname'] . "$";
+                }
+                
+                $expression = $this->getWherePattern('surname',
+                                                     $surname);
+            }
+            $where          .= $and . $expression;
+            $and            = ' AND ';
+        }                   // add surname check
 
         return $where;
     }       // function RecordSet::getWhere
@@ -2022,7 +2052,9 @@ require_once __NAMESPACE__ . '/Surname.inc';
      *  Delete all records in a RecordSet.                              *
      *                                                                  *
      *  Parameters:                                                     *
-     *      $xml        if true or a string, emit output to XML         *
+     *      $output     if true emit XML                                *
+     *                  if Record::JSON emit JSON (to do)               *
+     *                  if a string emit XML using as tag name          *
      *      $simulate   if true just display SQL command                *
      *                                                                  *
      *  Returns:                                                        *
@@ -2035,7 +2067,7 @@ require_once __NAMESPACE__ . '/Surname.inc';
      *      adding a message to $warn.  A specific case is if the       *
      *      an attempt is made to delete all the records in the table.  *
      ********************************************************************/
-    public function delete($xml         = false,
+    public function delete($output      = false,
                            $simulate    = false)
     {
         global  $debug;
@@ -2051,20 +2083,38 @@ require_once __NAMESPACE__ . '/Surname.inc';
             return 0;
         }
 
-        if (is_string($xml))
-        {       // string tag name
-            $tagname    = $xml;
-            $msgtag     = "p class='message'";
-            $emsgtag    = "p";
-            $xml        = true;
-        }       // string tag name
+        // determine style for diagnostic output
+        $indent             = '';
+        $xmlparms           = '';
+        $xml                = $output === Record::XML;
+        $json               = $output === Record::JSON;
+
+        if (is_string($output) && !$json)
+        {               // string tag name
+            $xmltext        = "'$output'";
+            $matches        = array();
+            if (preg_match('/^(\s*)(\w*)(.*)$/', $output, $matches))
+            {
+                $indent     = $matches[1];
+                $tagname    = $matches[2];
+                $xmlparms   = $matches[3];
+            }
+            else
+                $tagname    = $output;
+            $xml            = true;
+        }               // string tag name
         else
         if ($xml)
-        {       // true
-            $tagname    = 'cmd';
-            $msgtag     = 'msg';
-            $emsgtag    = 'msg';
-        }       // true
+        {               // boolean true
+            $xmltext        = 'true';
+            $indent         = '    ';
+            $tagname        = 'cmd';
+        }               // boolean true
+        else
+        if ($json)
+            $xmltext        = 'Record::JSON';
+        else
+            $xmltext        = 'false';
 
         if (strlen($this->where) == 0)
         {
@@ -2105,6 +2155,12 @@ require_once __NAMESPACE__ . '/Surname.inc';
                                 "\t" . $deleteText . "\n" .
                       "    </$tagname>\n";
             else
+            if ($json)
+            {
+                print ",\n$indent\"cmdcount\" : \"$result\",\n" .
+                          "$indent\"cmd\" : " . json_encode($deleteText);
+            }
+            else
             if ($debug)
                 $warn   .= "<p>RecordSet::delete: " . __LINE__ .
                                 " '$deleteText'</p>\n" .
@@ -2129,7 +2185,9 @@ require_once __NAMESPACE__ . '/Surname.inc';
      *      $setparms   associative array of field/value combinations   *
      *                  to specify update to be applied to all records  *
      *                  belonging to this RecordSet                     *
-     *      $xml        if true or a string, emit output to XML         *
+     *      $output     if true emit XML                                *
+     *                  if Record::JSON emit JSON (to do)               *
+     *                  if a string emit XML using as tag name          *
      *      $simulate   if true just display SQL command                *
      *      $orderby    value for ORDER clause                          *
      *                  this can also be set by specifying              *
@@ -2147,29 +2205,47 @@ require_once __NAMESPACE__ . '/Surname.inc';
      *      passed in the first parameter.                              *
      ********************************************************************/
     public function update($setparms,
-                           $xml     = false,
+                           $output      = false,
                            $simulate    = false,
-                           $orderby = '')
+                           $orderby     = '')
     {
         global  $debug;
         global  $warn;
         global  $connection;
 
         $quit           = false;
-        if (is_string($xml))
-        {       // string tag name
-            $tagname    = $xml;
-            $msgtag     = "p class='message'";
-            $emsgtag    = "p";
-            $xml        = true;
-        }       // string tag name
+        // determine style for diagnostic output
+        $indent             = '';
+        $xmlparms           = '';
+        $xml                = $output === Record::XML;
+        $json               = $output === Record::JSON;
+
+        if (is_string($output) && !$json)
+        {               // string tag name
+            $xmltext        = "'$output'";
+            $matches        = array();
+            if (preg_match('/^(\s*)(\w*)(.*)$/', $output, $matches))
+            {
+                $indent     = $matches[1];
+                $tagname    = $matches[2];
+                $xmlparms   = $matches[3];
+            }
+            else
+                $tagname    = $output;
+            $xml            = true;
+        }               // string tag name
         else
         if ($xml)
-        {       // true
-            $tagname    = 'cmd';
-            $msgtag     = 'msg';
-            $emsgtag    = 'msg';
-        }       // true
+        {               // boolean true
+            $xmltext        = 'true';
+            $indent         = '    ';
+            $tagname        = 'cmd';
+        }               // boolean true
+        else
+        if ($json)
+            $xmltext        = 'Record::JSON';
+        else
+            $xmltext        = 'false';
 
         // construct the SET clause for the update
         $set            = '';
@@ -2327,6 +2403,12 @@ require_once __NAMESPACE__ . '/Surname.inc';
                     {
                         print "<call level=\"$i\">" . $entry["file"] . ':' . $entry["line"] . ' ' . $entry["function"] . '(' . print_r($entry["args"], true) . ")</call>\n";
                     }
+                }
+                else
+                if ($json)
+                {
+                    print ",\n$indent\"cmdcount\" : \"$count\",\n" .
+                          "$indent\"cmd\" : " . json_encode($updateText);
                 }
                 if ($debug)
                     $warn   .= "<p>RecordSet.inc: " . __LINE__ . ' ' .

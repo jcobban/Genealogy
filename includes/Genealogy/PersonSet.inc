@@ -200,16 +200,16 @@ class PersonSet extends RecordSet
             throw new Exception("PersonSet::getWhere:: parms=" .
                                 print_r($this->parms, true));
 
-        $where      			= '';
-        $and        			= 'WHERE ';
-        $or     			    = '';
-        $needRBracket   		= false;
-        $loose      			= false;
-        $incMarried 			= false;
-        $surname    			= null;
-        $givennames 			= null;
-        $treename   			= '';
-        $message    			= '';
+        $where                  = '';
+        $and                    = 'WHERE ';
+        $or                     = '';
+        $needRBracket           = false;
+        $loose                  = false;
+        $incMarried             = false;
+        $surname                = null;
+        $givennames             = null;
+        $treename               = '';
+        $message                = '';
 
         if (!is_array($this->sqlParms))
             $this->sqlParms     = array();

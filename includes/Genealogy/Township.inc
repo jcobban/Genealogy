@@ -19,13 +19,13 @@ use \Iterator;
  *      Code        VARCHAR(64) NOT NULL DEFAULT '',                    *
  *      Name        VARCHAR(64) NOT NULL DEFAULT '',                    *
  *      Location    INT(10 UNSIGNED DEFAULT NULL,                       *
- *		PRIMARY KEY (`Prov`, `County`, `Code`),				            *
- *		UNIQUE KEY `Domain` (`Domain`, `County`, `Code`),				*
- *		KEY `Name` (`Name`),				                            *
- *      KEY `Location` (`Location`),				                    *
- *      CONSTRAINT `Townships_ibfk_1` FOREIGN KEY (`Location`) 			*
- *          REFERENCES `tblLR` (`IDLR`) 				                *
- *          ON DELETE SET NULL ON UPDATE CASCADE )				        *
+ *      PRIMARY KEY (`Prov`, `County`, `Code`),                         *
+ *      UNIQUE KEY `Domain` (`Domain`, `County`, `Code`),               *
+ *      KEY `Name` (`Name`),                                            *
+ *      KEY `Location` (`Location`),                                    *
+ *      CONSTRAINT `Townships_ibfk_1` FOREIGN KEY (`Location`)          *
+ *          REFERENCES `tblLR` (`IDLR`)                                 *
+ *          ON DELETE SET NULL ON UPDATE CASCADE )                      *
  *                                                                      *
  *  History:                                                            *
  *      2014/09/29      created                                         *

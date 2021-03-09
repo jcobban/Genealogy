@@ -256,8 +256,11 @@ use \Exception;
  *                      method get invokes getNotes and getDescription  *
  *                      to ensure consistent behavior                   *
  *      2020/06/12      correct JSON output                             *
+ *      2021/02/19      replace throws with error_logs                  *
+ *                      use Record::constDebug and                      * 
+ *                      Record::debugBacktrace                          *
  *                                                                      *
- *  Copyright &copy; 2020 James A. Cobban                               *
+ *  Copyright &copy; 2021 James A. Cobban                               *
  ************************************************************************/
 require_once __NAMESPACE__ . '/RecordPic.inc';
 require_once __NAMESPACE__ . '/LegacyDate.inc';
@@ -517,13 +520,13 @@ class Event extends RecordPic
      *  Description of record class                                     *
      ********************************************************************/
     protected static    $info   = array(
-                'table'     => 'tblER',
-                'name'      => 'Events',
-                'prime'     => 'ider',
-                'srvmg'     => true,
-                'fldcount'  => 4,
-                'order'     => '`Order`',
-                'classname' => 'Event');
+                'table'                 => 'tblER',
+                'name'                  => 'Events',
+                'prime'                 => 'ider',
+                'srvmg'                 => true,
+                'fldcount'              => 4,
+                'order'                 => '`Order`',
+                'classname'             => 'Event');
 
     /********************************************************************
      *  Event::$translate                                               *
@@ -531,11 +534,11 @@ class Event extends RecordPic
      *  array containing synonyms for field names                       *
      ********************************************************************/
     protected static    $translate  = array(
-                'id'        => 'ider',
-                'desc'      => 'notes',
-                'date'      => 'eventd',
-                'location'  => 'idleevent',
-                'private'   => 'eventexclude');
+                'id'                    => 'ider',
+                'desc'                  => 'notes',
+                'date'                  => 'eventd',
+                'location'              => 'idleevent',
+                'private'               => 'eventexclude');
 
     /********************************************************************
      *  Event::defaultOrder                                             *
@@ -824,39 +827,11 @@ class Event extends RecordPic
                                 'idir'      => $idir);
         }       // old style create new event
 
-        if ($debug && is_array($parms))
-        {
-            $parmsTxt           = 'Array';
-            $comma              = '[';
-            foreach($parms as $key => $parm)
-            {       // loop through parameters
-                $parmsTxt       .= $comma . $key . '=';
-                if (is_object($parm))
-                    $parmsTxt   .= get_class($parm) . ' object';
-                else
-                    $parmsTxt   .= gettype($parm) . '=' . $parm;
-                $comma          = ', ';
-            }       // loop through parameters
-            $warn               .= "<p>Event::__construct(" .
-                $parmsTxt . "])</p>\n";
-            $backtrace          = debug_backtrace();
-            foreach($backtrace as $call)
-            {
-                if (array_key_exists('class', $call) &&
-                    strlen($call['class']) > 0)
-                    $classPref      = $call['class'] . '::';
-                else
-                    $classPref      = '';
-                $warn   .= "<p>Event::__construct: " . __LINE__ .
-                    " function=$classPref" . $call['function'] .
-                    " called from line " . $call['line'] .
-                    " of " . $call['file'] . "</p>\n";
-            }
-        }
-
         // act on parameter to select and update record
         if (is_array($parms))
         {           // associative array
+            if ($debug)
+                $this->constDebug('Event', $parms);
             $ider                           = 0;
             $iderSpecified                  = false;
             $idet                           = self::ET_NULL;
@@ -1177,41 +1152,60 @@ class Event extends RecordPic
      *  Delete the database record associated with this instance.       *
      *                                                                  *
      *  Input:                                                          *
-     *      $xml        if true emit XML output                         *
+     *      $output     if true emit XML                                *
+     *                  if Record::JSON emit JSON (to do)               *
+     *                  if a string emit XML using as tag name          *
      *                                                                  *
      *  Returns:                                                        *
      *      false       if the method was unable to update the database *
      *      1           if the method deleted the database record       *
      *      0           if the record did not need to be deleted        *
      ********************************************************************/
-    function delete($xml = false)
+    function delete($output = false)
     {
         global  $debug;
         global  $warn;
         global  $connection;
 
-        $ider       = $this->row['ider'];
-        if ($ider == 0)
-            return;
-        $idType     = $this->row['idtype'];
-        $count      = false;
+        // determine style for diagnostic output
+        $indent             = '';
+        $xmlparms           = '';
+        $xml                = $output === Record::XML;
+        $json               = $output === Record::JSON;
 
-        if (is_string($xml))
-        {       // string tag name
-            $tagname    = $xml;
-            $msgtag = "p class='message'";
-            $emsgtag    = "p";
-            $xml    = true;
-        }       // string tag name
+        if (is_string($output) && !$json)
+        {               // string tag name
+            $xmltext        = "'$output'";
+            $matches        = array();
+            if (preg_match('/^(\s*)(\w*)(.*)$/', $output, $matches))
+            {
+                $indent     = $matches[1];
+                $tagname    = $matches[2];
+                $xmlparms   = $matches[3];
+            }
+            else
+                $tagname    = $output;
+            $xml            = true;
+        }               // string tag name
         else
         if ($xml)
-        {       // true
-            $tagname    = 'cmd';
-            $msgtag = 'msg';
-            $emsgtag    = 'msg';
-        }       // true
+        {               // boolean true
+            $xmltext        = 'true';
+            $indent         = '    ';
+            $tagname        = 'cmd';
+        }               // boolean true
         else
-            $tagname    = false;
+        if ($json)
+            $xmltext        = 'Record::JSON';
+        else
+            $xmltext        = 'false';
+
+        // update database
+        $ider               = $this->row['ider'];
+        if ($ider == 0)
+            return;
+        $idType             = $this->row['idtype'];
+        $count              = false;
 
         // to simplify expressions
         if (!$this->needInsert &&
@@ -1232,7 +1226,13 @@ class Event extends RecordPic
                     $warn           .= "<p>Event::delete: " . __LINE__.
                                        " '$deleteText', count=$count</p>\n";
                 if ($xml)
-                    print "<$tagname count='$count'>$deleteText</$tagname>\n";
+                    print "$indent<$tagname count='$count'>$deleteText</$tagname>\n";
+                else
+                if ($json)
+                {
+                    print ",\n$indent\"cmdcount\" : \"$count\",\n" .
+                          "$indent\"cmd\" : " . json_encode($deleteText);
+                }
 
                 // log the update
                 $this->log($delete,
@@ -1246,8 +1246,10 @@ class Event extends RecordPic
             }       // success
             else
             {       // error updating record
-                error_log("Event.inc: " . __LINE__ . " '$delete', " .
-                            print_r($stmt->errorInfo(),true) . "\n");
+                error_log("Event::delete: " . __LINE__ .
+                                " '$deleteText', " .
+                                print_r($stmt->errorInfo(),true) . "\n");
+                error_log("Event::delete: " . $this->debugBacktrace());
                 return false;
             }       // error updating record
         }       // have ider value and record is written to table
@@ -1257,7 +1259,7 @@ class Event extends RecordPic
         $parms      = array('idime'     => $ider,
                             'type'      => $cittype);
         $citations  = new RecordSet('Citations', $parms);
-        $count      = $citations->delete($tagname);
+        $count      = $citations->delete($output);
 
         return $count;  // number of records deleted
     }       // Event::delete
@@ -2612,7 +2614,8 @@ class Event extends RecordPic
      *  database.                                                       *
      *                                                                  *
      *  Parameters:                                                     *
-     *      $xml        if true diagnostic output is emitted in XML     *
+     *      $output     if true diagnostic output is emitted in XML     *
+     *                  if Record::JSON emit JSON (to do)               *
      *                  if a string use it as tag name                  *
      *                                                                  *
      *  Returns:                                                        *
@@ -2620,49 +2623,89 @@ class Event extends RecordPic
      *      0           if the record did not need to be updated        *
      *      false       if the record could not be updated              *
      ********************************************************************/
-    function save($xml)
+    function save($output)
     {
         global  $connection;
         global  $debug;
         global  $warn;
         global  $document_root;
 
+        // determine style for diagnostic output
+        $indent             = '';
+        $xmlparms           = '';
+        $xml                = $output === Record::XML;
+        $json               = $output === Record::JSON;
+
+        if (is_string($output) && !$json)
+        {               // string tag name
+            $xmltext        = "'$output'";
+            $matches        = array();
+            if (preg_match('/^(\s*)(\w*)(.*)$/', $output, $matches))
+            {
+                $indent     = $matches[1];
+                $tagname    = $matches[2];
+                $xmlparms   = $matches[3];
+            }
+            else
+                $tagname    = $output;
+            $xml            = true;
+        }               // string tag name
+        else
+        if ($xml)
+        {               // boolean true
+            $xmltext        = 'true';
+            $indent         = '    ';
+            $tagname        = 'cmd';
+        }               // boolean true
+        else
+        if ($json)
+            $xmltext        = 'Record::JSON';
+        else
+            $xmltext        = 'false';
+
         // the associated record is identified appropriately to make
         // the code easy to understand
-        $indiv      = $this->associatedRecord;
-        $idir       = intval($this->row['idir']);
-        $idtype     = intval($this->row['idtype']);
-        $idet       = intval($this->row['idet']);
-        $preferred  = $this->row['preferred'];
+        $indiv              = $this->associatedRecord;
+        $idir               = intval($this->row['idir']);
+        $idtype             = intval($this->row['idtype']);
+        $idet               = intval($this->row['idet']);
+        $preferred          = $this->row['preferred'];
         if ($idet == Event::ET_BIRTH)
         {
-            $birthsd    = $this->row['eventsd'];
+            $birthsd        = $this->row['eventsd'];
         }
         if ($indiv)
-            $indivset   = 'Indiv is set';
+            $indivset       = 'Indiv is set';
         else
-            $indivset   = 'Indiv is not set';
+            $indivset       = 'Indiv is not set';
         if ($preferred)
-            $preftext   = "preferred instance";
+            $preftext       = "preferred instance";
         else
-            $preftext   = '';
+            $preftext       = '';
 
         // do not create a new event record if it has no contents
         if ($this->row['eventd'] == '' &&
             $this->row['idlrevent'] == 1 &&
             $this->row['description'] == '')
-            return;
+            return false;
+        if ($this->row['idet'] <= 1)
+        {
+            error_log("Event::save: NULL event: " .
+                                print_r($this->row, true));
+            error_log("Event::save: " . $this->debugBacktrace());
+            return false;
+        }
 
         // migrate events from associated record to Event record
         if ($this->needInsert && $preferred)
         {       // new preferred event
             if ($debug)
-                $warn   .= "<p>Insert preferred event: " .
-                           "idir=$idir, idet=$idet</p>\n";
+                $warn       .= "<p>Event::save: Insert preferred event: " .
+                                       "idir=$idir, idet=$idet</p>\n";
 
             // ensure that event information is removed from old location
             if ($indiv)
-            {       // have old base record
+            {       // have former base record
                 switch($idet)
                 {   // act on specific event types
                     case Event::ET_BIRTH:
@@ -2671,7 +2714,7 @@ class Event extends RecordPic
                         $indiv->clearEvent('birth');
                         // restore birthsd which is used for sorting
                         $indiv->set('birthsd',
-                                 $birthsd);
+                                    $birthsd);
                         break;
                     }
 
@@ -2749,8 +2792,11 @@ class Event extends RecordPic
                     case 0:
                     case Event::ET_NULL:
                     {
-                        throw new Exception("Event::save: NULL event: " .
-                                print_r($this->row, true));
+                        error_log("Event::save: NULL event: " .
+                                            print_r($this->row, true));
+                        error_log("Event::save: " . 
+                                            $this->debugBacktrace());
+                        return false;
                     }
                 }   // act on specific event types
             }       // have associated record
@@ -2783,8 +2829,10 @@ class Event extends RecordPic
             }       // success
             else
             {       // error performing query
-                throw new Exception("Event::save: '$queryText': " .
-                                print_r($stmt->errorInfo(), true));
+                error_log("Event::save: '$queryText': " .
+                                    print_r($stmt->errorInfo(), true));
+                error_log("Event::save: " . $this->debugBacktrace());
+                return false;
             }       // error performing query
         }       // new preferred event
 
@@ -2796,27 +2844,25 @@ class Event extends RecordPic
             if (!$this->recordSetByConstructor)
             {
                 if ($debug)
-                    $warn   .= "<p>\$indiv->save($xml)</p>\n";
-                $indiv->save($xml);
+                    $warn   .= "<p>Event::save: \$indiv->save($xmltext)</p>\n";
+                $indiv->save($output);
             }
 
             // also update name index entries
             $idir       = $this->row['idir'];
             if ($debug)
-                $warn   .= "<p>Event.inc: " . __LINE__ . " new RecordSet('Names', array('idir'  => $idir));</p>\n" .
+                $warn   .= "<p>Event::save: " . __LINE__ . " new RecordSet('Names', array('idir'  => $idir));</p>\n" .
                 "<p>\$names->update(array('birthsd' => $birthsd))</p>\n";
-            $names  = new RecordSet('Names', array('idir'   => $idir));
+            $names      = new RecordSet('Names', array('idir'   => $idir));
             $names->update(array('birthsd'  => $birthsd));
         }       // update associated records
 
-        // invoke parent's implementation
-        $oldider    = intval($this->row['ider']);
-        if ($this->row['idet'] <= 1)
-            throw new Exception("Event::save: NULL event: " .
-                            print_r($this->row, true));
-        parent::save($xml);
+        // invoke parent's implementation to complete update
+        $oldider        = intval($this->row['ider']);
+        parent::save($output);
         if ($debug && $oldider == 0)
-            $warn   .= "<p>new event IDER=" . $this->row['ider'] . "</p>\n";
+            $warn       .= "<p>Event::save: new event IDER=" .
+                                    $this->row['ider'] . "</p>\n";
 
         // also apply any changes made to migrate citations
         $citations      = $this->getCitations();
@@ -2827,7 +2873,7 @@ class Event extends RecordPic
             if ($debug)
                 $warn   .= "<p>move citation IDSX=$idsx to IDIME=$ider</p>\n";
             $citation->set('idime', $ider);
-            $citation->save($xml);
+            $citation->save($output);
         }           // loop through all citations
 
     }       // Event::save

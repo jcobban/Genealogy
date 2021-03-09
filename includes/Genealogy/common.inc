@@ -219,8 +219,10 @@ use \Templating\Template;
  *      2020/02/14      initialize $dbversion                           *
  *      2020/06/09      set secure and samesite=lax on all cookies      *
  *      2020/06/10      ensure $browser->majorver always set            *
+ *      2021/01/21      $authorized global variable not set for         *
+ *                      session persistence                             *
  *                                                                      *
- *  Copyright &copy; 2020 James A. Cobban                               *
+ *  Copyright &copy; 2021 James A. Cobban                               *
  ************************************************************************/
 // identify the SQL server to connect to based upon the URL
 // initializes the global variable $dsn
@@ -304,13 +306,13 @@ require_once __NAMESPACE__ . '/User.inc';
 require_once __NAMESPACE__ . '/Blog.inc';
 require_once __NAMESPACE__ . '/RecordSet.inc';
 
-$user               		= null;     // instance of User
-$userid             		= null;
-$password           		= null;
-$newuserid          		= '';
-$authorized         		= '';
-$familyTreeCookie   		= array();
-$signonText         		= 'contribute';
+$user                       = null;     // instance of User
+$userid                     = null;
+$password                   = null;
+$newuserid                  = '';
+$authorized                 = '';
+$familyTreeCookie           = array();
+$signonText                 = 'contribute';
 try {
     // check for existing session
     session_start();
@@ -344,73 +346,73 @@ try {
     // check cookies
     if (isset($_COOKIE) && count($_COOKIE) > 0)
     {                   // handle cookies
-	    foreach($_COOKIE as $key => $value)
-	    {               // loop through all cookie variables
-	        switch(strtolower($key))
-	        {           // act on specific cookies
-	            case 'persistence':
-	            {
-	                if (!isset($userid))
-	                {
-	                    $user       = new User(array('persistence' => $value));
-	                    if ($user->isExisting())
-	                        $userid = $user['username'];
+        foreach($_COOKIE as $key => $value)
+        {               // loop through all cookie variables
+            switch(strtolower($key))
+            {           // act on specific cookies
+                case 'persistence':
+                {
+                    if (!isset($userid))
+                    {
+                        $user           = 
+                            new User(array('persistence' => $value));
+                        if ($user->isExisting())
+                        {
+                            $userid     = $user['username'];
+                            $authorized = $user->get('auth');
+                            $options    = $user->get('options');
+                        }
                         else
                         {
-                            error_log("common.inc: " . __LINE__ .
-                                        " \$_SESSION=" . 
-                                        var_export($_SESSION,true) . "\n");
-	                        error_log("common.inc: " . __LINE__ . 
-                                        " \$_COOKIE=" .
-                                        var_export($_COOKIE, true) . "\n");
-                            $user   = null;
+                            $user           = null;
+                            $userid         = null;
                         }
-	                }
-	                setcookie($key, $value,
-	                          [ 'expires'   => time() + 60*60*24*7, 
-	                            'path'      => '/',
-	                            'secure'    => true,
-	                            'samesite'  => 'lax']);
-	                break;
-	            }
-	
-	            case 'rememberme':
-	            {
-	                unset($_COOKIE[$key]);
-	                setcookie($key, '', 
-	                          [ 'expires'   => time() - 3600, 
-	                            'path'      => '/',
-	                            'secure'    => true,
-	                            'samesite'  => 'lax']);
-	                break;
-	            }
-	
-	            case 'familytree':
-	            {       // family tree information
-	                $parts      = explode('&', $value);
-	                foreach($parts as $part)
-	                {       // process each part
-	                    $o          = strpos($part, ':');
-	                    $pname      = rawurldecode(substr($part, 0, $o));
-	                    $pvalue     = rawurldecode(substr($part, $o+1));
-	                    $familyTreeCookie[$pname]   = $pvalue;
-	                }       // process each part
-	                break;
-	            }       // family tree information
-	
-	            case 'dboptions':
-	            {       // obsolete dboptions
-	                setcookie('dboptions','', 
-	                          [ 'expires'   => time() - 3600, 
-	                            'path'      => '/',
-	                            'secure'    => true,
-	                            'samesite'  => 'lax']);
-	                $value      = '';
-	                break;
-	            }       // obsolete dboptions
-	        }           // act on specific cookies
-	
-	    }               // loop through all cookie variables
+                    }
+                    setcookie($key, $value,
+                              [ 'expires'   => time() + 60*60*24*7, 
+                                'path'      => '/',
+                                'secure'    => true,
+                                'samesite'  => 'lax']);
+                    break;
+                }
+    
+                case 'rememberme':
+                {
+                    unset($_COOKIE[$key]);
+                    setcookie($key, '', 
+                              [ 'expires'   => time() - 3600, 
+                                'path'      => '/',
+                                'secure'    => true,
+                                'samesite'  => 'lax']);
+                    break;
+                }
+    
+                case 'familytree':
+                {       // family tree information
+                    $parts      = explode('&', $value);
+                    foreach($parts as $part)
+                    {       // process each part
+                        $o          = strpos($part, ':');
+                        $pname      = rawurldecode(substr($part, 0, $o));
+                        $pvalue     = rawurldecode(substr($part, $o+1));
+                        $familyTreeCookie[$pname]   = $pvalue;
+                    }       // process each part
+                    break;
+                }       // family tree information
+    
+                case 'dboptions':
+                {       // obsolete dboptions
+                    setcookie('dboptions','', 
+                              [ 'expires'   => time() - 3600, 
+                                'path'      => '/',
+                                'secure'    => true,
+                                'samesite'  => 'lax']);
+                    $value      = '';
+                    break;
+                }       // obsolete dboptions
+            }           // act on specific cookies
+    
+        }               // loop through all cookie variables
     }                   // handle cookies
 
     // record that the user is logged on
@@ -536,60 +538,60 @@ class Browser
     {           // constructor
         if (isset($_SERVER['HTTP_USER_AGENT']))
         {
-            $useragent      		= $_SERVER['HTTP_USER_AGENT'];
-            $chromePatn     		= "#Chrome/([0-9.]+)#";
-            $firefoxPatn    		= "#Firefox/([0-9.]+)#";
-            $konquerorPatn  		= "#Konqueror/([0-9.]+)#";
-            $msiePatn       		= "#compatible; MSIE ([0-9.]+)#";
-            $res        		    = array();
+            $useragent              = $_SERVER['HTTP_USER_AGENT'];
+            $chromePatn             = "#Chrome/([0-9.]+)#";
+            $firefoxPatn            = "#Firefox/([0-9.]+)#";
+            $konquerorPatn          = "#Konqueror/([0-9.]+)#";
+            $msiePatn               = "#compatible; MSIE ([0-9.]+)#";
+            $res                    = array();
 
             if (preg_match($chromePatn, $useragent, $res))
             {       // Chrome browser, including M$ Edge
-                $this->browser  	= 'chrome';
-                $this->version  	= $res[1];
+                $this->browser      = 'chrome';
+                $this->version      = $res[1];
             }       // Chrome browser
             else
             if (preg_match($firefoxPatn, $useragent, $res))
             {       // Firefox browser
 
-                $this->version  	= $res[1];
+                $this->version      = $res[1];
             }       // Firefox browser
             else
             if (preg_match($konquerorPatn, $useragent, $res))
             {       // Konqueror browser
-                $this->browser  	= 'konqueror';
-                $this->version  	= $res[1];
+                $this->browser      = 'konqueror';
+                $this->version      = $res[1];
             }       // Konqueror browser
             else
             if (preg_match($msiePatn, $useragent, $res))
             {       // MSIE browser
-                $this->browser  	= 'IE';
-                $this->version  	= $res[1];
+                $this->browser      = 'IE';
+                $this->version      = $res[1];
             }       // MSIE browser
             else
             {       // other
-                $this->browser  	= 'other';
-                $this->version  	= '1.0';
+                $this->browser      = 'other';
+                $this->version      = '1.0';
             }       // other
 
             if (preg_match("#^([0-9]*)[^0-9]?([0-9]*)#", $this->version, $res))
             {
-                $this->majorver 	= $res[1];
-                $this->minorver 	= $res[2];
+                $this->majorver     = $res[1];
+                $this->minorver     = $res[2];
             }
             else
             {
-                $this->majorver 	= $this->version;
-                $this->minorver 	= '';
+                $this->majorver     = $this->version;
+                $this->minorver     = '';
             }
 
         }
         else
         {       // not invoked from browser
-            $this->browser  		= 'netscape';
-            $this->version  		= 0;
-            $this->majorver 		= 0;
-            $this->minorver 		= '';
+            $this->browser          = 'netscape';
+            $this->version          = 0;
+            $this->majorver         = 0;
+            $this->minorver         = '';
         }       // not invoked from browser
     }           // constructor
 }   // class Browser
@@ -624,8 +626,28 @@ if ($browser->browser == 'IE' && $browser->majorver < 8)
 </p>
 <?php
     $warn   .= ob_get_clean();
-    $msg    .= "Warning: Your computer is insecure and your operating system is no longer supported for security fixes.  Upgrade to a later version of Windows or switch to a more secure operating system?.";
+    $msg    .= "Warning: Your computer is insecure and your operating system is no longer supported for security fixes.  Upgrade to a later version of Windows or switch to a more secure operating system.";
 }       // old browser
+
+
+/************************************************************************
+ *  function globalExpHandler                                           *
+ *                                                                      *
+ *  This global function handles exceptions and errors that are         *
+ *  encountered during the execution of an application script.          *
+ *                                                                      *
+ *  Parameters:                                                         *
+ *      error       instance of Throwable                               *
+ *                                                                      *
+ ************************************************************************/
+function globalExpHandler(\Throwable $error)
+{
+    print "<p>Unhandled error '" . $error->getMessage() . "' at " .
+        $error->getFile() . ":" . $error->getLine() . "</p>\n";
+    print "<p>Trace: " . $error->getTraceAsString() . "</p>\n";
+}       // function globalExpHandler
+
+set_exception_handler('Genealogy\globalExpHandler');
 
 /************************************************************************
  *  canUser                                                             *

@@ -137,6 +137,7 @@ use \Genealogy\RecordSet;
  *                  tag handling into separate startTag and closeTag    *
  *                  functions                                           *
  *      2020/05/03  fix interaction of set with third parameter         *
+ *      2020/11/16  add list of includes to warning messages            *
  *                                                                      *
  *  Copyright &copy; 2020 James A. Cobban All Rights Reserved           *
  ************************************************************************/
@@ -324,12 +325,12 @@ class Template implements ArrayAccess
                 else
                     $this->mainValid    = file_exists($this->main);
                 if (!$this->mainValid)
-                    $warn   .= "<p>Invalid parameter to Template constructor '" . escape($init) . "'</p>\n";
+                    $warn   .= "<p>Template::construct: " . __LINE__ . " Invalid parameter to Template constructor '" . escape($init) . "'</p>\n";
             }
         }
         else
         {
-            $warn   .= "<p>Invalid parameter to Template constructor " .
+            $warn   .= "<p>Template::construct: " . __LINE__ . " Invalid parameter to Template constructor " .
                            gettype($init) . "</p>\n";
             $this->mainValid    = false;
         }
@@ -1207,7 +1208,7 @@ class Template implements ArrayAccess
             $tag->contents == 'default')
         {       // duplicate start tag
             $this->log("Template::startTag: " . __LINE__ .
-                " &lt;$tagName&gt; encountered when a tag of the same type was open, template=" . $this->main);
+                " &lt;$tagName&gt; encountered when a tag of the same type was open," . $this->diagPosition($tag));
             $topTag                 = array_pop($this->tagStack);
             if ($this->test)
                 $this->log("Template::startTag: " . __LINE__ .
@@ -1282,6 +1283,22 @@ class Template implements ArrayAccess
     }       // private function Template::startTag
 
     /********************************************************************
+     *  function Template::diagPosition                                 *
+     *                                                                  *
+     *  Generate string indicating position within template.            *
+     ********************************************************************/
+    private function diagPosition($tag)
+    {
+                                    
+        $position   = " at {$tag->start}, template=" . $this->main;
+        foreach($this->includes as $key => $filen)
+        {
+            $position   .= ", includes['$key']='$filen'";
+        }
+        return $position;
+    }       // function Template::diagPosition
+
+    /********************************************************************
      *  function Template::closeTag                                     *
      *                                                                  *
      *  Handle a closing tag of an element                              *
@@ -1327,52 +1344,51 @@ class Template implements ArrayAccess
                                     " stray end tag " .
                                     str_replace('<','&lt',$tagText) .
                                     " doesn't match $contents" .
-                                    " at {$tag->start}" .
-                                    ", template=" . $this->main);
+                                    $this->diagPosition($tag));
                 }
                 $peek                   = count($this->tagStack) - 1;
                 if ($peek >= 0)
                 {
-                $topTag                 = $this->tagStack[$peek];
-                if ($tagName == $topTag->tagName)
-                {
-                    if ($this->test)
-                        $this->log("Template::closeTag: " . __LINE__ .
-                                " close open &lt;{$tag->tagName}&gt;");
-                    $tag                = array_pop($this->tagStack);
-                }
-                else
-                {               // does not match next tag on stack
-                    for ($ii = $peek; $ii >= 0; $ii--)
-                    {           // scan down the stack
-                        $stack          = $this->tagStack[$ii];
+                    $topTag                 = $this->tagStack[$peek];
+                    if ($tagName == $topTag->tagName)
+                    {
                         if ($this->test)
                             $this->log("Template::closeTag: " . __LINE__ .
-                                " tagStack[$ii]=". $stack->tagName . ' ' .
-                                escape(substr($this->page, $stack->start, 70)) .
-                                " at {$stack->start}");
-                        if ($tagName == $stack->tagName)
-                        {       // found matching tag
-                            for ($ij = $peek; $ij > $ii; $ij--)
-                            {
-                                $closeTag       = $this->tagStack[$ij];
-                                if ($this->test)
-                                    $this->log("Template::closeTag: " . __LINE__ .
-                                    " close open &lt;{$closeTag->tagName}&gt;");
-                                $closeTag->etagLength   = 0;
-                                $closeTag->length       = $this->cursor - $closeTag->start;
-                                array_pop($this->tagStack);
-                            }
+                                    " close open &lt;{$tag->tagName}&gt;");
+                        $tag                = array_pop($this->tagStack);
+                    }
+                    else
+                    {               // does not match next tag on stack
+                        for ($ii = $peek; $ii >= 0; $ii--)
+                        {           // scan down the stack
+                            $stack          = $this->tagStack[$ii];
                             if ($this->test)
                                 $this->log("Template::closeTag: " . __LINE__ .
-                                " close open &lt;{$stack->tagName}&gt;");
-                            $stack->etagLength  = strlen($tagText);
-                            $stack->length      = $this->cursor + $stack->etagLength -
-                                                    $stack->start;
-                            break;
-                        }       // found matching tag
-                    }           // scan down the stack
-                }               // does not match next tag on stack
+                                    " tagStack[$ii]=". $stack->tagName . ' ' .
+                                    escape(substr($this->page, $stack->start, 70)) .
+                                    " at {$stack->start}");
+                            if ($tagName == $stack->tagName)
+                            {       // found matching tag
+                                for ($ij = $peek; $ij > $ii; $ij--)
+                                {
+                                    $closeTag       = $this->tagStack[$ij];
+                                    if ($this->test)
+                                        $this->log("Template::closeTag: " . __LINE__ .
+                                        " close open &lt;{$closeTag->tagName}&gt;");
+                                    $closeTag->etagLength   = 0;
+                                    $closeTag->length       = $this->cursor - $closeTag->start;
+                                    array_pop($this->tagStack);
+                                }
+                                if ($this->test)
+                                    $this->log("Template::closeTag: " . __LINE__ .
+                                    " close open &lt;{$stack->tagName}&gt;");
+                                $stack->etagLength  = strlen($tagText);
+                                $stack->length      = $this->cursor +
+                                    $stack->etagLength - $stack->start;
+                                break;
+                            }       // found matching tag
+                        }           // scan down the stack
+                    }               // does not match next tag on stack
                 }
 
                 if ($tag->contents == 'paragraph')

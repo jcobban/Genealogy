@@ -12,20 +12,20 @@ use \Iterator;
  *  This class provides access to the information in a row              *
  *  of the table Pages.                                                 *
  *                                                                      *
- *  CREATE TABLE `Pages` (				                                *
- *		`Census`        VARCHAR(6) NOT NULL DEFAULT 'CA1881',			*
- *		`DistId`        DECIMAL(4,1) NOT NULL,				            *
- *		`SdId`          VARCHAR(5) NOT NULL,				            *
- *		`Div`           VARCHAR(4) NOT NULL DEFAULT '',				    *
- *		`Sched`         CHAR(1) NOT NULL DEFAULT '1',				    *
- *		`PageNum`       INT(4) NOT NULL DEFAULT '1',				    *
- *		`Population`    INT(2) DEFAULT '25',				            *
- *		`Image`         VARCHAR(255) DEFAULT '',				        *
- *		`Transcriber`   VARCHAR(64) DEFAULT '',				            *
- *		`ProofReader`   VARCHAR(64) DEFAULT '',				            *
- *		PRIMARY KEY (`Census`, `DistId`, `SdId`,				        *
- *              		`Div`, `Sched`, `PageNum`),				        *
- *		KEY `PT_Image` (`Image`) )				                        *
+ *  CREATE TABLE `Pages` (                                              *
+ *      `Census`        VARCHAR(6) NOT NULL DEFAULT 'CA1881',           *
+ *      `DistId`        DECIMAL(4,1) NOT NULL,                          *
+ *      `SdId`          VARCHAR(5) NOT NULL,                            *
+ *      `Div`           VARCHAR(4) NOT NULL DEFAULT '',                 *
+ *      `Sched`         CHAR(1) NOT NULL DEFAULT '1',                   *
+ *      `PageNum`       INT(4) NOT NULL DEFAULT '1',                    *
+ *      `Population`    INT(2) DEFAULT '25',                            *
+ *      `Image`         VARCHAR(255) DEFAULT '',                        *
+ *      `Transcriber`   VARCHAR(64) DEFAULT '',                         *
+ *      `ProofReader`   VARCHAR(64) DEFAULT '',                         *
+ *      PRIMARY KEY (`Census`, `DistId`, `SdId`,                        *
+ *                      `Div`, `Sched`, `PageNum`),                     *
+ *      KEY `PT_Image` (`Image`) )                                      *
  *                                                                      *
  *  History:                                                            *
  *      2013/07/13      created                                         *
@@ -72,16 +72,16 @@ class Page extends Record
      *  Default initial row                                             *
      ********************************************************************/
     protected static $initRow   = array(
-                                        'census'         	=> 'CA1881',
-                                        'distid'         	=> 0,
-                                        'sdid'           	=> '',
+                                        'census'            => 'CA1881',
+                                        'distid'            => 0,
+                                        'sdid'              => '',
                                         'div'               => '',
-                                        'sched'          	=> '1',
+                                        'sched'             => '1',
                                         'pagenum'           => 1,
-                                        'population'     	=> 25,
-                                        'image'          	=> '',
-                                        'transcriber'    	=> '',
-                                        'proofreader'    	=> '');
+                                        'population'        => 25,
+                                        'image'             => '',
+                                        'transcriber'       => '',
+                                        'proofreader'       => '');
 
     /********************************************************************
      *  Page::$translate                                                *
@@ -653,12 +653,12 @@ class Page extends Record
         if ($line > 0 && 
             $line <= $this->row['population'])
         { 
-			$parms  = array('Census'		=> $this->row['census'],
-					        'District'		=> $this->row['distid'],
-					        'SubDistrict'	=> $this->row['sdid'],
-					        'Division'		=> $this->row['div'],
-	                        'Page'		    => $this->row['pagenum'],
-	                        'Line'          => $line);
+            $parms  = array('Census'        => $this->row['census'],
+                            'District'      => $this->row['distid'],
+                            'SubDistrict'   => $this->row['sdid'],
+                            'Division'      => $this->row['div'],
+                            'Page'          => $this->row['pagenum'],
+                            'Line'          => $line);
             return new CensusLine($parms);
         }
         else

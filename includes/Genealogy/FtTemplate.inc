@@ -31,6 +31,7 @@ use Templating\escape;
  *      2020/12/01      add method fmtMessage                           *
  *      2020/12/03      validateLang accepted invalid string            *
  *      2021/01/16      add error message before exception              *
+ *      2021/01/24      remove method fmtMessage                        *
  *                                                                      *
  *  Copyright &copy; 2021 James A. Cobban All Rights Reserved           *
  ************************************************************************/
@@ -218,29 +219,6 @@ class FtTemplate extends Template
     }           // static function validateLang
 
     /********************************************************************
-     *  function FtTemplate::fmtMessage                                 *
-     *                                                                  *
-     *  Get a message template from the page template and make          *
-     *  substitutions into it.  This is an extension of str_replace.    *
-     *                                                                  *
-     *  Parameters:                                                     *
-     *      $id         the id value of the element containing the      *
-     *                  message text template                           *
-     *      $match      either a string value of the token to replace   *
-     *                  or an array of strings                          *
-     *      $replace    either a string value or an array of string     *
-     *                  values to replace the tokens.                   *
-     *                                                                  *
-     *  Returns:                                                        *
-     *      string                                                      *
-     ********************************************************************/
-    public function fmtMessage($id, $match, $replace)
-    {
-        $text       = $this->getElementById($id)->innerHTML();
-        return str_replace($match, $replace, $text);
-    }           // function fmtMessage
-
-    /********************************************************************
      *  function FtTemplate::getFormatter                               *
      *                                                                  *
      *  Get the locale specific number formatter                        *
@@ -321,11 +299,11 @@ class FtTemplate extends Template
             $namelen        = strlen($filename);
             $suffix         = $matches[0];
             $suflen         = strlen($suffix);
-            error_log("FtTemplate::includeSub: " . __LINE__ .
-                        " filename='$filename' replaced by ");
+            $oldfilename    = $filename;
             $filename       = substr($filename, 0, $namelen - $suflen) .
                               'en.html';
-            error_log("'$filename'\n");
+            error_log("FtTemplate::includeSub: " . __LINE__ .
+                    " filename='$oldfilename' replaced by '$filename'\n");
         }
 
         return parent::includeSub($tempBase . $filename,

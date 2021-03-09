@@ -141,12 +141,13 @@ class Marriage extends Record
      ********************************************************************/
     protected static    $info   = array(
                         'table'             => 'Marriage',
-                        'name'              => 'Marriage',
+                        'name'              => 'Marriages',
                         'prime'             =>
-                            array('RegDomain','RegYear','RegNum'),
+                                    array('RegDomain','RegYear','RegNum'),
                         'srvmg'             => true,
                         'fldcount'          => 19,
-                        'order'             => 'RegDomain, RegYear, RegNum',
+                        'order'             =>
+                                    'RegDomain, RegYear, RegNum',
                         'classname'         => 'Marriage');
 
     /********************************************************************
@@ -977,31 +978,31 @@ class Marriage extends Record
         $retval                 = 0;
 
         // determine top level tag name for XML output
-        $indent             	= '';
+        $indent                 = '';
         if (is_string($xml))
         {                   // string tag name
-            $matches        	= array();
+            $matches            = array();
             if (preg_match('/^(\s*)(\w*)/', $xml, $matches))
             {
-                $indent     	= $matches[1];
-                $xml        	= $matches[2];
+                $indent         = $matches[1];
+                $xml            = $matches[2];
             }
-            $tagname        	= $xml;
-            $xml            	= true;
+            $tagname            = $xml;
+            $xml                = true;
         }                   // string tag name
         else
         if ($xml)
         {                   // true
-            $indent         	= "    ";
-            $tagname        	= 'cmd';
+            $indent             = "    ";
+            $tagname            = 'cmd';
         }                   // true
 
         if ($this->needInsert)
         {                   // create new record
-            $fldnames       	= '';
-            $comma          	= '';
-            $values         	= '';
-            $sqlParms       	= array();
+            $fldnames           = '';
+            $comma              = '';
+            $values             = '';
+            $sqlParms           = array();
             foreach($this->row as $fld => $value)
             {
                 switch($fld)

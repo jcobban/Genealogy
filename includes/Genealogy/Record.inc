@@ -218,8 +218,9 @@ use \Iterator;
  *      2020/10/10      remove prefix from fields names in Pages        *
  *      2020/12/02      add method isValid                              *
  *                      add XSS protection                              *
+ *      2021/02/19      add protected method debugBacktrace             *
  *                                                                      *
- *  Copyright &copy; 2020 James A. Cobban                               *
+ *  Copyright &copy; 2021 James A. Cobban                               *
  ************************************************************************/
 
 /************************************************************************
@@ -981,9 +982,24 @@ class Record implements Iterator, ArrayAccess
         }
 
         $warn       .= "<p>$className::__construct($parmText), ";
+        $warn       .= $this->debugBacktrace();
+        $warn       .= "</p>\n";
+    }       // protected function Record::constDebug($parms)
 
+    /********************************************************************
+     *  function Record::debugBacktrace                                 *
+     *                                                                  *
+     *  Return a string containing a caller backtrace.                  *
+     *                                                                  *
+     *  Returns:                                                        *
+     *      string                                                      *
+     ********************************************************************/
+    protected function debugBacktrace()
+    {
         $trace                          = debug_backtrace(DEBUG_BACKTRACE_PROVIDE_OBJECT,5);
+        $retval                         = '';
         $comma                          = '';
+        $level                          = 1;
 
         foreach($trace as $call)
         {
@@ -992,16 +1008,16 @@ class Record implements Iterator, ArrayAccess
             else
                 $classRef               = '';
             $function                   = $call['function'];
-            if ($function == 'constDebug')
+            if ($function == 'constDebug' || $function == 'debugBacktrace')
                 continue;
-            $warn   .= $comma . " function=" . $classRef . $function .
-                        " called by line=" . $call['line'] .
-                        " in " . $call['file'];
+            $retval     .= "$comma $level function=$classRef$function" .
+                                " called by line=" . $call['line'] .
+                                " in " . $call['file'];
             $comma                      = ',';
+            $level++;
         }
-        $warn       .= "</p>\n";
-
-    }       // protected function constDebug($parms)
+        return htmlspecialchars($retval);
+    }       // protected function Record::debugBacktrace()
 
     /********************************************************************
      *  function Record::getId                                          *
@@ -1014,38 +1030,29 @@ class Record implements Iterator, ArrayAccess
      ********************************************************************/
     function getId()
     {
+        global $debug;
         global $warn;
 
-        if (is_null($this->prime) ||
-            (is_string($this->prime) && strlen($this->prime) == 0))
+        if (!is_string($this->prime) || strlen($this->prime) == 0)
+            return null;
+        $retval                 = $this->row[$this->prime];
+        
+        if (is_null($retval) ||
+            (is_string($retval) && strlen($retval) == 0))
         {
-            $warn   .= "<p>Record::getId: table " . $this->table .
-                " does not have a unique primary key</p>\n";
+            if ($debug)
+                $warn   .= "<p>Record::getId: table " . $this->table .
+                            " does not have a unique primary key</p>\n";
             return null;
         }
-        else
-        if (is_array($this->prime))
-        {
-            $retval             = '';
-            $comma              = '';
-            foreach($this->prime as $keyName)
-            {
-                $value          = $this->row[$keyName];
-                if (is_numeric($value))
-                    $retval     .= "$comma$value";
-                else
-                    $retval     .= "$comma'$value'";
-                $comma          = ',';
-            }
-            return $retval;
-        }
-        $retval                 = $this->row[$this->prime];
+
         if ($this->needInsert && $retval == 0)
         {
-            $warn   .= "<p>Record::getId: table " . $this->table .
-                " record does not exist in database</p>\n";
-            throw new Exception("table " . $this->table .
-                " record $retval does not exist in database");
+            if ($debug)
+                $warn   .= "<p>Record::getId: table " . $this->table .
+                            " record does not exist in database</p>\n";
+            error_log("Record::getId: table " . $this->table .
+                        " record does not exist in database");
             return null;
         }
         return $retval;
@@ -1322,7 +1329,7 @@ class Record implements Iterator, ArrayAccess
             $mins           = '0' . $mins;
         $currtime           = $hours . ':' . $mins;
 
-        // determine top level tag name for XML output
+        // determine style for diagnostic output
         $indent             = '';
         $xmlparms           = '';
         $xml                = $output === self::XML;
@@ -1557,9 +1564,9 @@ class Record implements Iterator, ArrayAccess
                 // is not changed to an already defined value
                 if (is_array($prime))
                 {       // primary key is multiple fields
-                    $key        = 0;
-                    $update     = "UPDATE $table SET $set";
-                    $and        = ' WHERE ';
+                    $key            = 0;
+                    $update         = "UPDATE $table SET $set";
+                    $and            = ' WHERE ';
                     foreach($prime as $fldname)
                     {
                         $update     .= $and . $fldname . '=:o' . $fldname;
@@ -1569,11 +1576,11 @@ class Record implements Iterator, ArrayAccess
                 }       // primary key is multiple fields
                 else
                 {       // primary key is single field
-                    $key        = $this->former[$prime];
+                    $key            = $this->former[$prime];
                     if ($key == 0)
-                        $key    = $this->row[$prime];
-                    $update     = "UPDATE $table SET $set" .
-                                      " WHERE $prime=:prime";
+                        $key        = $this->row[$prime];
+                    $update         = "UPDATE $table SET $set" .
+                                              " WHERE $prime=:prime";
                     $parms['prime'] = $key;
                 }       // primary key is single field
 
@@ -1589,6 +1596,10 @@ class Record implements Iterator, ArrayAccess
                                 "$indent\t$updateText\n" .
                                 "$indent</$tagname>\n";
                     }
+                    else
+                    if ($json)
+                        print "$indent\"sqlcount\" : \"$count\",\n" .
+                              "$indent\"sql\" : " . json_encode($updateText) . ",\n";
 
                     if ($debug)
                         $warn       .= "<p>" . $updateText . "</p>\n";
@@ -1615,8 +1626,8 @@ class Record implements Iterator, ArrayAccess
         }       // update existing record
 
         // all changes have been applied
-        $this->changed  = array();  // reset
-        $this->former   = null;     // reset
+        $this->changed              = array();  // reset
+        $this->former               = null;     // reset
 
         // successful, return count of number of records updated
         return $count;
@@ -1660,7 +1671,7 @@ class Record implements Iterator, ArrayAccess
         global  $warn;
         global  $connection;
 
-        // handle XML output option
+        // handle diagnostic output option
         $indent             = '';
         $xmlparms           = '';
         $xml                = $output === self::XML;
@@ -1832,11 +1843,11 @@ class Record implements Iterator, ArrayAccess
                             $citation->save(false);
                     }
                     else
-                        $warn   .= "<p>Record::postUpdate: " .
+                        $warn   .= "<p>Record::postCheckCitation: " .
                             __LINE__ .
                             " Citation record not found for IDSX=$idsx</p>";
                 } catch(Exception $e) {
-                        $warn   .= "<p>Record::postUpdate: " .  __LINE__ .
+                        $warn   .= "<p>Record::postCheckCitation: " .  __LINE__ .
                                ' ' . $e->getMessage() . "</p>";
                 }
             }
@@ -1889,15 +1900,15 @@ class Record implements Iterator, ArrayAccess
             }                       // undefined field name
             else
             {                       // defined field name
-	            if ($xml)
-	                print "\t<$fieldLc>" . htmlspecialchars($value) . "</$fieldLc>\n";
-	            else
+                if ($xml)
+                    print "\t<$fieldLc>" . htmlspecialchars($value) . "</$fieldLc>\n";
+                else
                 if ($json)
                 {                   // JSON output
                     print "$comma\n    \"$fieldLc\" : " . json_encode($value);
                     $comma              = ',';
                 }                   // JSON output
-	
+    
                 if (is_string($value))
                     $this->set($fieldLc, $value);
                 else
@@ -2257,40 +2268,40 @@ class Record implements Iterator, ArrayAccess
 
         // modify value
         if (array_key_exists($fieldLc, $this->row))
-        {       // valid field name
+        {                   // valid field name
             $oldvalue           = $this->row[$fieldLc];
             if (is_int($oldvalue))
             {
                 if (ctype_digit($value) &&
                     ($value == '0' ||
                     substr($value, 0, 1) != '0')) // dates have leading 0
-                    $value      = intval($value);
+                    $value                  = intval($value);
             }
             else
             if (is_int($value) &&
                 ctype_digit($oldvalue))
-                $oldvalue       = intval($oldvalue);
+                $oldvalue                   = intval($oldvalue);
             if ($value !== $oldvalue)
-            {       // value has changed
+            {               // value has changed
                 if (is_null($this->former))
-                    $this->former       = $this->row;
+                    $this->former           = $this->row;
                 $this->row[$fieldLc]        = $value;
                 if (!($this->needInsert))
                 {
                     $this->changed[$fieldLc]    = $value;
                 }
-            }       // value has changed
-        }       // valid field name
+            }               // value has changed
+        }                   // valid field name
         else
-        {       // insert into extras
+        {                   // insert into extras
             if (array_key_exists($fieldLc, $this->extras))
-                $oldvalue           = $this->extras[$fieldLc];
+                $oldvalue                   = $this->extras[$fieldLc];
             else
             {
-                $oldvalue           = null;
+                $oldvalue                   = null;
             }
-            $this->extras[$fieldLc]     = $value;
-        }       // insert into extras
+            $this->extras[$fieldLc]         = $value;
+        }                   // insert into extras
         return $oldvalue;
     }       // function Record::set
 

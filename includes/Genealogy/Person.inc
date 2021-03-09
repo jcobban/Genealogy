@@ -5,7 +5,7 @@ use \Exception;
 /************************************************************************
  *  Person.inc                                                          *
  *                                                                      *
- *  Definition of a class representing an individual in a genealogical  *
+ *  Definition of a class representing a Person in a genealogical       *
  *  database.  This class provides access to the information in a row   *
  *  of the table tblIR.                                                 *
  *                                                                      *
@@ -130,7 +130,7 @@ use \Exception;
  *          ENGINE=InnoDB DEFAULT CHARSET=utf8                          *
  *                                                                      *
  *  History:                                                            *
- *      2010/09/05      Move display of individual event to Event       *
+ *      2010/09/05      Move display of Person event to Event           *
  *      2010/10/11      check result not connection for errors          *
  *      2010/10/20      changed parent constructor                      *
  *      2010/10/23      connection made global                          *
@@ -160,7 +160,7 @@ use \Exception;
  *      2011/01/28      add global $connection in mergeFrom             *
  *      2011/02/01      privatize dates in toXml                        *
  *      2011/03/06      catch exception from LegacyLocation constructor *
- *      2011/05/23      display any notes for the name of the individual*
+ *      2011/05/23      display any notes for the name of the Person    *
  *      2011/07/01      catch exception on new Temple in toXml          *
  *      2012/01/07      support creating instance with assigned IDIR    *
  *      2012/01/12      permit null first parameter to toXml            *
@@ -286,7 +286,7 @@ use \Exception;
  *                      remove Person::getNumAltNames                   *
  *                      remove Person::getNextAltName                   *
  *      2014/03/26      delete associated blog entries when deleting    *
- *                      the individual                                  *
+ *                      the Person                                      *
  *      2014/04/08      LegacyAltName renamed to LegacyName             *
  *                      toXML optionally includes instances of          *
  *                      LegacyName                                      *
@@ -369,8 +369,8 @@ use \Exception;
  *      2015/01/08      add parameter to method getNames to limit type  *
  *                      of name records to obtain                       *
  *                      use LegacyName::updateNames to update given     *
- *                      name of individual instead of looping through   *
- *                      all existing name records for the individual    *
+ *                      name of Person instead of looping through       *
+ *                      all existing name records for the Person        *
  *      2015/01/14      do not update alternate name records during     *
  *                      setField, defer to save                         *
  *                      add method clearEvent to permit Event           *
@@ -524,7 +524,7 @@ use \Exception;
  *                      if the tree name has not changed                *
  *                      Surname was reset in Families and old value     *
  *                      from Family was copied back to Name record      *
- *      2018/10/26      do not return name of individual if private     *
+ *      2018/10/26      do not return name of Person if private         *
  *      2018/12/05      functionality of getName moved to class Name    *
  *      2018/12/07      eliminate infinite recursion in getBirthEvent   *
  *                      if debug requested                              *
@@ -548,8 +548,10 @@ use \Exception;
  *      2019/11/23      correct implementation of getPerson             *
  *      2019/12/19      replace xmlentities with htmlentities           *
  *      2020/03/20      log more information on failed insert           *
+ *      2021/02/18      do not create instance of Event                 *
+ *                      in getBirthEvent if no information in Person    *
  *                                                                      *
- *  Copyright &copy; 2020 James A. Cobban                               *
+ *  Copyright &copy; 2021 James A. Cobban                               *
  ************************************************************************/
 require_once __NAMESPACE__ . '/RecordPic.inc';
 require_once __NAMESPACE__ . '/Family.inc';
@@ -566,7 +568,7 @@ require_once __NAMESPACE__ . '/Blog.inc';
 /************************************************************************
  *  class Person                                                        *
  *                                                                      *
- *  Definition of a class implementing behavior for individual records  *
+ *  Definition of a class implementing behavior for Person records      *
  *  within a genealogy database.                                        *
  *                                                                      *
  ************************************************************************/
@@ -586,7 +588,7 @@ class Person extends RecordPic
     /********************************************************************
      *  Person::xxxxxEvent                                              *
      *                                                                  *
-     *  There are 8 individual events that were represented by sets of  *
+     *  There are 8 Person events that were represented by sets of      *
      *  fields within the Person record, but are presented to the       *
      *  use as if they are instances of Event.                          *
      ********************************************************************/
@@ -607,7 +609,7 @@ class Person extends RecordPic
      *  Person::altNames                                                *
      *                                                                  *
      *  altNames is an array of all of the name records                 *
-     *  for this individual, including married names, adopted names,    *
+     *  for this Person, including married names, adopted names,        *
      *  The index of the array is the record number IDNX                *
      *                                                                  *
      ********************************************************************/
@@ -618,7 +620,7 @@ class Person extends RecordPic
      *  Person::parents                                                 *
      *                                                                  *
      *  parents is an array of all of the Family records                *
-     *  representing families in which this individual is a child       *
+     *  representing families in which this Person is a child           *
      *  child is a parallel array of the corresponding instances of     *
      *  Child                                                           *
      ********************************************************************/
@@ -631,14 +633,14 @@ class Person extends RecordPic
      *  Person::families                                                *
      *                                                                  *
      *  families is an array of all of the Family records               *
-     *  representing families in which this individual is a spouse      *
+     *  representing families in which this Person is a spouse          *
      ********************************************************************/
     private $families           = null;
 
     /********************************************************************
      *  Person::eventRes                                                *
      *                                                                  *
-     *  Result of query for events for the individual                   *
+     *  Result of query for events for the Person                       *
      ********************************************************************/
     private $eventRes           = null;
 
@@ -646,7 +648,7 @@ class Person extends RecordPic
      *  Person::treeName                                                *
      *                                                                  *
      *  The name of the tree, or subdivision of the database, to        *
-     *  which this individual belongs.                                  *
+     *  which this Person belongs.                                      *
      ********************************************************************/
     private $treeName           = '';
 
@@ -813,18 +815,28 @@ class Person extends RecordPic
      *  Get an existing entry or create an instance of the class Person *
      *  from a row returned from a database query of the table          *
      *  'tblIR' for a value of IDIR.                                    *
+     *  This can also be accessed by $familytree->getPerson($idir);     *
      *                                                                  *
      *  Input:                                                          *
-     *      $idir       integer identifier of a person                  *
+     *      $idir       integer identifier of a Person                  *
      *                                                                  *
      *  Returns:                                                        *
      *      an instance of Person                                       *
+     *                                                                  *
+     *  Throws Exception if parameter is not numeric.                   *
      ********************************************************************/
     static function getPerson($idir)
     {
-        if (!array_key_exists($idir, self::$personIndex))
-            self::$personIndex[$idir]   = new Person(array('idir' => $idir));
-        return self::$personIndex[$idir];
+        if (is_numeric($idir) || ctype_digit($idir))
+        {                   // valid numeric
+            if (!array_key_exists($idir, self::$personIndex))
+                self::$personIndex[$idir]   =
+                                    new Person(array('idir' => $idir));
+            return self::$personIndex[$idir];
+        }                   // valid numeric
+        else
+            throw new Exception(
+                            "Person::getPerson: invalid parameter $idir");
     }           // static function Person::getPerson
 
     /********************************************************************
@@ -843,13 +855,13 @@ class Person extends RecordPic
      *                  3) a database record presented as an array, or  *
      *                  4) value of a key specified by the second       *
      *                     parameter uniquely identifying the           *
-     *                     individual.  This is deprecated in favor of  *
+     *                     Person.  This is deprecated in favor of      *
      *                     array($fldname, $value).  Or     ...         *
      *                  5) 'new' to create a new empty record.          *
      *                     This is deprecated in favor of option 1 or 2.*
      *      $fldName    if $value is a key value the name of the        *
      *                  database field to match it against:             *
-     *                   'idir'    key linking individual to other      *
+     *                   'idir'    key linking Person to other          *
      *                             records. Default if omitted.         *
      *                   'id'      auto-increment field, internal key   *
      *                             of tblIR                             *
@@ -858,26 +870,26 @@ class Person extends RecordPic
      *                  deprecated.                                     *
      *                                                                  *
      *  Example:                                                        *
-     *      $indiv      = new Person(); or                              *
-     *      $indiv      = new Person(null); or                          *
-     *      $indiv      = new Person('new'); or                         *
-     *      $indiv      = new Person(array());                          *
-     *          Creates a new individual with all default values.       *
+     *      $person      = new Person(); or                             *
+     *      $person      = new Person(null); or                         *
+     *      $person      = new Person('new'); or                        *
+     *      $person      = new Person(array());                         *
+     *          Creates a new Person with all default values.           *
      *                                                                  *
-     *      $indiv      = new Person(                                   *
+     *      $person      = new Person(                                  *
      *                    array('givenname'     => 'John',              *
      *                          'surname'       => 'Smith',             *
      *                          'gender'        => Person::MALE,        *
      *                          'birthd'        => '12 Apr 1856',       *
      *                          'deathd'        => '23 Nov 1899'));     *
-     *          Creates a new individual with the specified name,       *
+     *          Creates a new Person with the specified name,           *
      *          gender and birth and death dates.                       *
      *                                                                  *
-     *      $indiv      = new Person(array('idir'       => 1234));      *
+     *      $person      = new Person(array('idir'       => 1234));     *
      *          Creates an instance from an existing record in the      *
      *          database.  However it is more efficient to use          *
      *          because it returns an existing entry if one exists.     *
-     *      $indiv      = Person::getPerson($idir);                     *
+     *      $person      = Person::getPerson($idir);                    *
      ********************************************************************/
     function __construct($parms     = null,
                          $fldName   = 'idir')
@@ -975,7 +987,7 @@ class Person extends RecordPic
         if ($debug)
             $warn       .= "<p>Person::__construct($parmText)</p>\n";
 
-        // dbrow represents the contents of the individual fields in
+        // dbrow represents the contents of the Person fields in
         // the database record
         $dbrow              = null;
         $idir               = null;
@@ -1057,7 +1069,7 @@ class Person extends RecordPic
 
             if (strlen($where) > 0)
             {               // search database
-                // construct the query of the individual table
+                // construct the query of the Person table
                 $query                      = "SELECT * FROM tblIR $where";
 
                 // query the database
@@ -1175,7 +1187,7 @@ class Person extends RecordPic
     /********************************************************************
      *  function Person::delete                                         *
      *                                                                  *
-     *  Delete the database records associated with this individual     *
+     *  Delete the database records associated with this Person         *
      *                                                                  *
      *  Parameters                                                      *
      *      $xml    if true generate XML output                         *
@@ -1227,11 +1239,11 @@ class Person extends RecordPic
 
         if (count($this->getParents()) > 0 ||
             count($this->getFamilies()) > 0)
-        {       // individual is connected to any others
+        {       // Person is connected to any others
             // not currently supported:
             // return statistics indicating nothing done
             return $counts;
-        }       // individual is connected to any others
+        }       // Person is connected to any others
 
         // delete associated name records
         $nameSet    = new RecordSet('Names', array('idir' => $idir));
@@ -1260,10 +1272,10 @@ class Person extends RecordPic
             if (count($idimeList) > 0)
             {
                 $citationSet    = new RecordSet('Citations',
-                                                array('idime'   => $idimeList,
-                                                      'type'    => 30));
-                $result     = $citationSet->delete($xml);
-                $citCount   += $result;
+                                            array('idime'   => $idimeList,
+                                                  'type'    => 30));
+                $result         = $citationSet->delete($xml);
+                $citCount       += $result;
             }
         }
         else
@@ -1272,7 +1284,7 @@ class Person extends RecordPic
         // return statistics
         $counts['citCount'] = $citCount;
 
-        // delete any events associated with this individual
+        // delete any events associated with this Person
         $eventSet   = new RecordSet('Events',
                                         array('idir'    => $idir,
                                               'idtype'  => 0));
@@ -1288,7 +1300,7 @@ class Person extends RecordPic
         $result     = $blogSet->delete($xml);
         $counts['blogCount']    = $result;
 
-        // finally delete the individual record itself
+        // finally delete the Person record itself
         $oldJson            = $this->toJson(false);
         $delIndiv           = "DELETE FROM tblIR WHERE IDIR=:idir";
         $sqlParms           = array('idir'      => $idir);
@@ -1301,7 +1313,7 @@ class Person extends RecordPic
         {           // success
             $result         = $stmt->rowCount();
             if ($result > 0)
-            {           // individual record was deleted
+            {           // Person record was deleted
                 if ($xml)
                     print "$indent<$tagname count='$result'>$deleteText</$tagname>\n";
                 else
@@ -1354,7 +1366,7 @@ class Person extends RecordPic
                                     "</p>\n";
                     }       // ignore duplicates
                 }       // error performing query
-            }           // individual record was deleted
+            }           // Person record was deleted
         }           // success
         else
         {           // error performing deletion
@@ -1377,7 +1389,7 @@ class Person extends RecordPic
      *  function Person::getIdir                                        *
      *                                                                  *
      *  Get the value of the unique external numeric key IDIR for       *
-     *  this individual.                                                *
+     *  this Person.                                                    *
      *                                                                  *
      *  Returns:                                                        *
      *      Return the key IDIR as an integer                           *
@@ -1442,10 +1454,10 @@ class Person extends RecordPic
     /********************************************************************
      *  function Person::getGender                                      *
      *                                                                  *
-     *  Get the gender of this individual.                              *
+     *  Get the gender of this Person.                                  *
      *                                                                  *
      *  Returns:                                                        *
-     *      The gender for this individual as:                          *
+     *      The gender for this Person as:                              *
      *          Person::MALE                                            *
      *          Person::FEMALE                                          *
      *          Person::UNKNOWN                                         *
@@ -1458,10 +1470,10 @@ class Person extends RecordPic
     /********************************************************************
      *  function Person::getGenderClass                                 *
      *                                                                  *
-     *  Get the gender of this individual as a CSS class name           *
+     *  Get the gender of this Person as a CSS class name               *
      *                                                                  *
      *  Returns:                                                        *
-     *      The gender for this individual as:                          *
+     *      The gender for this Person as:                              *
      *          'male'                                                  *
      *          'female'                                                *
      *          'unknown'                                               *
@@ -1477,7 +1489,7 @@ class Person extends RecordPic
     /********************************************************************
      *  function Person::setGender                                      *
      *                                                                  *
-     *  Validate and change the value of gender for this individual.    *
+     *  Validate and change the value of gender for this Person.        *
      *                                                                  *
      *  Input:                                                          *
      *      $value      Person::MALE        or 'M' or 'MALE'            *
@@ -1485,7 +1497,7 @@ class Person extends RecordPic
      *                  Person::UNKNOWN     or '?' or 'UNKNOWN'         *
      *                                                                  *
      *  Returns:                                                        *
-     *      old value of gender for this individual.                    *
+     *      old value of gender for this Person.                        *
      *          Person::MALE                                            *
      *          Person::FEMALE                                          *
      *          Person::UNKNOWN                                         *
@@ -1523,7 +1535,7 @@ class Person extends RecordPic
      *  function Person::getSurname                                     *
      *                                                                  *
      *  Returns:                                                        *
-     *      current surname for this individual as a string             *
+     *      current surname for this Person as a string                 *
      ********************************************************************/
     function getSurname()
     {
@@ -1540,13 +1552,13 @@ class Person extends RecordPic
     /********************************************************************
      *  function Person::setSurname                                     *
      *                                                                  *
-     *  Change the value of surname for this individual.                *
+     *  Change the value of surname for this Person.                    *
      *                                                                  *
      *  Input:                                                          *
      *      $newname        new surname                                 *
      *                                                                  *
      *  Returns:                                                        *
-     *          former surname for this individual.                     *
+     *          former surname for this Person.                         *
      ********************************************************************/
     function setSurname($newname)
     {
@@ -1570,7 +1582,7 @@ class Person extends RecordPic
     /********************************************************************
      *  function Person::getGivenName                                   *
      *                                                                  *
-     *  Get the value of given name for this individual.                *
+     *  Get the value of given name for this Person.                    *
      *                                                                  *
      *  Return:                                                         *
      *          the value of given name as a string                     *
@@ -1590,7 +1602,7 @@ class Person extends RecordPic
     /********************************************************************
      *  function Person::setGivenName                                   *
      *                                                                  *
-     *  Change the value of given name for this individual.             *
+     *  Change the value of given name for this Person.                 *
      *                                                                  *
      *  Input:                                                          *
      *      $newname    new given names as a string                     *
@@ -1627,7 +1639,7 @@ class Person extends RecordPic
     /********************************************************************
      *  function Person::getName                                        *
      *                                                                  *
-     *  Return the primary name for this individual including all parts *
+     *  Return the primary name for this Person including all parts     *
      *  in a standard form for external display.                        *
      *                                                                  *
      *  Input:                                                          *
@@ -1637,7 +1649,7 @@ class Person extends RecordPic
      *          NAME_SURNAME_FIRST      put surname first               *
      *                                                                  *
      *  Returns:                                                        *
-     *      string containing the primary name of the individual        *
+     *      string containing the primary name of the Person            *
      ********************************************************************/
     function getName($options   = 0)
     {
@@ -1664,7 +1676,7 @@ class Person extends RecordPic
     /********************************************************************
      *  function Person::getTreeName                                    *
      *                                                                  *
-     *  Get the value of tree name for this individual.                 *
+     *  Get the value of tree name for this Person.                     *
      *                                                                  *
      *  Return:                                                         *
      *          the value of tree name as a string                      *
@@ -1692,7 +1704,7 @@ class Person extends RecordPic
     /********************************************************************
      *  function Person::setTreeName                                    *
      *                                                                  *
-     *  Change the value of tree name for this individual.              *
+     *  Change the value of tree name for this Person.                  *
      *                                                                  *
      *  Input:                                                          *
      *      $newname    new tree name as a string                       *
@@ -1905,34 +1917,49 @@ class Person extends RecordPic
             {       // Birth Location
                 $tmp        = self::needLocationObj($field, $value);
                 $event      = $this->getBirthEvent(true);
-                return $event->set('idlrevent', $value);
+                if ($event)
+                    return $event->set('idlrevent', $value);
+                else
+                    return 0;
             }       // Birth Location
 
             case 'idlrchris':
             {       // Christening Location
                 $tmp        = self::needLocationObj($field, $value);
                 $event      = $this->getChristeningEvent(true);
-                return $event->set('idlrevent', $value);
+                if ($event)
+                    return $event->set('idlrevent', $value);
+                else
+                    return 0;
             }       // Christening Location
 
             case 'idlrdeath':
             {       // Death Location
                 $tmp        = self::needLocationObj($field, $value);
                 $event      = $this->getDeathEvent(true);
-                return $event->set('idlrevent', $value);
+                if ($event)
+                    return $event->set('idlrevent', $value);
+                else
+                    return 0;
             }       // Death Location
 
             case 'idlrburied':
             {       // Buried Location
                 $tmp        = self::needLocationObj($field, $value);
                 $event      = $this->getBuriedEvent(true);
-                return $event->set('idlrevent', $value);
+                if ($event)
+                    return $event->set('idlrevent', $value);
+                else
+                    return 0;
             }       // Buried Location
 
             case 'idtrbaptism':
             {       // Baptism location
                 $event      = $this->getBaptismEvent(true);
-                return $event->set('idlrevent', $value);
+                if ($event)
+                    return $event->set('idlrevent', $value);
+                else
+                    return 0;
             }       // Baptism location
 
             case 'idtrendow':
@@ -1956,25 +1983,37 @@ class Person extends RecordPic
             case 'idarbirth':
             {       // Birth IDAR
                 $event      = $this->getBirthEvent(true);
-                return $event->set('idar', $value);
+                if ($event)
+                    return $event->set('idar', $value);
+                else
+                    return 0;
             }       // Birth IDAR
 
             case 'idarchris':
             {       // Christening IDAR
                 $event      = $this->getChristeningEvent(true);
-                return $event->set('idar', $value);
+                if ($event)
+                    return $event->set('idar', $value);
+                else
+                    return 0;
             }       // Christening IDAR
 
             case 'idardeath':
             {       // Death IDAR
                 $event      = $this->getDeathEvent(true);
-                return $event->set('idar', $value);
+                if ($event)
+                    return $event->set('idar', $value);
+                else
+                    return 0;
             }       // Death IDAR
 
             case 'idarburied':
             {       // Buried IDAR
                 $event      = $this->getBuriedEvent(true);
-                return $event->set('idar', $value);
+                if ($event)
+                    return $event->set('idar', $value);
+                else
+                    return 0;
             }       // Buried IDAR
 
             case 'cremated':
@@ -2098,7 +2137,7 @@ class Person extends RecordPic
      *  This is used to permit the set method of classes, to which      *
      *  fields originally in Person have been moved to comply with 3NF, *
      *  to maintain the old fields.                                     *
-     *
+     *                                                                  *
      *  Parameters:                                                     *
      *      $field      name of field to change                         *
      *      $value      new value to set it to                          *
@@ -2245,7 +2284,7 @@ class Person extends RecordPic
      *  function Person::getParents                                     *
      *                                                                  *
      *  Get a RecordSet of the Families in which this                   *
-     *  individual is a child.                                          *
+     *  Person is a child.                                              *
      *                                                                  *
      *  Returns:                                                        *
      *      RecordSet of instances of Family indexed by the IDCR        *
@@ -2274,7 +2313,7 @@ class Person extends RecordPic
             if ($this->needInsert)
                 return $this->parents;
 
-            // get instances of Child where current individual is a child
+            // get instances of Child where current Person is a child
             $parms      = array('idir'  => $this->row['idir']);
             $this->child    = new RecordSet('Children', $parms);
 
@@ -2314,7 +2353,7 @@ class Person extends RecordPic
      *  function Person::getPreferredParents                            *
      *                                                                  *
      *  Get the preferred instance of Family in which this              *
-     *  individual is a child.                                          *
+     *  Person is a child.                                              *
      *                                                                  *
      *  Returns:                                                        *
      *      An instance of Family or null if no parents                 *
@@ -2371,7 +2410,7 @@ class Person extends RecordPic
      *  function Person::getChild                                       *
      *                                                                  *
      *  Get an array of instances of Child representing                 *
-     *  all of the instances where this individual is a child in a      *
+     *  all of the instances where this Person is a child in a          *
      *  family. This array parallels the one returned by                *
      *  Person::getParents. That is a given index refers to the         *
      *  same family in both arrays.                                     *
@@ -2389,7 +2428,7 @@ class Person extends RecordPic
     /********************************************************************
      *  function Person::getFamilies                                    *
      *                                                                  *
-     *  Get the families in which this individual is a spouse.          *
+     *  Get the instances of Family in which this Person is a spouse.   *
      *                                                                  *
      *  Returns:                                                        *
      *      RecordSet of instances of Family                            *
@@ -2411,7 +2450,7 @@ class Person extends RecordPic
         {       // need to perform query for families
 
             // construct the query of the marriage table for all marriages
-            // in which the current individual is a partner
+            // in which the current Person is a partner
             if ($this->row['gender'] == Person::FEMALE)
             {           // wife
                 $famParms           = array('IDIRWife'  => $idir,
@@ -2464,7 +2503,7 @@ class Person extends RecordPic
     /********************************************************************
      *  function Person::getNumMarriages                                *
      *                                                                  *
-     *  Get the number of families in which the current individual is a *
+     *  Get the number of families in which the current Person is a     *
      *  spouse.                                                         *
      *  This method is deprecated.  Use Person::getFamilies()->count(). *
      *                                                                  *
@@ -2487,7 +2526,7 @@ class Person extends RecordPic
     /********************************************************************
      *  function Person::getBirthEvent                                  *
      *                                                                  *
-     *  Get the birth event for the individual                          *
+     *  Get the birth event for the Person                              *
      *                                                                  *
      *  Input:                                                          *
      *      $create     true    return instance of Event even           *
@@ -2502,20 +2541,20 @@ class Person extends RecordPic
     {
         global  $debug;
         global  $warn;
-        if ($debug)
+
+        $idir                   = $this->row['idir'];
+        if (is_bool($create))
         {
-            if (is_bool($create))
-            {
-                if ($create)
-                    $createStr  = 'true';
-                else
-                    $createStr  = 'false';
-            }
+            if ($create)
+                $createStr  = 'true';
             else
-                $createStr  = $create;
-            $warn           .= "<p>Person(IDIR=" . $this->row['idir'] .
-                                ")->getBirthEvent($createStr)</p>\n";
+                $createStr  = 'false';
         }
+        else
+            $createStr      = "'$create'";
+        if ($debug)
+            $warn               .=
+                "<p>Person(IDIR=$idir)->getBirthEvent($createStr)</p>\n";
 
         // ensure that the events table is initialized
         if (is_null($this->pevents))
@@ -2526,6 +2565,10 @@ class Person extends RecordPic
         $chrisEvent         = $this->chrisEvent;
         if (is_null($event))
         {                       // not initialized
+            if (count($this->pevents) > 0 && $create)
+                error_log("Person(IDIR=$idir)->getBirthEvent($createStr) ".
+                            "and no existing entry in tblER\n" .
+                            $this->debugBacktrace());
             $birthd         = $this['birthd'];
             $birthsd        = $this['birthsd'];
             if ($create ||
@@ -2564,7 +2607,7 @@ class Person extends RecordPic
             if ($this['birthsd'] == -99999999 &&
                 $birthsd != -99999999)
             {                   // correct bad sort date in Person
-                $this->set('birthsd', $event->get('eventsd'));
+                $this->set('birthsd', $birthsd);
                 $this->save(false);
             }                   // correct bad sort date in Person
             $chrisEvent         = $this->chrisEvent;
@@ -2591,7 +2634,7 @@ class Person extends RecordPic
     /********************************************************************
      *  function Person::getBirthDate                                   *
      *                                                                  *
-     *  Get the privatized birth date for the individual                *
+     *  Get the privatized birth date for the Person                    *
      *                                                                  *
      *  Returns:                                                        *
      *      A string.                                                   *
@@ -2608,7 +2651,7 @@ class Person extends RecordPic
     /********************************************************************
      *  function Person::getChristeningEvent                            *
      *                                                                  *
-     *  Get the christening event for the individual                    *
+     *  Get the christening event for the Person                        *
      *                                                                  *
      *  Input:                                                          *
      *      $create     true    return instance of Event even           *
@@ -2670,7 +2713,7 @@ class Person extends RecordPic
     /********************************************************************
      *  function Person::getDeathEvent                                  *
      *                                                                  *
-     *  Get the death event for the individual                          *
+     *  Get the death event for the Person                              *
      *                                                                  *
      *  Input:                                                          *
      *      $create     true    return instance of Event even           *
@@ -2730,7 +2773,7 @@ class Person extends RecordPic
     /********************************************************************
      *  function Person::getDeathDate                                   *
      *                                                                  *
-     *  Get the privatized death date for the individual                *
+     *  Get the privatized death date for the Person                    *
      *                                                                  *
      *  Returns:                                                        *
      *      A string.                                                   *
@@ -2747,7 +2790,7 @@ class Person extends RecordPic
     /********************************************************************
      *  function Person::getBuriedEvent                                 *
      *                                                                  *
-     *  Get the buried event for the individual                         *
+     *  Get the buried event for the Person                             *
      *                                                                  *
      *  Input:                                                          *
      *      $create     true    return instance of Event even           *
@@ -2813,7 +2856,7 @@ class Person extends RecordPic
     /********************************************************************
      *  function Person::getBaptismEvent                                *
      *                                                                  *
-     *  Get the LDS baptism event for the individual                    *
+     *  Get the LDS baptism event for the Person                        *
      *                                                                  *
      *  Input:                                                          *
      *      $create     true    return instance of Event even           *
@@ -2865,7 +2908,7 @@ class Person extends RecordPic
     /********************************************************************
      *  function Person::getConfirmationEvent                           *
      *                                                                  *
-     *  Get the LDS Confirmation event for the individual               *
+     *  Get the LDS Confirmation event for the Person                   *
      *                                                                  *
      *  Input:                                                          *
      *      $create     true    return instance of Event even           *
@@ -2917,7 +2960,7 @@ class Person extends RecordPic
     /********************************************************************
      *  function Person::getInitiatoryEvent                             *
      *                                                                  *
-     *  Get the LDS Initiatory event for the individual                 *
+     *  Get the LDS Initiatory event for the Person                     *
      *                                                                  *
      *  Input:                                                          *
      *      $create     true    return instance of Event even           *
@@ -2969,7 +3012,7 @@ class Person extends RecordPic
     /********************************************************************
      *  function Person::getEndowEvent                                  *
      *                                                                  *
-     *  Get the LDS Endow event for the individual                      *
+     *  Get the LDS Endow event for the Person                          *
      *                                                                  *
      *  Input:                                                          *
      *      $create     true    return instance of Event even           *
@@ -3021,7 +3064,7 @@ class Person extends RecordPic
     /********************************************************************
      *  function Person::getEvents                                      *
      *                                                                  *
-     *  Get the events for the individual.  This array                  *
+     *  Get the events for the Person.  This array                      *
      *  includes all events.  This is an associative array in which     *
      *  the key is the IDER value for events represented as records in  *
      *  tblER and a descriptive string for events represented as fields *
@@ -3032,12 +3075,12 @@ class Person extends RecordPic
      *  the events from tblER.  For example this means, for example,    *
      *  that a funeral event, which exists only as a record in the      *
      *  Events table is presented before a death event which is         *
-     *  constructed from the Persons table.                             *
+     *  constructed from the Person table.                              *
      *                                                                  *
      *  Returns:                                                        *
      *      An associative array of instances of Event indexed          *
      *      by IDER (or special key for events in tblIR).               *
-     *      Use foreach($indiv->getEvents() as $ider => $event)         *
+     *      Use foreach($person->getEvents() as $ider => $event)         *
      ********************************************************************/
     function getEvents()
     {
@@ -3048,28 +3091,32 @@ class Person extends RecordPic
         $tevents        = null;
         $maxorder       = -1;
 
-        // check for events recorded in individual record instead of
-        // tblER
+        // check for events recorded in Person as well
+        // as associated instances of Event
         if ($this->pevents == null)
-        {               // initialize pevents array
+        {                   // initialize pevents array
             $this->pevents  = array();
+            $idir           = $this->row['idir'];
+            if ($idir == 0) // not initialized
+                return $this->pevents;
 
             if ($this->isExisting())
-            {           // an already existing individual
+            {               // an already existing Person
                 // get a list of instances of Event from tblER for this
-                // individual.  Each record represents an event or fact
-                // in the life of the individual
-                $parms          = array('idir'      => $this->row['idir'],
+                // Person.  Each record represents an event or fact
+                // in the life of the Person
+                $parms          = array('idir'      => $idir,
                                         'idtype'    => Event::IDTYPE_INDIV);
                 $tevents        = new RecordSet('Events', $parms);
                 // ensure that methods getXxxxEvent return the same
                 // instances as getEvents
                 foreach($tevents as $ider => $event)
-                {
-                    if ($event->get('order') > $maxorder)
-                        $maxorder       = $event->get('order');
+                {           // loop through instances of Event
+                    $order              = $event->get('order');
+                    if ($order > $maxorder)
+                        $maxorder       = $order;
                     switch($event->getIdet())
-                    {
+                    {       // act on event type
                         case Event::ET_BIRTH:
                         {
                             $event->setAssociatedRecord($this);
@@ -3127,55 +3174,55 @@ class Person extends RecordPic
                         }
 
                     }       // act on event type
-                }       // loop through existing event objects
-            }           // an already existing individual
+                }           // loop through existing event objects
+            }               // an already existing Person
 
             // check to see if the childhood events are
             // still in their old locations in tblIR
             // these events do not have an IDER key
             // put youth related events at front of $this->pevents
             // it would be nice if we could just fix up the database at
-            // this point, but this could be invoked for a user who does not
-            // have write authority on the database
+            // this point, but this could be invoked for a user
+            // who does not have write authority on the database
             if (is_null($this->birthEvent))
-            {               // birth
-                $tevent                     = $this->getBirthEvent(true);
+            {               // no birth event
+                $tevent             = $this->getBirthEvent(false);
                 if ($tevent)
                     $this->pevents['birth'] = $tevent;
             }               // birth
 
             if (is_null($this->chrisEvent))
             {               // other Christian christening/baptism
-                $tevent                     = $this->getChristeningEvent(true);
+                $tevent             = $this->getChristeningEvent(false);
                 if ($tevent)
                     $this->pevents['christening']   = $tevent;
             }               // other Christian christening/baptism
 
             if (is_null($this->baptismEvent))
             {               // LDS Baptism 
-                $tevent                     = $this->getBaptismEvent(false);
+                $tevent             = $this->getBaptismEvent(false);
                 if ($tevent)
                     $this->pevents['baptism']   = $tevent;
             }               // LDS Baptism 
 
-            $tevent                     = $this->getConfirmationEvent(false);
+            $tevent                 = $this->getConfirmationEvent(false);
             if ($tevent && $tevent->get('ider') == 0)
                 $this->pevents['confirmation']  = $tevent;
 
-            $tevent                     = $this->getInitiatoryEvent(false);
+            $tevent                 = $this->getInitiatoryEvent(false);
             if ($tevent && $tevent->get('ider') == 0)
                 $this->pevents['initiatory']    = $tevent;
 
-            $tevent                     = $this->getEndowEvent(false);
+            $tevent                 = $this->getEndowEvent(false);
             if ($tevent && $tevent->get('ider') == 0)
                 $this->pevents['endow']     = $tevent;
 
             // add events from tblER
             if ($tevents)
-            {           // an already existing individual
+            {           // an already existing Person
                 foreach($tevents as $ider => $event)
                     $this->pevents[$ider]   = $event;
-            }           // an already existing individual
+            }           // an already existing Person
 
             // check to see if the death and/or buried events are
             // still in their old locations in tblIR
@@ -3295,8 +3342,8 @@ class Person extends RecordPic
     /********************************************************************
      *  function Person::addEvent                                       *
      *                                                                  *
-     *  Add a new individual event represented by an instance of        *
-     *  Event to this individual                                        *
+     *  Add a new Person event represented by an instance of            *
+     *  Event to this Person                                            *
      *                                                                  *
      *  Input:                                                          *
      *      $parms  associative array of parameters to initialize       *
@@ -3346,7 +3393,7 @@ class Person extends RecordPic
     /********************************************************************
      *  function Person::getNames                                       *
      *                                                                  *
-     *  Get the alternate name records for the individual.              *
+     *  Get the alternate Name records for the Person.                  *
      *                                                                  *
      *  Input:                                                          *
      *      $order      optional value to select only certain types     *
@@ -3354,24 +3401,24 @@ class Person extends RecordPic
      *      getNames(1)                                                 *
      *          returns only the "real" alternate names                 *
      *      getNames(0)                                                 *
-     *          returns only the main name of the individual            *
+     *          returns only the main name of the Person                *
      *      getNames(-1)                                                *
-     *          returns only the married names of the individual        *
+     *          returns only the married names of the Person            *
      *      getNames(array(0,-1))                                       *
-     *          returns the main name of the individual and             *
-     *          the married names of the individual                     *
+     *          returns the main name of the Person and                 *
+     *          the married names of the Person                         *
      *                                                                  *
      *  Returns:                                                        *
      *      An instance of RecordSet containing instances of Name       *
      *      indexed by IDNX.                                            *
-     *      Use foreach($indiv->getNames() as $idnx => $altname)        *
+     *      Use foreach($person->getNames() as $idnx => $altname)       *
      ********************************************************************/
     function getNames($order = null)
     {
         global  $debug;
         global  $warn;
 
-        // if individual has not been written to the database
+        // if Person has not been written to the database
         // there can be no name records
         if ($this->needInsert)
         {
@@ -3467,7 +3514,7 @@ class Person extends RecordPic
      *  external textual value.                                         *
      *                                                                  *
      *  Parameters:                                                     *
-     *      $top        tag name for top node, default 'indiv'          *
+     *      $top        tag name for top node, default 'person'          *
      *                  if null output not enclosed in a top level node *
      *      $parms      if true print the output,                       *
      *                  if false just return it                         *
@@ -3488,7 +3535,7 @@ class Person extends RecordPic
     const   TOXML_INCLUDE_NAMES     = 4;
     const   TOXML_INCLUDE_EVENTS    = 8;
 
-    function toXml($top         = 'indiv',
+    function toXml($top         = 'person',
                    $parms       = true,
                    $options     = 0)
     {
@@ -3703,7 +3750,7 @@ class Person extends RecordPic
         else
             $names  = $this->getNames(0);
         if (count($names) > 0)
-        {       // individual has at least one name record
+        {       // Person has at least one name record
             if ($includeNames)
                 $retval .= "  <names count='" . count($names) . "'>\n";
             else
@@ -3713,7 +3760,7 @@ class Person extends RecordPic
                 $retval .= $name->toXml('name', false);
             }       // loop through names
             $retval .= "  </names>\n";
-        }       // individual has at least one name record
+        }       // Person has at least one name record
 
         // include events as <event> tags
         $this->birthEvent   = null; // force refresh from DB
@@ -3736,14 +3783,14 @@ class Person extends RecordPic
         {       // include parents information
             $parents    = $this->getParents();
             if ($parents->count() > 0)
-            {       // individual is a child in a family
+            {       // Person is a child in a family
                 $retval .= "  <parents count='" . $parents->count() . "'>\n";
                 foreach($parents as $ic => $family)
                 {       // loop through parents
                     $retval .= $family->toXml('family', false, 0);
                 }       // loop through parents
                 $retval .= "  </parents>\n";
-            }       // individual is a child in a family
+            }       // Person is a child in a family
         }       // include parents information
 
         // if requested include family information
@@ -3751,14 +3798,14 @@ class Person extends RecordPic
         {       // include family information
             $families   = $this->getFamilies();
             if (count($families) > 0)
-            {       // individual is a parent in a family
+            {       // Person is a parent in a family
                 $retval .= "  <families count='" . count($families) . "'>\n";
                 foreach($families as $idmr => $family)
                 {       // loop through families
                     $retval .= $family->toXml('family', false, 0);
                 }       // loop through families
                 $retval .= "  </families>\n";
-            }       // individual is a parent in a family
+            }       // Person is a parent in a family
         }       // include family information
 
         // close off response
@@ -4063,7 +4110,7 @@ class Person extends RecordPic
             $names              = $this->getNames(0);
         $comma  = ",\n\t";
         if (count($names) > 0)
-        {               // individual has at least one name record
+        {               // Person has at least one name record
             $retval             .= "$comma\"names\":\n\t{";
             $sep                = '';
             foreach($names as $idnx => $name)
@@ -4073,7 +4120,7 @@ class Person extends RecordPic
             }           // loop through names
             $retval         .= "\t}\n";
             $comma          = ",\n\t";
-        }               // individual has at least one name record
+        }               // Person has at least one name record
 
         // include events as <event> tags
         $this->birthEvent   = null; // force refresh from DB
@@ -4104,7 +4151,7 @@ class Person extends RecordPic
         {               // include parents information
             $parents        = $this->getParents();
             if ($parents->count() > 0)
-            {           // individual is a child in a family
+            {           // Person is a child in a family
                 $retval     .= $comma . "\"parents\":\n\t{";
                 $sep        = '';
                 foreach($parents as $ic => $family)
@@ -4114,7 +4161,7 @@ class Person extends RecordPic
                 }       // loop through parents
                 $retval     .= "\t}\n";
                 $comma      = ",\n\t";
-            }           // individual is a child in a family
+            }           // Person is a child in a family
         }               // include parents information
 
         // if requested include family information
@@ -4122,7 +4169,7 @@ class Person extends RecordPic
         {               // include family information
             $families       = $this->getFamilies();
             if (count($families) > 0)
-            {           // individual is a parent in a family
+            {           // Person is a parent in a family
                 $retval     .= $comma . "\"families\":\n\t{";
                 $sep        = '';
                 foreach($families as $idmr => $family)
@@ -4132,7 +4179,7 @@ class Person extends RecordPic
                 }       // loop through families
                 $retval     .= "\t}\n";
                 $comma      = ",\n\t";
-            }           // individual is a parent in a family
+            }           // Person is a parent in a family
         }               // include family information
 
         // close off response
@@ -4146,13 +4193,13 @@ class Person extends RecordPic
     /********************************************************************
      *  function Person::mergeFrom                                      *
      *                                                                  *
-     *  Merge information from another individual into this individual  *
+     *  Merge information from another Person into this Person          *
      *  for all fields that do not have an explicit value in the        *
      *  current record.  The internal field values are changed.         *
      *  Invoke the save method to apply the changes to the database.    *
      *                                                                  *
      *  Input:                                                          *
-     *      $indiv2     instance of Person from which to copy           *
+     *      $person2    instance of Person from which to copy           *
      *                  values                                          *
      *                                                                  *
      *  Returns:                                                        *
@@ -4160,14 +4207,14 @@ class Person extends RecordPic
      *      changed.  Each entry is an associative array:               *
      *      array('field' => fieldname, 'value' => new value)           *
      ********************************************************************/
-    function mergeFrom($indiv2)
+    function mergeFrom($person2)
     {
         $retval             = array();
 
         // check all other fields in the main record
         foreach($this->row as $field => $value)
         {                           // loop through all fields in current
-            $value2         = $indiv2->get($field);
+            $value2         = $person2->get($field);
             switch($field)
             {                       // act on specific field
                 case 'id':
@@ -4203,18 +4250,18 @@ class Person extends RecordPic
                 case 'endowd':
                 case 'confirmationd':
                 case 'initiatoryd':
-                {                   // text fields preference for first indiv
+                {                   // text fields preference for first person
                     if (is_array($value2))
                         print "<p>Person.inc: " . __LINE__ . " field='$field', value2=" . var_export($value2, true) . "</p>\n";
                     else
                     if (strlen($value) == 0 && strlen($value2) > 0)
-                    {               // only replace if no value in first indiv
+                    {               // only replace if no value in first person
                         $this->set($field, $value2);
-                        $retval     .= array('field'    => $field,
-                                             'value'    => $value2);
-                    }               // only replace if no value in first indiv
+                        $retval[]       = array('field'    => $field,
+                                                'value'    => $value2);
+                    }               // only replace if no value in first person
                     break;
-                }                   // text fields preference for first indiv
+                }                   // text fields preference for first person
 
                 case 'baptismsd':
                 case 'endowsd':
@@ -4243,11 +4290,11 @@ class Person extends RecordPic
                 case 'deathcause':
                 {                   // textual notes
                     if (strlen($value) == 0 && strlen($value2) > 0)
-                    {               // replace if no value in first indiv
+                    {               // replace if no value in first person
                         $this->set($field, $value2);
                         $retval[]     = array('field'   => $field,
                                               'value'   => $value2);
-                    }               // replace if no value in first indiv
+                    }               // replace if no value in first person
                     else
                     if (strlen($value) > 0 && strlen($value2) > 0)
                     {               // concatenate if present in both
@@ -4279,16 +4326,16 @@ class Person extends RecordPic
                 default:
                 {                   // other fields
                     if (($value == 0) && ($value2 != 0))
-                    {               // replace if no value in first indiv
+                    {               // replace if no value in first person
                         $this->set( $field, $value2);
                         $retval[]     = array('field'   => $field,
                                               'value'   => $value2);
-                    }               // replace if no value in first indiv
+                    }               // replace if no value in first person
                     break;
                 }                   // other fields
             }                       // switch on field name
 
-        }                           // loop through all fields in individual
+        }                           // loop through all fields in Person
 
         return $retval;
     }       // function Person::mergeFrom
@@ -4693,7 +4740,7 @@ class Person extends RecordPic
                 $this->log($insert,
                            $sqlParms);
 
-                // make the current user an owner of the new individual
+                // make the current user an owner of the new Person
                 $this->addOwner();
 
                 // also create primary name entry
@@ -4779,7 +4826,7 @@ class Person extends RecordPic
                     $this->lastSqlCmd       .= ";$cmd";
 
                 // ensure that the alternate name entries for all of the
-                // families this individual is a spouse in exist
+                // families this Person is a spouse in exist
                 if ($this['gender'] == Person::FEMALE)
                 {                   // wife
                     $families                   = $this->getFamilies();
@@ -4878,10 +4925,10 @@ class Person extends RecordPic
     /********************************************************************
      *  function Person::__toString                                     *
      *                                                                  *
-     *  Get a textual representation of the individual.                 *
+     *  Get a textual representation of the Person.                     *
      *                                                                  *
      *  Returns:                                                        *
-     *      Summary of individual as a string.                          *
+     *      Summary of Person as a string.                              *
      ********************************************************************/
     function __toString()
     {

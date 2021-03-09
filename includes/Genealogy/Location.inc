@@ -149,6 +149,7 @@ use \Iterator;
  *      2020/12/30      replace HTML escapes in location name           *
  *      2021/01/03      static method getLocation extended to support   *
  *                      using location as unique key                    *
+ *      2021/02/18      add information to error log                    *
  *                                                                      *
  *  Copyright &copy; 2021 James A. Cobban                               *
  ************************************************************************/
@@ -383,20 +384,20 @@ class Location extends RecordPic
 
         if (count($parms) >= count(self::$initRow))
         {           // full row from database supplied
-            $dbrow      			    = $parms;
-            $needInsert     			= $dbrow['idlr'] == 0;
+            $dbrow                      = $parms;
+            $needInsert                 = $dbrow['idlr'] == 0;
         }           // full row from database supplied
         else
         {           // search parameters
-            $dbrow          			= null;
-            $where          			= '';
-            $and            			= 'WHERE ';
-            $sqlParms       			= array();
-            $idlr           			= null;
-            $location       			= null;
+            $dbrow                      = null;
+            $where                      = '';
+            $and                        = 'WHERE ';
+            $sqlParms                   = array();
+            $idlr                       = null;
+            $location                   = null;
             foreach($parms as $fldname => $value)
             {               // loop through parameters
-                $fldnameLc  			= strtolower($fldname);
+                $fldnameLc              = strtolower($fldname);
                 if (is_array($value))
                 {           // combine by OR
                     if (count($value) > 0)
@@ -408,18 +409,18 @@ class Location extends RecordPic
                             $where      .= "$or`$orfield`=?";
                             $sqlParms[] = $orvalue;
                             $or         = ' OR ';
-			                switch(strtolower($orfield))
-			                {       // act on specific field names
-			                    case 'location':
-			                    {
-			                        $location       = $orvalue;
-			                        break;
-			                    }
-			                }       // act on specific field names
+                            switch(strtolower($orfield))
+                            {       // act on specific field names
+                                case 'location':
+                                {
+                                    $location       = $orvalue;
+                                    break;
+                                }
+                            }       // act on specific field names
                         }
                         $where          .= ')';
                         $and            = ' AND ';
-		            }       // not empty
+                    }       // not empty
                 }           // combine by OR
                 else
                 switch($fldnameLc)
@@ -536,7 +537,7 @@ class Location extends RecordPic
         {
             foreach($parms as $fldname => $value)
             {       // loop through parameters
-                $fldnameLc  			= strtolower($fldname);
+                $fldnameLc              = strtolower($fldname);
                 if ($fldnameLc != 'idlr' &&
                     $fldnameLc != 'location' &&
                     !is_array($value))
@@ -743,8 +744,13 @@ class Location extends RecordPic
     {
         $idlr       = $this->row['idlr'];
         if ($this->needInsert && $idlr == 0)
-            error_log("Location.inc: " . __LINE__ . 
-                    " Location::getId called for new record\n");
+        {
+            error_log("Location::getId: " . __LINE__ . 
+                            " called for unsaved record returns 0");
+            $trace  = debug_backtrace();
+            foreach($trace as $entry)
+                error_log("Location:getId: called from {$entry['file']}:{$entry['line']}"); 
+        }
         return $idlr;
     }       // Location::getId
 
@@ -758,7 +764,7 @@ class Location extends RecordPic
         $idlr       = $this->row['idlr'];
         if ($this->needInsert && $idlr == 0)
             error_log("Location.inc: " . __LINE__ . 
-                "Location::getIdlr called for new record\n");
+                "Location::getIdlr called for new record");
         return $idlr;
     }       // Location::getIdlr
 

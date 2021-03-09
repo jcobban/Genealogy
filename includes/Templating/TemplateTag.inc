@@ -14,8 +14,10 @@ use \Genealogy\RecordSet;
  *      2019/08/02  provide access to outerHTML, innerHTML, and         *
  *                  childNodes as attributes                            *
  *                  support assigning values to outerHTML and innerHTML *
+ *      2021/01/24  add method replace                                  *
+ *      2021/02/01  replace uses outerHTML if tag is a paragraph        *
  *                                                                      *
- *  Copyright &copy; 2019 James A. Cobban All Rights Reserved           *
+ *  Copyright &copy; 2021 James A. Cobban All Rights Reserved           *
  ************************************************************************/
 require_once __NAMESPACE__ . '/Template.inc' ;
 
@@ -182,7 +184,14 @@ class TemplateTag implements Iterator, ArrayAccess
         if (array_key_exists('id', $this->attributes))
         {
             $this->id       = $this->attributes['id'];
-            $this->template->dom->elements[$this->id]   = $this;
+            if (strpos($this->id, '||') !== false)
+            {       // multiple ids separated by ||
+                $ids        = explode('||', $this->id);
+                foreach ($ids as $id)
+                    $this->template->dom->elements[$id]     = $this;
+            }       // multiple ids separated by ||
+            else
+                $this->template->dom->elements[$this->id]   = $this;
         }
         else
             $this->id       = '';
@@ -205,12 +214,24 @@ class TemplateTag implements Iterator, ArrayAccess
      *                                                                  *
      *  This method adds a subordinate tag as a child of the current    *
      *  tag.                                                            *
+     *                                                                  *
+     *  Input:                                                          *
+     *      $child      instance of TemplateTag or string               *
      ********************************************************************/
     public function addChild($child)
     {
-        $this->children[]   = $child;
-        $child->parent      = $this;
-        $child->template    = $this->template;
+        if ($child instanceof TemplateTag)
+        {
+            $this->children[]   = $child;
+            $child->parent      = $this;
+            $child->template    = $this->template;
+        }
+        else
+        if (is_string($child))
+            $this->children[]   = $child;
+        else
+            error_log("TemplateTag::addChild: invalid parameter " .
+                        gettype($child));
     }       // function TemplateTag::addChild
 
     /********************************************************************
@@ -218,6 +239,10 @@ class TemplateTag implements Iterator, ArrayAccess
      *                                                                  *
      *  This method replaces an existing tag as a child of the current  *
      *  tag.                                                            *
+     *                                                                  *
+     *  Input:                                                          *
+     *      $oldchild   instance of TemplateTag                         *
+     *      $child      instance of TemplateTag                         *
      ********************************************************************/
     public function replChild($oldChild, $child)
     {
@@ -226,17 +251,22 @@ class TemplateTag implements Iterator, ArrayAccess
         for($i = 0; $i < count($this->children); $i++)
         {
             $tag    = $this->children[$i];
-            if ($tag->start == $oldChild->start)
+            if ($tag instanceof TemplateTag &&
+                $tag->start == $oldChild->start)
             {
                 $ord    = $i;
+                break;
             }
         }
         if ($ord !== false)
             $this->children[$ord]   = $child;
         else
             $this->children[]       = $child;
-        $child->parent      = $this;
-        $child->template    = $this->template;
+        if ($child instanceof TemplateTag)
+        {
+            $child->parent      = $this;
+            $child->template    = $this->template;
+        }
     }       // function TemplateTag::replChild
 
     /********************************************************************
@@ -322,6 +352,9 @@ class TemplateTag implements Iterator, ArrayAccess
      *                                                                  *
      *  This method prints a summary of this tag and the tree of        *
      *  tags under this tag.                                            *
+     *                                                                  *
+     *  Input:                                                          *
+     *      $level      nesting level within the document               *
      ********************************************************************/
     public function printTag($level = 0)
     {
@@ -333,6 +366,9 @@ class TemplateTag implements Iterator, ArrayAccess
      *                                                                  *
      *  This method creates a string containing a summary of this tag   *
      *  and the tree of tags under this tag.                            *
+     *                                                                  *
+     *  Input:                                                          *
+     *      $level      nesting level within the document               *
      ********************************************************************/
     public function show($level = 0)
     {
@@ -372,7 +408,12 @@ class TemplateTag implements Iterator, ArrayAccess
         }
         $retval         .= "</p>\n";
         foreach ($this->children as $child)
-            $retval     .= $child->show($level + 1);
+        {
+            if ($child instanceof TemplateTag)
+                $retval     .= $child->show($level + 1);
+            else
+                $retval     .= "<p style='text-indent: {$level}0px;margin-top:0px;'>" . "'$child'</p>\n";
+        }
         return $retval;
     }       // function printTag
 
@@ -413,7 +454,8 @@ class TemplateTag implements Iterator, ArrayAccess
             }           // insertion is within tag limits
         }           // loop through insertions
         foreach ($this->children as $child)
-            $child->updateInsertions($insertions, $offset);
+            if ($child instanceof TemplateTag)
+                $child->updateInsertions($insertions, $offset);
         return $insertions;
     }       // function updateInsertions
 
@@ -422,6 +464,9 @@ class TemplateTag implements Iterator, ArrayAccess
      *                                                                  *
      *  This method returns the text from the beginning of the tag to   *
      *  the end of the closing tag.                                     *
+     *                                                                  *
+     *  Input:                                                          *
+     *      $replace        optional instance of string                 *
      *                                                                  *
      *  Returns:                                                        *
      *      string containing HTML or XML                               *
@@ -456,6 +501,13 @@ class TemplateTag implements Iterator, ArrayAccess
      *  This method returns the text contained within the tag element   *
      *  including all child tags as text.                               *
      *                                                                  *
+     *      $text           = $tag->innerHTML();                        *
+     *      $tag->innerHTML($replace);                                  *
+     *      $tag->innerHTML = $replace;                                 *
+     *                                                                  *
+     *  Input:                                                          *
+     *      $replace        optional instance of string                 *
+     *                                                                  *
      *  Returns:                                                        *
      *      string containing HTML or XML                               *
      ********************************************************************/
@@ -486,6 +538,28 @@ class TemplateTag implements Iterator, ArrayAccess
                       $start,
                       $end - $start);
     }       // function TemplateTag::innerHTML
+
+    /********************************************************************
+     *  function TemplateTag::replace                                   *
+     *                                                                  *
+     *  This method returns the text contained within the tag element   *
+     *  including all child tags as text, with specified text value(s)  *
+     *  replaced by new value(s).                                       *
+     *                                                                  *
+     *  Input:                                                          *
+     *      $match          string or array of strings                  *
+     *      $replace        string or array of strings                  *
+     *                                                                  *
+     *  Returns:                                                        *
+     *      string which may contain HTML or XML                        *
+     ********************************************************************/
+    public function replace($match, $replace)
+    {
+        $text       = $this->outerHTML();
+        if (strtolower(substr($text, 0, 3)) != '<p ')
+            $text   = $this->innerHTML();
+        return str_replace($match, $replace, $text);
+    }       // function TemplateTag::replace
 
     /********************************************************************
      *  function TemplateTag::__set                                     *
@@ -555,13 +629,16 @@ class TemplateTag implements Iterator, ArrayAccess
         $retval     = array();
         foreach($this->children as $tag)
         {
-            if (strtolower($tag->tagName) == $tagName)
-                $retval[]   = $tag;
-            else
+            if ($tag instanceof TemplateTag)
             {
-                $temp       = $tag->getElementsByTagName($tagName);
-                if (count($temp) > 0)
-                    $retval = array_merge($retval, $temp);
+                if (strtolower($tag->tagName) == $tagName)
+                    $retval[]   = $tag;
+                else
+                {
+                    $temp       = $tag->getElementsByTagName($tagName);
+                    if (count($temp) > 0)
+                        $retval = array_merge($retval, $temp);
+                }
             }
         }
         return $retval;
@@ -733,6 +810,9 @@ class TemplateTag implements Iterator, ArrayAccess
      *                                                                  *
      *  Parameters:                                                     *
      *      $key        lookup key                                      *
+     *                                                                  *
+     *  Returns:                                                        *
+     *      string value if match found, otherwise null                 *
      ********************************************************************/
     public function offsetGet($key)
     {
