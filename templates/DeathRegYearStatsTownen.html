@@ -148,6 +148,28 @@
         </table>
       </form>
     </div> <!-- end of <div id="body"> -->
+    <div class="hidden" id="templates">
+        <span id="yearMissing">
+            Mandatory RegYear parameter is missing.
+        </span>
+        <span id="yearInvalid">
+            RegYear '$year' must be a four decimal digit number.
+        </span>
+        <span id="domainInvalid">
+            Domain '$value' must be an alphabetic country code followed by
+            an alphabetic state or province code.
+        </span>
+        <span id="countyInvalid">
+            County '$value' must be alphabetic.
+        </span>
+        <span id="domainUnsupported">
+            Domain '$value' must be a supported two character country code
+            followed by a two or three character state or province code. 
+        </span>
+        <p id="countyUnsupported">
+            County code '$value' is not valid for domain '$domain'.
+        </p>
+    </div> <!-- id="templates" -->
     <div class="balloon" id="HelpTownStats">
         Click on this button to display a summary of the deaths transcribed
         for the specific town or township.

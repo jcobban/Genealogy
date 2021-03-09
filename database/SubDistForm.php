@@ -286,12 +286,15 @@ if (count($_POST) > 0)
     	    case 'orig_id':
     	    {
                 if ($subDistrict)
-                {
-                    ob_start();
-                    $subDistrict->save('p');
-                    $warn               .= ob_get_clean();
+                {                   // apply pending changes
+                    if ($subDistrict->save(false) > 0)
+                    {               // database changed
+                        $sqlcmd         = $subDistrict->getLastSqlCmd();
+                        $warn   .= "<p>SubDistForm.php: " . __LINE__ .
+                                        " issued '$sqlcmd'</p>\n";
+                    }               // database changed
                     $subDistrict        = null;
-                }
+                }                   // apply pending changes
     			$sdParms['sd_id']	    = $value;
     			break;
     	    }
@@ -312,14 +315,17 @@ if (count($_POST) > 0)
 
     	    case 'sd_name':
             {
-    			if ($value == '[Delete]')
-    			{
-                    ob_start();
-    			    $subDistrict->delete('p');
-                    $warn               .= ob_get_clean();
+    			if (strtolower($value) == '[delete]')
+    			{                   // user deleted the subdistrict
+    			    if ($subDistrict->delete(false))
+                    {               // database changed
+                        $sqlcmd         = $subDistrict->getLastSqlCmd();
+                        $warn   .= "<p>SubDistForm.php: " . __LINE__ .
+                                        " issued '$sqlcmd'</p>\n";
+                    }               // database changed
     			    $subDistrict	    = null;
-    			}
-    			else
+    			}                   // user deleted the subdistrict
+    			else                // update the name
     			    $subDistrict->set($column, $value);
     			break;
     	    }
@@ -347,7 +353,7 @@ if (count($_POST) > 0)
         }		    // act on specific parameter
     }	            // loop through all parameters
     if ($debug)
-        $warn   .= $parmsText . "</table>\n";
+        $warn           .= $parmsText . "</table>\n";
 }		            // invoked by submit to update account
 
 // create Template
@@ -437,6 +443,13 @@ if (strlen($msg) == 0)
 
     // get the set of SubDistricts for this District
     $subdistList	            = $district->getSubDistricts();
+    $info			    		= $subdistList->getInformation();
+	$count			    		= $info['count'];
+    $query			    		= $info['query'];
+    if ($debug)
+    {
+        $warn   .= "<p>\$district->getSubDistricts() used query='$query' and returned $count divisions</p>\n";
+    }
 
     $domain		                = new Domain(array('domain' => "$cc$province"));
     $provinceName	            = $domain['name'];

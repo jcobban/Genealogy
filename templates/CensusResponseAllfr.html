@@ -28,8 +28,37 @@
         </span>
         <div style="clear: both;"></div>
       </h1>
-      $TRACE
       $MSG
+      $TRACE
+		<!--- Put out a line with links to previous and next section of table -->
+		<div class="center" id="topBrowse">
+		    <span class="left" id="topPrev">
+			<a href="$npPrev" id="prenpprev">
+			&lt;---
+			</a>
+		    </span>
+		    <span class="right" id="topNext">
+			<a href="$npNext" id="prenpnext">
+			    ---&gt;
+			</a>
+		    </span>
+		      <span id="respdescrows">montrer rangs $first a $last
+					   de $totalrows
+		      </span>
+		      <span id="respdescsub">
+			$province dist $dId $DName, sousdist $subdId $SubDName
+		      </span>
+		      <span id="respdescdiv">
+			 div $divId
+		      </span>
+		      <span id="respdescpage">
+			 page $page
+		      </span>
+		      <span id="respdescfam">
+			 famille $family
+		      </span>
+		    <div style="clear: both;"></div>
+		</div>
     <form action="doNothing.php" name="buttonForm" id="buttonForm">
 	<p class="label" id="buttonRow">
 	    <input type="hidden" name="search" disabled="disabled"
@@ -39,35 +68,6 @@
 	    <button type="button" name="seeAllFields">voir tous les champs</button>
 	    <button type="button" name="displayImage">Afficher l"image</button>
 	</p>
-<!--- Put out a line with links to previous and next section of table -->
-<div class="center" id="topBrowse">
-    <span class="left" id="topPrev">
-	<a href="$npPrev" id="prenpprev">
-	&lt;---
-	</a>
-    </span>
-    <span class="right" id="topNext">
-	<a href="$npNext" id="prenpnext">
-	    ---&gt;
-	</a>
-    </span>
-      <span id="respdescrows">montrer rangs $first a $last
-			   de $totalrows
-      </span>
-      <span id="respdescsub">
-	$province dist $dId $DName, sousdist $subdId $SubDName
-      </span>
-      <span id="respdescdiv">
-	 div $divId
-      </span>
-      <span id="respdescpage">
-	 page $page
-      </span>
-      <span id="respdescfam">
-	 famille $family
-      </span>
-    <div style="clear: both;"></div>
-</div>
   <!--- Put out the response as a table -->
   <table class="summary" cellspacing="0px" id='dataTable'>
     <thead> <!--- Put out the column headers -->
@@ -165,6 +165,62 @@ transcription.
 </div>
 <div class="hidden" id="templates">
   <!-- the following are language specific error messages -->
+      <span id="noParameters">
+        No parameters passed.
+      </span>
+      <span id="censusInvalid">
+        Value $value for Census is syntactically invalid.
+      </span>
+      <span id="censusUnsupported">
+        Value $value for Census is not defined.
+      </span>
+      <p id="limitInvalid">
+        Value $value for Limit must be number between 5 and 99.
+      </p>
+      <p id="offsetInvalid">
+         Value $value for Offset must be an integer between 0 and 999,999. 
+      </p>
+      <p id="orderbyInvalid">
+         Invalid value of OrderBy='$value'.
+      </p>
+      <span id="byearInvalid">
+         Birth Year '$value' must be an integer and
+         in the range 1750 to 2099.
+      </span>
+	  <span id="rangeInvalid">
+		Range '$value' must be an integer between 1 and 10.
+      </span>
+	  <span id="pageInvalid">
+		Page '$value' must be an integer.
+      </span>
+	  <span id="familyInvalid">
+		Family '$value' must be an integer.
+      </span>
+	  <span id="surnameInvalid">
+		Surname '$value' invalid.
+      </span>
+	  <span id="soundexInvalid">
+		SurnameSoundex '$value' invalid, must be 'Y' or 'N'.
+      </span>
+	  <span id="provinceInvalid">
+		Province '$value' invalid.
+      </span>
+	  <span id="districtInvalid">
+		District '$value' invalid.
+      </span>
+	  <span id="subdistInvalid">
+		SubDistrict '$value' invalid.
+      </span>
+      <span id="divisionInvalid">
+		Division '$value' invalid.
+      </span>
+      <span id="fieldInvalid">
+		Field '$key' value '$value' invalid.
+      </span>
+      <p id="noRecords">
+		No records match request.
+      </p>
+	  <span class="note" id="imageCopyrightNote">
   <span class="note" id="imageCopyrightNote">
 	Image provided courtesy of 
 	<a href="http://www.bac-lac.gc.ca/eng/Pages/home.aspx">

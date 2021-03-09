@@ -332,6 +332,10 @@ if (strlen($msg) == 0)
 	// create an array of language information for select <options>
     $languageSet	        = new RecordSet('Languages');
     $language               = $languageSet[$lang];
+    if ($language instanceof Record)
+        error_log("DomainsEdit.php: " . __LINE__ . "\$language=object" . get_class($language));
+    else
+        error_log("DomainsEdit.php: " . __LINE__ . "\$language=" . print_r($language,true));
 	$language->selected     = true;
 
 	// get the set of administrative domains for the country

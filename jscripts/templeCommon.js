@@ -43,7 +43,7 @@ var deferSubmit         = false;
  *      ev              Javascript change Event                         *
  ************************************************************************/
 function templeChanged(ev)
-
+{
     // get the name of the input field
     let name;
     let ider                    = 0;

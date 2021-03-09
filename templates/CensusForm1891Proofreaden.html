@@ -38,8 +38,8 @@
 	</span>
 	<div style="clear: both;"></div>
       </h1>
-      $TRACE
       $MSG
+      $TRACE
       <p class="message" id="origTranscriberMessage">
 	Only the original transcriber can modify the transcription.
 	Any changes you make will be recorded as field notes.
@@ -108,8 +108,9 @@
 	<input type="hidden" name="Page" value="$PAGE">
 	<input type="hidden" name="Rows" value="$ROWS">
 	<input type="hidden" name="Debug" value="$DEBUG">
-      </div>
-      <table class="form" id="form" >
+    </div>
+    <p id="pageSize" class="warning">Page contains $NUMLINES lines</p>
+    <table class="form" id="form" >
 	<thead>
 	  <!--- Put out the column headers -->
 	  <tr>

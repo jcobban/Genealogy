@@ -29,8 +29,37 @@
         </span>
         <div style="clear: both;"></div>
       </h1>
-      $TRACE
       $MSG
+      $TRACE
+		<!--- Put out a line with links to previous and next section of table -->
+		<div class="center" id="topBrowse">
+		    <span class="left" id="topPrev">
+			<a href="$npPrev" id="prenpprev">
+			&lt;---
+			</a>
+		    </span>
+		    <span class="right" id="topNext">
+			<a href="$npNext" id="prenpnext">
+			    ---&gt;
+			</a>
+		    </span>
+		      <span id="respdescrows">montrer rangs $first a $last
+					   de $totalrows
+		      </span>
+		      <span id="respdescsub">
+			$province dist $dId $DName, sousdist $subdId $SubDName
+		      </span>
+		      <span id="respdescdiv">
+			 div $divId
+		      </span>
+		      <span id="respdescpage">
+			 page $page
+		      </span>
+		      <span id="respdescfam">
+			 famille $family
+		      </span>
+		    <div style="clear: both;"></div>
+		</div>
     <form action="doNothing.php" name="buttonForm" id="buttonForm">
 	<p class="label" id="buttonRow">
 	    <input type="hidden" name="search" disabled="disabled"
@@ -40,35 +69,6 @@
 	    <button type="button" name="seeAllFields">voir tous les champs</button>
 	    <button type="button" name="displayImage">Afficher l"image</button>
 	</p>
-<!--- Put out a line with links to previous and next section of table -->
-<div class="center" id="topBrowse">
-    <span class="left" id="topPrev">
-	<a href="$npPrev" id="prenpprev">
-	&lt;---
-	</a>
-    </span>
-    <span class="right" id="topNext">
-	<a href="$npNext" id="prenpnext">
-	    ---&gt;
-	</a>
-    </span>
-      <span id="respdescrows">montrer rangs $first a $last
-			   de $totalrows
-      </span>
-      <span id="respdescsub">
-	$province dist $dId $DName, sousdist $subdId $SubDName
-      </span>
-      <span id="respdescdiv">
-	 div $divId
-      </span>
-      <span id="respdescpage">
-	 page $page
-      </span>
-      <span id="respdescfam">
-	 famille $family
-      </span>
-    <div style="clear: both;"></div>
-</div>
   <!--- Put out the response as a table -->
   <table class="summary" cellspacing="0px" id="dataTable">
     <thead> <!--- Put out the column headers -->
@@ -155,22 +155,79 @@
   </div>
   </div>
   </div> <!-- id="transcription" -->
-<div class="balloon" id="HelpseeAllFields">
-Click on this button to display a form containing all of the transcribed
-columns for the page.  If you are a registered contributor to the
-web-site you will be able to edit the contents of this form to add
-or correct the transcription of the census.
-</div>
-<div class="balloon" id="HelpdisplayImage">
-Click on this button to split the window and display the original
-census image corresponding to this page as obtained from the Library and
-Archives of Canada web-site.
-</div>
-<div class="balloon" id="HelpDetails">
-Click on this button to see all of the fields from this row of the census
-transcription.
-</div>
-<div class="hidden" id="templates">
+	<div class="balloon" id="HelpseeAllFields">
+	  Click on this button to display a form containing all of the transcribed
+	  columns for the page.  If you are a registered contributor to the
+	  web-site you will be able to edit the contents of this form to add
+	  or correct the transcription of the census.
+	</div>
+	<div class="balloon" id="HelpdisplayImage">
+	  Click on this button to split the window and display the original
+	  census image corresponding to this page as obtained from the Library and
+	  Archives of Canada web-site.
+	</div>
+	<div class="balloon" id="HelpDetails">
+	  Click on this button to see all of the fields from this row of the census
+	  transcription.
+	</div>
+	<div class="hidden" id="templates">
+      <span id="noParameters">
+        Aucun paramètre passé.
+      </span>
+      <span id="censusInvalid">
+        L'identifiant $value pour le recensement est syntaxiquement
+        incorrect.
+      </span>
+      <span id="censusUnsupported">
+        L'identifiant $value pour le recensement n'est pas défini.
+      </span>
+      <p id="limitInvalid">
+        Valeur $value pour Limit doit être un nombre compris entre 5 et 99.
+      </p>
+      <p id="offsetInvalid">
+        Valeur $value pour Offset doit être un nombre compris entre 5 et 999,999. 
+      </p>
+      <p id="orderbyInvalid">
+         Valeur incorrecte de OrderBy='$value'.
+      </p>
+      <span id="byearInvalid">
+         L'année de naissance '$value' doit être un entier et
+         dans la gamme 1750 à 2099.
+      </span>
+	  <span id="rangeInvalid">
+		La plage '$value' doit être un entier compris entre 1 et 10.
+      </span>
+	  <span id="pageInvalid">
+		La page '$value'  doit être un entier.
+      </span>
+	  <span id="familyInvalid">
+		La numero de famille '$value'  doit être un entier.
+      </span>
+	  <span id="surnameInvalid">
+		Surnom '$value' invalide.
+      </span>
+	  <span id="soundexInvalid">
+		SurnameSoundex '$value' invalide, doit être 'Y' ou 'N'.
+      </span>
+	  <span id="provinceInvalid">
+		L'identifiant de la Province '$value' invalide.
+      </span>
+	  <span id="districtInvalid">
+		L'identifiant de la District '$value' invalid.
+      </span>
+	  <span id="subdistInvalid">
+		L'identifiant de la SubDistrict '$value' invalid.
+      </span>
+      <span id="divisionInvalid">
+		L'identifiant de la Division '$value' invalid.
+      </span>
+      <span id="fieldInvalid">
+        Paramètre '$key' valeur '$value' invalide.
+      </span>
+      <p id="noRecords">
+		Aucun enregistrement dans la demande de correspondance de table.
+      </p>
+	  <!-- the following are language specific error messages -->
   <!-- the following are language specific error messages -->
   <span class="note" id="imageCopyrightNote">
 	Image provided courtesy of 

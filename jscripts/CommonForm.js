@@ -149,6 +149,8 @@
  *      2021/01/12      drop support for IE 9 & 10.  That is browsers   *
  *                      that or not compatible with ECMA ES6            *
  *      2021/01/16      use XMLSerializer for diagnostic output         *
+ *      2021/02/23      in dates insert a space between digit and [     *
+ *                      and between letter and [                        *
  *                                                                      *
  *  Copyright &copy; 2021 James A. Cobban                               *
  ************************************************************************/
@@ -1322,8 +1324,8 @@ function dateChanged(ev)
     // ensure that there is a space between a letter and a digit
     // or a digit and a letter
     var value       = this.value;
-    value       = value.replace(/([a-zA-Z])(\d)/g,"$1 $2");
-    this.value      = value.replace(/(\d)([a-zA-Z])/g,"$1 $2");
+    value           = value.replace(/([a-zA-Z])([\[0-9])/g,"$1 $2");
+    this.value      = value.replace(/(\d)([\[a-zA-Z])/g,"$1 $2");
 
     changeElt(this);    // change case and expand abbreviations
 
@@ -1528,7 +1530,7 @@ function checkProvince()
 function checkOccupation()
 {
     var element     = this;
-    var re      = /^[a-zA-Z\u00c0-\u00ff\s\.,'&\-\[\]?]*$/;
+    var re      = /^[a-zA-Z\u00c0-\u00ff\s\.,'&\-\[\]?()]*$/;
     var occupation  = element.value;
     setErrorFlag(element, re.test(occupation));
 }       // function checkOccupation
@@ -1545,7 +1547,7 @@ function checkOccupation()
 function checkAddress()
 {
     var element     = this;
-    var re      = /^[-a-zA-Z\u00c0-\u00ff0-9 .,'½¼¾&\[\]\/?]*$/;
+    var re      = /^[-a-zA-Z\u00c0-\u00ff0-9 .,'½¼¾&(){}\[\]\/?]*$/;
     var address     = element.value;
     setErrorFlag(element, re.test(address));
 }       // function checkAddress
@@ -2256,7 +2258,7 @@ function tableKeyDown(ev)
         case 'ArrowDown':
         {           // go to same column next row
             field               = getCellRelCol(this, 1);
-            e.preventDefault();
+            ev.preventDefault();
             if (field === undefined)
                 return false;
             field.focus();          // set focus on same column next row
@@ -2267,10 +2269,10 @@ function tableKeyDown(ev)
 
         case 'End':
         {           // End key
-            if (e.ctrlKey)
+            if (ev.ctrlKey)
             {       // ctrl-End
                 field           = getCellLastRow(this);
-                e.preventDefault();
+                ev.preventDefault();
                 if (field === undefined)
                     return false;
                 field.focus();      // set focus on last column current row
@@ -2282,10 +2284,10 @@ function tableKeyDown(ev)
 
         case 'Home':
         {           // Home key
-            if (e.ctrlKey)
+            if (ev.ctrlKey)
             {       // ctrl-Home
                 field           = getCellFirstRow(this);
-                e.preventDefault();
+                ev.preventDefault();
                 if (field === undefined)
                     return false;
                 field.focus();  // set focus on first column current row
@@ -2305,7 +2307,7 @@ function tableKeyDown(ev)
                     field       = getCellRelRow(this, -1);
                     field.focus();      // set focus on prev col same row
                     field.select();     // select all of the text to replace
-                    e.preventDefault();
+                    ev.preventDefault();
                     return false;       // suppress default action
                 }
             }
@@ -2315,7 +2317,7 @@ function tableKeyDown(ev)
         case 'ArrowUp':
         {           // arrow up
             field               = getCellRelCol(this, -1);
-            e.preventDefault();
+            ev.preventDefault();
             if (field === undefined)
                 return false;
             field.focus();              // set focus on same column prev row
@@ -2332,7 +2334,7 @@ function tableKeyDown(ev)
                     field       = getCellRelRow(this, 1);
                     field.focus();      // set focus on next col same row
                     field.select();     // select all of the text to replace
-                    e.preventDefault();
+                    ev.preventDefault();
                     return false;       // suppress default action
                 }
             }
@@ -2342,19 +2344,19 @@ function tableKeyDown(ev)
         case 'F1':  // F1
         {
             displayHelp(this);
-            e.preventDefault();
+            ev.preventDefault();
             return false;       // suppress default action
         }           // F1
 
         case 'c':
         case 'C':
         {           // letter 'C'
-            if (e.altKey)
+            if (ev.altKey)
             {       // alt-C
                 var correctImage    = document.getElementById('correctImage');
                 if (correctImage)
                     correctImageUrl();
-                e.preventDefault();
+                ev.preventDefault();
                 return false;
             }       // alt-C
             break;
@@ -2363,12 +2365,12 @@ function tableKeyDown(ev)
         case 'i':
         case 'I':
         {           // letter 'I'
-            if (e.altKey)
+            if (ev.altKey)
             {       // alt-I
                 var imageButton = document.getElementById('imageButton');
                 if (imageButton)
                     imageButton.click();
-                e.preventDefault();
+                ev.preventDefault();
                 return false;
             }       // alt-I
             break;
@@ -2377,10 +2379,10 @@ function tableKeyDown(ev)
         case 's':
         case 'S':
         {           // letter 'S'
-            if (e.ctrlKey)
+            if (ev.ctrlKey)
             {       // ctrl-S
                 form.submit();
-                e.preventDefault();
+                ev.preventDefault();
                 return false;
             }       // ctrl-S
             break;
@@ -2389,7 +2391,7 @@ function tableKeyDown(ev)
         case 'u':
         case 'U':
         {           // letter 'U'
-            if (e.altKey)
+            if (ev.altKey)
             {       // alt-U
                 form.submit();
             }       // alt-U
@@ -2399,10 +2401,10 @@ function tableKeyDown(ev)
         case 'z':
         case 'Z':
         {           // letter 'Z'
-            if (e.ctrlKey)
+            if (ev.ctrlKey)
             {       // ctrl-Z
                 this.value  = this.defaultValue;
-                e.preventDefault();
+                ev.preventDefault();
                 return false;
             }       // ctrl-Z
             break;
@@ -2441,7 +2443,7 @@ function numericKeyDown(ev)
         return true;
     if (key.length == 1)
     {
-        e.preventDefault();
+        ev.preventDefault();
         return false;
     }
     else

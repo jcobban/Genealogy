@@ -193,7 +193,10 @@ if (isset($_POST) && count($_POST) > 0)
                     preg_match("#^[0-9a-zA-Z:;_. +=/&?-]+#", $value, $matches);
                     $image              = htmlspecialchars($value);
                     if (is_array($matches) && isset($matches[0]))
-                        $warn           .= "Image URL '$image' contains invalid character after '{$matches[0]}'. ";
+                    {
+                        if (strlen($matches[0]) < strlen($value))
+                            $warn           .= "Image URL '$image' contains invalid character after '{$matches[0]}'. ";
+                    }
                     else
                         $warn           .= "Image URL '$image' contains invalid characters. ";
                 }
@@ -465,24 +468,29 @@ if (strlen($msg) == 0)
         $warn   .= "<p>numParms=$numParms</p>";
 
     // update the last row on the page
-    if ($record->isExisting())
-    {           // updating existing record
-        if (strtolower($record->get('surname')) == '[delete]')
-            $record->delete();
-        else
-            $record->save(false);   // save changes
-    }           // updating existing record
-    else
-    {           // inserting new record
-        if (strtolower($record->get('surname')) != '[delete]')
-            $record->save(false);
-    }           // inserting new record
+    if ($record)
+    {               // have a record
+	    if ($record->isExisting())
+	    {           // updating existing record
+	        if (strtolower($record->get('surname')) == '[delete]')
+	            $record->delete();
+	        else
+	            $record->save(false);   // save changes
+	    }           // updating existing record
+	    else
+	    {           // inserting new record
+	        if (strtolower($record->get('surname')) != '[delete]')
+	            $record->save(false);
+	    }           // inserting new record
+    }               // have a record
 
     // register the update in the Pages table
     $pageEntry->set('population',$count);
     $pageEntry->set('transcriber',$userid);
     $pageEntry->set('image', $image);
-    $pageEntry->save($debug);
+    $count              = $pageEntry->save(false);
+    if ($debug && $count > 0)
+        $warn           .= "<p>" . $pageEntry->getLastSqlCmd() . "</p>\n";
 
     // ensure the transcription statistics in the District
     // are synchronized

@@ -15,6 +15,7 @@ use \Exception;
  *																		*
  *  History:															*
  *		2020/12/28		created											*
+ *		2021/02/15      fix syntax of JSON
  *																		*
  *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
@@ -41,12 +42,12 @@ if (is_int($idnx))
 
     // update object from $_POST parameters
     $name->postUpdate(Record::JSON);
-
+    print ",";
     // save object state to server
-    $name->save(true);
+    $name->save(Record::JSON);
 
     // include XML representation of updated record in response
-    print ",\n\"record\" : ";
+    print "\n\"record\" : ";
     $name->toJson(true);
     $command                    = $name->getLastSqlCmd();
     print ",\n\"saveName\": " . json_encode($command);

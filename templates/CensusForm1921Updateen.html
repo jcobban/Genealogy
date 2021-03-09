@@ -32,14 +32,14 @@
   <div id="transcription" style="overflow: auto; overflow-x: scroll">
     <div class="body">
       <h1>
-      1921 Census of Canada Update
-    <span class="right">
-      <a href="/database/CensusForm1921Helpen.html" target="help">? Help</a>
-    </span>
-    <div style="clear: both;"></div>
+        1921 Census of Canada Update
+        <span class="right">
+          <a href="/database/CensusForm1921Helpen.html" target="help">? Help</a>
+        </span>
+        <div style="clear: both;"></div>
       </h1>
-      $TRACE
       $MSG
+      $TRACE
       <!--- Put out a line with links to previous and next section of table -->
       <div class="center" id="frontPager">
         <span class="left" id="npPrevFront">
@@ -62,38 +62,38 @@
 
       <!--- Put out the response as a table -->
       <form name="censusForm" id="censusForm"
-        action="CensusUpdate.php"
-        method="post"
-        autocomplete="off"
-        enctype="multipart/form-data">
-    <p class="label" id="TranscriberLine">
-        Transcriber: $TRANSCRIBER
-    </p>
-    <p class="label" id="ProofreaderLine">
-        Proof Reader: $PROOFREADER
-    </p>
-    <p class="label" id="imageLine">
-      <span id="ImageButton">
-        <button type="button" id="imageButton">
-        Display Original Census <u>I</u>mage
-        </button>
-            <input type="hidden" name="Image" id="Image"
-            value="$IMAGE">
-      </span> <!-- id="ImageButton" -->
-        <span id="ImagePrompt">
-        Enter URL of Census Image:
-            <input type="text" name="Image" id="Image"
-        size="64" maxlength="128" class="black white left"
-        value="$IMAGE">
-        </span> <!-- id="ImagePrompt" -->
-        <button type="button" id="treeMatch">
-        Match Family Tree Citations
-        </button>
-          &nbsp;
-      <button type="button" id="showImportant">
-        Show Important
-      </button>
-    </p>
+            action="CensusUpdate.php"
+            method="post"
+            autocomplete="off"
+            enctype="multipart/form-data">
+        <p class="label" id="TranscriberLine">
+            Transcriber: $TRANSCRIBER
+        </p>
+        <p class="label" id="ProofreaderLine">
+            Proof Reader: $PROOFREADER
+        </p>
+        <p class="label" id="imageLine">
+          <span id="ImageButton">
+            <button type="button" id="imageButton">
+            Display Original Census <u>I</u>mage
+            </button>
+                <input type="hidden" name="Image" id="Image"
+                value="$IMAGE">
+          </span> <!-- id="ImageButton" -->
+            <span id="ImagePrompt">
+            Enter URL of Census Image:
+                <input type="text" name="Image" id="Image"
+                    size="64" maxlength="128" class="black white left"
+                    value="$IMAGE">
+            </span> <!-- id="ImagePrompt" -->
+            <button type="button" id="treeMatch">
+            Match Family Tree Citations
+            </button>
+              &nbsp;
+          <button type="button" id="showImportant">
+            Show Important
+          </button>
+        </p> <!-- id="imageLine" -->
 
     <div class="hidden" id="hidden">
             <input type="hidden" name="Census" value="$CENSUSID">
@@ -105,6 +105,7 @@
             <input type="hidden" name="Rows" value="$ROWS">
             <input type="hidden" name="Debug" value="$DEBUG">
     </div>
+    <p id="pageSize" class="warning">Page contains $NUMLINES lines</p>
     <table class="form" id="form" >
       <thead>
         <!--- Put out the column headers -->

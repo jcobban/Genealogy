@@ -52,8 +52,9 @@ use \Exception;
  *		                use FtTemplate                                  *
  *		2020/05/03      add default for censusId                        *
  *		2020/10/10      remove field prefix for Pages table             *
+ *		2021/01/24      remove field prefix during update               *
  *																		*
- *  Copyright &copy; 2020 James A. Cobban								*
+ *  Copyright &copy; 2021 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/FtTemplate.inc';
 require_once __NAMESPACE__ . '/SubDistrict.inc';
@@ -65,12 +66,19 @@ $flds	    = "Census, DistId, SdId, Div, Page, Population, Transcriber, ProofRead
 $tbls	    = "Pages";
 
 // identify the specific Division
+$cc			    		= 'CA';		    // ISO country code
+$countryName			= 'Canada';
 $censusId				= null;		// census id 'CCYYYY'
+$censustext				= null;		// invalid census id 
 $censusYear				= null;		// year of enumeration
 $distId		    		= null;		// district number
+$disttext		    	= null;		// invalid district number
 $subdistId				= null;		// subdistrict identifier
+$subdisttext			= null;		// invalid subdistrict identifier
 $division				= null;		// division number
+$divisiontext			= null;		// invalid division number
 $province				= null;		// explicit province id
+$provincetext			= null;		// invalid province id
 $subDistrict			= null;		// instance of SubDistrict
 $pageEntry				= null;		// instance of Page
 $provs		    		= null;		// string of valid provinces
@@ -84,9 +92,10 @@ if (count($_POST) > 0)
                   "<tr><th class='colhead'>key</th>" .
                       "<th class='colhead'>value</th></tr>\n";
     foreach($_POST as $key 		=> $value)
-	{		            // loop through parameters
+    {		            // loop through parameters
+        $valuetext  = htmlspecialchars($value);
         $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
-                        "<td class='white left'>$value</td></tr>\n"; 
+                        "<td class='white left'>$valuetext</td></tr>\n"; 
 	
 		// split the field names into column name
 		// and page number
@@ -108,32 +117,47 @@ if (count($_POST) > 0)
 			switch(strtolower($fldname))
 			{	        // take action on field name
 			    case 'census':
-			    {
-					$censusId	    = $value;
+                {
+                    if (preg_match('/^([a-zA-Z]{2,5})(\d{4})$/', $value))
+                        $censusId	    = $value;
+                    else
+                        $censustext     = htmlspecialchars($value);
 					break;
 				}		// census identifier
 		
 			    case 'district':
 			    {	    // district number
-					$distId	        = $value;
+                    if (preg_match('/^\d+(.5|)$/', $value))
+                        $distId	        = $value;
+                    else
+                        $disttext       = htmlspecialchars($value);
 					break;
 				}		// district number
 		
 			    case 'province':
-			    {	    // province code
-					$province	    = strtoupper($value);
+                {	    // province code
+                    if (preg_match('/^[a-zA-Z]{2,3}$/', $value))
+                        $province	    = strtoupper($value);
+                    else
+                        $provincetext   = htmlspecialchars($value);
 					break;
 				}		// province code
 		
 			    case 'subdistrict':
 			    {	    // subdistrict code
-					$subdistId	= $value;
+                    if (preg_match('/^[a-zA-Z0-9()[\]-]+$/', $value))
+					    $subdistId	    = $value;
+                    else
+                        $subdisttext    = htmlspecialchars($value);
 					break;
 				}		// subdistrict code
 		
 			    case 'division':
 			    {	    // division code
-					$division	= $value;
+                    if (preg_match('/^[a-zA-Z0-9()[\]-]+$/', $value))
+					    $division	    = strtoupper($value);
+                    else
+                        $divisiontext   = htmlspecialchars($value);
 					break;
 				}		// division code
 	
@@ -172,10 +196,12 @@ else
     }
 }               // census ID provided
 
-if (strlen($province) != 2 || strpos($provs, $province) === false)
+if (strpos($provs, $province) === false)
+    $provincetext       = $province;
+if (is_string($provincetext))
 {
-    $text               = $template['provinceInvalid']->innerHTML;
-    $msg	            .= str_replace('$province', $province, $text);
+    $text           = $template['provinceInvalid']->replace('$province', 
+                                                            $province);
 }
 
 // the invoker must explicitly provide the District number
@@ -214,6 +240,15 @@ else
     }
 }               // try to get the instance of SubDistrict
 
+$search		= "?Census=$censusId&Province=$province&District=$distId&SubDistrict=$subdistId&Division=$division";
+
+$template->set('SEARCH',		    $search);
+$template->set('CENSUSID',		    $censusId);
+$template->set('PROVINCE',		    $province);
+$template->set('DISTID',		    $distId);
+$template->set('SUBDISTID',		    $subdistId);
+$template->set('DIVISION',		    $division);
+
 if (strlen($msg) == 0)
 {		        // no errors
     // update table
@@ -226,13 +261,15 @@ if (strlen($msg) == 0)
 						     $split);
 		if ($patres == 1)
 		{
-		    $fldname	= $split[1];	// part that is all letters and
-		    $pagenum	= $split[2];	// part that is numeric
+            $fldname	    = $split[1];	// part that is all letters and
+            if (strtoupper(substr($fldname, 0, 3)) == 'PT_')
+                $fldname    = substr($fldname, 3);
+		    $pagenum	    = $split[2];	// part that is numeric
 		}
 		else
 		{
-		    $fldname	= $key;
-		    $pagenum	= '';
+		    $fldname	    = $key;
+		    $pagenum	    = '';
 		}
 		switch(strtolower($fldname))
 		{	                        // take action on parameter id
@@ -255,7 +292,12 @@ if (strlen($msg) == 0)
 		    case 'image':
 		    {
 				$pageEntry->set($fldname, $value);
-				$pageEntry->save(false);
+                $count          = $pageEntry->save(false);
+                if ($count > 0)
+                {
+                    $sqlcmd     = $pageEntry->getLastSqlCmd();
+                    $warn       .= "<p>$sqlcmd</p>\n";
+                }
 				$pageEntry		= null;
 				break;
 			}						// Image
@@ -263,20 +305,14 @@ if (strlen($msg) == 0)
 		}		                    // take action on parameter id
 	}				                // loop through parameters
 
-    header("Location: ReqUpdatePages.php?censusid=$censusId&Province=$province&District=$distId&subdistrict=$subdistId&division=$division&lang=en");
+    if (strlen($warn) == 0)
+        header("Location: ReqUpdatePages.php?censusid=$censusId&Province=$province&District=$distId&subdistrict=$subdistId&division=$division&lang=en");
+    else
+        $template->display();
 }				        // no errors
 else
 {                       // report errors
 	// arguments to URL
-	$search		= "?Census=$censusId&Province=$province&District=$distId&SubDistrict=$subdistId&Division=$division";
-
-	$template->set('SEARCH',		    $search);
-	$template->set('CENSUSID',		    $censusId);
-    $template->set('PROVINCE',		    $province);
-    $template->set('DISTID',		    $distId);
-    $template->set('SUBDISTID',		    $subdistId);
-    $template->set('DIVISION',		    $division);
-
     if ($subDistrict)
     {
 		// get the district and subdistrict names

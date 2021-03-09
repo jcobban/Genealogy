@@ -223,17 +223,17 @@ var  lower              = "abcdefghijklmnopqrstuvwxyz";
  *                                                                      *
  *  Table for normal number of rows in full census page                 *
  ************************************************************************/
-var  CenPageSize = {"1851"  : 50,
-                    "1861"  : 50,
-                    "1871"  : 20,
-                    "1881"  : 25,
-                    "1891"  : 25,
-                    "1901"  : 50,
-                    "1906"  : 50,
-                    "1911"  : 50,
-                    "1916"  : 50,
-                    "1921"  : 50
-                    };
+var  CenPageSize = {        "1851"  : 50,
+		                    "1861"  : 50,
+		                    "1871"  : 20,
+		                    "1881"  : 25,
+		                    "1891"  : 25,
+		                    "1901"  : 50,
+		                    "1906"  : 50,
+		                    "1911"  : 50,
+		                    "1916"  : 50,
+		                    "1921"  : 50
+		                    };
 
 /************************************************************************
  *  ForeignBplaces table                                                *
@@ -242,96 +242,94 @@ var  CenPageSize = {"1851"  : 50,
  *  This table is used to determine if a birthplace is outside Canada   *
  *  and therefore the year of immigration should be provided            *
  ************************************************************************/
-var  ForeignBplaces = {
-                'Africa'            : 'Africa',
-                'African'           : 'Africa',
-                'Australia'         : 'Australia',
-                'Austria'           : 'Austria',
-                'Belgium'           : 'Belgium',
-                'Bermuda'           : 'Bermuda',
-                'Borneo'            : 'Borneo',
-                'C. C. Africa'      : 'C. C. Africa',
-                'Cape Of Good Hope' : 'Cape of Good Hope',
-                'Channel Islands'   : 'Channel Islands',
-                'China'             : 'China',
-                'Corfu'             : 'Corfu',
-                'Denmark'           : 'Denmark',
-                'E. India'          : 'India',
-                'East India'        : 'India',
-                'East Indies'       : 'East Indies',
-                'England'           : 'England',
-                'Est India'         : 'East India',
-                'France'            : 'France',
-                'Germany'           : 'Germany',
-                'Gibraltar'         : 'Gibraltar',
-                'Glasgow, Scotland' : 'Scotland',
-                'Greece'            : 'Greece',
-                'Guernsey'          : 'Guernsey',
-                'Holland'           : 'Holland',
-                'IA, US'            : 'U.States',
-                'India'             : 'India',
-                'India East'        : 'India East',
-                'Indiana'           : 'U.States',
-                'Ireland'           : 'Ireland',
-                'Isle Guernsey'     : 'Guernsey',
-                'Isle Of Jersey'    : 'Jersey',
-                'Isle of Man'       : 'Isle of Man',
-                'Italy'             : 'Italy',
-                'Jersey'            : 'Jersey',
-                'Jersey Island'     : 'Jersey',
-                'Malta'             : 'Malta',
-                'Mechlenburg'       : 'Mechlenburg',
-                'Michigan'          : 'U.States',
-                'Michigan, US'      : 'U.States',
-                'Michigan, USA'     : 'U.States',
-                'New York, USA'     : 'U.States',
-                'New Zealand'       : 'New Zealand',
-                'NJ, US'            : 'U.States',
-                'North Wales'       : 'North Wales',
-                'Norway'            : 'Norway',
-                'NY, US'            : 'U.States',
-                'OH, US'            : 'U.States',
-                'Ohio, USA'         : 'U.States',
-                'Poland'            : 'Poland',
-                'Prussia'           : 'Prussia',
-                'Russia'            : 'Russia',
-                'Scotland'          : 'Scotland',
-                'Scotland Isles'    : 'Scotland',
-                'Spain'             : 'Spain',
-                'Sweden'            : 'Sweden',
-                'Switzerland'       : 'Switzerland',
-                'Syria'             : 'Syria',
-                'Trinidad'          : 'Trinidad',
-                'U'                 : 'U.States',
-                'U. States'         : 'U.States',
-                'U.S.'              : 'U.States',
-                'U.S.A.'            : 'U.States',
-                'U.States'          : 'U.States',
-                'United States'     : 'U.States',
-                'US'                : 'U.States',
-                'W. I.'             : 'West Indies',
-                'Wales'             : 'Wales',
-                'West Indies'       : 'West Indies'};
+var  ForeignBplaces = {     'Africa'            : 'Africa',
+			                'African'           : 'Africa',
+			                'Australia'         : 'Australia',
+			                'Austria'           : 'Austria',
+			                'Belgium'           : 'Belgium',
+			                'Bermuda'           : 'Bermuda',
+			                'Borneo'            : 'Borneo',
+			                'C. C. Africa'      : 'C. C. Africa',
+			                'Cape Of Good Hope' : 'Cape of Good Hope',
+			                'Channel Islands'   : 'Channel Islands',
+			                'China'             : 'China',
+			                'Corfu'             : 'Corfu',
+			                'Denmark'           : 'Denmark',
+			                'E. India'          : 'India',
+			                'East India'        : 'India',
+			                'East Indies'       : 'East Indies',
+			                'England'           : 'England',
+			                'Est India'         : 'East India',
+			                'France'            : 'France',
+			                'Germany'           : 'Germany',
+			                'Gibraltar'         : 'Gibraltar',
+			                'Glasgow, Scotland' : 'Scotland',
+			                'Greece'            : 'Greece',
+			                'Guernsey'          : 'Guernsey',
+			                'Holland'           : 'Holland',
+			                'IA, US'            : 'U.States',
+			                'India'             : 'India',
+			                'India East'        : 'India East',
+			                'Indiana'           : 'U.States',
+			                'Ireland'           : 'Ireland',
+			                'Isle Guernsey'     : 'Guernsey',
+			                'Isle Of Jersey'    : 'Jersey',
+			                'Isle of Man'       : 'Isle of Man',
+			                'Italy'             : 'Italy',
+			                'Jersey'            : 'Jersey',
+			                'Jersey Island'     : 'Jersey',
+			                'Malta'             : 'Malta',
+			                'Mechlenburg'       : 'Mechlenburg',
+			                'Michigan'          : 'U.States',
+			                'Michigan, US'      : 'U.States',
+			                'Michigan, USA'     : 'U.States',
+			                'New York, USA'     : 'U.States',
+			                'New Zealand'       : 'New Zealand',
+			                'NJ, US'            : 'U.States',
+			                'North Wales'       : 'North Wales',
+			                'Norway'            : 'Norway',
+			                'NY, US'            : 'U.States',
+			                'OH, US'            : 'U.States',
+			                'Ohio, USA'         : 'U.States',
+			                'Poland'            : 'Poland',
+			                'Prussia'           : 'Prussia',
+			                'Russia'            : 'Russia',
+			                'Scotland'          : 'Scotland',
+			                'Scotland Isles'    : 'Scotland',
+			                'Spain'             : 'Spain',
+			                'Sweden'            : 'Sweden',
+			                'Switzerland'       : 'Switzerland',
+			                'Syria'             : 'Syria',
+			                'Trinidad'          : 'Trinidad',
+			                'U'                 : 'U.States',
+			                'U. States'         : 'U.States',
+			                'U.S.'              : 'U.States',
+			                'U.S.A.'            : 'U.States',
+			                'U.States'          : 'U.States',
+			                'United States'     : 'U.States',
+			                'US'                : 'U.States',
+			                'W. I.'             : 'West Indies',
+			                'Wales'             : 'Wales',
+			                'West Indies'       : 'West Indies'};
 
 /************************************************************************
  *  EmpWhereAbbrs table                                                 *
  *                                                                      *
  *  A table for expanding abbreviations for employment locations        *
  ************************************************************************/
-var  EmpWhereAbbrs = {
-                    "And"       : "and",
-                    "At"        : "at",
-                    "By"        : "by",
-                    "F"         : "Farm",
-                    "For"       : "for",
-                    "From"      : "from",
-                    "H"         : "Home",
-                    "In"        : "in",
-                    "Of"        : "of",
-                    "On"        : "on",
-                    "Or"        : "or",
-                    "["         : "[blank]"
-                };
+var  EmpWhereAbbrs = {      "And"       		: "and",
+		                    "At"        		: "at",
+		                    "By"        		: "by",
+		                    "F"         		: "Farm",
+		                    "For"       		: "for",
+		                    "From"      		: "from",
+		                    "H"         		: "Home",
+		                    "In"        		: "in",
+		                    "Of"        		: "of",
+		                    "On"        		: "on",
+		                    "Or"        		: "or",
+		                    "["         		: "[blank]"
+		                };
 
 /************************************************************************
  *  colNames2Blank table                                                *
@@ -373,33 +371,33 @@ var  bInYearMonth       = [ 'Apr',
  *                                                                      *
  *  Table for determining the expected sex value for a relationship.    *
  ************************************************************************/
-var  RelationGender = {"aunt"               : "F",
-                      "adopted-daughter"    : "F",
-                      "adopted-son"         : "M",
-                      "brother-in-law"      : "M",
-                      "brother"             : "M",
-                      "daughter"            : "F",
-                      "daughter-in-law"     : "F",
-                      "father"              : "M",
-                      "father-in-law"       : "M",
-                      "grand-daughter"      : "F",
-                      "grand-father"        : "M",
-                      "grand-mother"        : "F",
-                      "grand-son"           : "M",
-                      "husband"             : "M",
-                      "mother"              : "F",
-                      "mother-in-law"       : "F",
-                      "nephew"              : "M",
-                      "niece"               : "F",
-                      "son"                 : "M",
-                      "step-daughter"       : "F",
-                      "sister"              : "F",
-                      "sister-in-law"       : "F",
-                      "son-in-law"          : "M",
-                      "step-son"            : "M",
-                      "uncle"               : "M",
-                      "wife"                : "F"
-                };
+var  RelationGender = {     "aunt"              : "F",
+	                        "adopted-daughter"  : "F",
+	                        "adopted-son"       : "M",
+	                        "brother-in-law"    : "M",
+	                        "brother"           : "M",
+	                        "daughter"          : "F",
+	                        "daughter-in-law"   : "F",
+	                        "father"            : "M",
+	                        "father-in-law"     : "M",
+	                        "grand-daughter"    : "F",
+	                        "grand-father"      : "M",
+	                        "grand-mother"      : "F",
+	                        "grand-son"         : "M",
+	                        "husband"           : "M",
+	                        "mother"            : "F",
+	                        "mother-in-law"     : "F",
+	                        "nephew"            : "M",
+	                        "niece"             : "F",
+	                        "son"               : "M",
+	                        "step-daughter"     : "F",
+	                        "sister"            : "F",
+	                        "sister-in-law"     : "F",
+	                        "son-in-law"        : "M",
+	                        "step-son"          : "M",
+	                        "uncle"             : "M",
+	                        "wife"              : "F"
+	                };
 
 /************************************************************************
  *  Invoke the function onLoad when the page has been completely loaded *
@@ -1979,6 +1977,29 @@ function addRow(event)
 }       // function addRow
 
 /************************************************************************
+ *  function exportJSON                                                 *
+ *                                                                      *
+ *  Export the contents of this page in JSON format.                    *
+ *                                                                      *
+ *  Input:                                                              *
+ *      this        <button id='exportJSON'>                            *
+ ************************************************************************/
+function exportJSON(event)
+{
+    event.stopPropagation();
+    let re              = /^(.*)CensusId=([A-Z]+)([0-9]+)(.*)$/;
+    let search          = window.location.search;
+    let result          = re.exec(search);
+    if (result)
+    {
+        search          = result[1] +
+                            'table=Census' + result[3] + 
+                            '&CensusId=' + result[2] + result[3] + result[4];
+    }
+    window.location.href= "/getRecordJSON.php" + search;
+}       // function exportJSON
+
+/************************************************************************
  *  function initElement                                                *
  *                                                                      *
  *  Initialize the dynamic behavior of an element.                      *
@@ -2608,6 +2629,13 @@ function initElement(element, clear)
                 element.addEventListener('click', addRow, false);
             break;
         }   // button to add an additional row to the end
+
+        case 'exportjson':
+        {   // button to export the contents in JSON format
+            if (element.addEventListener)
+                element.addEventListener('click', exportJSON, false);
+            break;
+        }   // button to export the contents in JSON format
 
         default:
         {       // all other columns

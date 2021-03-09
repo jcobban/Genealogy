@@ -39,8 +39,8 @@
 		</span>
 		<div style="clear: both;"></div>
       </h1>
-      $TRACE
       $MSG
+      $TRACE
       <!--- Put out a line with links to previous and next section of table -->
       <div class="center" id="frontPager">
 		<span class="left" id="npPrevFront">
@@ -110,6 +110,7 @@
 		<input type="hidden" name="Rows" value="$ROWS">
 		<input type="hidden" name="Debug" value="$DEBUG">
       </div>
+    <p id="pageSize" class="warning">Page contains $NUMLINES lines</p>
       <table class="form" id="form" >
 		<thead>
 		  <!--- Put out the column headers -->
@@ -181,170 +182,169 @@
 		    <th class="$cellclass left">$line</th>
 		    <td class="$cellclass left">
 		        <input type="text" name="Family$line" 
-			    value="$family"
-			    class="$famclass white right"
-			    size="3" maxlength="6">
+				    value="$family"
+				    class="$famclass white right"
+				    size="3" maxlength="6">
 		    </td>
 		    <td class="$cellclass left">
 		        <input type="text" name="Surname$line"
-			    value="$surname"
-			    class="$surclass white left"
-			    size="14" maxlength="120">
+				    value="$surname"
+				    class="$surclass white left"
+				    size="14" maxlength="120">
 		    </td>
 		    <td class="$cellclass left">
 		        <input type="text" name="GivenNames$line"
-			    value="$givennames"
-			    class="black white left" 
-			    size="18" maxlength="120">
+				    value="$givennames"
+				    class="black white left" 
+				    size="18" maxlength="120">
 		    </td>
 		    <td class="$cellclass left">
 		        <input type="text" name="Occupation$line"
-			    value="$occupation"
-			    class="black white leftnc" 
-			    size="18" maxlength="48">
+				    value="$occupation"
+				    class="black white leftnc" 
+				    size="18" maxlength="48">
 		    </td>
 		    <td class="$cellclass left">
 		        <input type="text" name="BPlace$line"
-			    value="$bplace"
-			    class="black white left" 
-			    size="14" maxlength="32">
+				    value="$bplace"
+				    class="black white left" 
+				    size="14" maxlength="32">
 		    </td>
 		    <td class="$cellclass left">
 		        <input type="text" name="Religion$line"
-			    value="$religion"
-			    class="$relclass white leftnc"
-			    size="14" maxlength="32">
+				    value="$religion"
+				    class="$relclass white leftnc"
+				    size="14" maxlength="32">
 		    </td>
 		    <th class="$cellclass left">
 		        $line 
 		    </th>
 		    <td class="$cellclass left">
 		        <input type="text" name="Location$line"
-			    value="$location"
-
-			    class="black white left" 
-			    size="14" maxlength="32">
+				    value="$location"
+				    class="black white left" 
+				    size="14" maxlength="64">
 		    </td>
 		    <td class="$cellclass right">
 		        <input type="text" name="Age$line"
-			    value="$age"
-			    class="black white rightnc" 
-			    size="3" maxlength="8">
+				    value="$age"
+				    class="black white rightnc" 
+				    size="3" maxlength="8">
 		    </td>
 		    <td class="$cellclass center">
 		        <input type="text" name="Sex$line"
-			    value="$sex" 
-			    class="black white center"
-			    size="1" maxlength="1">
+				    value="$sex" 
+				    class="black white center"
+				    size="1" maxlength="1">
 		    </td>
 		    <td class="$cellclass center">
 		        <input type="text" name="MStat$line"
-			    value="$mstat"
-			    class="black white center" 
-			    size="1" maxlength="1">
+				    value="$mstat"
+				    class="black white center" 
+				    size="1" maxlength="1">
 		    </td>
 		    <td class="$cellclass center">
 		        <input type="text" name="Negro$line"
-			    value="$negro"
-			    class="black white center" 
-			    size="1" maxlength="1">
+				    value="$negro"
+				    class="black white center" 
+				    size="1" maxlength="1">
 		    </td>
 		    <td class="$cellclass center">
 		        <input type="text" name="Indian$line"
-			    value="$indian"
-			    class="black white center" 
-			    size="1" maxlength="1">
+				    value="$indian"
+				    class="black white center" 
+				    size="1" maxlength="1">
 		    </td>
 		    <td class="$cellclass center">
 		        <input type="text" name="Member$line"
-			    value="$member"
-			    class="black white center" 
-			    size="1" maxlength="1">
+				    value="$member"
+				    class="black white center" 
+				    size="1" maxlength="1">
 		    </td>
 		    <td class="$cellclass center">
 		        <input type="text" name="Absent$line"
-			    value="$absent"
-			    class="black white center" 
-			    size="1" maxlength="1">
+				    value="$absent"
+				    class="black white center" 
+				    size="1" maxlength="1">
 		    </td>
 		    <td class="$cellclass center">
 		        <input type="text" name="Deaf$line"
-			    value="$deaf"
-			    class="black white center" 
-			    size="1" maxlength="1">
+				    value="$deaf"
+				    class="black white center" 
+				    size="1" maxlength="1">
 		    </td>
 		    <td class="$cellclass center">
 		        <input type="text" name="Blind$line"
-			    value="$blind"
-			    class="black white center" 
-			    size="1" maxlength="1">
+				    value="$blind"
+				    class="black white center" 
+				    size="1" maxlength="1">
 		    </td>
 		    <td class="$cellclass center">
 		        <input type="text" name="Lunatics$line"
-			    value="$lunatics"
-			    class="black white center" 
-			    size="1" maxlength="1">
+				    value="$lunatics"
+				    class="black white center" 
+				    size="1" maxlength="1">
 		    </td>
 		    <td class="$cellclass center">
 		        <input type="text" name="School$line"
-			    value="$school"
-			    class="black white center" 
-			    size="1" maxlength="1">
+				    value="$school"
+				    class="black white center" 
+				    size="1" maxlength="1">
 		    </td>
 		    <td class="$cellclass center">
 		        <input type="text" name="Birth$line"
-			    value="$birth"
-			    class="black white center" 
-			    size="1" maxlength="1">
+				    value="$birth"
+				    class="black white center" 
+				    size="1" maxlength="1">
 		    </td>
 		    <td class="$cellclass center">
 		        <input type="text" name="DeathSex$line"
-			    value="$deathsex"
-			    class="black white center" 
-			    size="1" maxlength="1">
+				    value="$deathsex"
+				    class="black white center" 
+				    size="1" maxlength="1">
 		    </td>
 		    <td class="$cellclass right">
 		        <input type="text" name="AgeAtDeath$line"
-			    value="$ageatdeath"
-			    class="black white rightnc" 
-			    size="3" maxlength="4">
+				    value="$ageatdeath"
+				    class="black white rightnc" 
+				    size="3" maxlength="4">
 		    </td>
 		    <td class="$cellclass left">
 		        <input type="text" name="CauseOfDeath$line"
-			    value="$causeofdeath"
-			    class="black white leftnc" 
-			    size="10" maxlength="32">
+				    value="$causeofdeath"
+				    class="black white leftnc" 
+				    size="10" maxlength="32">
 		    </td>
 		    <td class="$cellclass center">
 		        <input type="text" name="ResType$line"
-			    value="$restype"
-			    class="black white left" 
-			    size="7" maxlength="16">
+				    value="$restype"
+				    class="black white left" 
+				    size="7" maxlength="16">
 		    </td>
 		    <td class="$cellclass right">
 		        <input type="text" name="Stories$line"
-			    value="$stories"
-			    class="black white rightnc" 
-			    size="3" maxlength="8">
+				    value="$stories"
+				    class="black white rightnc" 
+				    size="3" maxlength="8">
 		    </td>
 		    <td class="$cellclass right">
 		        <input type="text" name="NumFamilies$line"
-			    value="$numfamilies"
-			    class="black white rightnc" 
-			    size="2" maxlength="2">
+				    value="$numfamilies"
+				    class="black white rightnc" 
+				    size="2" maxlength="2">
 		    </td>
 		    <td class="$cellclass left">
 		        <input type="text" name="Remarks$line"
-			    value="$remarks"
-			    class="black white leftnc" 
-			    size="20" maxlength="255">
+				    value="$remarks"
+				    class="black white leftnc" 
+				    size="20" maxlength="255">
 		    </td>
 		    <th class="$cellclass left">
 		        $line 
 		    </th>
 		    <td class="$cellclass left" style="white-space: nowrap;">
 		        <input type="hidden" name="IDIR$line"
-			    value="$idir">
+			        value="$idir">
 		        <button type="button" id="doIdir$line"
 				    class="button">
 			    $idirtext 
@@ -427,11 +427,17 @@
 		    <button type="submit" id="Submit">
 		      <u>U</u>pdate Database 
 		    </button>
+            &nbsp;
 		    <button type="reset" id="reset">
 		      Reset to Defaults 
 		    </button>
+            &nbsp;
 		    <button type="button" id="addRow">
 		      Add a Row 
+		    </button>
+            &nbsp;
+		    <button type="button" id="exportJSON">
+		      Export as JSON
 		    </button>
 		  </p>
       </form>

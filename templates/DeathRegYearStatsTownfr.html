@@ -152,6 +152,30 @@
         </table>
       </form>
     </div> <!-- end of <div id="body"> -->
+    <div class="hidden" id="templates">
+        <span id="yearMissing">
+            Le paramètre RegYear obligatoire est manquant.
+        </span>
+        <span id="yearInvalid">
+            RegYear '$year' doit être un nombre à quatre chiffres décimaux.
+        </span>
+        <span id="domainInvalid">
+            Le domaine '$value' doit être un code de pays alphabétique 
+            suivi d'un code alphabétique d'état ou de province.
+        </span>
+        <span id="countyInvalid">
+            Le code de comté '$value' doit être alphabétique.
+        </span>
+        <span id="domainUnsupported">
+            L'identifiant de domaine '$value' doit être un code de pays 
+            à deux caractères pris en charge suivi d'un code d'état ou 
+            de province à deux ou trois caractères. 
+        </span>
+        <p id="countyUnsupported">
+            Le code de comté '$value' n'est pas valide 
+            pour le domaine '$domain'.
+        </p>
+    </div> <!-- id="templates" -->
     <div class="balloon" id="HelpTownStats">
         Click on this button to display a summary of the deaths transcribed
         for the specific town or township.

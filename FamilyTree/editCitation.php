@@ -145,7 +145,7 @@ $template           = new FtTemplate("editCitation$action$lang.html");
 $template->updateTag('otherStylesheets',
                      array('filename'   => 'editCitation'));
 $translate          = $template->getTranslate();
-$citText            = $translate['typeText'];
+$citText            = $translate['typeText'];   // instance of TemplateTag
 
 if (is_string($idimetext))
     $msg            .= "Invalid value for IDIME='$idimetext'. ";

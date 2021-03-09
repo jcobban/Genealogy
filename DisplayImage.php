@@ -185,7 +185,11 @@ if (strlen($msg) == 0)
     else
     if ($protocol == "http:" || $protocol == "https:")
     {                   // assume prev by decrement, next by increment
-        $headers                = get_headers($src);
+        $context    = stream_context_create(['ssl' => [
+										        'verify_peer' => false,
+										        'verify_peer_name' => false,
+										    ]]);
+        $headers                = get_headers($src,0,$context);
         if ($headers && stripos($headers[0], '200 OK'))
         {               // valid URL
 	        $text                   = $template['creditUrl']->innerHTML;

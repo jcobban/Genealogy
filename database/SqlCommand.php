@@ -1515,6 +1515,10 @@ if (count($_GET) > 0)
         $warn               .= $parmsText . "</table>\n";
 }		        // parameters passed by method=post
 
+$template                   = new FtTemplate("SqlCommand$lang.html");
+$translate                  = $template->getTranslate();
+$idetTranslate              = $translate['idetTitleText'];
+
 // parse patterns for SQL commands
 $cmdPattern					= '/^(\w+)\s+(.*)$/i';
 $deletePattern				= '/^(\w*)\s*FROM\s+(\w+)\s+(.*)$/i';
@@ -2814,6 +2818,18 @@ if (!is_null($count))
 <?php
                                 break;
                             }	// IDAR field
+
+                            case 'idet':
+                            {	// IDET field in Event
+                                $name	= $idetTranslate[$value];
+?>
+      <td class='<?php print $cellClass; ?> right'>
+            <?php print $value; ?>=<?php print $name; ?>
+      </td>
+<?php
+                                break;
+                            }	// IDET field
+
 
                             case 'birthd':
                             case 'chrisd':

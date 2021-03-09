@@ -1,11 +1,11 @@
 <!DOCTYPE HTML >
 <html>
-<head>
-   <title>Locations Master List: Help</title>
-    <meta HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=utf-8">
-    <meta http-equiv="Content-Style-Type" content="text/css">
-    <meta name="author" content="James A. Cobban">
-    <meta name="copyright" content="&copy; 2018 James A. Cobban">
+  <head>
+     <title>Locations Master List: Help</title>
+      <meta HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=utf-8">
+      <meta http-equiv="Content-Style-Type" content="text/css">
+      <meta name="author" content="James A. Cobban">
+      <meta name="copyright" content="&copy; 2018 James A. Cobban">
 <!--*********************************************************************
  *  LocationsHelpen.html                                                *
  *                                                                      *
@@ -16,108 +16,141 @@
  *		2014/02/10		eliminate use of tables for layout				*
  *		2018/02/04		update header/footer links						*
  *      2018/11/18      renamed to xxxxxxxxHelpen.html                  *
+ *      2021/01/30      add minor details                               *
  **********************************************************************-->
-    <link rel="stylesheet" type="text/css" href="/styles.css"/>
-</head>
-<body>
-<div class="topcrumbs">
-	<a href="/indexHelpen.html">Home</a>: 
-	<a href="/genealogyHelpen.html">Genealogy</a>: 
-	<a href="/FamilyTree/ServicesHelpen.html">Services</a>:
-</div>
-<div class="help">
-<h1>Locations Master list: Help</h1>
-<p>Every location that is referenced by an event or fact in the database is
-recorded in the Locations Master List.  This way all of the information
-collected about a particular location is in a central location.  This,
-in particular facilitates ensuring that particular locations are always
-identified in the same way.
-</p>
-<p>You get to the Locations Master List from the Family Tree
-<a href="/FamilyTree/ServicesHelpen.html">Top Level Services</a> web page.
-When you first enter the Locations Master List web page it displays the first
-20 locations in the list in alphabetical order.  You can scroll through the
-list by clicking on the forward and backward arrows at the top of the list.
-</p>
-<p>You may use the "Pattern" field to search for locations based upon their
-textual representation.  Technically the value you enter in this field
-is a POSIX extended <a href="http://en.wikipedia.org/wiki/Regular_expression">
-regular expression</a> pattern.
-The following are just some of the ways you can use this pattern.
-<ul>
-  <li>Ordinary text, particularly text containing only letters, digits,
-	and spaces, matches anywhere in the location.  For example
-	entering "Michigan" will match all locations that contain the
-	text "Michigan".  The match ignores the case, so this will also
-	match "michigan" and "MICHIGAN".
-  <li>The period '.' matches any single character.  You can use this
-	any time you do not know, or care, about what character is present
-	at a particular spot in the location.
-  <li>The caret '^' (shift-6 on American keyboards) matches to the
-	beginning of the location.  For example to find locations that
-	start with "New" enter "^New", as just entering "New" matches 
-	locations that contain the string "new" anywhere in the text.
-  <li>The dollar sign '$' (shift-4 on American keyboards) matches to the
-	end of the location.  For example to find locations that end with
-	"USA" enter "USA$".
-  <li>The asterisk '*' (shift-8 on American keyboards) causes the
-	immediately preceding character to match zero or more repetitions.
-	This is most commonly used with the period to skip over any number
-	of characters that do not match.  For example the pattern "Mi.*USA"
-	matches any location that has the text "Mi" and later on the text "USA"
-	with any number of arbitrary characters in between.  For example it
-	will match locations containing "MI, USA" and "Michigan, USA", as
-	well as "Mississippi, USA".
-  <li>There are many more options which you can experiment with.
-</ul>
-</p>
-<p>The "Name" input field is primarily used to create new location names.
-Normally a new location name is created automatically the first time the
-location is referenced by the family tree.  However for administrative 
-purposes it may be desirable to pre-define a location so that it will
-have the preferred spelling, capitalization, abbreviation, and sort order,
-rather than just accepting what the first reference suggests.
-</p>
-<p>Just type the complete location name into the "Name" field and press
-enter, or click on the <span class="button">Search</span> button.  
-If that name happens
-to match an existing location name then the existing record is displayed in
-a new tab or window.  Otherwise you are provided with the opportunity to
-create a new location, signalled by an IDLR value of 0 in the
-edit dialog.  The new location
-is not actually added to the database until you click on the
-<span class="button"><u>U</u>pdate&nbsp;Location</span> button.  If you
-change your mind just close the window.
-</p>
-<p>Each of the locations displayed on this web page shows:
-<ol>
-    <li>The unique numeric key of the location.
-	This numeric key is a link to a
-	<a href="/FamilyTree/LocationHelpen.html">web page</a> 
-	that displays the details recorded
-	about the location, and if you are authorized to do so, permits you
-	to edit those details.
-    <li>The name of the location as it is displayed in reports.  This
-	is frequently a complete postal address. 
-    <li>An indicator of whether the description of the location includes its
-	geographic coordinates, 
-    <li>An indicator of whether the description of the location includes 
-	any textual notes describing the location
-    <li>An indicator of whether the description of the location includes
-	a set of boundary coordinates (for extended areas such as states or
-	counties).
-</ol> 
-</div>
-<div class="botcrumbs">
-    <span class="right">
-	<img SRC="/logo70.gif" height="70" width="70" alt="James Cobban Logo">
-    </span>
-	<a href="/contactAuthor.php?subject=LocationsHelpen.html" target="_blank">Contact Author</a>
-	<br/>
-	<a href="/indexHelpen.html">Home</a>: 
-	<a href="/genealogyHelpen.html">Genealogy</a>: 
-	<a href="/FamilyTree/ServicesHelpen.html">Services</a>:
-    <div style="clear: both;"></div>
-</div>
-</body>
+      <link rel="stylesheet" type="text/css" href="/styles.css"/>
+  </head>
+  <body>
+    <div class="topcrumbs">
+    	<a href="/indexHelpen.html">Home</a>: 
+    	<a href="/genealogyHelpen.html">Genealogy</a>: 
+    	<a href="/FamilyTree/ServicesHelpen.html">Services</a>:
+    </div>
+    <div class="help">
+      <h1>Locations Master list: Help</h1>
+      <p>Every location that is referenced by an event or fact in
+        the Family Tree is recorded in the Locations Master List. 
+        This way all of the information collected about a particular
+        location is in a central location.  This, in particular
+        facilitates ensuring that particular locations are always
+        identified in the same way.
+      </p>
+      <p>You get to the Locations Master List from the Family Tree
+      <a href="/FamilyTree/ServicesHelpen.html">Top Level Services</a>
+        web page.  When you first enter the Locations Master List web page
+        it displays the first 20 locations in the list in alphabetical
+        order.  You can scroll through the list by clicking on the
+        forward and backward arrows at the top of the list.
+      </p>
+      <p>You may use the "Pattern" field to search for locations based
+        upon their textual representation.  Enter the pattern in the
+        Pattern field and press Enter or click on the 
+        <span class="button"><u>S</u>earch</span> button. 
+        Technically the value
+        you enter in this field is a 
+        <a href="https://en.wikipedia.org/wiki/POSIX">POSIX</a>  
+        <a href="https://en.wikipedia.org/wiki/Regular_expression">
+        Basic Regular Expression (BRE)</a> pattern. 
+        The following are just some of the ways you can use this pattern.
+      </p>
+      <ul>
+        <li>Ordinary text, particularly text containing only letters,
+            digits,
+        	and spaces, matches anywhere in the location.  For example
+        	entering "Michigan" will match all locations that contain the
+        	text "Michigan".  The match ignores the case, so this will also
+        	match "michigan" and "MICHIGAN".
+        </li>
+        <li>The period '.' matches any single character.  You can use this
+        	any time you do not know, or care, about what character
+            is present at a particular spot in the location. 
+            For example "H.le" will match "Hale" and "Hole".
+        </li>
+        <li>The caret '^' (shift-6 on American keyboards), as the first
+          character in a pattern, matches to the
+        	beginning of the location.  For example to find locations that
+        	start with "New" enter "^New", as just entering "New" matches 
+        	locations that contain the string "new" anywhere in the text.
+            Do <b>not</b> enter "New*" as this will match any location
+            which contains the letters "ne" followed by zero or more "w"s.
+        </li>
+        <li>The dollar sign '$' (shift-4 on American keyboards), when it is
+          the last character in the pattern,  matches to the
+        	end of the location name.  For example to find locations that
+            end with "USA" enter "USA$".
+        </li>
+        <li>The asterisk '*' (shift-8 on American keyboards) causes the
+        	immediately preceding character to match zero or more
+            repetitions.  This is most commonly used with the period
+            to skip over any number of characters that do not match. 
+            For example the pattern "Mi.*USA" matches any location
+            that has the text "Mi" and later on the text "USA"
+        	with any number of arbitrary characters in between. 
+            For example it will match locations containing "MI, USA"
+            and "Michigan, USA", "Minnesota, USA", 
+            "Bloomington, Illinois, USA", 
+            as well as "Mississippi, USA".
+        </li>
+        <li>There are many more options which you can experiment with. See
+          <a href="https://en.wikipedia.org/wiki/Regular_expression">
+          regular expressions</a> for details.  
+        </li>
+      </ul>
+      <p>The "Name" input field is primarily used to create new location 
+        names.  Normally a new location name is created automatically
+        the first time an event at the
+        location is added to the family tree.  However for administrative 
+        purposes it may be desirable to pre-define a location so that it
+        will have the preferred spelling, capitalization, abbreviation,
+        coordinates, boundary, description, and sort order,
+        rather than just accepting what the defaults.
+      </p>
+      <p>Just type the complete location name into the "Name" field
+        and click on the
+        <span class="button">Create New</span> button.  
+        If that name happens to match an existing location name
+        then the existing record is displayed in
+        a new tab or window.  Otherwise you are provided with
+        the opportunity to create a new location.  The new location
+        is not actually added to the database until you click on the
+        <span class="button"><u>U</u>pdate&nbsp;Location</span> button. 
+        If you change your mind click on the
+        <span class="button"><u>C</u>lose</span> button. 
+      </p>
+      <p>Each of the locations displayed on this web page shows:
+      </p>
+      <ol>
+        <li>The unique internal numeric key of the location.
+        	This numeric key is a link to a
+      	<a href="/FamilyTree/LocationHelpen.html">web page</a> 
+          that displays the details recorded
+          about the location, and if you are authorized to do so, permits
+          you to edit those details.
+        <li>The name of the location as it is displayed in reports.  This
+          is frequently a complete postal address. 
+        </li>
+        <li>An indicator of whether the description of the location includes
+          its geographic coordinates, 
+        </li>
+        <li>An indicator of whether the description of the location
+          includes any textual notes describing the location
+        </li>
+        <li>An indicator of whether the description of the location includes
+          a set of boundary coordinates (for extended areas such as states,
+          counties, or townships).
+        </li>
+      </ol> 
+    </div> <!-- class="help" -->
+    <div class="botcrumbs">
+     <span class="right">
+    	<img SRC="/logo70.gif" height="70" width="70" alt="James Cobban Logo">
+      </span>
+      <a href="/contactAuthor.php?subject=LocationsHelpen.html" target="_blank">Contact Author</a>
+      <br/>
+      <a href="/indexHelpen.html">Home</a>: 
+      <a href="/genealogyHelpen.html">Genealogy</a>: 
+      <a href="/FamilyTree/ServicesHelpen.html">Services</a>:
+      <div style="clear: both;"></div>
+    </div> <!-- class="botcrumbs" -->
+  </body>
 </html>

@@ -232,6 +232,8 @@ if (!is_null($subdistId))
                     $subParms   = array('census'    => $census,
                                         'district'  => $district,
                                         'id'        => $id);
+                    if (is_string($division))
+                        $subParms['division']   = $division;
                     $subdistrict    = new SubDistrict($subParms);
                 }
 			}		        // single district
@@ -250,6 +252,8 @@ if (!is_null($subdistId))
                 $subParms       = array('census'    => $census,
                                         'district'  => $di,
                                         'id'        => $sd);
+                if (is_string($division))
+                    $subParms['division']   = $division;
                 $subdistrict    = new SubDistrict($subParms);
                 $district       = $subdistrict->getDistrict();
             }

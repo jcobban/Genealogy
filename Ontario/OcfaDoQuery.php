@@ -38,11 +38,15 @@ use \Exception;
  *		                passed to this script                           *
  *		                use standard element ids for top and bottom     *
  *		                page scrolling so PgUp and PgDn work            *
+ *		2021/02/21      protect against XSS                             *
+ *		                improve parameter checking                      *
+ *		                get message texts from template                 *
  *																		*
- *  Copyright &copy; 2019 James A. Cobban								*
+ *  Copyright &copy; 2021 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . "/Ocfa.inc";
 require_once __NAMESPACE__ . "/FtTemplate.inc";
+require_once __NAMESPACE__ . "/Surname.inc";
 require_once __NAMESPACE__ . "/common.inc";
 
 // action taken depends upon whether the user is authorized to
@@ -50,14 +54,24 @@ require_once __NAMESPACE__ . "/common.inc";
 
 // default values
 $offset						= 0;
+$offsettext                 = null;
 $limit						= 20;
+$limittext                  = null;
 $county         			= '';
+$countytext                 = null;
 $township       			= '';
+$townshiptext               = null;
 $cemetery       			= '';
+$cemeterytext               = null;
 $givenname     			    = '';
+$giventext                  = null;
 $surname        			= '';
+$surnametext                = null;
 $surnamesoundex        		= 'N';
 $soundex        			= false;
+$soundextext                = null;
+$reference        			= false;
+$referencetext              = null;
 $matches        			= array();
 $totalrows      			= 0;
 $getParms       			= array();
@@ -71,8 +85,9 @@ $parmsText  = "<p class='label'>\$_GET</p>\n" .
                       "<th class='colhead'>value</th></tr>\n";
 foreach($_GET as $key => $value)
 {			        // loop through all parameters
+    $safevalue  = htmlspecialchars($value);
     $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
-                        "<td class='white left'>$value</td></tr>\n"; 
+                        "<td class='white left'>$safevalue</td></tr>\n"; 
 	switch(strtolower($key))
 	{		        // switch on parameter name
 	    case 'count':
@@ -80,9 +95,11 @@ foreach($_GET as $key => $value)
         {		    // limit number of rows returned
             if (is_int($value) || ctype_digit($value))
             {
-                $limit	                = $value;
-                $getParms['limit']      = $value;
+                $limit	                    = $value;
+                $getParms['limit']          = $value;
             }
+            else
+                $limittext                  = $safevalue;
 			break;
 	    }		    // limit number of rows returned
 
@@ -90,59 +107,93 @@ foreach($_GET as $key => $value)
 	    {		    // starting offset
             if (is_int($value) ||ctype_digit($value))
             {
-			    $offset	                = $value;
-                $getParms['offset']     = $value;
+			    $offset	                    = $value;
+                $getParms['offset']         = $value;
             }
+            else
+                $offsettext                 = $safevalue;
 			break;
 	    }		    // starting offset
 
 	    case 'surname':
         {
-            $surname                    = $value;
-            if (strlen($value) > 0)
-                $getParms['surname']    = $value;
+            if (preg_match("/^[a-zA-Z ']*$/", $value) > 0)
+            {
+                $surname                    = $value;
+                if (strlen($value) > 0)
+                    $getParms['surname']    = $value;
+            }
+            else
+                $surnametext                = $safevalue;
 			break;
 	    }
 
 	    case 'givenname':
 	    case 'givennames':
 	    {		// match anywhere in string
-            $givenname                 = $value;
-            if (strlen($value) > 0)
-                $getParms['givenname'] = $value;
+            if (preg_match("/^[a-zA-Z ']*$/", $value) > 0)
+            {
+                $givenname                  = $value;
+                if (strlen($value) > 0)
+                    $getParms['givenname']  = $value;
+            }
+            else
+                $giventext                  = $safevalue;
 			break;
 	    }		// match in string
 
 	    case 'cemetery':
         {		// match anywhere in string
-            $cemetery                   = $value;
-            if (strlen($value) > 0)
-                $getParms['cemetery']   = $value;
+            $result     = preg_match("/^[-a-zA-Z0-9#()\/,.? ']*$/", $value);
+            if ($result > 0)
+            {
+                $cemetery                   = $value;
+                if (strlen($value) > 0)
+                    $getParms['cemetery']   = $value;
+            }
+            else
+                $cemeterytext               = $safevalue;
 			break;
 	    }		// match in string
 
 	    case 'surnamesoundex':
 	    case 'loosesurname':
         {		// handled under Surname
-            $surnamesoundex             = $value;
-            if (strtoupper($value) != 'N')
-                $getParms['loosesurname']   = true;
+            if (preg_match("/^[a-zA-Z0-9]*$/", $value) > 0)
+            {
+                $surnamesoundex             = $value;
+                if (strtoupper($value) != 'N')
+                    $getParms['loosesurname']   = true;
+            }
+            else
+                $soundextext                = $safevalue;
 			break;
 	    }		// handled under Surname
 
 	    case 'county':
         {		// exact match on field in table
-            $county                     = $value;
-            if (strlen($value) > 0)
-                $getParms['county']     = "^$value$";
+            $result     = preg_match("/^[-a-zA-Z0-9#()\/,.? ']*$/", $value);
+            if ($result > 0)
+            {
+                $county                     = $value;
+                if (strlen($value) > 0)
+                    $getParms['county']     = "^$value$";
+            }
+            else
+                $countytext                 = $safevalue;
 			break;
 	    }		// exact match on field in table
 
 	    case 'township':
         {		// exact match on field in table
-            $township                   = $value;
-            if (strlen($value) > 0)
-                $getParms['township']   = "^$value$";
+            if (preg_match("/^[-a-zA-Z0-9#()\/,.? ']*$/", $value) > 0)
+            {
+                $township                   = $value;
+                if (strlen($value) > 0)
+                    $getParms['township']   = "^$value$";
+            }
+            else
+                $townshiptext               = $safevalue;
 			break;
 	    }		// exact match on field in table
 
@@ -154,8 +205,12 @@ foreach($_GET as $key => $value)
 
 	    case 'reference':
 	    {		    // default match on field in table
-            if (strlen($value) > 0)
+            if (preg_match("/^[-a-zA-Z0-9#()\/,.? ']*$/", $value))
+            {
                 $getParms[$key]         = $value;
+            }
+            else
+                $referencetext          = $safevalue;
 			break;
         }		    // default match on field in table
 
@@ -166,14 +221,24 @@ if ($debug)
 
 $template           = new FtTemplate("OcfaDoQuery$lang.html");
 
-if (strlen($msg) == 0)
-{
-	// execute the query
-    $matches        = new RecordSet('Ocfa', $getParms);
-    $info           = $matches->getInformation();
-    $totalrows      = $info['count'];
-    $count          = $matches->count();
-}
+if (is_string($offsettext))
+	$warn		.= $template['offsettext']->replace('$text', $offsettext);
+if (is_string($limittext))
+	$warn		.= $template['limittext']->replace('$text', $limittext);
+if (is_string($countytext))
+	$msg		.= $template['countytext']->replace('$text', $countytext);
+if (is_string($townshiptext))
+	$msg		.= $template['townshiptext']->replace('$text', $townshiptext);
+if (is_string($cemeterytext))
+	$msg		.= $template['cemeterytext']->replace('$text', $cemeterytext);
+if (is_string($giventext))
+	$msg		.= $template['giventext']->replace('$text', $giventext);
+if (is_string($surnametext))
+	$msg		.= $template['surnametext']->replace('$text', $surnametext);
+if (is_string($soundextext))
+	$msg		.= $template['soundextext']->replace('$text', $soundextext);
+if (is_string($referencetext))
+	$msg		.= $template['referencetext']->replace('$text', $referencetext);
 
 $template->set('COUNTY',		    	$county);
 $template->set('TOWNSHIP',		    	$township);
@@ -181,10 +246,29 @@ $template->set('CEMETERY',		    	$cemetery);
 $template->set('GIVENNAMES',			$givenname);
 $template->set('SURNAME',		    	$surname);
 $template->set('SURNAMESOUNDEX',		$surnamesoundex);
-$template->set('TOTALROWS',		    	$totalrows);
 $template->set('LANG',			        $lang);
 $template->set('LIMIT',			        $limit);
 $template->set('OFFSET1',			    $offset + 1);
+
+if (strlen($msg) == 0)
+{
+	// execute the query
+    $matches        = new RecordSet('Ocfa', $getParms);
+    $info           = $matches->getInformation();
+    $totalrows      = $info['count'];
+    $query          = $info['query'];
+    if ($debug)
+        $warn       .= "<p>query='$query'</p>\n";
+    $count          = $matches->count();
+}
+else
+{
+    $totalrows      = 0;
+    $count          = 0;
+}
+$formatter          = $template->getFormatter();
+$template->set('TOTALROWS',		    	$formatter->format($totalrows));
+
 $offsetlast         = $offset + $count;
 if ($offsetlast > $totalrows)
     $offsetlast     = $totalrows;

@@ -287,6 +287,7 @@ const KEY_F10         = 121;
 const KEY_F11         = 122;
 const KEY_F12         = 123;
 
+// set global defaults
 var activateMCE             = true;
 var lang                    = 'en';
 
@@ -303,6 +304,19 @@ function isUnicodeSupported()
     let re      = new RegExp('\u{61}', 'u');
     return retval  = 'unicode' in re && re.unicode;
 }           // function isUnicodeSupported();
+
+/************************************************************************
+ *  Audio Output                                                        *
+ ************************************************************************/
+
+if ("AudioContext" in window)
+{
+    var audioContext        = new AudioContext();
+}
+else
+{
+    alert("AudioContext not supported.  Upgrade your browser.")
+}
 
 /************************************************************************
  *  function getArgs                                                    *
@@ -894,7 +908,7 @@ function displayHelp(element)
     } catch(e)
     {       // exception thrown trying to get help division name
         alert("util.js: displayHelp: exception=" + e +
-                        ", element=" + tagToString(element));
+                        ", element=" + element.outerHTML);
     }       // exception thrown trying to get help division name
 
     // to ensure unique id values, the supplied name is
@@ -902,7 +916,7 @@ function displayHelp(element)
     // updated to use this convention
 
     // accumulate information to be used in diagnostic messages
-    let msg         = tagToString(element);
+    let msg         = element.outerHTML;
 
     // 1) try for the div with id='Help<name>'
     // 2) try without any row number at end of <name>
@@ -2198,10 +2212,10 @@ function cancelSelection()
     alert("cancelSelection from row=" +
                 startCell.parentNode.rowIndex + " col=" +
                 startCell.cellIndex + " " +
-                tagToString(startCell) + " to row=" +
+                startCell.outerHTML + " to row=" +
                 endCell.parentNode.rowIndex +
                 " col=" + endCell.cellIndex + " "  +
-                tagToString(endCell));
+                endCell.outerHTML);
 
     if (startCell && endCell)
     {       // have a selection to cancel
@@ -2258,10 +2272,10 @@ function markSelection()
         alert("markSelection from row=" +
                 startCell.parentNode.rowIndex + " col=" +
                 startCell.cellIndex + " " +
-                tagToString(startCell) + " to row=" +
+                startCell.outerHTML + " to row=" +
                 endCell.parentNode.rowIndex +
                 " col=" + endCell.cellIndex + " "  +
-                tagToString(endCell));
+                endCell.outerHTML);
 
         let firstRowIndex   = startCell.parentNode.rowIndex;
         let lastRowIndex    = endCell.parentNode.rowIndex;
@@ -2353,9 +2367,9 @@ function eltMouseUp()
     {       // valid selection
 //  alert("select from row=" +
 //      startCell.parentNode.rowIndex + " col=" + startCell.cellIndex + " " +
-//      tagToString(startCell) + " to row=" +
+//      startCell.outerHTML + " to row=" +
 //      this.parentNode.rowIndex + " col=" + this.cellIndex + " "  +
-//      tagToString(this));
+//      this.outerHTML);
         mouseIsUp   = false;
         endCell     = this;
         markSelection();
@@ -2364,8 +2378,8 @@ function eltMouseUp()
         return false;
     }       // valid selection
 //    else
-//  alert("unexpected from " + tagToString(startCell) + " to " +
-//      tagToString(this));
+//  alert("unexpected from " + startCell.outerHTML + " to " +
+//      this.outerHTML);
 
     // not a valid selection, just move focus
     mouseIsUp       = false;
@@ -2615,7 +2629,7 @@ function popupLoadingText(element,
             loaddiv.style.left  = leftOffset + "px";
             loaddiv.style.top   = (getOffsetTop(element) - 30) + 'px';
             loaddiv.style.display   = 'block';
-//alert("loaddiv: " + tagToString(loaddiv));
+//alert("loaddiv: " + loaddiv.outerHTML);
         }           // display loading indicator to user
     }               // indicator not currently displayed
 }       // function popupLoadingText
@@ -2999,5 +3013,27 @@ function showImage(ev)
 				      "right");
     }		// Image field defined
     return false;
-}		// showImage
+}		// function showImage
+
+/************************************************************************
+ *  function beep   													*
+ *																		*
+ *  This function is called to issue a warning audio signal when an     *
+ *  requested action will not be performed.                             *
+ *																		*
+ ************************************************************************/
+function beep()
+{
+    if (typeof audioContext == 'object')
+    {
+        let oscillator      = audioContext.createOscillator();
+        let gain            = audioContext.createGain();
+        oscillator.frequency.setValueAtTime(440, audioContext.currentTime);
+        oscillator.connect(gain);
+        gain.connect(audioContext.destination);
+        oscillator.start();
+        gain.gain.exponentialRampToValueAtTime(0.00001, 
+                                               audioContext.currentTime + 0.1);
+    }
+}       // function beep
 

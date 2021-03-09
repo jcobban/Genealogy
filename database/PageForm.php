@@ -95,11 +95,16 @@ require_once __NAMESPACE__ . '/common.inc';
 $cc			    		= 'CA';		    // ISO country code
 $countryName			= 'Canada';
 $censusId				= null;		    // census code
+$censustext				= null;		// invalid census id 
 $censusYear				= '';		    // census year
 $province				= null;		    // province for pre-confederation
+$provincetext			= null;		// invalid province id
 $distId		    		= null;
+$disttext		    	= null;		// invalid district number
 $subdistId				= null;
+$subdisttext			= null;		// invalid subdistrict identifier
 $division				= '';
+$divisiontext			= null;		// invalid division number
 $offset                 = 0;
 $limit                  = 20;
 $lang		    	    = 'en';
@@ -115,44 +120,62 @@ if (isset($_GET) && count($_GET) > 0)
                   "<th class='colhead'>value</th></tr>\n";
     foreach ($_GET as $key => $value)
     {			    // loop through all parameters
+        $valuetext  = htmlspecialchars($value);
         $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
-                        "<td class='white left'>$value</td></tr>\n"; 
+                        "<td class='white left'>$valuetext</td></tr>\n"; 
         $value                      = trim($value);
 
 	    switch(strtolower($key))
 	    {
 	        case 'census':
 	        {		// census identifier
-	    		$censusId		    = strtoupper($value);
-	    		if (strlen($censusId) == 4 && ctype_digit($censusId))
-	    		{		// old format only includes year
-	    		    $censusYear		= $censusId;	// census year
-	    		    $censusId		= 'CA' . $censusYear;
-	    		}		// old format only includes year
+                if (preg_match('/^([a-zA-Z]{0,5})(\d{4})$/', $value))
+                {
+                    $censusId	    = strtoupper($value);
+		    		if (strlen($censusId) == 4)
+		    		{		// old format only includes year
+		    		    $censusYear		= $censusId;	// census year
+		    		    $censusId		= 'CA' . $censusYear;
+		    		}		// old format only includes year
+                }
+                else
+                    $censustext     = htmlspecialchars($value);
 	    		break;
 	        }		// census year
 
 	        case 'province':
 	        {		// province code
-	    		$province	        = strtoupper($value);
+                if (preg_match('/^[a-zA-Z]{2,3}$/', $value))
+	    		    $province	        = strtoupper($value);
+                else
+                    $provincetext       = htmlspecialchars($value);
 	    		break;
 	        }		// province code
 	    
 	        case 'district':
 	        {		// district number
-	    		$distId	            = $value;
+                if (preg_match('/^\d+(.5|)$/', $value))
+                    $distId	        = $value;
+                else
+                    $disttext       = htmlspecialchars($value);
 	    		break;
 	        }		// district number
 
 	        case 'subdistrict':
 	        {		// subdistrict code
-	    		$subdistId		    = $value;
+                if (preg_match('/^[a-zA-Z0-9()[\]-]+$/', $value))
+					$subdistId	    = $value;
+                else
+                    $subdisttext    = htmlspecialchars($value);
 	    		break;
 	        }		// subdistrict code
 
 	        case 'division':
 	        {		// enumeration division
-	    		$division		    = strtoupper($value);
+                if (preg_match('/^[a-zA-Z0-9()[\]-]+$/', $value))
+					$division	    = $value;
+                else
+                    $divisiontext   = htmlspecialchars($value);
 	    		break;
 	        }		// enumeration division
 
@@ -193,6 +216,10 @@ $template->updateTag('otherStylesheets',
     		         array('filename'   => 'PageForm'));
 
 // validate census identifier
+if (is_string($censustext))
+    $msg                .= $template['censusUndefined']->
+                                    replace('$CENSUSID', $censustext);
+else
 if ($censusId)
 {                       // census identifier specified
 	$censusRec				= new Census(array('censusid'	=> $censusId));
@@ -206,6 +233,14 @@ if ($censusId)
 	    $censusYear			= intval(substr($censusId, 2));
 	
         // validate province
+	    $provs	            = $censusRec->get('provinces');
+        if (strpos($provs, $province) === false)
+            $provincetext       = $province;
+        if (is_string($provincetext))
+        {
+            $msg    .= $template['provinceInvalid']->replace('$province', 
+                                                            $province);
+        }
         if ($province)
         {               // province specified
             if ($censusRec['collective'])
@@ -214,17 +249,16 @@ if ($censusId)
 			    if (strlen($province) != 2 || $ppos === false ||
 				    $ppos < 0 || ($ppos & 1) == 1)
                 {
-		            $text	= $template['provinceUndefined']->innerHTML;
-		            $text   = str_replace('$province', $province, $text);
-		            $text   = str_replace('$censusId', $censusId, $text);
-				    $msg	.= $text;
+		            $msg	.= $template['provinceUndefined']->
+                                    replace(array('$province','$censusid'), 
+                                            array($province, $censusId));
                 }
-                $censusId	= $province . $censusYear;
-	    	    $domain		= 'CA' . $province;
-	    	    $domainParms= array('domain'	=> $domain,
-	                        		'language'	=> $lang);
-	    	    $domainObj	= new Domain($domainParms);
-	    	    $countryName= $domainObj->getName();
+                $censusId	    = $province . $censusYear;
+	    	    $domain		    = 'CA' . $province;
+	    	    $domainParms    = array('domain'	=> $domain,
+	                        	    	'language'	=> $lang);
+	    	    $domainObj	    = new Domain($domainParms);
+	    	    $countryName    = $domainObj->getName();
             }           // collection of censuses
             // else province ignored
         }               // province specified
@@ -232,17 +266,15 @@ if ($censusId)
 	    {               // province not specified
             if ($censusRec['collective'])
             {           // collection of censuses
-		        $text	    = $template['provinceMissing']->innerHTML;
-		        $text       = str_replace('$censusId', $censusId, $text);
-                $msg	    .= $text;
+                $msg	    .= $template['provinceMissing']->
+                                        replace('$censusId', $censusId);
             }           // collection of censuses
 	    }               // province not specified
 	}                   // census defined
     else
     {                   // census not defined
-        $text               = $template['censusUndefined']->innerHTML;
-        $text               = str_replace('$censusId', $censusId, $text);
-        $msg	            .= $text;
+        $msg                .= $template['censusUndefined']->
+                                    replace('$CENSUSID', $censusId);
         $cc                 = substr($censusId, 0, 2);
     }                   // census not defined
 }                       // census identifier specified
@@ -262,13 +294,17 @@ if ($cc)
     }
     else
     {
-        $text	            = $template['countryUndefined']->innerHTML;
-        $text               = str_replace('$cc', $cc, $text);
+        $text	            = $template['countryUndefined']->
+                                                    replace('$cc', $cc);
 		$msg	            .= $text;
     }
 }
 
 // validate district identifier
+if (is_string($disttext))
+    $msg	        .= $template['districtUndefined']->
+                                            replace('$DISTID', $disttext);
+else
 if ($distId)
 {                       // district specified
 	if (preg_match("/^[0-9]+(\.[05]|)$/", $distId) == 1)
@@ -281,16 +317,14 @@ if ($distId)
             $distName		= $district->get('d_name');
         else
         {
-            $text	        = $template['districtUndefined']->innerHTML;
-            $text           = str_replace('$distId', $distId, $text);
-		    $msg	        .= $text;
+            $msg	        .= $template['districtUndefined']->
+                                            replace('$DISTID', $distId);
         }
 	}		            // matches pattern of a district number
 	else
 	{
-        $text	            = $template['districtInvalid']->innerHTML;
-        $text               = str_replace('$distId', $distId, $text);
-		$msg	            .= $text;
+        $msg                .= $template['districtInvalid']->
+                                        replace('$distId', $distId);
     }
 }                       // district specified
 else
@@ -298,6 +332,14 @@ else
 
 // get the district and subdistrict names
 // and other information about the identified division
+if (is_string($subdisttext))
+{
+    $text	            = $template['subdistrictUndefined']->innerHTML;
+    $text               = str_replace('$CENSUSID', $censusId.$censustext, $text);
+    $text               = str_replace('$DISTID', $distId.$disttext, $text);
+    $text               = str_replace('$SUBDISTID', $subdisttext, $text);
+    $msg	            .= $text;
+}
 if ($censusId && $distId && $subdistId)
 {
     $subDistrict	= new SubDistrict(array('sd_census'	=> $censusId,
@@ -309,7 +351,7 @@ if ($censusId && $distId && $subdistId)
     {
 		$subdistName		= $subDistrict->get('sd_name');
 		$pageCount		    = $subDistrict->get('sd_pages');
-		$page1		    	= $subDistrict->get('sd_page1');
+        $page1		    	= $subDistrict->get('sd_page1');
 		$bypage		    	= $subDistrict->get('sd_bypage');
 		$imageBase			= $subDistrict->get('sd_imagebase');
 		$relFrame			= $subDistrict->get('sd_relframe');
@@ -336,7 +378,6 @@ if ($censusId && $distId && $subdistId)
 }
 if (is_null($subdistId))
     $msg	                .= $template['subdistrictMissing']->innerHTML;
-
 $template->set('CC',		        $cc);
 $template->set('COUNTRYNAME',	    $countryName);
 $template->set('CENSUSID',		    $censusId);

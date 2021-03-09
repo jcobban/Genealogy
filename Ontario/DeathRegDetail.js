@@ -77,8 +77,9 @@
  *		2020/06/01      correct handling of 9m9d age                    *
  *		2020/06/17      DisplayImage moved to top folder                *
  *      2020/11/21      move showImage to common utilities script       *
+ *      2021/02/23      add abbreviations for durations                 *
  *																		*
- *  Copyright &copy; 2020 James A. Cobban								*
+ *  Copyright &copy; 2021 James A. Cobban								*
  ************************************************************************/
 
 /************************************************************************
@@ -170,6 +171,7 @@ var	DurationAbbrs = {
 					"Day" :					"day",
 					"Days" :				"days",
 					"Few" :					"few",
+					"From" :				"from",
 					"H" :					"hours",
 					"Hour" :				"hour",
 					"Hours" :				"hours",
@@ -183,6 +185,7 @@ var	DurationAbbrs = {
 					"Sev." :				"several",
 					"Several" :				"several",
 					"Some" :				"some",
+					"To" :				    "to",
 					"W" :					"weeks",
 					"Week" :				"week",
 					"Weeks" :				"weeks",

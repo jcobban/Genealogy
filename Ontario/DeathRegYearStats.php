@@ -44,8 +44,10 @@ use \NumberFormatter;
  *		                so it can be corrected                          *
  *		2019/12/13      remove D_ prefix from field names               *
  *		2020/01/22      internationalize numbers                        *
+ *		2021/02/12      internationalize parameter validation messages  *
+ *		                DeathSet::getStatistics now returns county name *
  *																		*
- *  Copyright &copy; 2019 James A. Cobban								*
+ *  Copyright &copy; 2021 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . "/Domain.inc";
 require_once __NAMESPACE__ . "/Country.inc";
@@ -56,50 +58,62 @@ require_once __NAMESPACE__ . "/FtTemplate.inc";
 require_once __NAMESPACE__ . '/common.inc';
 
 // validate parameters
-$regYear						= '';
-$cc			    				= 'CA`';
+$regYear						= null;
+$regyeartext                    = null;
+$cc			    				= 'CA';
 $country    					= null;     // instance of Country
 $countryName					= 'Canada';
 $domain		    				= 'CAON';	// default domain code
+$domaintext  				    = null;
 $domainName						= 'Ontario';
 $domainObj 		    			= null;     // instance of Domain
 $county 		    			= null;     // instance of County
-$countyCode		    			= '';
-$countyName		    			= '';
+$countyCode		    			= null;
+$countycodetext  				= null;
+$countyName		    			= null;
 $lang		    				= 'en';
 
 if (count($_GET) > 0)
 {                   // parameters passed
-	$parmsText      		    = "<p class='label'>\$_GET</p>\n" .
-	                                "<table class='summary'>\n" .
-	                                "<tr><th class='colhead'>key</th>" .
+	$parmsText      		= "<p class='label'>\$_GET</p>\n" .
+	                            "<table class='summary'>\n" .
+	                              "<tr><th class='colhead'>key</th>" .
 	                                "<th class='colhead'>value</th></tr>\n";
 	foreach($_GET as $key => $value)
-	{			    // loop through all input parameters
-	    $parmsText              .= "<tr><th class='detlabel'>$key</th>" .
-                            "<td class='white left'>$value</td></tr>\n"; 
-    $value                      = trim($value);
+    {			    // loop through all input parameters
+        $safevalue          = htmlspecialchars($value);
+	    $parmsText          .= "<tr><th class='detlabel'>$key</th>" .
+                            "<td class='white left'>$safevalue</td></tr>\n";
+        $value              = trim($value);
 		switch(strtolower($key))
 		{		    // process specific named parameters
 		    case 'regyear':
 		    case 'year':
-		    {
-				$regYear	        = $value;
+            {
+                if (ctype_digit($value))
+                    $regYear	        = $value;
+                else
+                    $regyeartext        = htmlspecialchars($value);
 				break;
 		    }		// RegYear passed
-	
+
 		    case 'regdomain':
 		    case 'domain':
-		    {
-				$domain		        = $value;
+            {
+                if (preg_match('/^[a-zA-Z]+$/', $value))
+                    $domain		        = strtoupper($value);
+                else
+                    $domaintext         = htmlspecialchars($value);
 				break;
 		    }		// RegDomain
 	
 		    case 'county':
 		    case 'regcounty':
 		    {
-				if (strlen($value) > 0)
-				    $countyCode     = $value;
+                if (preg_match('/^[a-zA-Z]+$/', $value))
+                    $countyCode		    = $value;
+                else
+                    $countycodetext     = htmlspecialchars($value);
 				break;
 		    }		// county
 	
@@ -126,27 +140,60 @@ if (count($_GET) > 0)
 }                   // parameters passed
 
 // create template
-if (strlen($countyCode) > 0)
-$template           = new FtTemplate("DeathRegYearStatsTown$lang.html");
+if (is_string($countyCode))
+    $template           = new FtTemplate("DeathRegYearStatsTown$lang.html");
 else
-$template           = new FtTemplate("DeathRegYearStats$lang.html");
+    $template           = new FtTemplate("DeathRegYearStats$lang.html");
+$translate              = $template->getTranslate();
+$t                      = $translate['tranTab'];
+$formatter              = $template->getFormatter();
 
 // validate parameters
-$domainObj	            = new Domain(array('domain'	    => $domain,
-   					            	   'language'	=> 'en'));
-if ($domainObj->isExisting())
+if (is_string($regyeartext))
 {
-$cc			        = substr($domain, 0, 2);
-$country    		= new Country(array('code' => $cc));
-$countryName	    = $country->getName();
+    $msg        .= $template['yearInvalid']->replace('$year', $regyeartext);
+	$template->set('REGYEAR',       $regyeartext);
+}
+else
+if (is_null($regYear))
+{
+	$msg		.= $template['yearMissing']->innerHTML;
+	$template->set('REGYEAR',       $t['Missing']);
+}
+
+if (is_string($domaintext))
+{
+    $msg        .= $template['domainInvalid']->
+                                    replace('$value', $domaintext);
+    $domainName		    = $domaintext . ' ' . $t['Unsupported'];
 }
 else
 {
-$msg	.= "Domain '$value' must be a supported two character country code followed by a two or three character state or province code. ";
+	$domainObj	            = new Domain(array('domain'	    => $domain,
+	   					            	   'language'	=> 'en'));
+	if ($domainObj->isExisting())
+	{
+		$cc			        = substr($domain, 0, 2);
+		$country    		= new Country(array('code' => $cc));
+		$countryName	    = $country->getName();
+	    $domainName		    = $domainObj->get('name');
+	}
+	else
+	{
+        $msg	    .= $template['domainUnsupported']->
+                                    replace('$value', $domain);
+	    $domainName		    = $domain . ' ' . $t['Unsupported'];
+	}
 }
-$domainName		        = $domainObj->get('name');
 
-if (strlen($countyCode) > 0)
+if (is_string($countycodetext))
+{
+    $msg        .= $template['countyInvalid']->
+                                    replace('$value', $countycodetext);
+    $countyName             = $countycodetext;
+}
+else
+if (is_string($countyCode))
 {
 	$county 		    = new County(array('domain'     => $domainObj, 
 	                                       'code'       => $countyCode));
@@ -155,22 +202,11 @@ if (strlen($countyCode) > 0)
 	}
 	else
 	{
-    $warn	        .= "<p>County code '$countyCode' is not valid for domain '$domain'.</p>\n";
-}
+        $warn	        .= $template['countyUnsupported']->replace( 
+								        array('$value','$domain'),
+								        array($countyCode, $domainName));
+    }
 	$countyName		    = $county->get('name');
-}
-
-if ($regYear == '')
-{
-	$msg		.= "RegYear omitted. ";
-}
-else
-{
-	if (!preg_match("/^([0-9]{4})$/", $regYear) ||
-	    ($regYear < 1800) || ($regYear > 2000))
-	{
-	    $msg	.= "RegYear $regYear must be a number between 1800 and 2000. ";
-}
 }
 
 // update template
@@ -181,19 +217,18 @@ $template->set('DOMAIN',        $domain);
 $template->set('DOMAINNAME',    $domainName);
 $template->set('COUNTY',        $countyCode);
 $template->set('COUNTYNAME',    $countyName);
-$template->set('REGYEAR',       $regYear);
-$template->set('PREVREGYEAR',   $regYear - 1);
-$template->set('NEXTREGYEAR',   $regYear + 1);
-
-$total                              = 0;
-$lowest                             = PHP_INT_MAX;
-$highest                            = 0;
-$totcount                           = 0;
-$totlinked                          = 0;
-$formatter                          = $template->getFormatter();
-
 if (strlen($msg) == 0)
-{			                // no errors
+{
+	$template->set('REGYEAR',       $regYear);
+	$template->set('PREVREGYEAR',   $regYear - 1);
+	$template->set('NEXTREGYEAR',   $regYear + 1);
+	
+	$total                              = 0;
+	$lowest                             = PHP_INT_MAX;
+	$highest                            = 0;
+	$totcount                           = 0;
+	$totlinked                          = 0;
+
 	if (is_null($county))
 	{
 	    $deaths         = new DeathSet(array('domain'       => $domain,
@@ -212,15 +247,9 @@ if (strlen($msg) == 0)
     for($i = 0; $i < count($result); $i++)
     {                       // loop through rows
         $row                            = $result[$i];
+        if ($debug)
+            $warn   .= "<p>row[$i] => " . print_r($row, true) . "</p>\n";
         $result[$i]['rownum']           = $i;
-        if (is_null($county))
-        {
-	        $tcounty   = new County(array('domain'     => $domainObj, 
-                                          'code'       => $row['county']));
-            $result[$i]['countyname']   = $tcounty->get('name');
-        }
-        else
-            $result[$i]['countyname']   = $countyName;
         $low                            = $row['low'];
         $high                           = $row['high'];
         if (array_key_exists('currhigh', $row))
@@ -251,12 +280,15 @@ if (strlen($msg) == 0)
         $result[$i]['pctdoneclass']     = $pctdoneclass;
         $result[$i]['pctlinked']        = $formatter->format($pctlinked);
         $result[$i]['pctlinkedclass']   = $pctlinkedclass;
+        if (isset($county))
+            $result[$i]['countyname']   = $countyName;
     }                       // loop through rows
 }		        // ok
 else
 {
     $result                             = array();
     $lowest                             = 0;
+    $template['topBrowse']->update(null);
 }
 
 if (count($result) > 0)

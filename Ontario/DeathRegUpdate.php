@@ -63,8 +63,9 @@ use \Exception;
  *		2017/10/13		class LegacyIndiv renamed to class Person		*
  *		2018/06/01		add support for lang parameter					*
  *		2020/03/13      use FtTemplate::validateLang                    *
+ *		2021/01/23      REGCOUNTY not set                               *
  *																		*
- *  Copyright &copy; 2020 James A. Cobban								*
+ *  Copyright &copy; 2021 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . "/Domain.inc";
 require_once __NAMESPACE__ . "/County.inc";
@@ -425,6 +426,7 @@ $template->set('LANG',	        $lang);
 $template->set('CODE',	        $code);
 $template->set('COUNTRYNAME',	$countryName);
 $template->set('DOMAINNAME',	$domainName);
+$template->set('REGCOUNTY',	    $county);
 $template->set('COUNTYNAME',	$countyName);
 $template->set('REGTOWNSHIP',	$township);
 $template->set('CONTACTTABLE',		'Deaths');

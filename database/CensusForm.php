@@ -282,6 +282,8 @@ else
 // get template
 $warn	        .= ob_get_clean();	// ensure previous output in page
 $template	    = new FtTemplate("CensusForm$censusYear$action$lang.html");
+$translate      = $template->getTranslate();
+$t              = $translate['tranTab'];
 
 // validate mandatory parameters 
 if (strlen($censusId) == 0)
@@ -485,172 +487,191 @@ else
 // update the popup for explaining the action taken by arrows
 if (strlen($msg) == 0)
 {
-    $rowElt             			= $template->getElementById('Row$line');
-    $rowHtml            			= $rowElt->outerHTML();
-    $data               			= '';
-	$lineSet		    			= new CensusLineSet($getParms);
-	$info			    			= $lineSet->getInformation();
-	$count			    			= $info['count'];
-	$groupLines		    			= $census->get('grouplines');
-	$lastunderline					= $census->get('lastunderline');
-	$oldFamily		    			= '';
-	$oldSurname		    			= '';
-	$oldReligion					= '';
-	$oldOrigin		    			= '';
-	$oldNationality					= '';
-	foreach($lineSet as $censusLine)
+    if (!preg_match('/^https?:/', $image))
+        $template['imageButton']->update(null);
+
+    if ($numLines > 0)
     {
-        $rtemplate      			= new Template($rowHtml);
-        $doIdirHidden               = false;
-	    foreach($censusLine as $field => $value)
+        $template->set('NUMLINES', $numLines);
+        $pageSizeP      = $template['pageSize'];
+        if ($pageSizeP instanceof \Templating\TemplateTag)
+            $pageSizeP->update(null);
+	    $rowElt             		= $template->getElementById('Row$line');
+	    $rowHtml            		= $rowElt->outerHTML();
+	    $data               		= '';
+		$lineSet		    		= new CensusLineSet($getParms);
+		$info			    		= $lineSet->getInformation();
+		$count			    		= $info['count'];
+		$groupLines		    		= $census->get('grouplines');
+		$lastunderline				= $census->get('lastunderline');
+		$oldFamily		    		= '';
+		$oldSurname		    		= '';
+		$oldReligion				= '';
+		$oldOrigin		    		= '';
+		$oldNationality				= '';
+		foreach($lineSet as $censusLine)
 	    {
-			switch($field)
-			{		// act on specific field names
-				case 'line':
-				{
-					$line			= $value;
-					if (($line % $groupLines) == 0 &&
-					     $line < $lastunderline)
-					    $censusLine->set('cellclass', 'underline');
-					else
-					    $censusLine->set('cellclass', 'cell');
-					if ($line < 10)
-                        $line	= '0' . $line;
-					break;
-				}		// line number on page
-
-				case 'family':
-				{
-					if ($value == $oldFamily)
-					    $censusLine->set('famclass', 'same');
-					else
+	        $rtemplate      			= new Template($rowHtml);
+	        $doIdirHidden               = false;
+		    foreach($censusLine as $field => $value)
+		    {
+				switch($field)
+				{		// act on specific field names
+					case 'line':
 					{
-					    $censusLine->set('famclass', 'black');
-					    $oldFamily	    = $value;
-                    }
-                    if (strlen($value) == 0)
-                    {
-                        $button         = $rtemplate['doIdir$line'];
-                        $doIdirHidden   = true;
-                        if ($button)
-                            $button->update(null);
-                    }
-					break;
-				}		// family number
-
-				case 'surname':
-				{
-					if ($value == $oldSurname)
-					    $censusLine->set('surclass', 'same');
-					else
+						$line			= $value;
+						if (($line % $groupLines) == 0 &&
+						     $line < $lastunderline)
+						    $censusLine->set('cellclass', 'underline');
+						else
+						    $censusLine->set('cellclass', 'cell');
+						if ($line < 10)
+	                        $line	    = '0' . $line;
+						break;
+					}		// line number on page
+	
+					case 'family':
 					{
-					    $censusLine->set('surclass', 'black');
-					    $oldSurname	    = $value;
-					}
-                    if ($doIdirHidden == false && 
-                        strtolower($value) == '[blank]')
-                    {
-                        $button         = $rtemplate['doIdir$line'];
-                        $doIdirHidden   = true;
-                        if ($button)
-                            $button->update(null);
-                    }
-					break;
-				}		// surname
-
-				case 'origin':
-				{
-					if ($value == $oldOrigin)
-					    $censusLine->set('orgclass', 'same');
-					else
+						if ($value == $oldFamily)
+						    $censusLine->set('famclass', 'same');
+						else
+						{
+						    $censusLine->set('famclass', 'black');
+						    $oldFamily	    = $value;
+	                    }
+	                    if (strlen($value) == 0)
+	                    {
+	                        $button         = $rtemplate['doIdir$line'];
+	                        $doIdirHidden   = true;
+	                        if ($button)
+	                            $button->update(null);
+	                    }
+						break;
+					}		// family number
+	
+					case 'surname':
 					{
-					    $censusLine->set('orgclass', 'black');
-					    $oldOrigin	= $value;
-					}
-					break;
-				}		// ethnic origin
-
-				case 'nationality':
-				{
-					if ($value == $oldNationality)
-					    $censusLine->set('natclass', 'same');
-					else
+						if ($value == $oldSurname)
+						    $censusLine->set('surclass', 'same');
+						else
+						{
+						    $censusLine->set('surclass', 'black');
+						    $oldSurname	    = $value;
+						}
+	                    if ($doIdirHidden == false && 
+	                        strtolower($value) == '[blank]')
+	                    {
+	                        $button         = $rtemplate['doIdir$line'];
+	                        $doIdirHidden   = true;
+	                        if ($button)
+	                            $button->update(null);
+	                    }
+						break;
+					}		// surname
+	
+					case 'origin':
 					{
-					    $censusLine->set('natclass', 'black');
-					    $oldNationality	= $value;
-					}
-					break;
-				}		// nationality
-
-				case 'religion':
-				{
-					if ($value == $oldReligion)
-					    $censusLine->set('relclass', 'same');
-					else
+						if ($value == $oldOrigin)
+						    $censusLine->set('orgclass', 'same');
+						else
+						{
+						    $censusLine->set('orgclass', 'black');
+						    $oldOrigin	= $value;
+						}
+						break;
+					}		// ethnic origin
+	
+					case 'nationality':
 					{
-					    $censusLine->set('relclass', 'black');
-					    $oldReligion	= $value;
-					}
-					break;
-				}		// religion
-
-				// default value of Mother's birthplace is
-				// Father's birthplace
-				// so if they are equal Mother's birthplace is default value
-				case 'mothersbplace';
-				{
-					if ($value == $censusLine['fathersbplace'])
-					    $censusLine->set('mbpclass', 'same');
-					else
-					    $censusLine->set('mbpclass', 'black');
-					break;
-				}		// mothersbirthplace
-
-			    case 'idir':
-                {
-                    if (is_null($value))
-                    {
-                        $value      = 0;
-                        $censusLine->set('idir',        0);
-                    }
-					if ($value > 0)
+						if ($value == $oldNationality)
+						    $censusLine->set('natclass', 'same');
+						else
+						{
+						    $censusLine->set('natclass', 'black');
+						    $oldNationality	= $value;
+						}
+						break;
+					}		// nationality
+	
+					case 'religion':
 					{
-					    $censusLine->set('idirtext',    'Show');
-					    $censusLine->set('idirclear',   $line);
-					}
-					else
+						if ($value == $oldReligion)
+						    $censusLine->set('relclass', 'same');
+						else
+						{
+						    $censusLine->set('relclass', 'black');
+						    $oldReligion	= $value;
+						}
+						break;
+					}		// religion
+	
+					// default value of Mother's birthplace is
+					// Father's birthplace
+					// so if they are equal Mother's birthplace is default value
+					case 'mothersbplace';
 					{
-					    $censusLine->set('idirtext',    'Find');
-                        $button         = $rtemplate['clearIdir$idirclear'];
-                        if ($button)
-                            $button->update(null);
-					}
-					break;
-			    }		// idir
-
-                case 'ownertenant':
-                {
-                    if (is_string($value) && strlen($value) > 1)
-                        $value              = substr($value, 0, 1);
-                    if (is_null($value))
-                        $censusLine->set($field, '');
-                    else
-                        $censusLine->set($field, strtoupper($value));
-					break;
-                }
-
-                default:
-                {
-                    if (is_null($value))
-                        $censusLine->set($field, '');
-					break;
-                }
-			}		// act on specific field names
-        }			// loop through all fields in record
-        $rtemplate['Row$line']->update($censusLine);
-        $data           .= $rtemplate->compile() . "\n";
-	}			// loop through records in page
-    $rowElt->update($data);
+						if ($value == $censusLine['fathersbplace'])
+						    $censusLine->set('mbpclass', 'same');
+						else
+						    $censusLine->set('mbpclass', 'black');
+						break;
+					}		// mothersbirthplace
+	
+				    case 'idir':
+	                {
+	                    if (is_null($value))
+	                    {
+	                        $value      = 0;
+	                        $censusLine->set('idir',        0);
+	                    }
+						if ($value > 0)
+						{
+						    $censusLine->set('idirtext',    'Show');
+						    $censusLine->set('idirclear',   $line);
+						}
+						else
+						{
+						    $censusLine->set('idirtext',    'Find');
+	                        $button         = $rtemplate['clearIdir$idirclear'];
+	                        if ($button)
+	                            $button->update(null);
+						}
+						break;
+				    }		// idir
+	
+	                case 'ownertenant':
+	                {
+	                    if (is_string($value) && strlen($value) > 1)
+	                        $value              = substr($value, 0, 1);
+	                    if (is_null($value))
+	                        $censusLine->set($field, '');
+	                    else
+	                        $censusLine->set($field, strtoupper($value));
+						break;
+	                }
+	
+	                default:
+	                {
+	                    if (is_null($value))
+	                        $censusLine->set($field, '');
+						break;
+	                }
+				}		// act on specific field names
+	        }			// loop through all fields in record
+	        $rtemplate['Row$line']->update($censusLine);
+	        $data           .= $rtemplate->compile() . "\n";
+		}			// loop through records in page
+	    $rowElt->update($data);
+    }                   // the page is not empty
+    else
+    {
+        $template['form']->update(null);            // remove whole table
+        $template['treeMatch']->update(null);       // remove button
+        $template['showImportant']->update(null);   // remove button
+        $template['reset']->update(null);           // remove button
+        $template['addRow']->update(null);          // remove button
+        $template->set('NUMLINES', $t['No']);
+    }
 }
 
 // display field comments

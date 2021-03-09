@@ -106,8 +106,15 @@ $nameuri                = '';   // defaults for trail of breadcrumbs
 $prefix                 = '';
 $idir1                  = null;
 $idir1text              = null;
+$person1        		= null;
 $idir2                  = null;
 $idir2text              = null;
+$person2        		= null;
+$evBirth2       		= null;
+$evChris2       		= null;
+$evDeath2       		= null;
+$evBuried2      		= null;
+$isOwner        		= null;
 $useSurname2            = false;
 $useGivenName2          = false;
 $useBthDate2            = false;
@@ -489,14 +496,17 @@ if (strlen($msg) == 0)
     }
 
     // copy citations from second christening date
-    $citations  = $evChris2->getCitations();
-    if (count($citations) > 0)
-    {       // have citations to copy
-        $template->set('CHRISCITATIONSCOUNT', count($citations));
-        $evChris1->addCitations($citations);
-    }       // have citations to copy
-    else
-        $template['chrisCount']->update(null);
+    if ($evChris2)
+    {
+	    $citations          = $evChris2->getCitations();
+	    if (count($citations) > 0)
+	    {       // have citations to copy
+	        $template->set('CHRISCITATIONSCOUNT', count($citations));
+	        $evChris1->addCitations($citations);
+	    }       // have citations to copy
+	    else
+	        $template['chrisCount']->update(null);
+    }
     $template->set('CHRISD',        $evChris1->getDate(9999, $t));
     $template->set('CHRISLOC',      $evChris1->getLocation()->getName());
 

@@ -23,17 +23,18 @@ window.onload   = onLoad;
  ************************************************************************/
 function onLoad()
 {
+    let trace   = '';
     // activate functionality for individual input elements
-    for(var i = 0; i < document.forms.length; i++)
+    for(let i = 0; i < document.forms.length; i++)
     {               // loop through all forms
-        var form    = document.forms[i];
-        for(var j = 0; j < form.elements.length; j++)
+        let form    = document.forms[i];
+        for(let j = 0; j < form.elements.length; j++)
         {           // loop through all elements
-            var element     = form.elements[j];
-            var name        = element.name;
+            let element     = form.elements[j];
+            let name        = element.name;
             if (!name || name.length == 0)
                 name        = element.id;
-
+            trace           += name + ", ";
             // identify change action for each cell
             switch(name.toLowerCase())
             {       // switch on column name
@@ -47,6 +48,7 @@ function onLoad()
 
                 case 'blog':
                 {   // action button
+                    trace   += "onclick=postBlog, ";
                     element.onclick     = postBlog;
                     break;
                 }   // action button
@@ -73,8 +75,8 @@ function onLoad()
  ************************************************************************/
 function postBlog(e)
 {
-    var form    = this.form;
-    var parms   = {'id'         : form.id.value,
+    let form    = this.form;
+    let parms   = {'id'         : form.id.value,
                    'tablename'  : form.tablename.value,
                    'message'    : form.message.value,
                    'email'      : form.email.value};
@@ -94,13 +96,13 @@ function postBlog(e)
  ************************************************************************/
 function gotPosted(xmlDoc)
 {
-    var root    = xmlDoc.documentElement;
+    let root    = xmlDoc.documentElement;
     if (root)
     {           // have XML response
-        var msg = "";
-        for(var i = 0; i < root.childNodes.length; i++)
+        let msg = "";
+        for(let i = 0; i < root.childNodes.length; i++)
         {       // loop through children
-            var node    = root.childNodes[i];
+            let node    = root.childNodes[i];
             if (node.nodeName && node.nodeName == 'msg')
                 msg     += node.textContent;
         }       // loop through children
@@ -140,10 +142,4 @@ function cancel(e)
 {
     closeFrame();
 }       // function cancel
-
-/************************************************************************
- *  function gotPosted                                                  *
- *                                                                      *
- *  This method is called when the XML file representing                *
- *  the completion of the post is retrieved from the server.            *
 

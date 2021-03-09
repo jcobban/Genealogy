@@ -315,6 +315,7 @@
  *      2020/09/26      fix failure to refresh for click on new Person  *
  *      2021/01/16      use XMLSerializer for diagnostic output         *
  *                      use addEventListener                            *
+ *      2021/03/04      avoid creating duplicate events                 *
  *                                                                      *
  *  Copyright &copy; 2021 James A. Cobban                               *
  ************************************************************************/
@@ -553,8 +554,8 @@ function loadEdit()
 
     // if this is invoked for a completely new individual the
     // heading is meaningless, set up to update it on the fly
-    var titleElement    = document.getElementById('title');
-    var title           = titleElement.innerHTML.trim();
+    let titleElement    = document.getElementById('title');
+    let title           = titleElement.innerHTML.trim();
     // if there is only one space prior to the date range then there is
     // no name information and a date range containing only an m-dash
     // is an empty date range
@@ -566,14 +567,14 @@ function loadEdit()
 
     document.body.onresize  = onWindowResize;
 
-    var idir                    = 0;
-    var marriagesButton         = document.getElementById('Marriages');
-    var parentsButton           = document.getElementById('Parents');
+    let idir                    = 0;
+    let marriagesButton         = document.getElementById('Marriages');
+    let parentsButton           = document.getElementById('Parents');
 
     // loop through arguments passed to script
-    for(var key in args)
+    for(let key in args)
     {                   // loop through all arguments
-        var value   = args[key];
+        let value   = args[key];
         switch(key.toLowerCase())
         {
             case 'id':
@@ -628,9 +629,9 @@ function loadEdit()
 
     document.body.onkeydown     = eiKeyDown;
 
-    for (var fi = 0; fi < document.forms.length; fi++)
+    for (let fi = 0; fi < document.forms.length; fi++)
     {                   // loop through all forms
-        var form            = document.forms[fi];
+        let form            = document.forms[fi];
 
         // set action methods for form as a whole
         if (form.name == 'indForm')
@@ -696,11 +697,11 @@ function loadEdit()
  ************************************************************************/
 function onWindowResize(ev)
 {
-    var body        = document.body;
-    var iframes     = body.getElementsByTagName('iframe');
-    for(var fi = 0; fi < iframes.length; fi++)
+    let body        = document.body;
+    let iframes     = body.getElementsByTagName('iframe');
+    for(let fi = 0; fi < iframes.length; fi++)
     {           // loop through all iframes
-        var iframe  = iframes[fi];
+        let iframe  = iframes[fi];
         if (iframe.src.substring(iframe.src.length - 10) == 'blank.html')
             continue;
         if (iframe.className == "right")
@@ -720,10 +721,10 @@ function onWindowResize(ev)
  ************************************************************************/
 function activateElements(form)
 {
-    var formElts    = form.elements;
-    for (var i = 0; i < formElts.length; ++i)
+    let formElts    = form.elements;
+    for (let i = 0; i < formElts.length; ++i)
     {
-        var element = formElts[i];
+        let element = formElts[i];
         if (element.nodeName.toLowerCase() == 'fieldset')
             continue;
         if ((element.type) && (element.type == 'text'))
@@ -736,12 +737,12 @@ function activateElements(form)
         element.addEventListener('change', change); // default handler
 
         // set behavior for individual elements by name
-        var name    = element.name;
+        let name    = element.name;
         if (name.length == 0)
             name    = element.id;
 
-        var namePattern = /^([a-zA-Z$_\[\]]+)([0-9]*)$/;
-        var pieces      = namePattern.exec(name);
+        let namePattern = /^([a-zA-Z$_\[\]]+)([0-9]*)$/;
+        let pieces      = namePattern.exec(name);
         if (pieces === null)
         {
             popupAlert("editIndivid.js: activateElements: " +
@@ -749,8 +750,8 @@ function activateElements(form)
                         element);
             pieces  = [name, name, ''];
         }
-        var colName = pieces[1];
-        var id      = pieces[2];
+        let colName = pieces[1];
+        let id      = pieces[2];
 
         switch(colName.toLowerCase())
         {       // switch on name of element
@@ -986,7 +987,7 @@ function activateElements(form)
  ************************************************************************/
 function validateForm()
 {
-    var form                = this;
+    let form                = this;
     console.log("editIndivid.js: validateForm: called");
 
     // do not submit the form if a modal dialog is being displayed
@@ -998,7 +999,7 @@ function validateForm()
 
     // handle feedback if the editIndivid.php page was invoked from
     // another window
-    var opener              = null;
+    let opener              = null;
     if (window.frameElement && window.frameElement.opener)
         opener              = window.frameElement.opener;
     else
@@ -1007,7 +1008,7 @@ function validateForm()
     if (opener != null)
     {                   // invoked from another window
         // dstform is the form in the invoking page
-        var dstform         = null;
+        let dstform         = null;
         try
         {               // do not fail script for permission failure
             dstform         = opener.document.forms[0];
@@ -1018,12 +1019,12 @@ function validateForm()
         {               // opener contains a form
             // if parmIdir is zero then the script has added a new individual
             // into the database.
-            var adding      = parmIdir == 0;
+            let adding      = parmIdir == 0;
 
             // process the parameters passed to the PHP script
-            for(var key in args)
+            for(let key in args)
             {           // loop through parameter name value pairs
-                var val = args[key];
+                let val = args[key];
                 switch(key.toLowerCase())
                 {       // action depends upon parameter name
                     case 'id':
@@ -1034,13 +1035,13 @@ function validateForm()
 
                     case 'idcr':
                     {   // request to edit a child in a family
-                        var childTable  =
+                        let childTable  =
                             opener.document.getElementById('children');
                         if (!childTable)
                             break;
-                        var genderSel   = form.Gender;
-                        var index       = genderSel.selectedIndex;
-                        var gender; // gender presentation class
+                        let genderSel   = form.Gender;
+                        let index       = genderSel.selectedIndex;
+                        let gender; // gender presentation class
                         gender          = genderSel.options[index].value;
                         if (gender == 0)
                             gender      = 'male';
@@ -1050,13 +1051,13 @@ function validateForm()
                         else
                             gender      = 'unknown';
 
-                        var birthDate   = '';
-                        var deathDate   = '';
+                        let birthDate   = '';
+                        let deathDate   = '';
 
-                        var birthRow    = document.getElementById('BirthRow');
+                        let birthRow    = document.getElementById('BirthRow');
                         if (birthRow)
                         {           // birth row present
-                            for(var celt = birthRow.firstChild;
+                            for(let celt = birthRow.firstChild;
                             celt;
                             celt = celt.nextSibling)
                             {
@@ -1072,10 +1073,10 @@ function validateForm()
                             }
                         }           // birth row present
 
-                        var deathRow    = document.getElementById('DeathRow');
+                        let deathRow    = document.getElementById('DeathRow');
                         if (deathRow)
                         {           // death row present
-                            for(var celt = deathRow.firstChild;
+                            for(let celt = deathRow.firstChild;
                             celt;
                             celt = celt.nextSibling)
                             {
@@ -1091,7 +1092,7 @@ function validateForm()
                             }
                         }           // death row present
 
-                        var parms   = {
+                        let parms   = {
                             'idir'      : idir,
                             'idcr'      : val,
                             'givenname' : form.GivenName.value,
@@ -1164,18 +1165,18 @@ function validateForm()
  ************************************************************************/
 function refresh()
 {
-    var form                = document.indForm;
+    let form                = document.indForm;
 
     // parms contain every input element with its value
-    var parms               = {};
-    var msg                 = "[";
-    var comma               = '';
-    for (var ei = 0; ei < form.elements.length; ei++)
+    let parms               = {};
+    let msg                 = "[";
+    let comma               = '';
+    for (let ei = 0; ei < form.elements.length; ei++)
     {                   // loop through form elements
-        var element = form.elements[ei]
+        let element = form.elements[ei]
         if (element.name)
         {               // element has a name
-            var name        = element.name;
+            let name        = element.name;
             msg             += comma + name + "='" + element.value;
             comma           = "',";
             if (name.substring(name.length - 2) == '[]')
@@ -1220,24 +1221,24 @@ function gotRefreshed(jsonObj)
         else
         if (typeof(newSearch) == "object")
         {               // have a pending button click to issue
-            var indiv               = jsonObj.person;
-            var idir                = indiv.idir;
+            let indiv               = jsonObj.person;
+            let idir                = indiv.idir;
 
             if ((idir - 0) == 0)
                 console.log("editIndivid.js: 1219: gotRefreshed: idir=" + idir);
-            var id                  = indiv.id;
+            let id                  = indiv.id;
 
-            var form                = document.indForm;
+            let form                = document.indForm;
             form.idir.value         = idir; // is now set
             form.id.value           = id;   // is now set
 
-            var names               = indiv.names;
+            let names               = indiv.names;
             if (names)
             {
-                for (var prop in names)
+                for (let prop in names)
                 {
-                    var name        = names[prop];
-                    var nameButton  = document.getElementById('editName0');
+                    let name        = names[prop];
+                    let nameButton  = document.getElementById('editName0');
                     if (nameButton)
                         nameButton.id = 'editName' + name.idnx;
                     break;
@@ -1254,14 +1255,14 @@ function gotRefreshed(jsonObj)
         else
         {               // unexpected object
             console.log("editIndivid.js: gotRefreshed: 1248: " +
-                        "typeof(newSearch)=" +
-                        typeof(newSearch));
+                            "typeof(newSearch)=" +
+                            typeof(newSearch));
         }               // unexpected object
 
     }                   // valid response
     else
     {                   // error response
-        console.log("editIndivid.js: gotRefreshed: 1259: " + jsonObj);
+        console.log("editIndivid.js: gotRefreshed: 1259: " + JSON.stringify(jsonObj));
     }                   // error response
 
 }       // function gotRefreshed
@@ -1278,13 +1279,13 @@ function update()
     // check for open frames
     if (windowList.length > 0)
     {                   // there are incomplete actions pending
-        var text            = '';
-        var comma           = '';
-        var button          = document.getElementById('Submit');
-        for (var iw = 0; iw < windowList.length; iw++)
+        let text            = '';
+        let comma           = '';
+        let button          = document.getElementById('Submit');
+        for (let iw = 0; iw < windowList.length; iw++)
         {               // loop through open iframes
-            var iwindow     = windowList[iw];
-            var idocument   = iwindow.document;
+            let iwindow     = windowList[iw];
+            let idocument   = iwindow.document;
             if (idocument && iwindow.frameElement)
             {           // window has a document and a frame
                 if (idocument.title.length > 0)
@@ -1300,7 +1301,7 @@ function update()
 
                 if (iw == 0)
                 {       // pop the first open frame to the top
-                    var zIndex  = iwindow.frameElement.style.zIndex + 5;
+                    let zIndex  = iwindow.frameElement.style.zIndex + 5;
                     iwindow.frameElement.style.zIndex   = zIndex;
                     iwindow.focus();
                 }       // pop the first open frame to the top
@@ -1315,17 +1316,17 @@ function update()
         }
     }                   // there are incomplete actions pending
 
-    var form                = document.indForm;
+    let form                = document.indForm;
 
     // parms contain every input element with its value
-    var parms               = {};
-    var msg                 = "parms=(";
-    for (var ei = 0; ei < form.elements.length; ei++)
+    let parms               = {};
+    let msg                 = "parms=(";
+    for (let ei = 0; ei < form.elements.length; ei++)
     {                   // loop through all form elements
-        var element         = form.elements[ei]
+        let element         = form.elements[ei]
         if (element.name)
         {               // element has a name
-            var name        = element.name;
+            let name        = element.name;
             msg             += name + "='" + element.value + "',";
             if (name.substring(name.length - 2) == '[]')
             {           // convention for passing an array
@@ -1361,15 +1362,15 @@ function update()
  ************************************************************************/
 function gotUpdated(jsonObj)
 {
-    var opener          = null;
+    let opener          = null;
     if (window.frameElement && window.frameElement.opener)
         opener          = window.frameElement.opener;
     else
         opener          = window.opener;
     if (typeof(jsonObj) == "object")
     {           // valid response
-        var srcform     = document.indForm;
-        var indiv       = jsonObj.person;
+        let srcform     = document.indForm;
+        let indiv       = jsonObj.person;
         if (typeof(indiv) === "undefined")
         {
             alert("editIndivid.js: gotUpdated: unexpected object=" +
@@ -1377,13 +1378,13 @@ function gotUpdated(jsonObj)
         }
         else
         {
-        // var  msg = "";
+        // let  msg = "";
         // for(key in indiv)
         //     msg      += key + "='" + indiv[key] + "',";
         // alert("editIndivid.js: gotUpdated: indiv={" + msg + "} ");
 
         // get the IDIR value from the response
-        var idir        = indiv.idir;
+        let idir        = indiv.idir;
         if (typeof(idir) === "undefined")
         {
             console.log("editIndivid.js: gotUpdated: 1362 idir=" + idir +
@@ -1398,8 +1399,8 @@ function gotUpdated(jsonObj)
         srcform.idir.value  = idir;
 
         // if there is a child tag present, get the IDCR value
-        var idcr            = 0;
-        var childr          = jsonObj.child;
+        let idcr            = 0;
+        let childr          = jsonObj.child;
         if (childr)
             idcr            = childr.idcr;
 
@@ -1408,7 +1409,7 @@ function gotUpdated(jsonObj)
         if (feedbackRow !== null &&
             typeof(feedbackRow.changePerson) == 'function')
         {       // updating a family member
-            var gender      = srcform.Gender.value;
+            let gender      = srcform.Gender.value;
             if (gender == 0)
                 genderClass = 'male';
             else
@@ -1417,16 +1418,16 @@ function gotUpdated(jsonObj)
             else
                 genderClass = 'unknown';
 
-            var birthDate           = '';
-            var deathDate           = '';
+            let birthDate           = '';
+            let deathDate           = '';
 
-            var eventBody           = document.getElementById('EventBody');
-            var eventRows           = eventBody.children;
-            for(var ir = 0; ir < eventRows.length; ir++)
+            let eventBody           = document.getElementById('EventBody');
+            let eventRows           = eventBody.children;
+            for(let ir = 0; ir < eventRows.length; ir++)
             {           // loop through all events
-                var eventRow        = eventRows[ir];
-                var children        = eventRow.getElementsByTagName('input');
-                for(var ic = 0;
+                let eventRow        = eventRows[ir];
+                let children        = eventRow.getElementsByTagName('input');
+                for(let ic = 0;
                     ic < children.length;
                     ic++)
                 {
@@ -1446,7 +1447,7 @@ function gotUpdated(jsonObj)
             }           // death row present
 
             // pass the information back to the invoker
-            var parms       = { "idir"      : idir,
+            let parms       = { "idir"      : idir,
                                 "givenname" : srcform.GivenName.value,
                                 "surname"   : srcform.Surname.value,
                                 "birthd"    : birthDate,
@@ -1464,10 +1465,10 @@ function gotUpdated(jsonObj)
             // Now that the individual is updated in the database
             // if adding a child, notify invoker to add the child to the list
             // of children
-            var childTable  = opener.document.getElementById('children');
-            var genderSel   = srcform.Gender;
-            var index       = genderSel.selectedIndex;
-            var gender      = genderSel.options[index].value;
+            let childTable  = opener.document.getElementById('children');
+            let genderSel   = srcform.Gender;
+            let index       = genderSel.selectedIndex;
+            let gender      = genderSel.options[index].value;
             if (gender == 0)
                 indiv.gender    = 'male';
             else
@@ -1544,23 +1545,23 @@ function editName(ev)
         ev          = window.event;
     ev.stopPropagation();
 
-    var form        = this.form;
-    var idnx        = this.id.substring(8);
+    let form        = this.form;
+    let idnx        = this.id.substring(8);
     if (idnx == 0)
     {
         newSearch   = this;     // identify button that was clicked
         refresh();
         return;
     }
-    var given       = encodeURIComponent(form.GivenName.value);
-    var surname     = encodeURIComponent(form.Surname.value);
-    var treeName    = encodeURIComponent(form.treeName.value);
-    var lang            = 'en';
+    let given       = encodeURIComponent(form.GivenName.value);
+    let surname     = encodeURIComponent(form.Surname.value);
+    let treeName    = encodeURIComponent(form.treeName.value);
+    let lang            = 'en';
     if ('lang' in args)
         lang            = args.lang;
 
     // open edit dialog in right half of window
-    var url = "/FamilyTree/editName.php?idnx=" + idnx +
+    let url = "/FamilyTree/editName.php?idnx=" + idnx +
                                       "&given=" + given +
                                       "&surname=" + surname +
                                       "&treename=" + treeName +
@@ -1589,19 +1590,19 @@ function editMarriages(ev)
         ev          = window.event;
     ev.stopPropagation();
 
-    var form    = this.form;
-    var idir    = form.idir.value;
+    let form    = this.form;
+    let idir    = form.idir.value;
     if (idir > 0)
     {           // idir field present
-        var given       = encodeURIComponent(form.GivenName.value);
-        var surname     = encodeURIComponent(form.Surname.value);
-        var treeName    = encodeURIComponent(form.treeName.value);
-        var lang            = 'en';
+        let given       = encodeURIComponent(form.GivenName.value);
+        let surname     = encodeURIComponent(form.Surname.value);
+        let treeName    = encodeURIComponent(form.treeName.value);
+        let lang            = 'en';
         if ('lang' in args)
             lang            = args.lang;
 
         // open edit dialog in right half of window
-        var url = "/FamilyTree/editMarriages.php?id=" + idir +
+        let url = "/FamilyTree/editMarriages.php?id=" + idir +
                                "&given=" + given +
                                "&surname=" + surname +
                                "&treename=" + treeName +
@@ -1636,19 +1637,19 @@ function editParents(ev)
         ev          = window.event;
     ev.stopPropagation();
 
-    var form    = this.form;
-    var idir    = form.idir.value;
+    let form    = this.form;
+    let idir    = form.idir.value;
     if (idir > 0)
     {           // idir field present
-        var given       = encodeURIComponent(form.GivenName.value);
-        var surname     = encodeURIComponent(form.Surname.value);
-        var treeName    = encodeURIComponent(form.treeName.value);
-        var lang            = 'en';
+        let given       = encodeURIComponent(form.GivenName.value);
+        let surname     = encodeURIComponent(form.Surname.value);
+        let treeName    = encodeURIComponent(form.treeName.value);
+        let lang            = 'en';
         if ('lang' in args)
             lang            = args.lang;
 
         // open edit dialog in right half of window
-        var url = "/FamilyTree/editMarriages.php?child=" + idir +
+        let url = "/FamilyTree/editMarriages.php?child=" + idir +
                             "&given=" + given +
                             "&surname=" + surname +
                             "&treename=" + treeName +
@@ -1694,13 +1695,13 @@ function editEventIndiv(ev)
     // check for open event frame
     if (windowList.length > 0)
     {           // there are incomplete actions pending
-        var text    = '';
-        var comma   = '';
-        var button  = document.getElementById('Submit');
-        for (var iw = 0; iw < windowList.length; iw++)
+        let text    = '';
+        let comma   = '';
+        let button  = document.getElementById('Submit');
+        for (let iw = 0; iw < windowList.length; iw++)
         {       // loop through open iframes
-            var iwindow = windowList[iw];
-            var iframe  = iwindow.frameElement;
+            let iwindow = windowList[iw];
+            let iframe  = iwindow.frameElement;
             if (iframe && iframe.name == "event")
             {
                 text    += comma + iwindow.document.title;
@@ -1715,14 +1716,14 @@ function editEventIndiv(ev)
         }
     }           // there are incomplete actions pending
 
-    var type        = this.id.substring(6) - 0;
-    var form        = this.form;
-    var idir        = form.idir.value;
-    var givenname   = encodeURIComponent(form.GivenName.value);
-    var surname     = encodeURIComponent(form.Surname.value);
+    let type        = this.id.substring(6) - 0;
+    let form        = this.form;
+    let idir        = form.idir.value;
+    let givenname   = encodeURIComponent(form.GivenName.value);
+    let surname     = encodeURIComponent(form.Surname.value);
     if (idir > 0)
     {           // database record already exists
-        var url = "/FamilyTree/editEvent.php?idir=" + idir +
+        let url = "/FamilyTree/editEvent.php?idir=" + idir +
                                 "&type=" + type +
                                 "&givenname=" + givenname +
                                 "&surname=" + surname;
@@ -1815,7 +1816,7 @@ function editEventIndiv(ev)
         if (debug != 'n')
             popupAlert("editIndivid.js: editEventIndiv: " + url,
                         this);
-        var lang            = 'en';
+        let lang            = 'en';
         if ('lang' in args)
             lang            = args.lang;
         url                 += '&lang=' + lang
@@ -1858,16 +1859,16 @@ function clearEventIndiv(ev)
         ev          = window.event;
     ev.stopPropagation();
 
-    var button          = this;
-    var form            = this.form;
-    var type            = button.id.substring(5);
-    var promptText      = "Are you sure you want to delete this event?";
-    var textElt         = document.getElementById('confirmDeleteEvent');
+    let button          = this;
+    let form            = this.form;
+    let type            = button.id.substring(5);
+    let promptText      = "Are you sure you want to delete this event?";
+    let textElt         = document.getElementById('confirmDeleteEvent');
     if (textElt)
         promptText      = textElt.innerHTML;
     else
         alert("cannot find element 'confirmDeleteEvent'");
-    var parms           = {"type"   : type,
+    let parms           = {"type"   : type,
                            "formname"   : form.name,
                            "template"   : "",
                            "msg"    :
@@ -1899,13 +1900,13 @@ function confirmClearInd(ev)
     ev.stopPropagation();
 
     // get the parameter values hidden in the dialog
-    var form        = this.form;
-    var type        = this.id.substr(12);
-    var formname    = form.elements['formname' + type].value;
-    var form        = document.forms[formname];
+    let form        = this.form;
+    let type        = this.id.substr(12);
+    let formname    = form.elements['formname' + type].value;
+    form            = document.forms[formname];
 
     dialogDiv.style.display = 'none';
-    var idir        = form.idir.value;
+    let idir        = form.idir.value;
     if (idir)
     {
         // make the visible changes
@@ -1955,8 +1956,8 @@ function confirmClearInd(ev)
                 {
                     // add a field that will cause updatePersonJson.php
                     // to clear the location
-                    var cell        = form.BaptismLocation.parentNode;
-                    var idtrfld     = document.createElement('input');
+                    let cell        = form.BaptismLocation.parentNode;
+                    let idtrfld     = document.createElement('input');
                     idtrfld.type    = 'hidden';
                     idtrfld.name    = 'IDTRBaptism';
                     idtrfld.value   = 1;
@@ -1975,8 +1976,8 @@ function confirmClearInd(ev)
                 {
                     // add a field that will cause updatePersonJson.php
                     // to clear the location
-                    var cell        = form.EndowmentLocation.parentNode;
-                    var idtrfld     = document.createElement('input');
+                    let cell        = form.EndowmentLocation.parentNode;
+                    let idtrfld     = document.createElement('input');
                     idtrfld.type    = 'hidden';
                     idtrfld.name    = 'IDTREndowment';
                     idtrfld.value   = 1;
@@ -1995,8 +1996,8 @@ function confirmClearInd(ev)
                 {
                     // add a field that will cause updatePersonJson.php
                     // to clear the location
-                    var cell        = form.ConfirmationLocation.parentNode;
-                    var idtrfld     = document.createElement('input');
+                    let cell        = form.ConfirmationLocation.parentNode;
+                    let idtrfld     = document.createElement('input');
                     idtrfld.type    = 'hidden';
                     idtrfld.name    = 'IDTRConfirmation';
                     idtrfld.value   = 1;
@@ -2015,8 +2016,8 @@ function confirmClearInd(ev)
                 {
                     // add a field that will cause updatePersonJson.php
                     // to clear the location
-                    var cell        = form.InitiatoryLocation.parentNode;
-                    var idtrfld     = document.createElement('input');
+                    let cell        = form.InitiatoryLocation.parentNode;
+                    let idtrfld     = document.createElement('input');
                     idtrfld.type    = 'hidden';
                     idtrfld.name    = 'IDTRInitiatory';
                     idtrfld.value   = 1;
@@ -2028,7 +2029,7 @@ function confirmClearInd(ev)
         }       // act on specific type
 
         // update the database
-        var parms   = {"idir"   : idir,
+        let parms   = {"idir"   : idir,
                            "type"   : type};
 
         // invoke script to update Event and return XML result
@@ -2073,13 +2074,13 @@ function editEventChildr(ev)
     // check for open event frame
     if (windowList.length > 0)
     {           // there are incomplete actions pending
-        var text    = '';
-        var comma   = '';
-        var button  = document.getElementById('Submit');
-        for (var iw = 0; iw < windowList.length; iw++)
+        let text    = '';
+        let comma   = '';
+        let button  = document.getElementById('Submit');
+        for (let iw = 0; iw < windowList.length; iw++)
         {       // loop through open iframes
-            var iwindow = windowList[iw];
-            var iframe  = iwindow.frameElement;
+            let iwindow = windowList[iw];
+            let iframe  = iwindow.frameElement;
             if (iframe && iframe.name == "event")
             {
                 text    += comma + iwindow.document.title;
@@ -2094,14 +2095,14 @@ function editEventChildr(ev)
         }
     }           // there are incomplete actions pending
 
-    var type        = this.id.substring(6) - 0;
-    var form        = this.form;
-    var idcr        = form.idcr.value;
-    var givenname   = encodeURIComponent(form.GivenName.value);
-    var surname     = encodeURIComponent(form.Surname.value);
+    let type        = this.id.substring(6) - 0;
+    let form        = this.form;
+    let idcr        = form.idcr.value;
+    let givenname   = encodeURIComponent(form.GivenName.value);
+    let surname     = encodeURIComponent(form.Surname.value);
     if (idcr)
     {
-        var url = "/FamilyTree/editEvent.php?idcr=" + idcr +
+        let url = "/FamilyTree/editEvent.php?idcr=" + idcr +
                                 "&type=17" +
                                 "&givenname=" + givenname +
                                 "&surname=" + surname +
@@ -2115,7 +2116,7 @@ function editEventChildr(ev)
             popupAlert("editIndivid.js: editEventChildr: " + url,
                         this);
         }
-        var lang            = 'en';
+        let lang            = 'en';
         if ('lang' in args)
             lang            = args.lang;
         url                 += '&lang=' + lang
@@ -2155,10 +2156,10 @@ function clearEventChildr(ev)
         ev          = window.event;
     ev.stopPropagation();
 
-    var button      = this;
-    var type        = button.id.substring(5);
-    var form        = this.form;
-    var idcr        = form.idcr.value;
+    let button      = this;
+    let type        = button.id.substring(5);
+    let form        = this.form;
+    let idcr        = form.idcr.value;
     if (idcr)
     {
         form.SealingDate.value  = "";
@@ -2169,8 +2170,8 @@ function clearEventChildr(ev)
         {
             // add a field that will cause updatePersonJson.php
             // to clear the location
-            var cell    = form.SealingTemple.parentNode;
-            var idtrfld = document.createElement('input');
+            let cell    = form.SealingTemple.parentNode;
+            let idtrfld = document.createElement('input');
             idtrfld.type    = 'hidden';
             idtrfld.name    = 'IDTRSealing';
             idtrfld.value   = 1;
@@ -2178,7 +2179,7 @@ function clearEventChildr(ev)
         }
 
         // delete associated citations
-        var parms   = {"idcr"   : idcr,
+        let parms   = {"idcr"   : idcr,
                            "type"   : 17};
 
         // invoke script to update Event and return XML result
@@ -2204,7 +2205,7 @@ function clearEventChildr(ev)
 function gotClearedEvent(xmlDoc)
 {
     hideLoading();      // hide the "loading..." popup
-    var topXml  = xmlDoc.documentElement;
+    let topXml  = xmlDoc.documentElement;
     if (topXml && typeof(topXml) == "object" && topXml.nodeName == 'deleted')
     {           // valid response
         // all done
@@ -2254,13 +2255,13 @@ function eventDetail(ev)
     // check for open event frame
     if (windowList.length > 0)
     {           // there are incomplete actions pending
-        var text            = '';
-        var comma           = '';
-        var button          = document.getElementById('Submit');
-        for (var iw = 0; iw < windowList.length; iw++)
+        let text            = '';
+        let comma           = '';
+        let button          = document.getElementById('Submit');
+        for (let iw = 0; iw < windowList.length; iw++)
         {       // loop through open iframes
-            var iwindow     = windowList[iw];
-            var iframe      = iwindow.frameElement;
+            let iwindow     = windowList[iw];
+            let iframe      = iwindow.frameElement;
             if (iframe && iframe.name == "event")
             {
                 text        += comma + iwindow.document.title;
@@ -2276,37 +2277,37 @@ function eventDetail(ev)
         }
     }           // there are incomplete actions pending
 
-    var form        = this.form;
-    var idir        = form.idir.value - 0;
-    var sdElt       = null;
+    let form        = this.form;
+    let idir        = form.idir.value - 0;
+    let sdElt       = null;
     if (idir > 0)
     {           // can edit immediately
-        var rownum      = this.id.substring(11);
-        var ider        = null;
-        var idet        = null;
+        let rownum      = this.id.substring(11);
+        let ider        = null;
+        let idet        = null;
 
-        var eventRow    = this.parentNode;
-        var rowname     = eventRow.id;
-        var givenname   = encodeURIComponent(form.GivenName.value);
-        var surname     = encodeURIComponent(form.Surname.value);
+        let eventRow    = this.parentNode;
+        let rowname     = eventRow.id;
+        let givenname   = encodeURIComponent(form.GivenName.value);
+        let surname     = encodeURIComponent(form.Surname.value);
 
         // URL to invoke editEvent
-        var url = "/FamilyTree/editEvent.php?idir=" + idir +
+        let url = "/FamilyTree/editEvent.php?idir=" + idir +
                             "&givenname=" + givenname +
                             "&surname=" + surname +
                             "&rownum=" + rownum;
         if (debug.toLowerCase() == 'y')
             url     += "&debug=y";
 
-        var children    = eventRow.getElementsByTagName('input');
-        for (var ic = 0; ic < children.length; ic++)
+        let children    = eventRow.getElementsByTagName('input');
+        for (let ic = 0; ic < children.length; ic++)
         {           // loop through children
-            var child       = children[ic];
-            var name        = child.id;
+            let child       = children[ic];
+            let name        = child.id;
             if (name === undefined || name === '')
                 name        = child.name;
-            var namePatt    = /^([a-zA-Z]+)([0-9]*)/;
-            var result      = namePatt.exec(name);
+            let namePatt    = /^([a-zA-Z]+)([0-9]*)/;
+            let result      = namePatt.exec(name);
             if (result)
                 name        = result[1];
 
@@ -2442,7 +2443,7 @@ function eventDetail(ev)
                 }
             }
         }           // event in tblIR
-        var lang            = 'en';
+        let lang            = 'en';
         if ('lang' in args)
             lang            = args.lang;
         url                 += '&lang=' + lang
@@ -2480,14 +2481,14 @@ function eventAdd(ev)
         ev          = window.event;
     ev.stopPropagation();
 
-    var form        = this.form;
-    var idir        = form.idir.value;
+    let form        = this.form;
+    let idir        = form.idir.value;
     if (idir > 0)
     {           // database record already exists
-        var lang            = 'en';
+        let lang            = 'en';
         if ('lang' in args)
             lang            = args.lang;
-        var url             = "/FamilyTree/editEvent.php?ider=0" +
+        let url             = "/FamilyTree/editEvent.php?ider=0" +
                                                     "&idir=" + idir +
                                                     "&rownum=" +
                                                     '&lang=' + lang
@@ -2527,21 +2528,21 @@ function eventDelete(ev)
         ev          = window.event;
     ev.stopPropagation();
 
-    var button          = this;
-    var form            = button.form;
-    var idir            = form.idir.value;
-    var rownum          = button.id.substring(11);
-    var ider            = form.elements['EventIder' + rownum].value;
-    var idet            = form.elements['EventIdet' + rownum].value;
-    var citType         = form.elements['EventCitType' + rownum].value;
-    var row             = button.parentNode;
-    var promptText      = "Are you sure you want to delete this event?";
-    var textElt         = document.getElementById('confirmDeleteEvent');
+    let button          = this;
+    let form            = button.form;
+    let idir            = form.idir.value;
+    let rownum          = button.id.substring(11);
+    let ider            = form.elements['EventIder' + rownum].value;
+    let idet            = form.elements['EventIdet' + rownum].value;
+    let citType         = form.elements['EventCitType' + rownum].value;
+    let row             = button.parentNode;
+    let promptText      = "Are you sure you want to delete this event?";
+    let textElt         = document.getElementById('confirmDeleteEvent');
     if (textElt)
         promptText      = textElt.innerHTML;
     else
         alert("cannot find element 'confirmDeleteEvent'");
-    var parms           = {"type"       : idet,
+    let parms           = {"type"       : idet,
                            "ider"       : ider,
                            "formname"   : form.name,
                            "rownum"     : rownum,
@@ -2574,18 +2575,18 @@ function confirmEventDel(ev)
     ev.stopPropagation();
 
     // get the parameter values hidden in the dialog
-    var form                = this.form;
-    var type                = this.id.substr(12);
-    var ider                = form.elements['IDER' + type].value;
-    var rowname             = form.elements['RowName' + type].value;
-    var rownum              = form.elements['RowNum' + type].value;
+    let form                = this.form;
+    let type                = this.id.substr(12);
+    let ider                = form.elements['IDER' + type].value;
+    let rowname             = form.elements['RowName' + type].value;
+    let rownum              = form.elements['RowNum' + type].value;
     dialogDiv.style.display = 'none';
 
     // action depends upon whether the event is recorded in tblIR or tblER
     if (ider > 0)
     {           // event is in tblER
         // invoke script to delete the record
-        var parms           = { "idime" : ider,
+        let parms           = { "idime" : ider,
                                 "cittype"   : 30,
                                 "rownum"    : rownum,
                                 "rowname"   : rowname};
@@ -2596,22 +2597,22 @@ function confirmEventDel(ev)
                   noDeleteEvent);
 
         // show user a long-running operation is in progress
-        var mainForm    = document.indForm;
-        var mainButton  = mainForm.elements['EventDelete' + rownum];
+        let mainForm    = document.indForm;
+        let mainButton  = mainForm.elements['EventDelete' + rownum];
         popupLoading(mainButton);
     }           // event is in tblER
     else
     {           // event is in tblIR
-        var row = document.getElementById(rowname);
+        let row = document.getElementById(rowname);
         if (row)
         {       // expected standard event row
-            for(var ic = 0; ic < row.childNodes.length; ic++)
+            for(let ic = 0; ic < row.childNodes.length; ic++)
             {       // loop through children
-                var child   = row.childNodes[ic];
+                let child   = row.childNodes[ic];
                 if (child.nodeType == 1 &&
                     child.nodeName.toLowerCase() == 'input')
                 {   // <input> tag
-                    var name    = child.name;
+                    let name    = child.name;
                     if (name.substring(name.length - 4) == 'Date' ||
                         name.substring(name.length - 8) == 'Location')
                         child.value     = '';
@@ -2622,8 +2623,8 @@ function confirmEventDel(ev)
             }       // loop through children
 
             // delete citations for the deleted event
-            var mainForm    = document.getElementById('indForm');
-            var parms       = {'idir'   : mainForm.idir.value,
+            let mainForm    = document.getElementById('indForm');
+            let parms       = {'idir'   : mainForm.idir.value,
                                'type'   : type};
             switch(type)
             {       // act on IDET value
@@ -2671,7 +2672,7 @@ function confirmEventDel(ev)
                               gotDeleteCitations,
                               noDeleteCitations);
 
-                    var cause   = document.createElement("INPUT");
+                    let cause   = document.createElement("INPUT");
                     cause.setAttribute("type",  "hidden");
                     cause.setAttribute("name",  "DeathCause");
                     cause.setAttribute("id",    "DeathCause");
@@ -2699,12 +2700,12 @@ function confirmEventDel(ev)
  ************************************************************************/
 function gotDeleteEvent(xmlDoc)
 {
-    var evtForm = document.evtForm;
-    var root    = xmlDoc.documentElement;
+    let evtForm = document.evtForm;
+    let root    = xmlDoc.documentElement;
     if (root && root.nodeName && root.nodeName == 'deleted')
     {
-        var msglist     = root.getElementsByTagName('msg');
-        var parmslist   = root.getElementsByTagName('parms');
+        let msglist     = root.getElementsByTagName('msg');
+        let parmslist   = root.getElementsByTagName('parms');
         if (msglist.length == 0)
         {
             if (parmslist.length == 0)
@@ -2713,9 +2714,9 @@ function gotDeleteEvent(xmlDoc)
             }           // parms feedback missing
             else
             {           // update DOM to remove displayed row
-                var parms       = getParmsFromXml(parmslist[0]);
-                var parmstr     = '';
-                var comma       = '{';
+                let parms       = getParmsFromXml(parmslist[0]);
+                let parmstr     = '';
+                let comma       = '{';
                 for (key in parms)
                 {
                     parmstr     += comma + key + '=' + parms[key];
@@ -2723,11 +2724,11 @@ function gotDeleteEvent(xmlDoc)
                 }
                 //alert("editIndivid.js: gotDeleteEvent: parms=" +
                 //      parmstr + "}");
-                var rowname = parms.rowname;
+                let rowname = parms.rowname;
                 if (rowname.substring(rowname.length - 3) == 'Row')
                 {       // standard event
-                    var name    = rowname.substring(0, rowname.length - 3);
-                    var dateElt = document.getElementById(name + "Date");
+                    let name    = rowname.substring(0, rowname.length - 3);
+                    let dateElt = document.getElementById(name + "Date");
                     if (dateElt  === null)
                     {
                         console.log("editIndivid.js: 2626 could not find element id='" + name + "Date'");
@@ -2737,7 +2738,7 @@ function gotDeleteEvent(xmlDoc)
                         dateElt.value   = '';
                         dateElt.onchange();
                     }
-                    var locnElt = document.getElementById(name + "Location");
+                    let locnElt = document.getElementById(name + "Location");
                     if (locnElt  === null)
                     {
                         console.log("editIndivid.js: 2636 could not find element id='" + name + "Location'");
@@ -2747,14 +2748,14 @@ function gotDeleteEvent(xmlDoc)
                     locnElt.value   = '';
                     locnElt.onchange();
                     }
-                    var rownum  = parms.rownum;
-                    var iderElt = document.getElementById("EventIder" + rownum);
+                    let rownum  = parms.rownum;
+                    let iderElt = document.getElementById("EventIder" + rownum);
                     iderElt.value   = 0;
                 }       // standard event
                 else
                 {       // row that may be removed from display
-                    var row = document.getElementById(parms.rowname);
-                    var table   = row.parentNode;
+                    let row = document.getElementById(parms.rowname);
+                    let table   = row.parentNode;
                     table.removeChild(row);
                 }       // row that may be removed from display
             }           // update DOM to remove displayed row
@@ -2767,7 +2768,7 @@ function gotDeleteEvent(xmlDoc)
     }
     else
     {       // error
-        var msg = "Error: ";
+        let msg = "Error: ";
         if (root && root.childNodes)
             msg += new XMLSerializer().serializeToString(root)
         else
@@ -2801,13 +2802,13 @@ function noDeleteEvent()
  ************************************************************************/
 function gotDeleteCitations(xmlDoc)
 {
-    var evtForm = document.evtForm;
-    var root    = xmlDoc.documentElement;
+    let evtForm = document.evtForm;
+    let root    = xmlDoc.documentElement;
     if (root && root.nodeName && root.nodeName == 'deleted')
     {
         //alert("gotDeleteCitations: root=" + new XMLSerializer().serializeToString(root));
-        var msglist = root.getElementsByTagName('msg');
-        var parmslist   = root.getElementsByTagName('parms');
+        let msglist = root.getElementsByTagName('msg');
+        let parmslist   = root.getElementsByTagName('parms');
         if (msglist.length > 0)
         {
             console.log("editIndivid.js: 2567: gotDeleteCitations: " +
@@ -2816,7 +2817,7 @@ function gotDeleteCitations(xmlDoc)
     }
     else
     {       // error
-        var msg = "Error: ";
+        let msg = "Error: ";
         if (root && root.childNodes)
             msg += new XMLSerializer().serializeToString(root)
         else
@@ -2849,7 +2850,7 @@ function noDeleteCitations()
  ************************************************************************/
 function dateChanged(ev)
 {
-    var value               = this.value;
+    let value               = this.value;
 
     // add a space anytime a digit is followed by a letter or vice-versa
     value                   = value.replace(/([a-zA-Z])(\d)/g,"$1 $2");
@@ -2870,24 +2871,24 @@ function dateChanged(ev)
     // that have been filled in so far
     if ((this.name == 'BirthDate' || this.name == 'DeathDate') && updateTitle)
     {
-        var form            = this.form;
-        var newName         = '';
-        var givennameElt    = form.GivenName;
+        let form            = this.form;
+        let newName         = '';
+        let givennameElt    = form.GivenName;
         if (givennameElt)
             newName         += givennameElt.value;
-        var surnameElt      = form.Surname;
+        let surnameElt      = form.Surname;
         if (surnameElt)
             newName         += ' ' + surnameElt.value;
         newName             += ' (';
-        var birthElt        = form.BirthDate;
+        let birthElt        = form.BirthDate;
         if (birthElt)
             newName         += birthElt.value;
         newName             += "\u2014";        // m-dash
-        var deathElt        = form.DeathDate;
+        let deathElt        = form.DeathDate;
         if (deathElt)
             newName         += deathElt.value;
         newName             += ')';
-        var titleElement    = document.getElementById('title');
+        let titleElement    = document.getElementById('title');
         titleElement.innerHTML  = titlePrefix + newName;
     }               // update title
 }       // function dateChanged
@@ -2904,16 +2905,16 @@ function dateChanged(ev)
  ************************************************************************/
 function eventChanged(ev)
 {
-    var row         = this.parentNode;
+    let row         = this.parentNode;
     if (row.className != 'row')
         row         = row.parentNode;
-    var inputs      = row.getElementsByTagName('input');
-    var changeElement   = null;
-    var elementids      = '';
-    for(var i = 0; i < inputs.length; i++)
+    let inputs      = row.getElementsByTagName('input');
+    let changeElement   = null;
+    let elementids      = '';
+    for(let i = 0; i < inputs.length; i++)
     {
-        var child           = inputs[i];
-        var id              = child.id;
+        let child           = inputs[i];
+        let id              = child.id;
         elementids          += id + ', ';
         if (id && id.substring(0,12) == 'EventChanged')
             changeElement   = child;
@@ -2939,13 +2940,13 @@ function eventChanged(ev)
  ************************************************************************/
 function eventPrefChanged(ev)
 {
-    var form        = this.form;
-    var name        = this.name;
-    var row         = this.parentNode;
-    var inputs      = this.getElementsByTagName('input');
-    for(var ic = 0; ic < inputs.length; ic++)
+    let form        = this.form;
+    let name        = this.name;
+    let row         = this.parentNode;
+    let inputs      = this.getElementsByTagName('input');
+    for(let ic = 0; ic < inputs.length; ic++)
     {               // loop through all siblings in this row
-        var child   = inputs[ic];
+        let child   = inputs[ic];
         if (child.id && child.id.substring(0,12) == 'EventChanged')
         {           // EventChanged hidden input field
             child.value     = "1";
@@ -2953,33 +2954,33 @@ function eventPrefChanged(ev)
         }           // EventChanged hidden input field
     }               // loop through all siblings in this row
 
-    var namePattern = /^([a-zA-Z$_\[\]]+)([0-9]*)$/;
-    var pieces      = namePattern.exec(name);
+    let namePattern = /^([a-zA-Z$_\[\]]+)([0-9]*)$/;
+    let pieces      = namePattern.exec(name);
     if (pieces === null)
     {
         pieces  = [name, name, ''];
     }
-    var colName     = pieces[1];
-    var rowNum      = pieces[2] - 0;
-    var idet        = idetArray[rowNum];
+    let colName     = pieces[1];
+    let rowNum      = pieces[2] - 0;
+    let idet        = idetArray[rowNum];
 
     // Since this method is only called if the value has changed
     // if the element is now checked then previously it wasn't
     if (this.checked)
     {               // uncheck any other instance that is checked
-        for (var i = 0; i < idetArray.length; i++)
+        for (let i = 0; i < idetArray.length; i++)
         {           // loop through event rows
             if (i != rowNum && idetArray[i] == idet)
             {           // another event row of the same type
-                var prefElt = document.getElementById('EventPref' + i);
+                let prefElt = document.getElementById('EventPref' + i);
                 if (prefElt.checked)
                 {       // element was previously checked
                     prefElt.checked = false;
-                    var row         = prefElt.parentNode;
-                    var inputs      = row.getElementsByTagName('input');
-                    for(var ic = 0; ic < inputs.length; ic++)
+                    let row         = prefElt.parentNode;
+                    let inputs      = row.getElementsByTagName('input');
+                    for(let ic = 0; ic < inputs.length; ic++)
                     {       // loop through all siblings in this row
-                        var child   = inputs[ic];
+                        let child   = inputs[ic];
                         if (child.id &&
                             child.id.substring(0,12) == 'EventChanged')
                         {   // EventChanged hidden input field
@@ -3022,12 +3023,12 @@ function grantAccess(ev)
     ev.stopPropagation();
 
     // open dialog to grant access in right half of window
-    var form    = this.form;
-    var idir    = form.idir.value;
-    var lang            = 'en';
+    let form    = this.form;
+    let idir    = form.idir.value;
+    let lang            = 'en';
     if ('lang' in args)
         lang            = args.lang;
-    var url             = "/FamilyTree/grantIndivid.php?idir=" + idir +
+    let url             = "/FamilyTree/grantIndivid.php?idir=" + idir +
                                                         "&lang=" + lang;
     windowList.push(openFrame("event",
                               url,
@@ -3046,8 +3047,8 @@ function grantAccess(ev)
  ************************************************************************/
 function genderChanged(ev)
 {
-    var form        = this.form;
-    var sex     = this.options[this.selectedIndex].value;
+    let form        = this.form;
+    let sex     = this.options[this.selectedIndex].value;
     switch(sex)
     {       // act on new value of sex
         case '0':
@@ -3087,27 +3088,27 @@ function orderEventsByDate(ev)
         ev          = window.event;
     ev.stopPropagation();
 
-    var button      = this;
+    let button      = this;
     button.disabled = true;     // only permit one sort
-    var form        = button.form;
-    var idir        = form.idir.value;
+    let form        = button.form;
+    let idir        = form.idir.value;
 
     // construct array of event rows
-    var eventBody   = document.getElementById('EventBody');
-    var eventRows   = eventBody.children;
-    var birthSD     = -100000000;
-    var sdElement   = null;
-    var eventSD     = -99999999;
-    var idetElement = null;
-    var idet        = null;
+    let eventBody   = document.getElementById('EventBody');
+    let eventRows   = eventBody.children;
+    let birthSD     = -100000000;
+    let sdElement   = null;
+    let eventSD     = -99999999;
+    let idetElement = null;
+    let idet        = null;
 
     // some events may have a sorted date of -99999999, patch them to
     // one day after the birth, so they will not be sorted before birth
-    for (var ir = 1; ir <= eventRows.length; ir++)
+    for (let ir = 1; ir <= eventRows.length; ir++)
     {
-        var orderElt        = document.getElementById('EventOrder' + ir);
+        let orderElt        = document.getElementById('EventOrder' + ir);
         orderElt.value      = ir - 1;
-        var changedElt      = document.getElementById('EventChanged' + ir);
+        let changedElt      = document.getElementById('EventChanged' + ir);
         changedElt.value    = 1;
     }
 }       // function orderEventsByDate
@@ -3144,20 +3145,20 @@ function compareSortDates(first, second)
 function gotOrder(xmlDoc)
 {
     hideLoading();      // hide the "loading..." popup
-    var evtForm = document.evtForm;
-    var root    = xmlDoc.documentElement;
+    let evtForm = document.evtForm;
+    let root    = xmlDoc.documentElement;
     if (root && root.nodeName == 'ordered')
     {
         refresh();      // refresh the page
     }
     else
     {       // error
-        var msg = "Error: ";
+        let msg = "Error: ";
         if (root)
         {
-            for(var i = 0; i < root.childNodes.length; i++)
+            for(let i = 0; i < root.childNodes.length; i++)
             {       // loop through children
-                var node    = root.childNodes[i];
+                let node    = root.childNodes[i];
                 if (node.nodeValue != null)
                     msg     += node.nodeValue;
             }       // loop through children
@@ -3184,17 +3185,17 @@ function showMore(ev)
         ev              = window.event;
     ev.stopPropagation();
 
-    var form            = this.form;
-    var layoutTable     = document.getElementById('layoutTable');
-    var tableBody       = layoutTable.tBodies[0];
-    var oldRow;                 // existing row to delete
-    var newRow;                 // new row to delete
-    var ie;                     // index through children of a node
-    var cell;                   // cell within a table row
-    var elt             = null; // an HTML Element
+    let form            = this.form;
+    let layoutTable     = document.getElementById('layoutTable');
+    let tableBody       = layoutTable.tBodies[0];
+    let oldRow;                 // existing row to delete
+    let newRow;                 // new row to delete
+    let ie;                     // index through children of a node
+    let cell;                   // cell within a table row
+    let elt             = null; // an HTML Element
 
-    var idir            = form.idir.value;
-    var parms           = {'idir'           : idir,
+    let idir            = form.idir.value;
+    let parms           = {'idir'           : idir,
                            'template'       : '',
                            'userRef'        :
                         document.getElementById('HideUserRef').value,
@@ -3282,18 +3283,18 @@ function editAddress(ev)
         ev          = window.event;
     ev.stopPropagation();
 
-    var form                = this.form;
+    let form                = this.form;
     if (form.idar && form.idar.value.length > 0)
     {   // idar present
-        var idar            = form.idar.value;
-        var given           = encodeURIComponent(form.GivenName.value);
-        var surname         = encodeURIComponent(form.Surname.value);
-        var lang            = 'en';
+        let idar            = form.idar.value;
+        let given           = encodeURIComponent(form.GivenName.value);
+        let surname         = encodeURIComponent(form.Surname.value);
+        let lang            = 'en';
         if ('lang' in args)
             lang            = args.lang;
 
         // open edit dialog for event in right half of window
-        var url;
+        let url;
         if (idar > 0)
             url   = "/FamilyTree/Address.php?idar=" + idar +
                                 "&kind=0" +
@@ -3335,17 +3336,17 @@ function editPictures(ev)
         ev          = window.event;
     ev.stopPropagation();
 
-    var form    = this.form;
+    let form    = this.form;
 
     if (form.idir && form.idir.value > 0)
     {   // idir present in form
-        var idir    = form.idir.value;
-        var lang            = 'en';
+        let idir    = form.idir.value;
+        let lang            = 'en';
         if ('lang' in args)
             lang            = args.lang;
 
         // open edit dialog for event in right half of window
-        var url     = "/FamilyTree/editPictures.php?idir=" + idir +
+        let url     = "/FamilyTree/editPictures.php?idir=" + idir +
                                                     "&idtype=Indiv" +
                                                     "&lang=" + lang;
         windowList.push(openFrame("pictures",
@@ -3374,8 +3375,8 @@ function editPictures(ev)
 function setIdar(newIdar)
 {
     this.idar.value     = newIdar;
-    var button      = document.getElementById('Address');
-    var template    = null;
+    let button      = document.getElementById('Address');
+    let template    = null;
     if (newIdar == 0)
         template    = document.getElementById('AddressAdd');
     else
@@ -3405,10 +3406,10 @@ function delIndivid(ev)
         ev          = window.event;
     ev.stopPropagation();
 
-    var form    = this.form;
+    let form    = this.form;
     if (form.idir && form.idir.value.length > 0)
     {       // idir field present
-        var idir    = form.idir.value;
+        let idir    = form.idir.value;
         if (idir > 0)
             location    = "deleteIndivid.php?idir=" + idir;
         else
@@ -3437,19 +3438,19 @@ function mergeIndivid(ev)
         ev          = window.event;
     ev.stopPropagation();
 
-    var form    = this.form;
+    let form    = this.form;
     if (form.idir && form.idir.value > 0)
     {       // idir field present
-        var idir            = form.idir.value;
+        let idir            = form.idir.value;
         // open merge dialog in right half of window
-        var lang            = 'en';
+        let lang            = 'en';
         if ('lang' in args)
             lang            = args.lang;
-        var url             = "/FamilyTree/mergeIndivid.php?idir=" + idir +
+        let url             = "/FamilyTree/mergeIndivid.php?idir=" + idir +
                                                             "&lang=" + lang;
         if (debug.toLowerCase() == 'y')
             url     += "&Debug=Y";
-        var mwindow = openFrame("mergeFrame",
+        let mwindow = openFrame("mergeFrame",
                                 url,
                                 "right");
     }       // idir field present
@@ -3476,8 +3477,8 @@ function popdownSearch(ev)
         ev          = window.event;
     ev.stopPropagation();
 
-    var form            = this.form;
-    var menu            = document.getElementById("SearchDropdownMenu");
+    let form            = this.form;
+    let menu            = document.getElementById("SearchDropdownMenu");
     if (menu)
     {           // make the menu visible on top of the button
         menu.style.position = "fixed";
@@ -3504,32 +3505,32 @@ function censusSearch(ev)
         ev          = window.event;
     ev.stopPropagation();
 
-    var form            = this.form;
-    var menu            = document.getElementById("SearchDropdownMenu");
+    let form            = this.form;
+    let menu            = document.getElementById("SearchDropdownMenu");
     if (menu)
         menu.style.visibility   = "hidden";
 
-    var yearPatt        = /\d{4}/;
-    var birthDate       = form.BirthDate.value;
-    var birthYear       = '';
-    var rxRes           = yearPatt.exec(birthDate);
+    let yearPatt        = /\d{4}/;
+    let birthDate       = form.BirthDate.value;
+    let birthYear       = '';
+    let rxRes           = yearPatt.exec(birthDate);
     if (rxRes)
         birthYear       = rxRes[0];
-    var givenName       = form.GivenName.value;
+    let givenName       = form.GivenName.value;
     if (givenName.length > 3)
         givenName       = givenName.substring(0,3);
-    var gender          = form.Gender.value;
-    var sex             = '';
+    let gender          = form.Gender.value;
+    let sex             = '';
     if (gender == 0)
         sex             = 'M';
     else
     if (gender == 1)
         sex             = 'F';
-    var lang            = 'en';
+    let lang            = 'en';
     if ('lang' in args)
         lang            = args.lang;
 
-    var searchUrl       =
+    let searchUrl       =
         "/database/CensusResponse.php?Query=&Census=CAALL&Count=20"+
         "&GivenNames=" + encodeURIComponent(givenName) +
         "&Surname=" + encodeURIComponent(form.Surname.value) +
@@ -3540,7 +3541,7 @@ function censusSearch(ev)
         "&lang=" + lang;
 
     // open Ancestry search dialog in right half of window
-    var swindow = openFrame("searchFrame",
+    let swindow = openFrame("searchFrame",
                             searchUrl,
                             "right");
 }       // function censusSearch
@@ -3561,40 +3562,40 @@ function bmdSearch(ev)
         ev          = window.event;
     ev.stopPropagation();
 
-    var form            = this.form;
-    var menu            = document.getElementById("SearchDropdownMenu");
+    let form            = this.form;
+    let menu            = document.getElementById("SearchDropdownMenu");
     if (menu)
         menu.style.visibility   = "hidden";
 
-    var yearPatt        = /\d{4}/;
-    var birthDate       = form.BirthDate.value;
-    var birthYear       = '';
-    var rxRes           = yearPatt.exec(birthDate);
+    let yearPatt        = /\d{4}/;
+    let birthDate       = form.BirthDate.value;
+    let birthYear       = '';
+    let rxRes           = yearPatt.exec(birthDate);
     if (rxRes)
         birthYear       = rxRes[0];
-    var deathDate       = form.DeathDate.value;
-    var deathYear       = '';
-    var rxRes           = yearPatt.exec(deathDate);
+    let deathDate       = form.DeathDate.value;
+    let deathYear       = '';
+    rxRes               = yearPatt.exec(deathDate);
     if (rxRes)
         deathYear       = rxRes[0];
-    var givenName       = form.GivenName.value;
+    let givenName       = form.GivenName.value;
     if (givenName.length > 3)
         givenName       = givenName.substring(0,3);
-    var gender          = form.Gender.value;
-    var sex         = '';
+    let gender          = form.Gender.value;
+    let sex         = '';
     if (gender == 0)
         sex         = 'M';
     else
     if (gender == 1)
         sex         = 'F';
-    var birthPlace      = form.BirthLocation.value;
+    let birthPlace      = form.BirthLocation.value;
     if (birthPlace.length > 6)
         birthPlace      = birthPlace.substring(0,6);
-    var lang            = 'en';
+    let lang            = 'en';
     if ('lang' in args)
         lang            = args.lang;
 
-    var searchUrl       =
+    let searchUrl       =
         "/Canada/BirthRegResponse.php?RegDomain=CAON&Offset=0&Limit=20" +
         "&GivenNames=" + encodeURIComponent(givenName) +
         "&Surname=" + encodeURIComponent(form.Surname.value) +
@@ -3606,7 +3607,7 @@ function bmdSearch(ev)
         "&lang=" + lang;
 
     // open Ancestry search dialog in right half of window
-    var swindow = openFrame("searchFrame",
+    let swindow = openFrame("searchFrame",
                             searchUrl,
                             "right");
 }       // function bmdSearch
@@ -3626,23 +3627,23 @@ function ancestrySearch(ev)
         ev          = window.event;
     ev.stopPropagation();
 
-    var form            = this.form;
-    var menu            = document.getElementById("SearchDropdownMenu");
+    let form            = this.form;
+    let menu            = document.getElementById("SearchDropdownMenu");
     if (menu)
         menu.style.visibility   = "hidden";
 
-    var yearPatt        = /\d{4}/;
-    var birthDate       = form.BirthDate.value;
-    var birthYear       = '';
-    var rxRes           = yearPatt.exec(birthDate);
+    let yearPatt        = /\d{4}/;
+    let birthDate       = form.BirthDate.value;
+    let birthYear       = '';
+    let rxRes           = yearPatt.exec(birthDate);
     if (rxRes)
         birthYear       = rxRes[0];
-    var deathDate       = form.DeathDate.value;
-    var deathYear       = '';
-    var rxRes           = yearPatt.exec(deathDate);
+    let deathDate       = form.DeathDate.value;
+    let deathYear       = '';
+    rxRes               = yearPatt.exec(deathDate);
     if (rxRes)
         deathYear       = rxRes[0];
-    var searchUrl       =
+    let searchUrl       =
         "http://search.ancestry.ca/cgi-bin/sse.dll?gl=ROOT_CATEGORY" +
         "&rank=1" +
         "&new=1" +
@@ -3666,7 +3667,7 @@ function ancestrySearch(ev)
         "&cp=3"
 
     // open Ancestry search dialog in right half of window
-    var swindow = openFrame("searchFrame",
+    let swindow = openFrame("searchFrame",
                             searchUrl,
                             "right");
 }       // function ancestrySearch
@@ -3686,10 +3687,10 @@ function marriageUpdated(idmr, newcount)
 {
     // remove the windowList entry for iframe in which the marriage was
     // displayed
-    for (var iw = 0; iw < windowList.length; iw++)
+    for (let iw = 0; iw < windowList.length; iw++)
     {           // loop through windows
-        var iwindow = windowList[iw];
-        var iframe  = iwindow.frameElement;
+        let iwindow = windowList[iw];
+        let iframe  = iwindow.frameElement;
         if (iframe && iframe.name == "marriages")
         {
             windowList.splice(iw, 1);
@@ -3697,9 +3698,9 @@ function marriageUpdated(idmr, newcount)
         }
     }           // loop through windows
 
-    var form        = this;
-    var button      = document.getElementById('Marriages');
-    var template;
+    let form        = this;
+    let button      = document.getElementById('Marriages');
+    let template;
     if (idmr > 0)
     {           // marriage that was updated
         if (form.IDMRPref)
@@ -3721,8 +3722,8 @@ function marriageUpdated(idmr, newcount)
         button.innerHTML    = template.innerHTML;
 
     // switch between Delete and Merge buttons
-    var deleteButton    = document.getElementById('Delete');
-    var mergeButton = document.getElementById('Merge');
+    let deleteButton    = document.getElementById('Delete');
+    let mergeButton = document.getElementById('Merge');
     if (newcount == 0 &&
         form.parentCount.value == 0)
     {
@@ -3753,8 +3754,8 @@ function marriageUpdated(idmr, newcount)
  ************************************************************************/
 function setIdmrPref(idmr)
 {
-    var form        = this;
-    var prefElt     = form.IDMRPref;
+    let form        = this;
+    let prefElt     = form.IDMRPref;
     if (!prefElt)
     {   // IDMRPref field not present in form
         // add it
@@ -3779,8 +3780,8 @@ function setIdmrPref(idmr)
  ************************************************************************/
 function setParentsPref(idmr)
 {
-    var form        = this;
-    var prefElt     = form.ParentsPref;
+    let form        = this;
+    let prefElt     = form.ParentsPref;
     if (!prefElt)
     {   // ParentsPref field not present in form
         // add it
@@ -3805,14 +3806,14 @@ function setParentsPref(idmr)
  ************************************************************************/
 function getRowNumOf(anElement)
 {
-    for (var next = anElement.parentNode.firstChild;
+    for (let next = anElement.parentNode.firstChild;
          next;
          next = next.nextSibling)
     {
         if (next.nodeName.toLowerCase() == 'input')
         {
-            var namePatt    = /^([a-zA-Z]+)([0-9]+)/;
-            var result      = namePatt.exec(next.name);
+            let namePatt    = /^([a-zA-Z]+)([0-9]+)/;
+            let result      = namePatt.exec(next.name);
             if (result)
             {
                 name        = result[1];
@@ -3848,16 +3849,12 @@ function getRowNumOf(anElement)
  ************************************************************************/
 function eventFeedback(parms)
 {
-    // diagnostic output
-    console.log("editIndivid.js: 3839: eventFeedback: parms=" +
-                JSON.stringify(parms) + "}");
-
     // remove the windowList entry for iframe in which the event was
     // displayed
-    for (var iw = 0; iw < windowList.length; iw++)
+    for (let iw = 0; iw < windowList.length; iw++)
     {           // loop through windows
-        var iwindow                     = windowList[iw];
-        var iframe                      = iwindow.frameElement;
+        let iwindow                     = windowList[iw];
+        let iframe                      = iwindow.frameElement;
         if (iframe && iframe.name == "event")
         {
             windowList.splice(iw, 1);
@@ -3866,19 +3863,19 @@ function eventFeedback(parms)
     }           // loop through windows
 
     // process parameters
-    var form                            = this;
-    var type                            = 0;
-    var preferred                       = 0;
-    var ider                            = 0;
-    var idet                            = 0;
-    var citType                         = 0;
-    var date                            = '';
-    var datesd                          = null;
-    var rownum                          = '';
+    let form                            = this;
+    let type                            = 0;
+    let preferred                       = 0;
+    let ider                            = 0;
+    let idet                            = 0;
+    let citType                         = 0;
+    let date                            = '';
+    let datesd                          = null;
+    let rownum                          = '';
 
-    for (var prop in parms)
+    for (let prop in parms)
     {
-        var value                       = parms[prop];
+        let value                       = parms[prop];
         switch(prop.toLowerCase())
         {
             case 'type':
@@ -3900,16 +3897,17 @@ function eventFeedback(parms)
             }               // ider
 
             case 'etype':
+            case 'idet':
             {
                 idet                    = parseInt(value);
                 break;
-            }               // idet
+            }               // etype
 
             case 'cittype':
             {
                 citType                 = parseInt(value);
                 break;
-            }               // idet
+            }               // cittype
 
             case 'date':
             {
@@ -3944,7 +3942,8 @@ function eventFeedback(parms)
         }                   // act on specific parameter
     }                       // loop through parameters
 
-    // event type is name or notes,recorded in tblIR, not in an event record
+    // event type is name or notes,recorded in tblIR,
+    // not in an Event record
     // and so not displayed in one of the event rows in the dialog
     if (type == STYPE_NAME ||           // 1
         type == STYPE_NOTESGENERAL ||   // 6
@@ -4043,10 +4042,10 @@ function eventFeedback(parms)
         if (rownum === '')
         {       // still not set, add new row
             rownum      = 1;
-            var eventBody               = document.getElementById('EventBody');
-            for(var ic = 0; ic < eventBody.childNodes.length; ic++)
+            let eventBody               = document.getElementById('EventBody');
+            for(let ic = 0; ic < eventBody.childNodes.length; ic++)
             {       // loop through "rows" of event "table"
-                var rowChild            = eventBody.childNodes[ic];
+                let rowChild            = eventBody.childNodes[ic];
                 if (rowChild.nodeName.toLowerCase() == 'div')
                 {       // a "row" of the event "table"
                     rownum++;
@@ -4059,7 +4058,7 @@ function eventFeedback(parms)
     // ensure sort date key is set in event
     if (datesd === null)
     {           // set default date for sort
-        var dateObj                     = new Date(date);
+        let dateObj                     = new Date(date);
         datesd                          = dateObj.getFullYear() * 10000 +
                                           (dateObj.getMonth() + 1) * 100 +
                                            dateObj.getDate();
@@ -4067,8 +4066,8 @@ function eventFeedback(parms)
     }           // set default date for sort
 
     // get a human interpretation of the event type
-    var typeText                        = 'Unknown ' + idet;
-    var eventTextElt            = document.getElementById('EventText' + idet);
+    let typeText                        = 'Unknown ' + idet;
+    let eventTextElt            = document.getElementById('EventText' + idet);
     if (eventTextElt)
     {               // have element from web page
         typeText                        = eventTextElt.innerHTML.trim() + ':';
@@ -4079,8 +4078,8 @@ function eventFeedback(parms)
     // update existing row or create new row
     // the name of the row cannot always be determined from the row number
 
-    var eventButton = document.getElementById('EventDetail' + rownum);
-    var eventRow    = null;
+    let eventButton = document.getElementById('EventDetail' + rownum);
+    let eventRow    = null;
     if (!eventButton)
     {           // add new row
         // find a place to insert the new row after the last event
@@ -4088,17 +4087,17 @@ function eventFeedback(parms)
         // although the current implementation in editIndivid.php
         // always displays the death fact, it is a customizable
         // option to display it only if it is known
-        var table   = document.getElementById("EventBody");
-        var nextRow = null;
+        let table   = document.getElementById("EventBody");
+        let nextRow = null;
 
         searchForPosition:
-        for(var row = table.firstChild; row; row = row.nextSibling)
+        for(let row = table.firstChild; row; row = row.nextSibling)
         {                       // loop through events
             console.log("editIndivid.js: 4083: datesd=" + datesd +
                             ", row=" + row.outerHTML);
             if (row.nodeName.toLowerCase() == 'div')
             {                   // an event
-                for (var elt = row.firstChild; elt; elt = elt.nextSibling)
+                for (let elt = row.firstChild; elt; elt = elt.nextSibling)
                 {               // loop through children of div
                     if (elt.nodeName.toLowerCase() == 'input')
                     {
@@ -4134,46 +4133,46 @@ function eventFeedback(parms)
                 parms.idet          = 0;
             parms.preferredchecked  = '';
             parms.changed           = 0;
-            var type                = eventText[parms.idet];
+            let type                = eventText[parms.idet];
             type.charAt(0).toUpperCase() + type.slice(1)
             parms.type              = type;
 
-            var msg = "{";
-            var comma   = "";
+            let msg = "{";
+            let comma   = "";
             for(key in parms)
             {
                 msg     += comma + key + "='" + parms[key] + "'";
                 comma   = ", ";
             }
             // create and insert the new event into the form
-            var newRow  = createFromTemplate("EventRow$rownum",
+            let newRow  = createFromTemplate("EventRow$rownum",
                                              parms,
                                              null);
-            var elements    = [];
-            var inputs      = newRow.getElementsByTagName('input');
+            let elements    = [];
+            let inputs      = newRow.getElementsByTagName('input');
             for (ii = 0; ii < inputs.length; ii++)
                 elements.push(inputs[ii]);
-            var buttons     = newRow.getElementsByTagName('button');
+            let buttons     = newRow.getElementsByTagName('button');
             for (ib = 0; ib < buttons.length; ib++)
                 elements.push(buttons[ib]);
-            var temp        = {'elements' : elements};  // simulate a form
+            let temp        = {'elements' : elements};  // simulate a form
             activateElements(temp);
 
             if (nextRow)
             {           // insert before next event
                 eventRow    = table.insertBefore(newRow, nextRow);
-                var order   = (parms.order - 0) + 2;
+                let order   = (parms.order - 0) + 2;
 
                 // increment order field of following events
                 while(nextRow)
                 {
                     if (nextRow.nodeName.toLowerCase() == 'div')
                     {       // next row of event section
-                        var children    = nextRow.getElementsByTagName('input');
-                        for (var ic = 0; ic < children.length; ic++)
+                        let children    = nextRow.getElementsByTagName('input');
+                        for (let ic = 0; ic < children.length; ic++)
                         {   // loop through children
-                            var child   = children[ic];
-                            var name    = child.name;
+                            let child   = children[ic];
+                            let name    = child.name;
                             if (name === undefined)
                                 name    = child.id;
                             if (name === undefined)
@@ -4199,27 +4198,27 @@ function eventFeedback(parms)
         eventRow                = eventButton.parentNode;
 
     // identify fields in the row
-    var detailButton            = null;
-    var deleteButton            = null;
-    var dateElt                 = null;
-    var sdElt                   = null;
-    var descnElt                = null;
-    var locationElt             = null;
-    var labelElt                = null;
+    let detailButton            = null;
+    let deleteButton            = null;
+    let dateElt                 = null;
+    let sdElt                   = null;
+    let descnElt                = null;
+    let locationElt             = null;
+    let labelElt                = null;
 
-    var dateTrace               = '';
+    let dateTrace               = '';
     // activate dynamic functionality and update values of
     // fields based upon returned parms
-    var children            = eventRow.getElementsByTagName('input');
-    for (var ic         = 0; ic < children.length; ic++)
+    let children                = eventRow.getElementsByTagName('input');
+    for (let ic = 0; ic < children.length; ic++)
     {               // loop through children
-        var child               = children[ic];
-        var name                = child.id;
+        let child               = children[ic];
+        let name                = child.id;
         if (name === undefined)
             name                = child.name;
-        var id                  = '';
-        var namePatt            = /^([a-zA-Z]+)([0-9]*)/;
-        var result              = namePatt.exec(name);
+        let id                  = '';
+        let namePatt            = /^([a-zA-Z]+)([0-9]*)/;
+        let result              = namePatt.exec(name);
         if (result)
         {
             name                = result[1];
@@ -4233,6 +4232,12 @@ function eventFeedback(parms)
         try {
         switch(name.toLowerCase())
         {           // act on specific fields
+            case 'eventider':
+            {
+                child.value             = ider;
+                break;
+            }
+
             case 'eventdetail':
             {
                 detailButton            = child;
@@ -4274,17 +4279,17 @@ function eventFeedback(parms)
                 }
                 else
                 {
-	                var date        = datePatt.exec(dateElt.value);
-	
-	                if (date === null)
-	                {
-	                    sdElt.value     = -99999999;
-	                }
-	                else
-	                {
-	                    sdElt.value     = (date[0]-0) * 10000 + 615;
-	                    sdElt.defaultvalue  = (date[0]-0) * 10000 + 615;
-	                }
+                    let date        = datePatt.exec(dateElt.value);
+    
+                    if (date === null)
+                    {
+                        sdElt.value     = -99999999;
+                    }
+                    else
+                    {
+                        sdElt.value     = (date[0]-0) * 10000 + 615;
+                        sdElt.defaultvalue  = (date[0]-0) * 10000 + 615;
+                    }
                 }
                 break;
             }
@@ -4623,10 +4628,10 @@ function fldKeyDown(ev)
     {       // browser is not W3C compliant
         ev  =  window.event;    // IE
     }       // browser is not W3C compliant
-    var form    = document.indForm;
+    let form    = document.indForm;
     if (ev.ctrlKey || ev.altKey)
         return true;
-    var code    = ev.keyCode;
+    let code    = ev.keyCode;
     if (ev.key)
         code    = ev.key;
     return this.oldkeydown(ev);     // pass to common handling
@@ -4650,9 +4655,9 @@ function eiKeyDown(ev)
     {           // browser is not W3C compliant
         ev          =  window.event;    // IE
     }           // browser is not W3C compliant
-    var code        = ev.keyCode;
-    var form        = document.indForm;
-    var idir        = form.idir.value;
+    let code        = ev.keyCode;
+    let form        = document.indForm;
+    let idir        = form.idir.value;
 
     // take action based upon code
     if (ev.ctrlKey)
@@ -4695,7 +4700,7 @@ function eiKeyDown(ev)
 
             case LTR_F:
             {       // letter 'F' edit families
-                var marriagesButton   = document.getElementById("Marriages");
+                let marriagesButton   = document.getElementById("Marriages");
                 if (marriagesButton)
                     marriagesButton.click();
                 return false;   // suppress default action
@@ -4727,7 +4732,7 @@ function eiKeyDown(ev)
 
             case LTR_P:
             {       // letter 'P' edit parents
-                var parentsButton   = document.getElementById("Parents");
+                let parentsButton   = document.getElementById("Parents");
                 if (parentsButton)
                     parentsButton.click();
                 return false;   // suppress default action
