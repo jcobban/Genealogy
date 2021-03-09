@@ -34,8 +34,11 @@ use \Iterator;
  *  History:                                                            *
  *      2019/11/23      created.                                        *
  *                      See LegacyHeader.inc for previous history.      *
+ *      2021/03/09      add methods isValid, dump, getErrors            *
+ *                      to match interface for Record                   *
+ *                      remove Exception throw in constructor           *
  *                                                                      *
- *  Copyright &copy; 2019 James A. Cobban                               *
+ *  Copyright &copy; 2021 James A. Cobban                               *
  ************************************************************************/
 
 /************************************************************************
@@ -115,6 +118,14 @@ class FamilyTree implements Iterator
     private $citationIndex    = array();
 
     /********************************************************************
+     *  $this->msg                                                      *
+     *                                                                  *
+     *  Any error messages accumulated by constructor.                  *
+     *  See FamilyTree::getErrors                                       *
+     ********************************************************************/
+    protected   $msg                = '';
+
+    /********************************************************************
      *  function FamilyTree::__construct                                *
      *                                                                  *
      *  Create an instance of FamilyTree                                *
@@ -123,6 +134,7 @@ class FamilyTree implements Iterator
     function __construct()
     {
         global  $debug;
+        global  $warn;
         global  $connection;
 
         // construct the query of the header table
@@ -130,7 +142,7 @@ class FamilyTree implements Iterator
         
         // query the database
         if ($debug)
-            print "<p>$query</p>";
+            $warn           /= "<p>FamilyTree::__construct: $query</p>";
         $stmt               = $connection->query($query);
         if ($stmt)
         {               // success
@@ -143,9 +155,9 @@ class FamilyTree implements Iterator
         }               // success
         else
         {               // error retrieving record row
-            throw new Exception(
-                        "FamilyTree::__construct: '$query' result=" . 
-                        print_r($connection->errorInfo(),true));
+            $this->msg      = "FamilyTree::__construct: '$query' result=" . 
+                                print_r($connection->errorInfo(),true);
+            $this->table    = array();  
         }               // error retrieving record row
     }       // FamilyTree::__construct
 
@@ -287,7 +299,7 @@ class FamilyTree implements Iterator
     }       // FamilyTree::get
 
     /********************************************************************
-     *  function FamilyTree::toXml                                  *
+     *  function FamilyTree::toXml                                      *
      *                                                                  *
      *  Emit the contents of the object as XML.                         *
      *                                                                  *
@@ -360,6 +372,97 @@ class FamilyTree implements Iterator
             print $retval;
         return $retval;
     }       // FamilyTree::toJson
+
+    /********************************************************************
+     *  function FamilyTree::isValid                                    *
+     *                                                                  *
+     *  Get an indication of whether or not the constructor completed   *
+     *  normally.                                                       *
+     *                                                                  *
+     *  Returns:                                                        *
+     *      true        the parameters passed in the constructor        *
+     *                  were valid.                                     *
+     *      false       there was/were an error/errors in the           * 
+     *                  parameters to the constructor.                  *
+     ********************************************************************/
+    function isValid()
+    {
+        return strlen($this->msg) == 0;
+    }       // function FamilyTree::isValid
+
+    /********************************************************************
+     *  function FamilyTree::dump                                       *
+     *                                                                  *
+     *  If debug output is enabled, display a diagnostic dump of the    *
+     *  contents of a database record in the web page.                  *
+     *                                                                  *
+     *  Input:                                                          *
+     *      $label      descriptive identifier for record               *
+     *      $force      if true output even if $debug false             *
+     *                  This is not needed because you can write:       *
+     *                      $warn   = $record->dump();                  *
+     *                                                                  *
+     *  Return:                                                         *
+     *      string containing trace output as HTML                      *
+     ********************************************************************/
+    function dump($label    = null,
+                  $force    = false)
+    {
+        global $debug;
+        global $warn;
+
+        // ensure that there is a label to use for the display
+        if (!is_string($label) || strlen($label) == 0)
+            $label              = 'Family Tree';
+
+        $output                 = '';
+        if (is_array($this->table))
+        {                       // record is initialized
+            $output             .= "<p class='label'>$label</p>\n";
+            $output             .= "<table border='1'>\n";
+            foreach($this->table as $key => $value)
+            {
+                $output         .= "  <tr>\n";
+                $output         .= "    <th class='label'>\n";
+                $output         .= "`$key`";
+                $output         .= "    </th>\n";
+                $output         .= "    <td class='dataleft'>\n";
+                if (is_null($value))
+                    $output     .= 'null';
+                else
+                if (strlen($value) > 100)
+                    $output     .= htmlspecialchars(substr($value, 0, 75) .
+                                    '...' . substr($value, -22));
+                else
+                    $output     .= htmlspecialchars($value);
+                $output         .= "    </td>\n";
+                $output         .= "  </tr>\n";
+            }   // loop through keys
+
+            $output             .= "</table>\n";
+        }                       // record is initialized
+        else
+            $output .= "<p class='message'>record not initialized</p>\n";
+
+        if (($debug || $force))
+            $warn               .= $output;
+        return $output;
+    }       // function FamilyTree::dump
+
+    /********************************************************************
+     *  function FamilyTree::getErrors                                  *
+     *                                                                  *
+     *  Get any errors detected by the constructor.  These errors       *
+     *  prevent updates being applied to the database but are           *
+     *  accumulated as an alternative to throwing an exception.         *
+     *                                                                  *
+     *  Returns:                                                        *
+     *      string containing error messages                            *
+     ********************************************************************/
+    function getErrors()
+    {
+        return $this->msg;
+    }       // function FamilyTree::getErrors
 
     /********************************************************************
      *  function FamilyTree::rewind                                     *
