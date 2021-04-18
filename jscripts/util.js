@@ -221,6 +221,7 @@
  *      2020/12/15      correct handling of parms passed by GET         *
  *      2020/12/26      eliminate duplicate URL parm testing            *
  *      2021/01/12      drop support for IE 9 & 10                      *
+ *      2021/03/30      remove changeDiv                                *
  *                                                                      *
  *  Copyright &copy; 2021 James A. Cobban                               *
  ************************************************************************/
@@ -1042,75 +1043,6 @@ function openSignon()
 }       // function openSignon
 
 /************************************************************************
- *  function changeDiv                                                  *
- *                                                                      *
- *  This method is called when the user selects a new division.         *
- *  It is called by the scripts ReqUpdateXxxxx.js.                      *
- *                                                                      *
- *  Input:                                                              *
- *      divNode         an XML element containing information about     *
- *                      a division as retrieved from the database       *
- *                      table SubDistTable.                             *
- ************************************************************************/
-function changeDiv(divNode)
-{
-    // locate cell to prompt for page number in
-    let tableNode   = getElt(document.distForm, "TABLE");
-    let tbNode      = getElt(tableNode,"TBODY");
-    let trNode      = document.getElementById("pageRow");
-
-    // remove any existing HTML from the table row with id='pageRow'
-    if (trNode)
-    {       // have <tr id='pageRow'>
-        let tdNode      = document.getElementById("pageCell");
-        if (tdNode)
-        {   // have cell containing number of pages
-            // remove previous contents of cell, if any
-            while (tdNode.hasChildNodes())
-                tdNode.removeChild(tdNode.firstChild);
-
-            // add information from database record
-            let pages       = divNode.getAttribute("pages");
-            let page1       = divNode.getAttribute("page1");
-            let bypage      = divNode.getAttribute("bypage");
-
-            if ((pages.length > 0) &&
-                (Number(pages) > 0))
-            {   // explicit number of pages available from database
-                // create selection element to choose page
-                let select  = document.createElement("select");
-                select.name = "Page";
-                select.size = 1;
-                let pageoff = 0;
-                if ((page1.length > 0) &&
-                    (Number(page1) > 0))
-                    pageoff = Number(page1) - bypage;
-
-                // add option element for each page in division
-                for(let i = 1; i <= Number(pages); i++)
-                {   // loop through pages
-                    addOption(select,
-                              i*bypage + pageoff,
-                              i*bypage + pageoff);
-                }   // loop through pages
-
-                tdNode.appendChild(select);
-            }   // explicit number of pages
-            else
-            {   // explicit number of pages not available from database
-                // use simple text input to obtain page number
-                let input   = document.createElement("input");
-                input.type="text";
-                input.name="Page";
-                input.size=2;
-                input.value="1";
-                tdNode.appendChild(input);
-            }   // explicit number of pages not available
-        }   // have cell containing number of pages
-    }       // have row containing number of pages
-}       // function changeDiv
-
-/************************************************************************
  *  function eltMouseOver                                               *
  *                                                                      *
  *  This function is called if the mouse moves over an input element    *
@@ -1289,9 +1221,6 @@ function displayMenu(ev)
  *  This function displays a customized dialog in a popup               *
  *                                                                      *
  *  Input:                                                              *
- *      dialog          an HTML element to modify and make visible.     *
- *                      This is normally a <div> element that is        *
- *                      initially not visible                           *
  *      templateId      identifier of an HTML element that provides the *
  *                      structure and constant strings to be laid       *
  *                      out in the dialog.                              *
@@ -1322,6 +1251,7 @@ function displayDialog(templateId,
     // only one modal dialog at a time is displayed
     if (dialogDiv)
     {               // a dialog balloon is currently displayed
+        console.log('displayDialog: existing dialogDiv=' + dialogDiv.outerHTML);
         dialogDiv.style.display = 'none';   // hide it
         dialogDiv               = null;     // it is no longer displayed
     }               // a dialog balloon is displayed
@@ -1511,7 +1441,10 @@ function hideDialog(ev)
 {
     // no longer displaying the modal dialog popup
     if (dialogDiv)
-        dialogDiv.style.display = 'none';   // hide`
+    {
+        console.log('hideDialog: dialogDiv=' + dialogDiv.outerHTML);
+        dialogDiv.style.display = 'none';   // hide
+    }
     dialogDiv           = null;
     return null;
 }       // function hideDialog
@@ -1568,6 +1501,7 @@ function dialogMouseMove(event)
  *                                                                      *
  *  Input:                                                              *
  *      this    the top element of the dialog                           *
+ *      event   instance of MouseUp Event                               *
  ************************************************************************/
 function dialogMouseUp()
 {
@@ -1583,11 +1517,13 @@ function dialogMouseUp()
  *                                                                      *
  *  Input:                                                              *
  *      this    the top element of the dialog                           *
+ *      event   instance of MouseClick Event                            *
  ************************************************************************/
 function documentOnClick(event)
 {
     if (dialogDiv)
     {       // a dialog balloon is displayed
+        console.log('documentOnClick: dialogDiv=' + dialogDiv.outerHTML);
         dialogDiv.style.display = 'none';
         dialogDiv               = null;
     }       // a dialog balloon is displayed

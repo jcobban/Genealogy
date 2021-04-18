@@ -100,7 +100,7 @@ if (count($_POST) > 0)
     {                   // loop through all update parameters
         $safevalue          = htmlspecialchars($value);
         $parmsText  .= "<tr><th class=\"detlabel\">$key</th>" .
-                         "<td class=\"white left\">$savevalue</td></tr>\n"; 
+                         "<td class=\"white left\">$safevalue</td></tr>\n"; 
         if (preg_match("/^([a-zA-Z_]+)(\d*)$/", $key, $matches))
         {
             $column         = $matches[1];
@@ -150,7 +150,7 @@ if (count($_POST) > 0)
                 else
                 {
                     $warn   .= "<p>CountyMarriagesEdit.php: " . __LINE__ .
-                                " invalid reportno='$savevalue' ignored</p>\n";
+                                " invalid reportno='$safevalue' ignored</p>\n";
                 }
                 break;
             }           // report no
@@ -184,7 +184,7 @@ if (count($_POST) > 0)
                     $getParms   = array('domain'    => $domain,
                                         'volume'    => $volume,
                                         'reportno'  => $reportNo,
-                                        'itemno'    => $itemno,
+                                        'itemno'    => $itemNo,
                                         'role'      => $role);
                     $record     = new CountyMarriage($getParms);
                 }       // a role field in a row of the table

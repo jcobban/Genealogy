@@ -489,6 +489,8 @@ function noTownship()
  ************************************************************************/
 function changeTownship(ev)
 {
+    ev.stopPropagation();
+
     // identify the selected township
     let townshipSelect      = this;
     let theForm             = this.form;
@@ -535,6 +537,7 @@ function changeTownship(ev)
                 case 'BResidence':
                 case 'BBirthPlace':
                 case 'Witness2Res':
+                case 'MResidence':
                 case 'PhysAddr':
                 case 'InfRes':
                 case 'BurPlace':

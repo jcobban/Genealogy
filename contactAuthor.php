@@ -42,6 +42,7 @@ use \Exception;
  *      2019/06/13      support I18N by moving "About :" template       *
  *                      support explicitly sending message to a user    *
  *      2021/01/02      correct XSS vulnerabilities                     *
+ *      2021/04/04      post messages to 'Users' table                  *
  *                                                                      *
  *  Copyright &copy; 2021 James A. Cobban                               *
  ************************************************************************/
@@ -189,7 +190,7 @@ $template->set('EMAIL',         htmlspecialchars($email));
 $template->set('LANG',          $lang);
 $template->set('ABOUT',         htmlspecialchars($about));
 $template->set('TEXT',          htmlspecialchars($text));
-$template->set('TABLENAME',     htmlspecialchars($tableName));
+$template->set('TABLENAME',     'Users');
 $template->set('CONTACTIDS',    $contactIds);
 
 // for registered users the E-Mail address is a private attribute of

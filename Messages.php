@@ -37,9 +37,10 @@ if (isset($_GET) && count($_GET) > 0)
 			                        "<th class='colhead'>value</th></tr>\n";
 	foreach($_GET as $key => $value)
     {	            // loop through all parameters
+        $safevalue          = htmlspecialchars($value);
         $parmsText          .= "<tr><th class='detlabel'>$key</th>" .
                                 "<td class='white left'>" .
-                                htmlspecialchars($value) . "</td></tr>\n"; 
+                                $safevalue . "</td></tr>\n"; 
 	    switch(strtolower($key))
 	    {		    // act on specific parameter
 			case 'lang':
@@ -77,8 +78,22 @@ $template->set('LANG',		    $lang);
 
 // display existing blog entries
 if ($blogCount > 0)
+{
+    $data           = '';
+    $rtext          = $template['blog$blid'];
+    foreach($bloglist as $blog)
+    {
+        $tuser      = new User(array("username" => $blog['bl_username']));
+        $auth       = $tuser['auth'];
+        if ($auth == 'visitor')
+        {
+            $blog['bl_username']    =
+                "<a href=\"mailto:{$tuser['email']}?subject=Family+History+Query\">{$tuser['username']}</a>\n";
+        }
+    }
     $template->updateTag('blog$blid',
                          $bloglist);
+}
 else
 {
     $template['messages']->update(null);

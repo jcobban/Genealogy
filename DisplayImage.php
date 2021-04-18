@@ -82,7 +82,7 @@ if (isset($_GET) && count($_GET) > 0)
 // get the template
 $template           = new FtTemplate("DisplayImage$lang.html", true);
 $template->updateTag('otherStylesheets',    
-                     array('filename'   => '/DisplayImage'));
+    array('filename'   => '/DisplayImage'));
 
 if ($src == '')
 {

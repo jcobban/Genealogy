@@ -88,8 +88,9 @@ use \Templating\Template;
  *      2020/03/13      use FtTemplate::validateLang                    *
  *      2020/05/09      set all fields in parameters to feedbackFunc    *
  *		2020/12/05      correct XSS vulnerabilities                     *
+ *		2021/03/17      handle missing birth event for second Person    *
  *                                                                      *
- *  Copyright &copy; 2020 James A. Cobban                               *
+ *  Copyright &copy; 2021 James A. Cobban                               *
  ************************************************************************/
 require_once __NAMESPACE__ . '/Person.inc';
 require_once __NAMESPACE__ . '/LegacyDate.inc';
@@ -454,14 +455,17 @@ if (strlen($msg) == 0)
     }       // take birth location from first
 
     // copy citations from second birth date
-    $citations  = $oldEvent->getCitations();
-    if (count($citations) > 0)
-    {       // have citations to copy
-        $template->set('BIRTHCITATIONSCOUNT', count($citations));
-        $newEvent->addCitations($citations);
-    }       // have citations to copy
-    else
-        $template['birthCount']->update(null);
+    if ($oldEvent)
+    {
+	    $citations      = $oldEvent->getCitations();
+	    if (count($citations) > 0)
+	    {       // have citations to copy
+	        $template->set('BIRTHCITATIONSCOUNT', count($citations));
+	        $newEvent->addCitations($citations);
+	    }       // have citations to copy
+	    else
+	        $template['birthCount']->update(null);
+    }
     $template->set('BIRTHD',        $newEvent->getDate(9999, $t));
     $template->set('BIRTHLOC',      $newEvent->getLocation()->getName());
 

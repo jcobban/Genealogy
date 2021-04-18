@@ -161,6 +161,7 @@
  *      2021/01/16      use XMLSerializer for diagnostic output         *
  *                      use addEventListener                            *
  *      2021/03/07      use beep to signal button click ignored         *
+ *      2921/03/15      use addCitJSON.php in place of addCitXml.php    *
  *                                                                      *
  *  Copyright &copy; 2021 James A. Cobban                               *
  ************************************************************************/
@@ -1771,7 +1772,7 @@ function createCitation()
 
             // send the request to add a citation to the server requesting
             // an XML response
-            HTTP.post('/FamilyTree/addCitXml.php',
+            HTTP.post('/FamilyTree/addCitJSON.php',
                       parms,
                       gotAddCit,
                       noAddCit);
@@ -1805,59 +1806,72 @@ function createCitation()
 /************************************************************************
  *  function gotAddCit                                                  *
  *                                                                      *
- *  This method is called when the XML file representing                *
+ *  This method is called when the JSON file representing               *
  *  the addition of a Citation is retrieved.                            *
+ *						                                                *
+ *  {						                                            *
+ *    "parms" : {						                                *
+ *      "idime" : "1063353",						                    *
+ *      "type" : "10",						                            *
+ *      "idsr" : "97",						                            *
+ *      "source" : "Birth Register, CA, Ontario",						*
+ *      "page" : "1896-07769",						                    *
+ *      "row" : "0",						                            *
+ *      "formname" : "nameForm"  },						                *
+ *      "sqlcmd1051" : "INSERT INTO tblSX (`idsr`, `idime`, `type`, `srcdetail`, `srcprintdetail`, `srcdettext`, `srcprinttext`, `srcdetnote`, `srcprintnote`, `srcprint`, `srcsurety`, `enteredsd`, `enteredd`, `filingref`, `order`, `used`, `verified`, `content`, `override`, `overridefootnote`, `overridesubsequent`, `overridebibliography`) VALUES(97, 1063353, 10, '1896-07769', 1, '', 1, '', 1, 1, 3, 20210315, 001503202100000000, '', 0, 0, 0, '', '', 1, 1, 1)",
+ *      "citation" : {				                                    *
+ *      	"idsx":	"449426",				                            *
+ *      	"idsr":	97,				                                    *
+ *      	"source":	"Birth Register, CA, Ontario",				    *
+ *      	"idime":	1063353,				                        *
+ *      	"type":	10,				                                    *
+ *      	"typemeans":	"Alternate Name",				            *
+ *      	"reckey":	"IDNX",				                            *
+ *      	"srcdetail":	"1896-07769",				                *
+ *      	"srcprintdetail":	1,				                        *
+ *      	"srcdettext":	"",				                            *
+ *      	"srcprinttext":	1,				                            *
+ *      	"srcdetnote":	"",				                            *
+ *      	"srcprintnote":	1,				                            *
+ *      	"srcprint":	1,				                                *
+ *      	"srcsurety":	3,				                            *
+ *      	"enteredsd":	20210315,				                    *
+ *      	"entereddc":	"001503202100000000",				        *
+ *      	"enteredd":	"15 Mar 2021",				                    *
+ *      	"filingref":	"",				                            *
+ *      	"order":	"0",				                            *
+ *      	"used":	0,				                                    *
+ *      	"verified":	0,				                                *
+ *      	"content":	"",				                                *
+ *      	"override":	"",				                                *
+ *      	"overridefootnote":	1,				                        *
+ *      	"overridesubsequent":	1,				                    *
+ *      	"overridebibliography":	1				                    *
+ *      },				                                                *
+ *      "type" : 10				                                        *
+ *  }				                                                    *
  *                                                                      *
  *  Parameters:                                                         *
- *      xmlDoc  information about the added citation                    *
+ *      jsonDoc  information about the added citation                   *
  ************************************************************************/
-function gotAddCit(xmlDoc)
+function gotAddCit(jsonDoc)
 {
-    let xmlRoot                     = xmlDoc.documentElement;
-    if (xmlRoot)
-    {                           // have XML root
-        if (xmlRoot.nodeName == "addCit")
-        {                       // valid response
-            let msgs                = {};
-            let msgsList            = xmlRoot.getElementsByTagName('msg');
-            if (msgsList.length > 0)
-            {
-                alert("editEvent.js: gotAddCit: xmlRoot=" +
-                      new XMLSerializer().serializeToString(xmlRoot));
-            }
-            let parms               = {};
-            let parmsList           = xmlRoot.getElementsByTagName('parms');
-            let parmsNode           = null;
-            if (parmsList.length > 0)
-            {
-                parmsNode           = parmsList[0];
-                parms               = getParmsFromXml(parmsNode);
-            }
-
-            let rowNum              = parms['row'];
-            let formname            = parms['formname'];
-            let form                = document.forms[formname];
-
-            parms['title']          = '';
-            if (parmsNode)
-            {                   // have parms node
-                let idsrList    = parmsNode.getElementsByTagName('idsr');
-                if (idsrList.length > 0)
-                {               // at least one idsr tag
-                    let idsrNode    = idsrList[0]
-                    let sourceList  = idsrNode.getElementsByTagName('source');
-                    if (sourceList.length > 0)
-                    {           // at least one source tag
-                        parms['title']  = sourceList[0].textContent;
-                    }           // at least one source tag
-                }               // at least one idsr tag
-            }                   // have parms node
-
-            let idsx                = '';
-            let idsxList            = xmlRoot.getElementsByTagName('idsx');
-            if (idsxList.length > 0)
-                idsx                = idsxList[0].textContent;
-            parms['idsx']           = idsx;
+    let msg                         = jsonDoc.msg;
+    if (msg && msg.length > 0)
+    {
+        alert("editEvent.js: gotAddCit: msg='" + msg + "'");
+    }
+    else
+    {
+        let parms                   = jsonDoc.parms;
+        if (parms.formname)
+        {
+		    let rowNum              = parms.row;
+		    let idsr                = parms.idsr;
+		    let sourcename          = parms.source;
+		    let formname            = parms.formname;
+		    let form                = document.forms[formname];
+            let citation            = jsonDoc.citation;
 
             // locate elements in web page to be updated
             let trowName            = 'sourceRow' + rowNum;
@@ -1869,8 +1883,10 @@ function gotAddCit(xmlDoc)
 
                 tbody.removeChild(trow);    // remove temporary row
 
-                if (idsx > 0)
+                if (citation)
                 {               // citation created
+                    let idsx        = citation.idsx;
+                    parms.idsx      = idsx;
                     let newRow      = createFromTemplate('sourceRow$idsx',
                                                          parms,
                                                          null);
@@ -1888,10 +1904,8 @@ function gotAddCit(xmlDoc)
         }                       // valid response
         else                    // unexpected response
             alert("editEvent.js: gotAddCit: " +
-                  "xmlRoot='" + new XMLSerializer().serializeToString(xmlRoot) + "'");
+                  "jsonDoc='" + JSON.stringify(jsonDoc));
     }
-    else
-        alert("editEvent.js: gotAddCit: xmlDoc='" + xmlDoc + "'");
 }       // function gotAddCit
 
 /************************************************************************
@@ -1902,7 +1916,7 @@ function gotAddCit(xmlDoc)
  ************************************************************************/
 function noAddCit()
 {
-    alert("editEvent.js: noAddCit: script addCitXml.php not found on server");
+    alert("editEvent.js: noAddCit: script addCitJSON.php not found on server");
 }       // function noAddCit
 
 /************************************************************************

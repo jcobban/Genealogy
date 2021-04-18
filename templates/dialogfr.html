@@ -13,8 +13,10 @@
  *      2018/11/28      created                                         *
  *      2019/02/08      remove breadcrumbs from footer                  *
  *      2020/02/02      add page menu button to body                    *
+ *      2021/04/09      add popup help for closeDlg button              *
+ *                      change tinyMCE parms                            *
  *									                                    *
- *  Copyright &copy; 2020 James A. Cobban				                *
+ *  Copyright &copy; 2021 James A. Cobban				                *
  **********************************************************************-->
     <meta charset='utf-8'>
     <meta http-equiv='default-style' content='text/css'>
@@ -36,7 +38,6 @@
         language            : '$LANG',
         skin                : 'oxide-dark',
 	    toolbar             : "undo redo | styleselect | bold italic | " 
-	                           + "alignleft aligncenter alignright alignjustify | " 
 	                           + "bullist numlist | link image",
         height              : "170px",
 	    content_css		    : "/styles.css"
@@ -102,5 +103,8 @@
     	</p>
       </form>
     </div>		<!-- id='hideMsgTemplate'-->
+    <div class="balloon" id="HelpcloseDlg">
+      Click on this button to close the dialog.
+    </div>
   </body>
 </html>

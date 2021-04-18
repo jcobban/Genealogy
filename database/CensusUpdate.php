@@ -76,10 +76,11 @@ use \Exception;
  *                      status display                                  *
  *      2020/06/07      update birth location in linked person          *
  *      2020/09/01      support divisions with bypage=2 but even pages  *
- *		2020/10/10      remove field prefix for Pages table             *
+ *      2020/10/10      remove field prefix for Pages table             *
  *      2020/12/05      correct XSS vulnerabilities                     *
+ *      2021/04/04      escape CONTACTSUBJECT                           *
  *                                                                      *
- *  Copyright 2020 James A. Cobban                                      *
+ *  Copyright &copy; 2021 James A. Cobban                               *
  ************************************************************************/
 require_once __NAMESPACE__ . '/CensusLine.inc';
 require_once __NAMESPACE__ . '/Country.inc';
@@ -93,28 +94,28 @@ require_once __NAMESPACE__ . '/common.inc';
 // validate the parameters that identify the specific page to
 // be updated
 
-$cc                     	= 'CA';     // country code
-$countryName            	= 'Canada'; // country
-$censusId               	= '';       // XX9999, XX=countrycode, 9999=year
-$census                 	= null;     // instance of class Census
-$censusYear             	= 0;        // census year as an integer
-$province               	= '';       // used in pre-confed'n censuses
+$cc                         = 'CA';     // country code
+$countryName                = 'Canada'; // country
+$censusId                   = '';       // XX9999, XX=countrycode, 9999=year
+$census                     = null;     // instance of class Census
+$censusYear                 = 0;        // census year as an integer
+$province                   = '';       // used in pre-confed'n censuses
 $domain                     = null;     // instance of class Domain
-$distID                 	= null;     // district number, usually integer
+$distID                     = null;     // district number, usually integer
 $district                   = null;     // instance of class District
 $districtName               = null;     // name of District
-$subDistID              	= null;     // sub-district identifier
-$division               	= '';       // division identifier
+$subDistID                  = null;     // sub-district identifier
+$division                   = '';       // division identifier
 $subDist                    = null;     // instance of class SubDistrict
-$subDistrictName        	= null;     // name of SubDistrict
-$page                   	= 0;        // page number
+$subDistrictName            = null;     // name of SubDistrict
+$page                       = 0;        // page number
 $pageText                   = null;     // page value if invalid
 $nextPage                   = 0;        // next page number
 $prevPage                   = 0;        // previous page number
-$image                  	= '';       // image URL
-$lang                   	= 'en';     // selected language code
-$varcount               	= 0;        // number of parameters passed
-$parms                  	= array();
+$image                      = '';       // image URL
+$lang                       = 'en';     // selected language code
+$varcount                   = 0;        // number of parameters passed
+$parms                      = array();
 
 // loop through the input parameters first to extract the identification
 // of the specific page
@@ -303,12 +304,12 @@ if (!is_null($subDistID))
                                                 'sd_sched'  => '1'));
     if ($subDist->isExisting())
     {
-	    $subDistrictName    = $subDist->get('sd_name');
-	    $pages              = intval($subDist->get('sd_pages'));
-	    $page1              = intval($subDist->get('sd_page1'));
-	    $bypage             = intval($subDist->get('sd_bypage'));
-	    $lastPage           = $page1 + ($pages - 1) * $bypage;
-	    $nextPage           = $page + $bypage;
+        $subDistrictName    = $subDist->get('sd_name');
+        $pages              = intval($subDist->get('sd_pages'));
+        $page1              = intval($subDist->get('sd_page1'));
+        $bypage             = intval($subDist->get('sd_bypage'));
+        $lastPage           = $page1 + ($pages - 1) * $bypage;
+        $nextPage           = $page + $bypage;
         $prevPage           = $page - $bypage;
     }
     else
@@ -352,19 +353,19 @@ else
 if (strlen($msg) == 0)
 {               // no errors in validating page identification
     if ($nextPage > $lastPage)
-        $nextPage           	= 0;    // no next page
+        $nextPage               = 0;    // no next page
     if ($prevPage < $page1)
-        $prevPage           	= 0;    // no previous page
-    $ptparms                	= array('sdid'   => $subDist,
+        $prevPage               = 0;    // no previous page
+    $ptparms                    = array('sdid'   => $subDist,
                                         'page'   => $page);
-    $pageEntry              	= new Page($ptparms);
+    $pageEntry                  = new Page($ptparms);
 
     // loop through all of the field values passed from
     // the input form to apply updates    
-    $count                  	= 0;    // number of individuals inserted
-    $oldrow                 	= '';   // detect change in row number
-    $numParms               	= 0;    // debugging count
-    $record                 	= null; // instance of CensusLine
+    $count                      = 0;    // number of individuals inserted
+    $oldrow                     = '';   // detect change in row number
+    $numParms                   = 0;    // debugging count
+    $record                     = null; // instance of CensusLine
     foreach($_POST as $key => $value)
     {           // loop through all input fields
         $numParms   ++;
@@ -470,18 +471,18 @@ if (strlen($msg) == 0)
     // update the last row on the page
     if ($record)
     {               // have a record
-	    if ($record->isExisting())
-	    {           // updating existing record
-	        if (strtolower($record->get('surname')) == '[delete]')
-	            $record->delete();
-	        else
-	            $record->save(false);   // save changes
-	    }           // updating existing record
-	    else
-	    {           // inserting new record
-	        if (strtolower($record->get('surname')) != '[delete]')
-	            $record->save(false);
-	    }           // inserting new record
+        if ($record->isExisting())
+        {           // updating existing record
+            if (strtolower($record->get('surname')) == '[delete]')
+                $record->delete();
+            else
+                $record->save(false);   // save changes
+        }           // updating existing record
+        else
+        {           // inserting new record
+            if (strtolower($record->get('surname')) != '[delete]')
+                $record->save(false);
+        }           // inserting new record
     }               // have a record
 
     // register the update in the Pages table
@@ -523,7 +524,8 @@ $template->set('PREVPAGE',          $page - $bypage);
 $template->set('NEXTPAGE',          $page + $bypage);
 $template->set('CENSUS',            $censusYear);
 $template->set('CONTACTTABLE',      'Census' . $censusYear);
-$template->set('CONTACTSUBJECT',    '[FamilyTree]' . $_SERVER['REQUEST_URI']);
+$template->set('CONTACTSUBJECT',    '[FamilyTree]' . 
+                                    urlencode($_SERVER['REQUEST_URI']));
 $template->set('IMAGE',             htmlspecialchars($image));
 
 if (strlen($province) == 0)

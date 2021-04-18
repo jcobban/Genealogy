@@ -1315,7 +1315,7 @@ function change()
  *                                                                      *
  *  Input:                                                              *
  *      this        an instance of an HTML input element.               *
- *		ev          instance of 'change' Event                          *
+ *      ev          instance of 'change' Event                          *
  ************************************************************************/
 function dateChanged(ev)
 {
@@ -1340,7 +1340,7 @@ function dateChanged(ev)
  *                                                                      *
  *  Input:                                                              *
  *      this        an instance of an HTML input element.               *
- *		ev          instance of 'change' Event                          *
+ *      ev          instance of 'change' Event                          *
  ************************************************************************/
 function surnameChanged(ev)
 {
@@ -1383,7 +1383,7 @@ function surnameChanged(ev)
  *                                                                      *
  *  Input:                                                              *
  *      this        instance of <input> that invoked this function      *
- *		ev          instance of 'change' Event                          *
+ *      ev          instance of 'change' Event                          *
  ************************************************************************/
 function givenChanged(ev)
 {
@@ -1462,7 +1462,7 @@ function givenChanged(ev)
  *                                                                      *
  *  Input:                                                              *
  *      this        an instance of an HTML <button> element.            *
- *		ev          instance of 'click' Event                           *
+ *      ev          instance of 'click' Event                           *
  ************************************************************************/
 function goToLink(ev)
 {
@@ -1514,8 +1514,9 @@ function checkName()
 function checkProvince()
 {
     var element     = this;
+    let re          = /^[a-zA-Z]{2,3}$/;
     var name        = element.value;
-    setErrorFlag(element, (offset & 1) == 0);
+    setErrorFlag(element, re.test(name));
 }       // function checkProvince
 
 /************************************************************************
@@ -1685,12 +1686,12 @@ function checkDate()
         }
         else
         {
-	        var month       = result[3].toLowerCase();
-	        l2              = month.length;
-	        if (l2 == 0)
-	            mi          = pi;
-	        else
-	            mi          = monTab[month];
+            var month       = result[3].toLowerCase();
+            l2              = month.length;
+            if (l2 == 0)
+                mi          = pi;
+            else
+                mi          = monTab[month];
         }
 
         var sndnum      = result[4];
@@ -2355,7 +2356,7 @@ function tableKeyDown(ev)
             {       // alt-C
                 var correctImage    = document.getElementById('correctImage');
                 if (correctImage)
-                    correctImageUrl();
+                    correctImage.click();
                 ev.preventDefault();
                 return false;
             }       // alt-C
@@ -2458,7 +2459,7 @@ function numericKeyDown(ev)
  *                                                                      *
  *  Input:                                                              *
  *      this        instance of <th>                                    *
- *		ev          instance of 'click' Event                           *
+ *      ev          instance of 'click' Event                           *
  ************************************************************************/
 function columnClick(ev)
 {
@@ -2540,7 +2541,7 @@ function columnClick(ev)
  *                                                                      *
  *  Input:                                                              *
  *      this            instance of <th>                                *
- *		ev              instance of 'click' event                       *
+ *      ev              instance of 'click' event                       *
  ************************************************************************/
 function columnWiden(ev)
 {
@@ -2588,7 +2589,7 @@ function columnWiden(ev)
  *                                                                      *
  *  Parameters:                                                         *
  *      this            element the mouse moved on to                   *
- *		ev              instance of 'mouse' event                       *
+ *      ev              instance of 'mouse' event                       *
  ************************************************************************/
 function linkMouseOver(ev)
 {
@@ -2617,7 +2618,7 @@ function linkMouseOver(ev)
  *                                                                      *
  *  Parameters:                                                         *
  *      this            element the mouse moved on to                   *
- *		ev              instance of 'mouse' event                       *
+ *      ev              instance of 'mouse' event                       *
  ************************************************************************/
 function linkMouseOut(ev)
 {

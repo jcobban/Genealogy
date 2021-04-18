@@ -20,6 +20,7 @@ use \Exception;
  *		2018/11/11		get error message texts from template           *
  *		2021/01/13      correct XSS vulnerabilities                     *
  *		                improve parameter checking                      *
+ *		2021/04/04      escape CONTACTSUBJECT                           *
  *																		*
  *  Copyright &copy; 2021 James A. Cobban								*
  ************************************************************************/
@@ -121,7 +122,8 @@ else
 $template			= new FtTemplate("ConcessionsEdit$action$lang.html");
 
 $template->set('CONTACTTABLE',	'Concessions');
-$template->set('CONTACTSUBJECT','[FamilyTree]' . $_SERVER['REQUEST_URI']);
+$template->set('CONTACTSUBJECT',    '[FamilyTree]' . 
+                                    urlencode($_SERVER['REQUEST_URI']));
 $template->set('LANG',          $lang);
 //$template->set('OFFSET',        $offset);
 //$template->set('LIMIT',         $limit);

@@ -1,195 +1,198 @@
 <!--*********************************************************************
- *	Personde.html														*
- *																		*
- *	Template for a web page containing details of an particular			*
- *	individual from the Legacy table of individuals.					*
- *																		*
- * History:																*
- *		2017/11/13		created		template for popups					*
- *		2018/01/27		extend template to whole body					*
- *	    2019/05/17      correct initialization of Blog form             *
- *	    2019/05/30      use current tinyMCE                             *
- *																		*
- *	Copyright &copy; 2019 James A. Cobban								*
+ *  Personde.html                                                       *
+ *                                                                      *
+ *  Template for a web page containing details of an particular         *
+ *  individual from the Legacy table of individuals.                    *
+ *                                                                      *
+ * History:                                                             *
+ *      2017/11/13      created     template for popups                 *
+ *      2018/01/27      extend template to whole body                   *
+ *      2019/05/17      correct initialization of Blog form             *
+ *      2019/05/30      use current tinyMCE                             *
+ *                                                                      *
+ *  Copyright &copy; 2019 James A. Cobban                               *
  **********************************************************************-->
   <div id="breadcrumbs" class="hidden">
-	<a href="/index.html">Home</a>:
+    <a href="/index.html">Home</a>:
       <a href="/genealogy.php?lang=de">
-				Stammbaumforschung
+                Stammbaumforschung
       </a>:
       <a href="/FamilyTree/Services.php?lang=de">
-				Dienste
+                Dienste
       </a>:
       <a href="/genCountry.php?cc=CA&lang=de">
-				Canada
+                Canada
       </a>:
       <a href="/FamilyTree/nominalIndex.php?name=$NAMEURI&treename=$TREENAME&lang=de">
-				Nomineller Index
+                Nomineller Index
       </a>:
       <a href="/FamilyTree/Surnames.php?initial=$PREFIX&lang=de">
-				Nachnamen, die mit '$ PREFIX' beginnen
+                Nachnamen, die mit '$ PREFIX' beginnen
       </a>:
       <a href="/FamilyTree/Names.php?Surname=$SURNAME&lang=de">
-				Nachname '$SURNAME'
+                Nachname '$SURNAME'
       </a>:
     </div>
     <div class="body">
       <h1>
         <span class="right">
-			  <a href="/FamilyTree/PersonHelpen.html" target="help">? Help</a>
+              <a href="/FamilyTree/PersonHelpen.html" target="help">? Help</a>
         </span>
-			  $TITLE
-			  <span id="inTree">: in tree "$treeName"</span>
+              $TITLE
+              <span id="inTree">: in tree "$treeName"</span>
         <div style="clear: both;"></div>
       </h1>
       $TRACE
       $MSG
       <div id="display">
-			$BODY
+            $BODY
       </div> <!-- id="display" -->
       <p id='wishtosee'>
-	      Wenn Sie die privaten Informationen zu dieser Person sehen möchten
+          Wenn Sie die privaten Informationen zu dieser Person sehen möchten
         <span id='notloggedon'>
-			  <a href='/Register.php' target='_blank'>
-				registrieren sie sich als neuer Benutzer</a> or
-			  <a href='/Signon.php' target='_blank'>
-				melden sie sich als bereits registrierter Benutzer an</a>.
+              <a href='/Register.php' target='_blank'>
+                registrieren sie sich als neuer Benutzer</a> or
+              <a href='/Signon.php' target='_blank'>
+                melden sie sich als bereits registrierter Benutzer an</a>.
         </span>
         <span id='contactOwners'>
-			  <a href='/contactAuthor.php?idir=$IDIR&tableName=tblIR&subject=%5BFamily%20Tree%5D%20Please%20Grant%20Access%20to%20$TITLE%3A%20IDIR%3D$IDIR' target='_blank'>
-				wenden sie sich an die Benutzer, die bereits Zugriff haben
-			  </a>
-				zu verlangen, dass sie Ihnen Zugriff gewähren.
+              <a href='/contactAuthor.php?idir=$IDIR&tableName=tblIR&subject=%5BFamily%20Tree%5D%20Please%20Grant%20Access%20to%20$TITLE%3A%20IDIR%3D$IDIR' target='_blank'>
+                wenden sie sich an die Benutzer, die bereits Zugriff haben
+              </a>
+                zu verlangen, dass sie Ihnen Zugriff gewähren.
         </span>
       </p>
       <form name="actionsForm" id="actionsForm" action="nothing.php" method="post"
-				enctype='multipart/form-data'>
+                enctype='multipart/form-data'>
         <div class="row" id="buttonsRow">
-			  <button type="button" id="showDescTree" accessKey="D">
-					Nachkommenbaum
-			  </button>
-			  &nbsp;
-			  <button type="button" id="showAncTree" accessKey="A">
-			      <u>A</u>hnenbaum
+              <button type="button" id="showDescTree" accessKey="D">
+                    Nachkommenbaum
               </button>
-			  &nbsp;
-			  <button type="button" id="relationshipCalc" accessKey="R">
-				    Beziehungsrechner
+              &nbsp;
+              <button type="button" id="showAncTree" accessKey="A">
+                  <u>A</u>hnenbaum
               </button>
-			  &nbsp;
-			  <button type="button" id="edit" accessKey="E">
-				    Diese Person bearbeiten
-			  </button>
-			  &nbsp;
-			  <button type="button" id="reqgrant" accessKey="I">
-	                Darf <u>i</u>ch diese Person aktualisieren?
-			  </button>
-			  &nbsp;
-			  <a href='/FamilyTree/getPersonSvg.php?idir=$IDIR&lang=de'
-					id="showGraphTree" target="picture" class="button">
-			      <img src='/logobutton.gif' height='25' width='81'
-						alt='James Cobban Logo'>
-			  </a>
+              &nbsp;
+              <button type="button" id="relationshipCalc" accessKey="R">
+                    Beziehungsrechner
+              </button>
+              &nbsp;
+              <button type="button" id="edit" accessKey="E">
+                    Diese Person bearbeiten
+              </button>
+              &nbsp;
+              <button type="button" id="reqgrant" accessKey="I">
+                    Darf <u>i</u>ch diese Person aktualisieren?
+              </button>
+              &nbsp;
+              <a href='/FamilyTree/getPersonSvg.php?idir=$IDIR&lang=de'
+                    id="showGraphTree" target="picture" class="button">
+                  <img src='/logobutton.gif' height='25' width='81'
+                        alt='James Cobban Logo'>
+              </a>
         </div>
         <div id="searchParmsHidden" class="hidden">
-			  <input type="hidden" name="idir" id="idir"
-					value="$IDIR">
-			  <input type="hidden" name="givenname" id="givenname"
-					value="$GIVENNAME">
-			  <input type="hidden" name="surname" id="surname"
-					value="$SURNAME">
-			  <input type="hidden" name="treeName" id="treeName"
-					value="$TREENAME">
-			  <input type="hidden" name="birthDate" id="birthDate"
-					value="$BIRTHDATE">
-			  <input type="hidden" name="birthPlace" id="birthPlace"
-					value="$BIRTHPLACE">
-			  <input type="hidden" name="deathDate" id="deathDate"
-					value="$DEATHDATE">
-			  <input type="hidden" name="deathPlace" id="deathPlace"
-					value="$DEATHPLACE">
-			  <input type="hidden" name="fatherGivenName" id="fatherGivenName"
-					value="$FATHERGIVENNAME">
-			  <input type="hidden" name="fatherSurname" id="fatherSurname"
-					value="$FATHERSURNAME">
-			  <input type="hidden" name="motherGivenName" id="motherGivenName"
-					value="$MOTHERGIVENNAME">
-			  <input type="hidden" name="motherSurname" id="motherSurname"
-					value="$MOTHERSURNAME">
+              <input type="hidden" name="idir" id="idir"
+                    value="$IDIR">
+              <input type="hidden" name="givenname" id="givenname"
+                    value="$GIVENNAME">
+              <input type="hidden" name="surname" id="surname"
+                    value="$SURNAME">
+              <input type="hidden" name="treeName" id="treeName"
+                    value="$TREENAME">
+              <input type="hidden" name="birthDate" id="birthDate"
+                    value="$BIRTHDATE">
+              <input type="hidden" name="birthPlace" id="birthPlace"
+                    value="$BIRTHPLACE">
+              <input type="hidden" name="deathDate" id="deathDate"
+                    value="$DEATHDATE">
+              <input type="hidden" name="deathPlace" id="deathPlace"
+                    value="$DEATHPLACE">
+              <input type="hidden" name="fatherGivenName" id="fatherGivenName"
+                    value="$FATHERGIVENNAME">
+              <input type="hidden" name="fatherSurname" id="fatherSurname"
+                    value="$FATHERSURNAME">
+              <input type="hidden" name="motherGivenName" id="motherGivenName"
+                    value="$MOTHERGIVENNAME">
+              <input type="hidden" name="motherSurname" id="motherSurname"
+                    value="$MOTHERSURNAME">
         </div>
       </form>
       <div class="row" style="width: 100%">
-        <hr>	<!-- start of blog section of page -->
+        <hr>    <!-- start of blog section of page -->
       </div>
       <form name="blogForm" id="blogForm" action="blogIndiv.php" method="post"
-				enctype='multipart/form-data'>
+                enctype='multipart/form-data'>
         <div id="blog$blid">
-			  <p class='label'>
-				  Um $datetime hat user '$username' geschrieben:
-			  </p>
-			  <p>
-			  $text
-			  </p>
-			  <div id="deleteButtons$showButtons"> <!-- $username == $userid -->
-			    <p>
-			      <button type="button" id="blEdit$blid">
-					Nachricht bearbeiten
-			      </button>
-			      <button type="button" id="blDel$blid">
-					Nachricht löschen
-			      </button>
-			    </p>
-			  </div> <!-- $username == $userid -->
+              <p class='label'>
+                  Um $datetime hat user '$username' geschrieben:
+              </p>
+              <p>
+              $text
+              </p>
+              <div id="deleteButtons$showButtons"> <!-- $username == $userid -->
+                <p>
+                  <button type="button" id="blEdit$blid">
+                    Nachricht bearbeiten
+                  </button>
+                  <button type="button" id="blDel$blid">
+                    Nachricht löschen
+                  </button>
+                </p>
+              </div> <!-- $username == $userid -->
         </div> <!-- id="blog$blid" -->
       <input type="hidden" name="userid" id="userid"
-				value="$userid">
+                value="$userid">
       <input type="hidden" name="idir" id="blogidir"
-				value="$idir">
+                value="$idir">
     <p>
       <textarea name="message" id="message" placeholder="[enter message]"
-				rows='5' cols='100'></textarea>
+                rows='5' cols='100'></textarea>
     </p>
     <div class="row" id="blogEmailRow">
       <label class='column1' for='emailAddress'>
-				Deine Emailadresse:
+                Deine Emailadresse:
       </label>
       <input type="text" class="white leftnc"
-					id="emailAddress" name="emailAddress"
-					size="80" value="$EMAIL">
+                    id="emailAddress" name="emailAddress"
+                    size="80" value="$EMAIL">
     </div>
     <div class="row" id="blogPostRow">
       <button type="button" id="PostBlog" accessKey="B">
-			  <u>B</u>log Posten
+              <u>B</u>log Posten
       </button>
     </div>
   </form> <!-- name="blogform" id="blogform" -->
       <div class="row" id="footnotesSection">
-	    <hr class='footnotes'/>
-	    <p class='label'>Fußnoten:</p>
-	    <div id='footnote$key'>
-	      <div class="column1" id="#fn$key">
-			$key
-	      </div>
-			$text
-	      <div style='clear: both;'></div>
-	    </div> <!-- class='footnote$key' -->
+        <hr class='footnotes'/>
+        <p class='label'>Fußnoten:</p>
+        <div id='footnote$key'>
+          <div class="column1" id="#fn$key">
+            $key
+          </div>
+            $text
+          <div style='clear: both;'></div>
+        </div> <!-- class='footnote$key' -->
       </div> <!-- class="row" id="footnotesSection" -->
     </div> <!-- class="body" -->
 
     <div class="hidden" id="messages">
       <span id="missingID">
-	    Fehlender obligatorischer Bezeichnerparameter.
+        Fehlender obligatorischer Bezeichnerparameter.
       </span>
       <span id="notFoundTitle">
-	    Person nicht gefunden
+        Person nicht gefunden
       </span>
       <span id="invisibleTitle">
         Person ist nicht öffentlich sichtbar
       </span>
+      <span id="neverMarried">
+        Dieses Paar war nie verheiratet. 
+      </span>
     </div> <!-- id="messages" -->
 
     <!--*****************************************************************
-	   *  generate popups												*
+     *  generate popups                                                 *
      ******************************************************************-->
     <!-- division within which to display a Google map -->
     <div class="map" id="mapDiv">
@@ -230,20 +233,20 @@
       $notes
       </p>
       <form name='locForm$idlr'>
-	   	  	<input type="hidden" name="searchName" value="$searchName">
-	   	  	<input type="hidden" name="county" value="$county">
-	   	  	<input type="hidden" name="Location" value="$location">
-	   	  	<input type="hidden" name="Latitude" value="$latitude">
-	   	  	<input type="hidden" name="Longitude" value="$longitude">
-	   	  	<input type="hidden" name="Zoom" value="$zoom">
-	   	  	<input type="hidden" name="Boundary" value="$boundary">
-	   	  	<button type="button" id="showMap$idlr" class="button">
-	   	  		  Karte anzeigen
-	   	  	</button>
-	   	  	&nbsp;
-	   	  	<button type="button" id="editLoc$idlr" class="button">
-	   	  		  Standort bearbeiten
-	   	  	</button>
+            <input type="hidden" name="searchName" value="$searchName">
+            <input type="hidden" name="county" value="$county">
+            <input type="hidden" name="Location" value="$location">
+            <input type="hidden" name="Latitude" value="$latitude">
+            <input type="hidden" name="Longitude" value="$longitude">
+            <input type="hidden" name="Zoom" value="$zoom">
+            <input type="hidden" name="Boundary" value="$boundary">
+            <button type="button" id="showMap$idlr" class="button">
+                  Karte anzeigen
+            </button>
+            &nbsp;
+            <button type="button" id="editLoc$idlr" class="button">
+                  Standort bearbeiten
+            </button>
       </form>
     </div>
   
@@ -253,12 +256,12 @@
       $notes
       </p>
       <form name='tplForm$idtr'>
-	   	  	<input type="hidden" name="Location" value="$temple">
-	   	  	<input type="hidden" name="Latitude" value="$latitude">
-	   	  	<input type="hidden" name="Longitude" value="$longitude">
-	   	  	<button type="button" id="tshowMap$idtr" class="button">
-	   	  		  Karte anzeigen
-	   	  	</button>
+            <input type="hidden" name="Location" value="$temple">
+            <input type="hidden" name="Latitude" value="$latitude">
+            <input type="hidden" name="Longitude" value="$longitude">
+            <button type="button" id="tshowMap$idtr" class="button">
+                  Karte anzeigen
+            </button>
       </form>
     </div> <!-- end of id=showTplDiv$idtr -->
   
@@ -268,92 +271,175 @@
       $notes
       </p>
       <form name='adrForm$idar'>
-	   	  	<input type="hidden" name="Location" value="$address">
-	   	  	<input type="hidden" name="Latitude" value="$latitude">
-	   	  	<input type="hidden" name="Longitude" value="$longitude">
-	   	  	<button type="button" id="ashowMap$idar" class="button">
-	   	  		  Show Map
-	   	  	</button>
+            <input type="hidden" name="Location" value="$address">
+            <input type="hidden" name="Latitude" value="$latitude">
+            <input type="hidden" name="Longitude" value="$longitude">
+            <button type="button" id="ashowMap$idar" class="button">
+                  Show Map
+            </button>
       </form>
     </div> <!-- end of id=showAdrDiv$idar -->
     $DEATHCAUSES
+
+    <!--*****************************************************************
+     *  'eventStmt'                                                     *
+     *                                                                  *
+     *  This table provides a translation from an event type to the     *
+     *  sentence to display to the user in the anecdotal text.          *
+     ******************************************************************-->
+    <div id="eventStmt" class="hidden">
+      <span data-key="1">$Pronoun $Description $onDate $atLocation.$Citations $Notes</span>
+      <span data-key="2">$Pronoun wurde adoptiert $onDate $atLocation von $Description.$Citations $Notes</span>
+      <span data-key="3">$Pronoun wurde geboren $Description $onDate $atLocation.$Citations $Notes</span>
+      <span data-key="4">$Pronoun wurde begraben $Description $onDate $atLocation.$Citations $Notes</span>
+      <span data-key="5">$Pronoun wurde getauft $Description $onDate $atLocation.$Citations $Notes</span>
+      <span data-key="6">$Pronoun starb $onDate $Description $atLocation.$Citations $Notes</span>
+      <span data-key="7">$Pronoun hatte eine Ehe annulliert $Description, $onDate $atLocation.$Citations $Notes</span>
+      <span data-key="8">$Pronoun wurde getauft $Description $onDate $atLocation.$Citations $Notes</span>
+      <span data-key="9">He celebrated his bar mitzvah $Description $onDate $atLocation.$Citations $Notes</span>
+      <span data-key="10">She celebrated her bas mitzvah $Description $onDate $atLocation.$Citations $Notes</span>
+      <span data-key="11">$Pronoun was blessed $Description $onDate $atLocation.$Citations $Notes</span>
+      <span data-key="12">$Pronoun appeared on the $Description Volkszählung von $onDate $atLocation.$Citations $Notes</span>
+      <span data-key="13">$Pronoun was circumcised $Description $onDate $atLocation.$Citations $Notes</span>
+      <span data-key="14">$Pronoun wurde $Description Staatsbürger $onDate $atLocation.$Citations $Notes</span>
+      <span data-key="15">$Pronoun was confirmed $Description $onDate $atLocation.$Citations $Notes</span>
+      <span data-key="16">$Pronoun was confirmed in The Church of Jesus Christ of Latter-day Saints $Description $onDate $atLocation.$Citations $Notes</span>
+      <span data-key="17">$Pronoun was involved in a court case about $Description $onDate $atLocation.$Citations $Notes</span>
+      <span data-key="18">$Pronoun wurde eingeäschert $Description $onDate $atLocation.$Citations $Notes</span>
+      <span data-key="19">$Pronoun received a degree of $Description $onDate $atLocation.$Citations $Notes</span>
+      <span data-key="20">$Pronoun wurden geschieden $Description $onDate $atLocation.$Citations $Notes</span>
+      <span data-key="21">$Pronoun reichten die Scheidung ein $Description $onDate $atLocation.$Citations $Notes</span>
+      <span data-key="22">$Pronoun wurde an erziehen $Description $onDate $atLocation.$Citations $Notes</span>
+      <span data-key="23">$Pronoun wanderte aus $Description $onDate $atLocation aus.$Citations $Notes</span>
+      <span data-key="24">$Pronoun war angestellt als $Description $onDate $atLocation.$Citations $Notes</span>
+      <span data-key="25">$Pronoun waren verlob $Description $onDate $atLocation.$Citations $Notes</span>
+      <span data-key="26">$Pronoun received First Holy Communion $Description $onDate $atLocation.$Citations $Notes</span>
+      <span data-key="27">$Pronoun machte seinen Abschluss in $Description $onDate $atLocation.$Citations $Notes</span>
+      <span data-key="28">$Pronoun enjoyed $Description $onDate $atLocation.$Citations $Notes</span>
+      <span data-key="29">$Pronoun was honoured for $Description $onDate $atLocation.$Citations $Notes</span>
+      <span data-key="30">$Pronoun was in the hospital for $Description $onDate $atLocation.$Citations $Notes</span>
+      <span data-key="31">$Pronoun was ill with $Description $onDate $atLocation.$Citations $Notes</span>
+      <span data-key="32">$Pronoun wanderte $Description $onDate nach aus $atLocation.$Citations $Notes</span>
+      <span data-key="33">$Pronoun was interviewed $Description $onDate $atLocation.$Citations $Notes</span>
+      <span data-key="34">$Pronoun $Description land $onDate $atLocation.$Citations $Notes</span>
+      <span data-key="35">$Pronoun veröffentlichten Heiratsverbote $Description $onDate $atLocation.$Citations $Notes</span>
+      <span data-key="36">$Pronoun unterzeichneten einen Ehevertrag $Description $onDate $atLocation.$Citations $Notes</span>
+      <span data-key="37">$They erhielten eine Heiratsurkunde $Description $onDate $atLocation.$Citations $Notes</span>
+      <span data-key="38">$Pronoun published an intent to marry $Description $onDate $atLocation.$Citations $Notes</span>
+      <span data-key="39">$Pronoun obtained a marriage settlement $Description $onDate $atLocation.$Citations $Notes</span>
+      <span data-key="40">$Pronoun received medical attention for $Description $onDate $atLocation.$Citations $Notes</span>
+      <span data-key="41">$Pronoun was a member of $Description $onDate $atLocation.$Citations $Notes</span>
+      <span data-key="42">$Pronoun served in the military $Description $onDate $atLocation.$Citations $Notes</span>
+      <span data-key="43">$Pronoun served a mission $Description $onDate $atLocation.$Citations $Notes</span>
+      <span data-key="44">$Pronoun was named after $Description $onDate $atLocation.$Citations $Notes</span>
+      <span data-key="45">$Pronoun was naturalized $Description $onDate $atLocation.$Citations $Notes</span>
+      <span data-key="46">$Pronoun obituary was published in the $Description $onDate $atLocation.$Citations $Notes</span>
+      <span data-key="47">$Pronoun arbeitete als $Description $onDate $atLocation.$Citations $Notes</span>
+      <span data-key="48">$Pronoun had the LDS ordinance $Description $onDate $atLocation.$Citations $Notes</span>
+      <span data-key="49">$Pronoun was ordained a $Description $onDate $atLocation.$Citations $Notes</span>
+      <span data-key="50">$Pronoun was described as $Description $onDate $atLocation.$Citations $Notes</span>
+      <span data-key="51">$Pronoun had an estate probated $Description $onDate $atLocation.$Citations $Notes</span>
+      <span data-key="52">$Pronoun $Description property $onDate $atLocation.$Citations $Notes</span>
+      <span data-key="53">$Pronoun belonged to the $Description faith $onDate $atLocation.$Citations $Notes</span>
+      <span data-key="54">$Pronoun hat $Description $onDate $atLocation gelebt.$Citations $Notes</span>
+      <span data-key="55">$Pronoun retired $Description $onDate $atLocation.$Citations $Notes</span>
+      <span data-key="56">$Pronoun attended school at $Description $onDate $atLocation.$Citations $Notes</span>
+      <span data-key="57">$Pronoun was assigned US Social Security Number $Description $onDate $atLocation.$Citations $Notes</span>
+      <span data-key="58">$Pronoun signed a will $Description $onDate $atLocation.$Citations $Notes</span>
+      <span data-key="59">$Pronoun had a medical condition of $Description, $onDate, $atLocation.$Citations $Notes</span>
+      <span data-key="60">$Pronoun served in the military: $Description, $onDate, $atLocation.$Citations $Notes</span>
+      <span data-key="61">$Pronoun had a photo taken $Description $onDate $atLocation.$Citations $Notes</span>
+      <span data-key="62">$Pronoun was assigned US Social Security Number $Description $onDate $atLocation.$Citations $Notes</span>
+      <span data-key="63">$Pronoun had another occupation as $Description $onDate $atLocation.$Citations $Notes</span>
+      <span data-key="64">$Pronoun was $Description $onDate $atLocation.$Citations $Notes</span>
+      <span data-key="65">$Pronoun belongs to family group $Description $onDate $atLocation.$Citations $Notes</span>
+      <span data-key="66">$Pronoun identified $reflexivePronoun as $Description $onDate $atLocation.$Citations $Notes</span>
+      <span data-key="67">$Pronoun funeral was held $Description $onDate $atLocation.$Citations $Notes</span>
+      <span data-key="68">$Pronoun was elected as $Description $onDate $atLocation.$Citations $Notes</span>
+      <span data-key="69">$Pronoun were married $Description $onDate and $atLocation.$Citations $Notes</span>
+      <span data-key="70">Marriage event $Description $onDate $atLocation.$Citations $Notes</span>
+      <span data-key="71">$possesivePronoun birth was registered $Description $onDate $atLocation.$Citations $Notes</span>
+      <span data-key="72">$possesivePronoun death was registered $Description $onDate $atLocation.$Citations $Notes</span>
+      <span data-key="73">Their marriage was registered $Description $onDate $atLocation.$Citations $Notes</span>
+      <span data-key="2000">$Pronoun was born $onDate $atLocation.$Citations $Notes</span>
+      <span data-key="3000">$Pronoun was christened $onDate $atLocation.$Citations $Notes</span>
+      <span data-key="4000">$Pronoun died $onDate $atLocation.$Citations $Notes</span>
+      <span data-key="5000">$Pronoun was buried $onDate $atLocation.$Citations $Notes</span>
+      <span data-key="5001">$Pronoun was cremated $onDate $atLocation.$Citations $Notes</span>
+      <span data-key="15000">$Pronoun received LDS Baptism $onDate $atLocation.$Citations $Notes</span>
+      <span data-key="16000">$Pronoun received LDS Endowment $onDate $atLocation.$Citations $Notes</span>
+      <span data-key="26000">$Pronoun received LDS Confirmation $onDate $atLocation.$Citations $Notes</span>
+      <span data-key="27000">$Pronoun received LDS Initiatory $onDate $atLocation.$Citations $Notes</span>
+    </div>
   
     <!-- the remaining portion of the page is divisions containing popup help -->
     <div class="balloon" id="HelpshowDescTree">
-	    Klicken Sie auf diese Schaltfläche, um eine Übersicht über die Nachkommen 
-	    dieser Person anzuzeigen.    
-	    Die Anwendung unterstützt auch die Tastenkombination Alt-D.
+        Klicken Sie auf diese Schaltfläche, um eine Übersicht über die Nachkommen 
+        dieser Person anzuzeigen.    
+        Die Anwendung unterstützt auch die Tastenkombination Alt-D.
     </div>
     <div class="balloon" id="HelpshowAncTree">
-		Click on this button to see a summary tree of the ancestors of this individual.
-		The application also supports the keyboard shortcut Alt-A.
-	</div>
-	<div class="balloon" id="HelprelationshipCalc">
-		Click on this button to display a dialog to calculate the degree of
-		relationship between the current individual and another individual in the
-		family tree.
-		The application also supports the keyboard shortcut Alt-R.
-	</div>
-	<div class="balloon" id="HelpancestrySearch">
-		Click on this button to split the screen horizontally between the display
-		of the individual page and the results of a search of the Ancestry.ca
-		database for document records with a similar name, birth date, birth place,
-		and parents names.
-		The application also supports the keyboard shortcut Alt-S.
-	</div>
-	<div class="balloon" id="HelpshowGraphTree">
-		Click on this button to see a graphical family tree centered on this
-		individual.
-	</div>
-	<div class="balloon" id="Helpedit">
-		Click on this button to edit the information recorded for this individual.
-		The application also supports the keyboard shortcut Alt-E.
-	</div>
-	<div class="balloon" id="Helpmessage">
-		This field is used to edit a message to be posted as a blog entry against
-		this individual.
-	</div>
-	<div class="balloon" id="HelpemailAddress">
-		If you are not signed in as a registered contributor to the web-site you
-		are required to supply an e-mail address to identify the source of any
-		blog messages you post.
-	</div>
-	<div class="balloon" id="HelpPostBlog">
-		Click on this button to post the message you have typed as a blog entry
-		against this individual.
-		The application also supports the keyboard shortcut Alt-B.
-	</div>
-	<div class="balloon" id="HelpblEdit">
-		Click on this button to edit the text of the message immediately above
-		the button, which is a message that you posted.
-	</div>
-	<div class="balloon" id="HelpblDel">
-		Click on this button to delete the message immediately above
-		the button, which is a message that you posted.
-	</div>
-	<div class="balloon" id="Helpreqgrant">
-		Click on this button to request permission to update the current individual,
-		and the current individual's ancestors and descendants.
-	</div>
-	<div class="balloon" id="HelpshowMap">
-		Click on this button to display a popup map of the location.
-	</div>
-	<div class="balloon" id="HelpeditLoc">
-		Click on this button to open a dialog to edit the information recorded about
-		a location.  This can include changing the name of the location,
-		although this will not be y reflected in the description
-		of this individual until the page is refreshed.
-		</div>
-	<script src="/jscripts/tinymce/js/tinymce/tinymce.js" type="application/javascript">
-	</script>
-	<script src="/jscripts/js20/http.js" type="application/javascript">
-	</script>
-	<script src="/jscripts/util.js" type="application/javascript">
-	</script>
-	<script src="/jscripts/CommonForm.js" type="application/javascript">
-	</script>
-	<script src="/jscripts/Cookie.js" type="application/javascript">
-	</script>
-	<script src="/FamilyTree/Person.js" type="application/javascript">
-	</script>
-	<script async defer src="https://maps.googleapis.com/maps/api/js?v=3.43&callback=initializeMaps&region=$GOOGLECC&key=$GOOGLEKEY" type="application/javascript"></script>
+        Click on this button to see a summary tree of the ancestors of this individual.
+        The application also supports the keyboard shortcut Alt-A.
+    </div>
+    <div class="balloon" id="HelprelationshipCalc">
+        Click on this button to display a dialog to calculate the degree of
+        relationship between the current individual and another individual in the
+        family tree.
+        The application also supports the keyboard shortcut Alt-R.
+    </div>
+    <div class="balloon" id="HelpancestrySearch">
+        Click on this button to split the screen horizontally between the display
+        of the individual page and the results of a search of the Ancestry.ca
+        database for document records with a similar name, birth date, birth place,
+        and parents names.
+        The application also supports the keyboard shortcut Alt-S.
+    </div>
+    <div class="balloon" id="HelpshowGraphTree">
+        Click on this button to see a graphical family tree centered on this
+        individual.
+    </div>
+    <div class="balloon" id="Helpedit">
+        Click on this button to edit the information recorded for this individual.
+        The application also supports the keyboard shortcut Alt-E.
+    </div>
+    <div class="balloon" id="Helpmessage">
+        This field is used to edit a message to be posted as a blog entry against
+        this individual.
+    </div>
+    <div class="balloon" id="HelpemailAddress">
+        If you are not signed in as a registered contributor to the web-site you
+        are required to supply an e-mail address to identify the source of any
+        blog messages you post.
+    </div>
+    <div class="balloon" id="HelpPostBlog">
+        Click on this button to post the message you have typed as a blog entry
+        against this individual.
+        The application also supports the keyboard shortcut Alt-B.
+    </div>
+    <div class="balloon" id="HelpblEdit">
+        Click on this button to edit the text of the message immediately above
+        the button, which is a message that you posted.
+    </div>
+    <div class="balloon" id="HelpblDel">
+        Click on this button to delete the message immediately above
+        the button, which is a message that you posted.
+    </div>
+    <div class="balloon" id="Helpreqgrant">
+        Click on this button to request permission to update the current individual,
+        and the current individual's ancestors and descendants.
+    </div>
+    <div class="balloon" id="HelpshowMap">
+        Click on this button to display a popup map of the location.
+    </div>
+    <div class="balloon" id="HelpeditLoc">
+        Click on this button to open a dialog to edit the information recorded about
+        a location.  This can include changing the name of the location,
+        although this will not be y reflected in the description
+        of this individual until the page is refreshed.
+        </div>
+    <script src="/jscripts/tinymce/js/tinymce/tinymce.js" type="application/javascript">
+    </script>
+    <script src="/FamilyTree/Person.js" type="module">
+    </script>
+    <script defer src="https://maps.googleapis.com/maps/api/js?v=3.43&callback=initializeMaps&region=$GOOGLECC&key=$GOOGLEKEY" type="application/javascript"></script>

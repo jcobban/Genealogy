@@ -66,8 +66,9 @@ use \Exception;
  *		2020/03/13      use FtTemplate::validateLang                    *
  *		2020/12/01      validate all parameters                         *
  *		                eliminate XSS vulnerabilities                   *
+ *		2021/04/04      escape CONTACTSUBJECT                           *
  *																		*
- *  Copyright &copy; 2020 James A. Cobban								*
+ *  Copyright &copy; 2021 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/Domain.inc';
 require_once __NAMESPACE__ . '/Census.inc';
@@ -489,7 +490,8 @@ else
 $template->set('CELLSPACING',		$cellspacing);
 
 $template->set('CONTACTTABLE',		'Census' . $censusYear);
-$template->set('CONTACTSUBJECT',	'[FamilyTree]' . $_SERVER['REQUEST_URI']);
+$template->set('CONTACTSUBJECT',    '[FamilyTree]' . 
+                                    urlencode($_SERVER['REQUEST_URI']));
 $template->set('LANG',			    $lang);
 
 $template->display();

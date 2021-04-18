@@ -393,7 +393,8 @@ if (is_string($countyCode))
 }                       // get set of Townships after update
 
 $template->set('CONTACTTABLE',      'Counties');
-$template->set('CONTACTSUBJECT',    '[FamilyTree]' . $_SERVER['REQUEST_URI']);
+$template->set('CONTACTSUBJECT',    '[FamilyTree]' . 
+                                    urlencode($_SERVER['REQUEST_URI']));
 $template->set('CC',                $cc);
 $template->set('COUNTRYNAME',       $countryName);
 $template->set('DOMAIN',            $domainCode);

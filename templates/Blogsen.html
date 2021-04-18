@@ -1,20 +1,21 @@
 <!--*********************************************************************
- *  Blogsen.html														*
- *																		*
- *  English language template for the Blogs management page				*
- *																		*
- *  History:															*
- *		2018/09/15		Created											*
- *																		*
- *  Copyright &copy; 2018 James A. Cobban								*
+ *  Blogsen.html                                                        *
+ *                                                                      *
+ *  English language template for the Blogs management page             *
+ *                                                                      *
+ *  History:                                                            *
+ *      2018/09/15      Created                                         *
+ *      2021/04/09      migrate to ES2015                               *
+ *                                                                      *
+ *  Copyright &copy; 2021 James A. Cobban                               *
  **********************************************************************-->
   <div id="breadcrumbs" class="hidden">
     <a href="/index.html">Home</a>:
-  </div>	
+  </div>    
   <div class="body">
     <h1 class="clear">Blogs Management
       <span class="right">
-		<a href="/BlogsHelpen.html" target="help">?&nbsp;Help</a>
+        <a href="/BlogsHelpen.html" target="help">?&nbsp;Help</a>
       </span>
     </h1>
     $TRACE
@@ -22,17 +23,13 @@
   <h2>Messages:</h2>
     <div id="blog$blid">
       <p class="label">
-		On $day $month $year at $time user '$username' 
-		wrote: <a href="BlogPost.php?table=Blogs&blogid=$blid">$blogname</a>
+        On $day $month $year at $time user '$username' 
+        wrote: <a href="BlogPost.php?table=Blogs&blogid=$blid">$blogname</a>
       </p>
     </div>
     <h2>
-		<a href="BlogPost.php?table=Blogs&blogid=0">New Post</a>
+        <a href="BlogPost.php?table=Blogs&blogid=0">New Post</a>
     </h2>
    </div>
-    <script src="/jscripts/util.js" type="text/javaScript">
-    </script>
-    <script src="/jscripts/js20/http.js" type="text/javaScript">
-    </script>
-    <script src="/Blogs.js" type="text/javaScript">
+    <script src="/jscripts6/util.js" type="module">
     </script>

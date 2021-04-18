@@ -230,7 +230,7 @@ function censusCitation($year, $page, $idir, $type)
     	// the individual may be identified in the census by
     	// birth name, married name, or other alternate name
 
-    	print "\"alt\" : {\n";
+    	print ",\n    \"alt\" : {\n";
     	$nameparms	    = array('idir' => $idir);
     	$namerecs	    = new RecordSet('Names', $nameparms);
 
@@ -266,7 +266,7 @@ function censusCitation($year, $page, $idir, $type)
     	    $or		    = ' OR ';
             $birthYear	= floor($birthsd/10000);
     	}	                // loop through matching names
-    	print "},\n";
+    	print "}";
 
     	if (strlen($whereName) > 0)
     	{	                // have at least one name to check
@@ -302,26 +302,27 @@ function censusCitation($year, $page, $idir, $type)
     	    {	            // select succeeded
     			$sresult	= $stmt->fetchAll(PDO::FETCH_ASSOC);
     			$count		= count($sresult);
-                print "    \"select\" : {\n";
+                print ",\n    \"select\" : {\n";
                 print "        \"count\" : $count,";
                 print "        \"cmd\" : " .
                                     json_encode($select) . ",\n";
                 print "        \"parms\" : " .
                                     json_encode($sqlParmsText) . "\n";
-                print "    },\n";
+                print "    }";
+                $comma          = ",\n";
     			foreach($sresult as $row)
     			{	        // found match in census
     			    $line	        = $row['line'];
     			    $csurname	    = $row['surname'];
     			    $cgivennames    = $row['givennames'];
 
-    			    print "    \"row$line\" : {\n";
+    			    print ",\n    \"row$line\" : {\n";
     			    print "	       \"line\" : $line,\n";
                     print "	       \"surname\" : " . 
                                         json_encode($csurname) . ",\n";
                     print "        \"givennames\" : " .
                                         json_encode($cgivennames) . "\n";
-    			    print "    },\n";
+                    print "\n    }";
 
     			    if ($count == 1)
     			    {		// unique match
@@ -338,9 +339,8 @@ function censusCitation($year, $page, $idir, $type)
     								            $line);
     					$line->set('idir', $idir);
                         $result		= $line->save(false);
-                        $sqlcmd     = $line->getLastSqlCmd();
-                        print "    \"sqlcmd\" : " .
-                                        json_encode($sqlcmd) . ",\n";
+                        print ",\n    \"sqlcmd" . __LINE__ . "\" : " .
+                                    json_encode($sqlcmd);
     			    }		// unique match
     			}		    // found matches in census
     	    }		        // select succeeded
@@ -353,7 +353,7 @@ function censusCitation($year, $page, $idir, $type)
                 print "        \"parms\" : " .
                                     json_encode($sqlParmsText) . ",\n";
                 print "        \"msg\" : " .
-                    json_encode(print_r($stmt->errorInfo(),true) . "\n";
+                    json_encode(print_r($stmt->errorInfo(),true)) . "\n";
                 print "    },\n";
     	    }	            // failed
     	}	                // have at least one name to check
@@ -383,16 +383,16 @@ function birthCitation($page, $idir, $type)
     {		        // citation to birth
     	// IDIME must be IDIR of individual
     	$personid	= new Person(array('idir' => $idir));
-    	$count	= preg_match('/^([0-9]{4})-([0-9]+)$/',
-    					     $page,
-    					     $matches);
+    	$count	    = preg_match('/^([0-9]{4})-([0-9]+)$/',
+    				    	     $page,
+    					         $matches);
     	if ($count == 1)
     	{		    // detail matches pattern
     	    $regyear	= $matches[1];
-    	    $regnum	= $matches[2];
-    	    $birth	= new Birth('CAON',
-    						    $regyear,
-    						    $regnum);
+    	    $regnum	    = $matches[2];
+    	    $birth	    = new Birth('CAON',
+    					    	    $regyear,
+    						        $regnum);
     	    $birth->set('idir', $idir);
     	    if (!($birth->isExisting()))
     	    {		// new record
@@ -410,11 +410,11 @@ function birthCitation($page, $idir, $type)
     			$birth->set('birthplace',
     						 $evBirth->getLocation()->toString());
     	    }		// new record
-    	    $result	= $birth->save(true);
+            $result	= $birth->save(false);
+            if ($result)
+                print ",\n    \"sqlcmd" . __LINE__ . "\" : " . json_encode($birth->getLastSqlCmd());
     	}		    // detail matches pattern
     }			    // citation to birth
-    else
-    	print "<type>$type</type>\n";
     return;
 }		// function birthCitation
 
@@ -475,7 +475,9 @@ function deathCitation($page, $idir, $type)
     			$deathYear	= floor($evDeath->get('eventsd') / 10000);
     			$death->set('age', $deathYear - $birthYear);
     	    }		// new record
-    	    $result	= $death->save(true);
+    	    $result	= $death->save(false);
+            if ($result)
+                print ",\n    \"sqlcmd" . __LINE__ . "\" : " . json_encode($death->getLastSqlCmd());
     	}	        // detail matches pattern
     }		        // citation to death
     return;
@@ -533,7 +535,7 @@ function marriageCitation($page, $idmr, $type)
     			$originalPage	= $matchesOld[3];
     			$originalItem	= $matchesOld[5];
     			if ($debug)
-    			    $warn	.= "<p>addCitXml.php: " . __LINE__ .
+    			    $warn	.= "<p>addCitJson.php: " . __LINE__ .
     						   " originalVolume=$originalVolume, " .
     						   "originalPage=$originalPage, " .
     						   "originalItem=$originalItem</p>\n";
@@ -546,7 +548,7 @@ function marriageCitation($page, $idmr, $type)
     			$regyear    	= $marriage->get('regyear');
     			$regnum	    	= $marriage->get('regnum');
     			if ($debug)
-    			    $warn   	.= "<p>addCitXml.php: " . __LINE__ .
+    			    $warn   	.= "<p>addCitJson.php: " . __LINE__ .
     					    	   " regyear=$regyear, regnum=$regnum</p>\n";
     	    }
 
@@ -580,7 +582,9 @@ function marriageCitation($page, $idmr, $type)
     			else
     			    $marloc	= $marriage->get('place');
     			// update marriage transcription record
-    			$marriage->save(true);
+    			$result     = $marriage->save(false);
+                if ($result)
+                    print ",\n    \"sqlcmd" . __LINE__ . "\" : " . json_encode($marriage->getLastSqlCmd());
 
     			// update record for groom
     			$idirhusb	= $family->get('idirhusb');
@@ -618,7 +622,9 @@ function marriageCitation($page, $idmr, $type)
     					$groom->set('residence', $marloc);
     					$groom->set('birthplace', $birthloc);
     			    }		// not initialized
-    			    $result	= $groom->save(true);
+    			    $result	= $groom->save(false);
+            if ($result)
+                print ",\n    \"sqlcmd" . __LINE__ . "\" : " . json_encode($groom->getLastSqlCmd());
     			}			// add information on husband
 
     			// update record for bride
@@ -655,7 +661,9 @@ function marriageCitation($page, $idmr, $type)
     					$bride->set('residence', $marloc);
     					$bride->set('birthplace', $birthloc);
     			    }		// not initialized
-    			    $result	= $bride->save(true);
+    			    $result	= $bride->save(false);
+            if ($result)
+                print ",\n    \"sqlcmd" . __LINE__ . "\" : " . json_encode($bride->getLastSqlCmd());
     			}			// add information on wife
     	    }			    // found Marriage transcription
     	}			        // have a marriage event
@@ -715,7 +723,9 @@ function countyMarriageCitation($page, $idmr, $type)
     	    if ($idirhusb)
     	    {			// add information on husband
     			$groom->set('idir', $idirhusb);
-    			$result	= $groom->save(true);
+    			$result	= $groom->save(false);
+            if ($result)
+                print ",\n    \"sqlcmd" . __LINE__ . "\" : " . json_encode($groom->getLastSqlCmd());
     	    }			// add information on husband
 
     	    // update record for bride
@@ -723,7 +733,9 @@ function countyMarriageCitation($page, $idmr, $type)
     	    if ($idirwife)
     	    {			// add information on wifeand
     			$bride->set('idir', $idirwife);
-    			$result	+= $bride->save(true);
+    			$result	+= $bride->save(false);
+            if ($result)
+                print ",\n    \"sqlcmd" . __LINE__ . "\" : " . json_encode($bride->getLastSqlCmd());
     	    }			// add information on wife
     	}	// detail matches pattern
     }		// citation to marriage
@@ -734,16 +746,12 @@ function countyMarriageCitation($page, $idmr, $type)
  *  Open Code															*
  ************************************************************************/
 
-// emit the XML header
-print "<?xml version='1.0' encoding='UTF-8'?".">\n";
-
 // print the root node of the XML tree
-print "<addCit>\n";
+print "{\n";
 
 // include feedback parameters as attributes
 // set default values for parameters
 $idsr				= null;		// index of source record
-$source				= null;		// source record
 $idime				= null;		// cited record
 $type				= Citation::STYPE_MAR;
 $idet				= 0;
@@ -770,23 +778,25 @@ if (strlen($authorized) == 0)
 
 // validate parameters
 // include all of the input parameters as debugging information
-print "  <parms>\n";
+print "  \"parms\" : {\n";
+$comma          = '';
 foreach ($_POST as $key => $value)
 {			    // look at all parameters
 	$value		= trim($value);
-	print "    <$key>" . htmlentities($value,ENT_XML1);
+    print "$comma    \"$key\" : " . json_encode($value);
+    $comma      = ",\n";
 	switch($key)
 	{		    // act on keys
 	    case 'idsr':
 	    {		// master source identifier
 			if ((is_int($value) || ctype_digit($value)) && $value > 0)
 			{	// validate syntax of parameter 
-			    $idsr	= intval($value);
-			    $source	= new Source(array('idsr' => $idsr));
+			    $idsr	    = intval($value);
+			    $source	    = new Source(array('idsr' => $idsr));
 			    if ($source->isExisting())
 			    {
-					print "\n<source>" . $source->get('name') .
-						"</source>\n";
+                    print ",\n    \"title\" : " . 
+                        json_encode($source->get('name'));
 			    }
 			    else
 			    {
@@ -844,8 +854,9 @@ foreach ($_POST as $key => $value)
 			    $idime	= intval($value);
 			    $personid	= new Person(array('idir' => $idime));
 			    if ($personid->isExisting())
-			    {
-					$personid->toXml('individ');
+                {
+                    print "    \"person\" : ";
+					$personid->toJson();
 			    }
 			    else
 			    {
@@ -864,10 +875,10 @@ foreach ($_POST as $key => $value)
 			if ((is_int($value) || ctype_digit($value)) && $value > 0)
 			{	// validate syntax of parameter 
 			    $idime		= intval($value);
-			    $family	= new Family(array('idmr' => $idime));
+			    $family	    = new Family(array('idmr' => $idime));
 			    if ($family->isExisting())
 			    {
-					$family->toXml('family');
+					$family->toJson();
 			    }
 			    else
 			    {
@@ -890,7 +901,7 @@ foreach ($_POST as $key => $value)
 			    if ($child->isExisting())
 			    {
 					$person		= $child->getPerson();
-					$child->toXml('child');
+					$child->toJson();
 			    }
 			    else
 					$msg	.= "Invalid value of IDCR=$value. ";
@@ -910,7 +921,7 @@ foreach ($_POST as $key => $value)
 			    $namerec	= new Name(array('idnx'	=> $idime));
 			    if ($namerec->isExisting())
 			    {
-					$nameRec->toXml('name');
+					$nameRec->toJson();
 			    }
 			    else
 					$msg	.= "Invalid value of IDNX=$value. ";
@@ -929,7 +940,7 @@ foreach ($_POST as $key => $value)
 			    $idime		= intval($value);
 			    $event	= new Event($idime);
 			    if ($event->isExisting())
-					$event->toXml('event');
+					$event->toJson();
 			    else
 					$msg	.= "Invalid value of IDER=$value. ";
 			}	// validate syntax of parameter 
@@ -998,9 +1009,8 @@ foreach ($_POST as $key => $value)
 			break;
 	    }		// quality
 	}		    // act on keys
-	print "</$key>\n";
 }			    // look at all parameters
-print "  </parms>\n";
+print "  }";
 
 // check for missing mandatory parameters;
 if ($idsr === null)
@@ -1012,13 +1022,16 @@ if ($formname === null)
 if ($rownum === null)
 	$msg	.= 'Missing mandatory parameter row. ';
 
-showTrace();
+if (strlen($warn) > 0)
+{
+    print "    \"warn\" : " . json_encode($warn) . ",\n";
+}
 
 // if any errors encountered in validating parameters
 // terminate the request and return the error message
 if (strlen($msg) > 0)
 {		// return the message text in XML
-	print "<msg>$msg</msg>\n";
+	print "    \"msg\" : " . json_encode($msg) . "\n";
 }		// return the message text in XML
 else
 {		// add the citation
@@ -1032,13 +1045,17 @@ else
 						'srcsurety'	    => $surety);
 
 	$citation	= new Citation($citParms);
-	$citation->save(true);	// write into the database
+    $count      = $citation->save(false);	// write into the database
+    if ($count > 0)
+        print ",\n    \"sqlcmd" . __LINE__ . "\" : " .
+                json_encode($citation->getLastsqlcmd());
 
 	// get the unique numeric identifier of the inserted citation record
 	// and feed it back to the invoker 
-	$idsx	= $citation->getIdsx();
-	print "    <idsx>$idsx</idsx>\n";
-	$citation->toXml('citation', true, 0);
+	$idsx	    = $citation->getIdsx();
+	print ",\n    \"citation\" : ";
+    $citation->toJson(true, 0);
+    $comma      = ",\n";
 
 	// some events moved from tblIR and tblMR to tblER 
 	// in general the citation type is passed as the parameter Type=
@@ -1110,7 +1127,8 @@ else
 	}		// possibly event moved to tblER from tblMR
 
 	// certain citations require the creation of links from the
-	// transcription of the source back to the family tree
+    // transcription of the source back to the family tree
+    //print "$comma    \"line\" : " . __LINE__ ;
 	switch($idsr)
 	{		// switch on source identifier
 	    case 11:
@@ -1201,4 +1219,4 @@ else
 }		    // add the citation
 
 // close of top level node 
-print "</addCit>\n";
+print "}\n";

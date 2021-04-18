@@ -25,8 +25,9 @@ use \Exception;
  *      2019/11/17      move CSS to <head>                              *
  *		2020/03/13      use FtTemplate::validateLang                    *
  *		2020/11/28      correct XSS error                               *
+ *		2021/04/04      escape CONTACTSUBJECT                           *
  *																		*
- *  Copyright &copy; 2020 James A. Cobban								*
+ *  Copyright &copy; 2021 James A. Cobban								*
  ************************************************************************/
     require_once __NAMESPACE__ . "/Domain.inc";
     require_once __NAMESPACE__ . "/Country.inc";
@@ -118,7 +119,8 @@ $template->set('DOMAIN',	    	$domain);
 $template->set('STATENAME',	    	$stateName);
 $template->set('LANG',		    	$lang);
 $template->set('CONTACTTABLE',		'Births');
-$template->set('CONTACTSUBJECT',    '[FamilyTree]' . $_SERVER['REQUEST_URI']);
+$template->set('CONTACTSUBJECT',    '[FamilyTree]' . 
+                                    urlencode($_SERVER['REQUEST_URI']));
 if ($debug)
     $template->set('DEBUG',		    'Y');
 else

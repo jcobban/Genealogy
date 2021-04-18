@@ -45,6 +45,7 @@ use \Exception;
  *		2020/03/13      use FtTemplate::validateLang                    *
  *		2021/01/16      report and ignore invalid input                 *
  *		                protect against XSS attacks                     *
+ *		2021/04/04      escape CONTACTSUBJECT                           *
  *																		*
  *  Copyright &copy; 2021 James A. Cobban								*
  ************************************************************************/
@@ -168,6 +169,7 @@ $template->set('DOMAIN',		$domain);
 $template->set('CC',		    $cc);
 $template->set('LANG',		    $lang);
 $template->set('CONTACTTABLE',	'Domains');
-$template->set('CONTACTSUBJECT','[FamilyTree]' . $_SERVER['REQUEST_URI']);
+$template->set('CONTACTSUBJECT',    '[FamilyTree]' . 
+                                    urlencode($_SERVER['REQUEST_URI']));
 
 $template->display();

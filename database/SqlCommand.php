@@ -2223,7 +2223,6 @@ if (strlen($msg) == 0 && $sqlCommand && strlen($sqlCommand) > 0)
         $phpfield		    = null; 
         if ($query)
         {		        // SELECT command, issue query
-            $warn   .= "<p>SqlCommand.php: " . __LINE__ . "</p>\n";
             if (is_null($sresult))
             {	        // query not issued yet
                 if (preg_match("/(.*)(phpsoundex\(\w+\))(.*)/i", 

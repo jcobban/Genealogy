@@ -15,8 +15,9 @@ use \Exception;
  *		                add support for multiple countries              *
  *		                Delete requested by name='Delete'               *
  *		2020/03/13      use FtTemplate::validateLang                    *
+ *		2021/04/04      escape CONTACTSUBJECT                           *
  *																		*
- *  Copyright &copy; 2020 James A. Cobban								*
+ *  Copyright &copy; 2021 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/FtTemplate.inc';
 require_once __NAMESPACE__ . '/Census.inc';
@@ -243,7 +244,8 @@ $country        = new Country(array('code'  => $cc));
 $template->set('COUNTRYNAME',		$country->getName($lang));
 $template->set('LANG',			    $lang);
 $template->set('CONTACTTABLE',		'Censuses');
-$template->set('CONTACTSUBJECT',	'[FamilyTree]' . $_SERVER['REQUEST_URI']);
+$template->set('CONTACTSUBJECT',    '[FamilyTree]' . 
+                                    urlencode($_SERVER['REQUEST_URI']));
 
 if (strlen($msg) > 0)
     $template->updateTag('censusForm', null);

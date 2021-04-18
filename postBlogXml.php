@@ -44,6 +44,7 @@ use \Exception;
  *		                email                                           *
  *		2019/12/19      replace xmlentities with htmlentities           *
  *		2020/02/24      failed constructors no longer throw exceptions  *
+ *		2021/04/04      add visitor's e-mail to text                    *
  *																		*
  *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
@@ -330,6 +331,7 @@ if (strlen($userid) == 0)
             $username			= 'Visitor ' . $allusers->count();
             $user['username']   = $username;  
             $user['email']      = $email;
+            $text               .= "<p>visitor's email=$email</p>\n";
             $user['auth']       = 'visitor';
             $user->save(false);
         }               // create temporary account

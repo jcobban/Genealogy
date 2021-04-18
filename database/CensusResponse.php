@@ -137,9 +137,11 @@ use \Exception;
  *      2020/03/13      use FtTemplate::validateLang                    *
  *      2020/03/24      use CensusLine pseudo-field 'sexclass'          *
  *      2020/04/16      move template ahead of validation               *
- *		2020/10/10      remove field prefix for Pages table             *
- *		2020/12/01      eliminate XSS vulnerabilities                   *
- *		2021/02/04      improve parameter checking and messages         *
+ *      2020/10/10      remove field prefix for Pages table             *
+ *      2020/12/01      eliminate XSS vulnerabilities                   *
+ *      2021/02/04      improve parameter checking and messages         *
+ *      2021/04/04      escape CONTACTSUBJECT                           *
+ *      2021/04/16      handle subdistrict id with colon better         *
  *                                                                      *
  *  Copyright &copy; 2021 James A. Cobban                               *
  ************************************************************************/
@@ -404,22 +406,22 @@ if (isset($_GET) && count($_GET) > 0)
                     $parmvalue  = '';
                     foreach($value as $sd)
                     {               // loop through values
-	                    $rxcnt  = preg_match("/^([0-9.]+):([A-Za-z0-9]+)$/",
-	                                         $sd,
-	                                         $matches);
-	
-	                    if ($rxcnt == 1)
-	                    {           // district:subdist format
+                        $rxcnt  = preg_match("/^([0-9.]+):([A-Za-z0-9]+)$/",
+                                             $sd,
+                                             $matches);
+    
+                        if ($rxcnt == 1)
+                        {           // district:subdist format
                             $parmvalue  .= "$comma$sd";
                             $comma      = ',';
-	                    }           // district:subdist format
-	                    else
-	                    if (preg_match('/^[a-zA-Z0-9(){}[\]]+$/', $sd))
-	                    {           // subdist format
-	                        $parmvalue  .= "$comma$sd";
+                        }           // district:subdist format
+                        else
+                        if (preg_match('/^[a-zA-Z0-9(){}[\]]+$/', $sd))
+                        {           // subdist format
+                            $parmvalue  .= "$comma$sd";
                             $comma      = ',';
-	                    }           // subdist format
-	                    else
+                        }           // subdist format
+                        else
                             $subdisttext    .= $comma . 
                                                htmlspecialchars($sd);
                     }               // loop through values
@@ -550,23 +552,23 @@ if (is_string($orderbytext))
 if (is_string($byeartext))
     $msg       .= $template['byearInvalid']->replace('$value', $byeartext);
 if (is_string($rangetext))
-    $msg		.= $template['rangeInvalid']->replace('$value', $rangetext);
+    $msg        .= $template['rangeInvalid']->replace('$value', $rangetext);
 if (is_string($pagetext))
-    $msg		.= $template['pageInvalid']->replace('$value', $pagetext);
+    $msg        .= $template['pageInvalid']->replace('$value', $pagetext);
 if (is_string($familytext))
-    $msg		.= $template['familyInvalid']->replace('$value', $familytext);
+    $msg        .= $template['familyInvalid']->replace('$value', $familytext);
 if (is_string($surnametext))
-    $msg		.= $template['surnameInvalid']->replace('$value', $surnametext);
+    $msg        .= $template['surnameInvalid']->replace('$value', $surnametext);
 if (is_string($soundextext))
-    $msg		.= $template['soundexInvalid']->replace('$value', $soundextext);
+    $msg        .= $template['soundexInvalid']->replace('$value', $soundextext);
 if (is_string($provincetext))
-    $msg		.= $template['provinceInvalid']->replace('$value', $provincetext);
+    $msg        .= $template['provinceInvalid']->replace('$value', $provincetext);
 if (is_string($districttext))
-    $msg		.= $template['districtInvalid']->replace('$value', $districttext);
+    $msg        .= $template['districtInvalid']->replace('$value', $districttext);
 if (is_string($subdisttext))
-    $msg		.= $template['subdistInvalid']->replace('$value', $subdisttext);
+    $msg        .= $template['subdistInvalid']->replace('$value', $subdisttext);
 if (is_string($divisiontext))
-    $msg		.= $template['divisionInvalid']->replace('$value', $divisiontext);
+    $msg        .= $template['divisionInvalid']->replace('$value', $divisiontext);
 foreach ($badfields as $key => $text)
     $msg        .= $template['fieldInvalid']->replace(array('$key','$value'),
                                                       array($key, $text));
@@ -830,7 +832,11 @@ if (strlen($msg) == 0)
         }
         if ($dId == floor($dId))
             $dId            = floor($dId);
-
+        if (preg_match('/^([0-9.]+):(.+)$/', $subdId, $matches))
+        {
+            if ($matches[1] == $dId)
+                $subdId     = $matches[2];
+        }
         $sdParms            = array(
                                 'census'    => $censusId,
                                 'distId'    => $dId,
@@ -958,7 +964,8 @@ if (isset($dId))
 $template->set('CENSUS',            $censusYear);
 $template->set('SEARCH',            $search);
 $template->set('CONTACTTABLE',      'Census' . $censusYear);
-$template->set('CONTACTSUBJECT',    '[FamilyTree]' . $_SERVER['REQUEST_URI']);
+$template->set('CONTACTSUBJECT',    '[FamilyTree]' . 
+                                    urlencode($_SERVER['REQUEST_URI']));
 
 if (strlen($msg) == 0)
 {                           // no errors and something to display

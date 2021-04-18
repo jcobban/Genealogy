@@ -17,16 +17,9 @@
  *                                                                      *
  *  Copyright &copy; 2019 James A. Cobban                               *
  ************************************************************************/
+import "../jscripts6/util.js";
 
-if (window.addEventListener) 
-{                    // For all major browsers, except IE 8 and earlier
-    window.addEventListener("load", onLoad, false);
-} 
-else 
-if (window.attachEvent) 
-{                  // For IE 8 and earlier versions
-    window.attachEvent("onload", onLoad)
-}
+window.addEventListener("load", onLoad, false);
 
 /************************************************************************
  *  function onLoad                                                     *
@@ -37,23 +30,25 @@ if (window.attachEvent)
  *  reflect the change in user status.                                  *
  *                                                                      *
  *  Input:                                                              *
- *      event       instance of Event containing load event             *
  *      this        instance of Window                                  *
+ *      evt         instance of Event containing load event             *
  ************************************************************************/
-function onLoad(event)
+function onLoad()
 {
     var opener      = window.opener;
     try {
-    if (opener)
-    {           // invoked from another window
-        if (opener.location.host == window.location.host)
-        {       // refresh
-            if (opener.location.pathname != "/" && 
-                opener.location.pathname != "/jamescobban/")
-                opener.location.reload();
-        }       // refresh
-    }           // invoked from another window
+        if (opener)
+        {           // invoked from another window
+            if (opener.location.host == window.location.host)
+            {       // refresh
+                if (opener.location.pathname != "/" && 
+                    opener.location.pathname != "/jamescobban/")
+                    opener.location.reload();
+            }       // refresh
+        }           // invoked from another window
     }
-    catch(error) {}
+    catch(error) {
+        console.log("genealogy.js: onLoad: exception " + error);
+    }
 
 }       // onLoad

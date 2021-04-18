@@ -285,42 +285,6 @@ require_once __NAMESPACE__ . '/FtTemplate.inc';
 require_once __NAMESPACE__ . '/common.inc';
 
     /********************************************************************
-     *  $typeText                                                       *
-     *                                                                  *
-     *  Events which are implemented by fields inside a record other    *
-     *  than an instance of Event (tblER), are distinguished            *
-     *  by the citation type, passed as parameter type.  This table     *
-     *  is used to modify the title of the dialog based upon the type.	*
-     ********************************************************************/
-    $typeText = array(
-                     0         => 'Generic Fact',
-                     1         => 'Name Fact',
-                     2         => 'Birth Event',
-                     3         => 'Christening Event',
-                     4         => 'Death Event',
-                     5         => 'Buried Event',
-                     6         => 'General Notes',
-                     7         => 'Research Notes',
-                     8         => 'Medical Notes',
-                     9         => 'Cause of Death',
-                    11         => 'Child Status',	   
-                    12         => 'Relationship to Father',  
-                    13         => 'Relationship to Mother',  
-                    15         => 'LDS Baptism Event',
-                    16         => 'LDS Endowment Event',
-                    17         => 'LDS Sealed to Parents Event',
-                    18         => 'LDS Sealed to Spouse Event',
-                    19         => 'Person Never Married Fact',
-                    20         => 'Marriage Event',
-                    21         => 'Marriage Note',
-                    22         => 'Never Married Fact',
-                    23         => 'This Couple had no Children Fact',
-                    24         => 'Marriage Ended',
-                    26         => 'LDS Confirmation Event',
-                    27         => 'LDS Initiatory Event'
-                );
-
-    /********************************************************************
      *  $eventText                                                      *
      *                                                                  *
      *  This table provides a translation from an event type to the text*
@@ -1326,7 +1290,7 @@ if (strlen($msg) == 0)
             else
             {       // proceed with edit
                 $idime     = $idir;	// key for citations
-                $heading = "Edit " . $typeText[$stype] .
+                $heading = "Edit " . $citText[$stype] .
         " for <a href=\"Person.php?idir=$idir\">$given $surname</a>";
                 if ($stype <= Citation::STYPE_BURIED &&
                      $stype >= Citation::STYPE_BIRTH)
@@ -1358,7 +1322,7 @@ if (strlen($msg) == 0)
                 $msg     .= 'Mandatory idcr parameter missing. ';
             else
                 $idime     = $idcr;	// key for citations
-            $heading     = "Edit " . $typeText[$stype] .
+            $heading     = "Edit " . $citText[$stype] .
                 " for <a href=\"Person.php?idir=$idir\">$given $surname</a>";
             break;
         }
@@ -1372,7 +1336,7 @@ if (strlen($msg) == 0)
         case Citation::STYPE_MARNOKIDS:	    // 23 No children  
         case Citation::STYPE_MAREND:		// 24 marriage end date
         {       // event defined in marriage record
-            $heading     = "Edit " . $typeText[$stype];
+            $heading     = "Edit " . $citText[$stype];
             if (is_null($idmr))
             {
                 $msg     .= 'Mandatory idmr parameter missing. ';
@@ -2838,8 +2802,8 @@ showTrace();
       <p>This is a multiple line text area in which you can record extended
         comments about the
 <?php
-        if (array_key_exists($stype, $typeText))
-            print $typeText[$stype]; ?>.
+        if (array_key_exists($stype, $citText))
+            print $citText[$stype]; ?>.
       </p>
     </div>
     <div class="balloon" id="Helpprefix">

@@ -221,6 +221,9 @@ use \Templating\Template;
  *      2020/06/10      ensure $browser->majorver always set            *
  *      2021/01/21      $authorized global variable not set for         *
  *                      session persistence                             *
+ *      2021/03/19      if administrator explicitly sets userid get     *
+ *                      authorization and options from that userid      *
+ *                      ignoring session and cookie values              *
  *                                                                      *
  *  Copyright &copy; 2021 James A. Cobban                               *
  ************************************************************************/
@@ -279,6 +282,7 @@ try {
               "dburl='$dburl', " .
               $e->getMessage() . ". ";
     $connection = null;
+    print "<p>$msg</p>\n";
 }       // error establishing connection
 
 
@@ -320,6 +324,8 @@ try {
     {                       // handle session variables
         foreach($_SESSION as $key => $value)
         {                   // loop through all session variables
+            if (isset($userid))
+                $warn   .= "<p>common.inc: " . __LINE__ . " \$userid='$userid'</p>\n";
             if ($key == 'userid')
             {
                 $userid             = trim($value);
@@ -339,6 +345,11 @@ try {
                         $options    = null;
                     }
                 }           // user name passed
+                else
+                {           // explicit no userid
+                    $authorized     = '';
+                    $options        = null;
+                }           // explicit no userid
             }
         }                   // loop through all session variables
     }                       // handle session variables
@@ -366,6 +377,8 @@ try {
                         {
                             $user           = null;
                             $userid         = null;
+                            $authorized     = null;
+                            $options        = 0;
                         }
                     }
                     setcookie($key, $value,
@@ -501,6 +514,17 @@ if (canUser('debug'))
                 case 'userid':
                 {
                     $userid     = $valueLc;         // simulate
+                    $user       = new User(array("username" => $userid));
+                    if ($user->isExisting())
+                    {
+                        $authorized = $user->get('auth');
+                        $options    = $user->get('options');
+                    }
+                    else
+                    {
+                        $authorized = '';
+                        $options    = 0;
+                    }
                     break;
                 }
 

@@ -1,15 +1,16 @@
 <!--*********************************************************************
- *  editNameUpdateen.html												*
- *																		*
- *  Template to display a web page for editting one alternate name		*
- *  for an individual from the Legacy database which is represented		*
- *  by an instance of Name (a record in table tblNX).					*
- * 																		*
- *  History: 															*
- *		2019/08/06		created											*
+ *  editNameUpdateen.html                                               *
+ *                                                                      *
+ *  Template to display a web page for editting one alternate name      *
+ *  for an individual from the Legacy database which is represented     *
+ *  by an instance of Name (a record in table tblNX).                   *
+ *                                                                      *
+ *  History:                                                            *
+ *      2019/08/06      created                                         *
  *      2019/09/25      add value="1" to checkboxes                     *
- *																		*
- *  Copyright &copy; 2019 James A. Cobban								*
+ *      2021/03/10      change widths for source citation               *
+ *                                                                      *
+ *  Copyright &copy; 2021 James A. Cobban                               *
  **********************************************************************-->
     <div id="breadcrumbs" class="hidden">
       <a href="/index.html">Home</a>:
@@ -147,14 +148,14 @@
                             class="ina leftnc"
                             value="$SRCTITLE"
                             readonly="readonly"
-                            size="50">
+                            size="40" style="width: 20em;">
               </td>
               <td>
                 <input type="text" name="Page$IDSX"
                             id="Page$IDSX"
                             class="white leftnc"
                             value="$DETAIL"
-                            size="32">
+                            size="37" style="width: 18em;">
               </td>
               <td>
                 <button type="button"
@@ -225,13 +226,13 @@
                       class="ina leftnc"
                       value="$title"
                       readonly="readonly"
-                      size="50">
+                      size="40" style="width: 20em;">
             </td>
             <td>
               <input type="text" name="Page$idsx" id="Page$idsx"
                       class="white leftnc"
                       value="$page"
-                      size="32">
+                      size="37" style="width: 18em;">
             </td>
             <td>
               <button type="button"
@@ -271,20 +272,21 @@
       </div>
     </div> <!-- end of <div id="cittemplates"> -->
     <div class="balloon" id="Helpprefix">
-		This field is used to supply a name prefix, such as an honorific or
-		indicator of rank or profession.  Typical examples include:
-		Capt., Col., Dr., Elder, Father, Lord, Lt. Col., Major, Miss, Mr., Mrs.,
-		Rev'd, or Sister.
+        This field is used to supply a name prefix, such as an honorific or
+        indicator of rank or profession.  Typical examples include:
+        Capt., Col., Dr., Elder, Father, Lord, Lt. Col., Major, Miss,
+        Mr., Mrs., Rev'd, or Sister.
     </div>
     <div class="balloon" id="Helptitle">
-		This field is used to supply a name suffix.  Typical examples include:
-		J'r, Jr., Jun., S'r, Sen., Sr., III, IV, K.C., M.D.
+        This field is used to supply a name suffix.  Typical examples
+        include: J'r, Jr., Jun., S'r, Sen., Sr., III, IV, K.C., M.D.
     </div>
     <div class="balloon" id="Helpsurname">
-		This field is used to update the alternate surname of an individual.
+        This field is used to update the alternate surname of an individual.
     </div>
     <div class="balloon" id="HelpgivenName">
-		This field is used to update the alternate given name of an individual.
+        This field is used to update the alternate given name
+        of an individual.
     </div>
     <div class="balloon" id="Helporder">
         The order field specifies the position within the list of alternate
@@ -300,56 +302,56 @@
         alternate name.
     </div>
     <div class="balloon" id="HelpSource">
-		Read-only field displaying one of the master sources
-		cited for this fact or event.
+        Read-only field displaying one of the master sources
+        cited for this fact or event.
     </div>
     <div class="balloon" id="HelpSourceSel">
-		This is a selection list used to identify a source which documents
+        This is a selection list used to identify a source which documents
         this event.  If you need to reference a source which has not
         previously been
-		referenced in the database you can scroll up to the first entry in the
+        referenced in the database you can scroll up to the first entry in the
         selection list which says "Add New Source".  A short cut for this is
         pressing the letter "A" while the focus is in this selection list.
     </div>
     <div class="balloon" id="HelpPage">
-		Field displaying the page number within the master source
-		that documents this fact or event.
+        Field displaying the page number within the master source
+        that documents this fact or event.
     </div>
     <div class="balloon" id="HelpeditCitation">
-		Clicking on this button pops up a dialog to edit the details of the
-		citation.
+        Clicking on this button pops up a dialog to edit the details of the
+        citation.
     </div>
     <div class="balloon" id="HelpdelCitation">
-		Clicking on this button deletes this citation.
+        Clicking on this button deletes this citation.
     </div>
     <div class="balloon" id="HelpAddCitation">
-		Clicking on this button adds a row to the citation table that permits
-		selecting the master source and specifying the page within that source
-		that documents the current fact or event.
+        Clicking on this button adds a row to the citation table that permits
+        selecting the master source and specifying the page within that source
+        that documents the current fact or event.
     </div>
     <div class="balloon" id="HelpaddCitation">
-		Clicking on this button adds a row to the citation table that permits
-		selecting the master source and specifying the page within that source
-		that documents the current fact or event.
+        Clicking on this button adds a row to the citation table that permits
+        selecting the master source and specifying the page within that source
+        that documents the current fact or event.
     </div>
     <div class="balloon" id="HelpupdName">
-		Clicking on this button applies all of the changes made to this
-		or name and closes the dialog.  Note that pressing the Enter key while
-		editting any text field in this dialog also performs this function.
+        Clicking on this button applies all of the changes made to this
+        or name and closes the dialog.  Note that pressing the Enter key while
+        editting any text field in this dialog also performs this function.
     </div>
     <div class="balloon" id="HelpSubmit">
-		Clicking on this button applies all of the changes made to this name
-		displays the XML returned by the script updateName.php. 
-		Note that pressing the Enter key while
-		editting any text field in this dialog also performs this function.
+        Clicking on this button applies all of the changes made to this name
+        displays the XML returned by the script updateName.php. 
+        Note that pressing the Enter key while
+        editting any text field in this dialog also performs this function.
     </div>
     <div class="balloon" id="HelpClear">
-		Clicking on this button, or alternatively using the keyboard shortcut
+        Clicking on this button, or alternatively using the keyboard shortcut
         Alt-C, clears all of the text from the notes field associated with
         this event.
     </div>
     <div id="loading" class="popup">
-		Loading...
+        Loading...
     </div>
     <script src="/jscripts/tinymce/js/tinymce/tinymce.js">
     </script>

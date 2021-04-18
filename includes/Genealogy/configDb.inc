@@ -30,31 +30,31 @@ use \Iterator;
             'backup'    => array(
                         'phptype'  => 'mysql',
                         'username' => 'jcobban_webupd',
-                        'password' => 'M1gz_F%^tEo8',
+                        'password' => '',
                         'hostspec' => 'localhost',
                         'database' => 'jamescobban_genealogy',
-                        'googlekey'=> 'AIzaSyCpSvn6_xeFTdVMue8hwxWpdYmoUCKXebc'
+                        'googlekey'=> ''
                         ),
             'isp'       => array(
                         'phptype'  => 'mysql',
                         'username' => 'jcobban_webupd',
-                        'password' => 'M1gz_F%^tEo8',
+                        'password' => '',
                         'hostspec' => 'localhost',
                         'database' => 'jamescobban_genealogy',
-                        'googlekey'=> 'AIzaSyBapDvSH80xd1AYBdqoxO51lQLnmW5tTPE'
+                        'googlekey'=> ''
                         ),
             'remote'    => array(
                         'phptype'  => 'mysql',
                         'username' => 'jcobban_webupd',
-                        'password' => 'M1gz_F%^tEo8',
+                        'password' => '',
                         'hostspec' => 'jamescobban.net',
                         'database' => 'jamescobban_genealogy',
-                        'googlekey'=> 'AIzaSyBapDvSH80xd1AYBdqoxO51lQLnmW5tTPE'
+                        'googlekey'=> ''
                         ),
             'original'  => array(
                         'phptype'  => 'mysql',
                         'username' => 'root',
-                        'password' => 'Spyn12..',
+                        'password' => '',
                         'hostspec' => 'localhost',
                         'database' => 'genealogy',
                         'googlekey'=> ''

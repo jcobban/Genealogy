@@ -127,8 +127,9 @@ use \Exception;
  *                      pass limit and offset values in parms           *
  *      2019/11/28      table=Censuses&id=censusid may create new entry *
  *      2020/02/16      limit parameter overrides maximum records       *
+ *      2021/04/17      add support for class Census1901Sched2          *
  *                                                                      *
- *  Copyright &copy; 2020 James A. Cobban                               *
+ *  Copyright &copy; 2021 James A. Cobban                               *
  ************************************************************************/
 require_once __NAMESPACE__ . '/Record.inc';
 require_once __NAMESPACE__ . '/Country.inc';
@@ -147,6 +148,8 @@ global $connection;
 
 // initialize
 $table              = null;     // name of table
+$information        = null;
+$extTableName       = null;
 $id                 = null;     // index into table
 $parms              = array();
 $domain             = 'CAON';
@@ -195,7 +198,9 @@ foreach($_GET as $key   => $value)
                 $table          = $information['table'];
             }
             else
-                $msg            .= "Invalid parameter value Table='$value'. ";
+            {
+                $msg            .= __LINE__ . " Invalid parameter value Table='$value'. ";
+            }
             break;
         }       // table name
 
@@ -1159,9 +1164,41 @@ require_once __NAMESPACE__ . '/CensusLine.inc';
             break;
         }       // Censuses
 
+        case 'Census1901S2':
+        {
+            $dist           = null;
+            $subdist        = null;
+            $division       = null;
+            foreach ($parms as $key => $value)
+            {
+                switch (strtolower($key))
+                {
+                    case 'district':
+                        $dist           = $value;
+                        break;
+
+                    case 'subdistrict':
+                        $subdist        = "^$value$";
+                        break;
+
+                    case 'division':
+                        $division       = "^$value$";
+                        break;
+                }
+            }
+            $parms  = array('districtnumber'    => $dist);
+            if ($subdist)
+                $parms['subdistid']             = $subdist;
+            if ($division)
+                $parms['division']              = $division;
+            $record         = new RecordSet('Census1901Sched2',$parms);
+            break;
+        }
+
         default:
         {
-            $msg    .= "Table `$table` is not supported by this script. ";
+            $msg    .= "Unsupported table '$table'. ";
+            break;
         }
     }       // switch($table)
 //} catch(Exception $e) {

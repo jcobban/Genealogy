@@ -32,6 +32,8 @@ use Templating\escape;
  *      2020/12/03      validateLang accepted invalid string            *
  *      2021/01/16      add error message before exception              *
  *      2021/01/24      remove method fmtMessage                        *
+ *      2021/04/02      suppress advertising for Web Crawler Bots       *
+ *      2021/04/04      escape contact subject URL                      *
  *                                                                      *
  *  Copyright &copy; 2021 James A. Cobban All Rights Reserved           *
  ************************************************************************/
@@ -401,7 +403,7 @@ class FtTemplate extends Template
         if (!array_key_exists('CONTACTTABLE',   $this->fields))
             $this->set('CONTACTTABLE',  '');    // identify the table
         if (!array_key_exists('CONTACTSUBJECT', $this->fields))
-            $this->set('CONTACTSUBJECT',$_SERVER['REQUEST_URI']);
+            $this->set('CONTACTSUBJECT',urlencode($_SERVER['REQUEST_URI']));
         $this->set('GOOGLEKEY',         $dsn['googlekey']);
         $this->set('GOOGLECC',          'CA');
 
@@ -465,42 +467,48 @@ class FtTemplate extends Template
         }
 
         // pick an advertisement to display
-        $getparms               = array('adname' => '!');
-        $advertisers            = new RecordSet('Advertisers',
-                                                $getparms);
-        $info                   = $advertisers->getInformation();
-        $count                  = $info['count'];
-        $counterRec             = new Advertiser(array('adname' => ''));
-        $counterRec->increment('01');   // stats count
-        $index                  = $counterRec['count01'] % $count;
-        $getparms               = array('adname'    => '!',
-                                        'offset'    => $index,
-                                        'limit'     => 1);
-        $advertisers            = new RecordSet('Advertisers',
-                                                $getparms);
-        $advertiser             = $advertisers->rewind();
-        $adname                 = $advertiser['adname'];
-        $adurl                  = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://$_SERVER[HTTP_HOST]" . "/Advertisements/$adname.html";
-        $date                   = date('m d');
-        $month                  = substr($date, 0, 2);
-        $advertiser->increment($month);
-
-        // the following code is to ensure that the count for
-        // the next month is zero before the month begins
-        // this should be moved to a cron job
-        $day                    = substr($date, -2);
-        if ($day == '28')
-        {                   // move to cron job
-            $month              += 1;
-            if ($month > 12)
-                $month          = $month - 13;
-            if (strlen($month) == 1)
-                $month          = '0' . $month;
-            $advertiser->set("Count$month", 0);
-            $advertiser->save(false);
-        }                   // move to cron job
-
-        $this->set('ADURL',         $adurl);
+        $useragent              = $_SERVER['HTTP_USER_AGENT'];
+        if (!preg_match('/compatible; \w+Bot\//', $useragent))
+        {
+	        $getparms               = array('adname' => '!');
+	        $advertisers            = new RecordSet('Advertisers',
+	                                                $getparms);
+	        $info                   = $advertisers->getInformation();
+	        $count                  = $info['count'];
+	        $counterRec             = new Advertiser(array('adname' => ''));
+	        $counterRec->increment('01');   // stats count
+	        $index                  = $counterRec['count01'] % $count;
+	        $getparms               = array('adname'    => '!',
+	                                        'offset'    => $index,
+	                                        'limit'     => 1);
+	        $advertisers            = new RecordSet('Advertisers',
+	                                                $getparms);
+	        $advertiser             = $advertisers->rewind();
+	        $adname                 = $advertiser['adname'];
+	        $adurl                  = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://$_SERVER[HTTP_HOST]" . "/Advertisements/$adname.html";
+	        $date                   = date('m d');
+	        $month                  = substr($date, 0, 2);
+	        $advertiser->increment($month);
+	
+	        // the following code is to ensure that the count for
+	        // the next month is zero before the month begins
+	        // this should be moved to a cron job
+	        $day                    = substr($date, -2);
+	        if ($day == '28')
+	        {                   // move to cron job
+	            $month              += 1;
+	            if ($month > 12)
+	                $month          = $month - 13;
+	            if (strlen($month) == 1)
+	                $month          = '0' . $month;
+	            $advertiser->set("Count$month", 0);
+	            $advertiser->save(false);
+	        }                   // move to cron job
+	
+	        $this->set('ADURL',         $adurl);
+        }
+        else
+	        $this['advertSpan']->update(null);
 
         // if the script has not explicitly defined a special stylesheet
         // delete the alternate stylesheet tag

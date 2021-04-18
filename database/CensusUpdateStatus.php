@@ -72,8 +72,9 @@ use \NumberFormatter;
  *      2019/11/17      move CSS to <head>                              *
  *      2019/12/01      improved parameter validation                   *
  *		2020/01/22      internationalize numbers                        *
+ *		2021/04/04      escape CONTACTSUBJECT                           *
  *																		*
- *  Copyright &copy; 2020 James A. Cobban								*
+ *  Copyright &copy; 2021 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/Census.inc';
 require_once __NAMESPACE__ . '/CensusSet.inc';
@@ -329,7 +330,8 @@ $template->set('LANG',			    $lang);
 $template->set('CENSUS',			$censusYear);
 $template->set('SEARCH',			$searchPage);
 $template->set('CONTACTTABLE',		'Census' . $censusYear);
-$template->set('CONTACTSUBJECT',    '[FamilyTree]' . $_SERVER['REQUEST_URI']);
+$template->set('CONTACTSUBJECT',    '[FamilyTree]' . 
+                                    urlencode($_SERVER['REQUEST_URI']));
 
 // update popup link information
 $template->updateTag('mouseprevCensusLink',

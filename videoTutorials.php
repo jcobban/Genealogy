@@ -15,8 +15,9 @@ use \Exception;
  *		2018/10/15      get language apology text from Languages        *
  *		2019/02/18      use new FtTemplate constructor                  *
  *		2021/01/03      correct XSS vulnerability                       *
+ *      2021/04/04      escape contact subject URL                      *
  *																		*
- *  Copyright &copy; 2019 James A. Cobban								*
+ *  Copyright &copy; 2021 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . "/FtTemplate.inc";
 require_once __NAMESPACE__ . "/RecordSet.inc";
@@ -53,7 +54,8 @@ if (isset($_GET) && count($_GET) > 0)
 $template		= new FtTemplate("videoTutorials$lang.html");
 
 $template->set('CONTACTTABLE',		'Videos');
-$template->set('CONTACTSUBJECT',	'[FamilyTree]' . $_SERVER['REQUEST_URI']);
+$template->set('CONTACTSUBJECT',	'[FamilyTree]' . 
+                                    urlencode($_SERVER['REQUEST_URI']));
 $template->set('LANG', $lang);
 $videos		= new RecordSet('Videos', array('lang' => $lang));
 if ($videos->count() == 0)

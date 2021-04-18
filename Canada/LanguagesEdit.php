@@ -19,8 +19,9 @@ use \Exception;
  *		2019/02/21      use new FtTemplate constructor                  *
  *		2019/04/06      use new FtTemplate::includeSub                  *
  *		2020/03/13      use FtTemplate::validateLang                    *
+ *		2021/04/04      escape CONTACTSUBJECT                           *
  *											                            *
- *  Copyright &copy; 2020 James A. Cobban						        *
+ *  Copyright &copy; 2021 James A. Cobban						        *
  ************************************************************************/
 require_once __NAMESPACE__ . "/Language.inc";
 require_once __NAMESPACE__ . "/RecordSet.inc";
@@ -235,7 +236,8 @@ $gotPage	    = $template->includeSub($includeSub,
 
 $template->set('PATTERN',		    $pattern);
 $template->set('CONTACTTABLE',	    'Languages');
-$template->set('CONTACTSUBJECT',	'[FamilyTree]' . $_SERVER['REQUEST_URI']);
+$template->set('CONTACTSUBJECT',    '[FamilyTree]' . 
+                                    urlencode($_SERVER['REQUEST_URI']));
 $template->set('LANG',              $lang);
 $template->set('OFFSET',            $offset);
 $template->set('LIMIT',             $limit);

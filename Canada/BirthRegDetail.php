@@ -141,8 +141,9 @@ use \Exception;
  *		                fix undefined variables                         *
  *		2020/10/01      erroneously matched to Ontario Death Register   *
  *		2020/11/28      correct XSS errors                              *
+ *		2021/04/04      escape CONTACTSUBJECT                           *
  *																		*
- *  Copyright &copy; 2020 James A. Cobban								*
+ *  Copyright &copy; 2021 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/FtTemplate.inc';
 require_once __NAMESPACE__ . '/County.inc';
@@ -375,7 +376,8 @@ $template->set('countyName',	$countyName);
 $template->set('regTownship',	$regTownship);
 $template->set('LANG',		    $lang);
 $template->set('CONTACTTABLE',	'Births');
-$template->set('CONTACTSUBJECT','[FamilyTree]' . $_SERVER['REQUEST_URI']);
+$template->set('CONTACTSUBJECT',    '[FamilyTree]' . 
+                                    urlencode($_SERVER['REQUEST_URI']));
 
 // internationalization support
 $monthsTag		    = $trtemplate->getElementById('Months');

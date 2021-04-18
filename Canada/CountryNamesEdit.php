@@ -227,7 +227,8 @@ $template->set('LANG',		        $lang);
 $template->set('CC',		        $cc);
 $template->set('COUNTRYNAME',	    $countryName);
 $template->set('CONTACTTABLE',	    'CountryNames');
-$template->set('CONTACTSUBJECT',	'[FamilyTree]' . $_SERVER['REQUEST_URI']);
+$template->set('CONTACTSUBJECT',    '[FamilyTree]' . 
+                                    urlencode($_SERVER['REQUEST_URI']));
 
 if (strlen($msg) == 0)
 {			// no errors detected

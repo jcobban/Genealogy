@@ -47,6 +47,7 @@ use \Templating\Template;
  *      2021/01/13      correct XSS exposures                           *
  *                      improve parameter validation                    *
  *                      get message texts from template                 *
+ *		2021/04/04      escape CONTACTSUBJECT                           *
  *                                                                      *
  *  Copyright &copy; 2021 James A. Cobban                               *
  ************************************************************************/
@@ -401,7 +402,8 @@ if ($changed)
 }                       // invoked to display table
 
 $template->set('CONTACTTABLE',      'Counties');
-$template->set('CONTACTSUBJECT',    '[FamilyTree]' . $_SERVER['REQUEST_URI']);
+$template->set('CONTACTSUBJECT',    '[FamilyTree]' . 
+                                    urlencode($_SERVER['REQUEST_URI']));
 $template->set('DOMAIN',            $domain);
 $template->set('DOMAINNAME',        $domainName);
 $template->set('STATENAME',         $stateName);

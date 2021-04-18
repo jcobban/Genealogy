@@ -307,6 +307,7 @@ function changeTree()
  ************************************************************************/
 function newTreeNameChanged()
 {
+        alert("newTreeNameChanged");
     hideDialog();
     var newTreeName = this.value;
     var patt        = /^[A-Z][A-Z ']*$/i;

@@ -9,11 +9,15 @@
  *      2018/10/30      use Node.textContent rather than getText        *
  *      2019/02/10      no longer need to call pageInit                 *
  *      2020/01/04      add cancel button                               *
+ *      2021/04/04      use ES2015 import                               *
  *                                                                      *
  *  Copyright &copy; 2020 James A. Cobban                               *
  ************************************************************************/
+import {HTTP} from "../jscripts6/js20/http.js";
+import {closeFrame}
+            from "../jscripts6/util.js";
 
-window.onload   = onLoad;
+window.addEventListener("load", onLoad);
 
 /************************************************************************
  *  function onLoad                                                     *
@@ -23,7 +27,6 @@ window.onload   = onLoad;
  ************************************************************************/
 function onLoad()
 {
-    let trace   = '';
     // activate functionality for individual input elements
     for(let i = 0; i < document.forms.length; i++)
     {               // loop through all forms
@@ -34,7 +37,6 @@ function onLoad()
             let name        = element.name;
             if (!name || name.length == 0)
                 name        = element.id;
-            trace           += name + ", ";
             // identify change action for each cell
             switch(name.toLowerCase())
             {       // switch on column name
@@ -48,7 +50,6 @@ function onLoad()
 
                 case 'blog':
                 {   // action button
-                    trace   += "onclick=postBlog, ";
                     element.onclick     = postBlog;
                     break;
                 }   // action button
@@ -71,10 +72,11 @@ function onLoad()
  *                                                                      *
  *  Input:                                                              *
  *      this            <button id='Blog'> element                      *
- *      e               instance of Event                               *
+ *      ev              instance of Event                               *
  ************************************************************************/
-function postBlog(e)
+function postBlog(ev)
 {
+    ev.stopPropagation();
     let form    = this.form;
     let parms   = {'id'         : form.id.value,
                    'tablename'  : form.tablename.value,
@@ -136,10 +138,11 @@ function noPosted()
  *                                                                      *
  *  Input:                                                              *
  *      this            <button id='Cancel'> element                    *
- *      e               instance of Event                               *
+ *      ev              instance of Event                               *
  ************************************************************************/
-function cancel(e)
+function cancel(ev)
 {
+    ev.stopPropagation();
     closeFrame();
 }       // function cancel
 

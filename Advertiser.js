@@ -6,11 +6,14 @@
  *                                                                      *
  *  History:                                                            *
  *      2020/01/17      created                                         *
+ *      2021/04/01      use ES2015 import                               *
  *                                                                      *
  *  Copyright &copy; 2020 James A. Cobban                               *
  ************************************************************************/
+import {eltMouseOver, eltMouseOut, keyDown} from "../jscripts6/util.js";
+import {changeElt} from "../jscripts6/CommonForm.js";
 
-window.onload   = onLoad;
+window.addEventListener("load", onLoad);
 
 /************************************************************************
  *  function onLoad                                                     *
@@ -76,6 +79,7 @@ function onLoad()
             }           // act on a field
         }               // loop through all elements in the form
     }                   // loop through all forms
+    console.log("Advertiser.js: onLoad: " + trace);
 
 }       // function onLoad
 
@@ -104,6 +108,8 @@ function changeEmail()
  ************************************************************************/
 function uploadAdvertisement(ev)
 {
+    ev.stopPropagation();
+
     var fileelt             = document.getElementById('file');
     var count               = fileelt.files.length;
     if (count == 0)
@@ -131,7 +137,9 @@ function uploadAdvertisement(ev)
  ************************************************************************/
 function fileSelected(ev)
 {
-        let file            = this.files[0];
-        alert("file=" + file.name);
+    ev.stopPropagation();
+
+    let file            = this.files[0];
+    console.log("Advertiser.js: fileSelected: file=" + file.name);
     this.form.submit();
 }       // function fileSelected

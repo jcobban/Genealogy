@@ -8,19 +8,19 @@ use \Templating\TemplateTag;
 /************************************************************************
  *  Person.php                                                          *
  *                                                                      *
- *  Display a web page containing details of an particular individual   *
- *  from the Legacy table of individuals.                               *
+ *  Display a web page containing details of an particular Person       *
+ *  from the database table of Persons.                                 *
  *                                                                      *
  *  Parameters (passed by method="get")                                 *
- *      idir    unique numeric identifier of the individual to display  *
+ *      idir    unique numeric identifier of the Person to display      *
  *              Optional if UserRef is specified                        *
- *      UserRef user assigned identifier of the individual to display.  *
+ *      UserRef user assigned identifier of the Person to display.      *
  *              Ignored if idir is specified                            *
  *                                                                      *
  * History:                                                             *
  *      2010/08/11      Fix blog code so the option to blog appears     *
  *                      if there are no existing blog messages on the   *
- *                      individual.  Change to use Ajax to add blog     *
+ *                      Person.  Change to use Ajax to add blog         *
  *                      message.                                        *
  *      2010/08/11      Cleanup parameter handling code to avoid        *
  *                      PHP warnings if parameter omitted.              *
@@ -295,8 +295,12 @@ use \Templating\TemplateTag;
  *      2020/06/02      avoid exception on undefined locations          *
  *      2020/08/22      do not ask for parents or families if IDIR 0    *
  *      2020/12/03      correct XSS issues                              *
+ *      2021/03/13      change implementation of showEvent to use       *
+ *                      translate table in template and use simple      *
+ *                      text substitution.                              *
+ *      2021/03/19      migrate to ES2015                               *
  *                                                                      *
- *  Copyright &copy; 2020 James A. Cobban                               *
+ *  Copyright &copy; 2021 James A. Cobban                               *
  ************************************************************************/
 require_once __NAMESPACE__ . '/Address.inc';
 require_once __NAMESPACE__ . '/Blog.inc';
@@ -330,23 +334,22 @@ static $dateTemplate    = '[dd] [Month] [yyyy][BC]';
 /************************************************************************
 // gender pronouns for the current language                             *
  ***********************************************************************/
-$malePronoun         = 'He';
-$femalePronoun         = 'She';
-$otherPronoun         = 'He/She';
-$maleChildRole         = 'son';
-$femaleChildRole     = 'daughter';
-$unknownChildRole     = 'child';
-$deathcause         = array();
+$malePronoun            = 'He';
+$femalePronoun          = 'She';
+$otherPronoun           = 'He/She';
+$maleChildRole          = 'son';
+$femaleChildRole        = 'daughter';
+$unknownChildRole       = 'child';
+$deathcause             = array();
 
 /************************************************************************
  *  $statusText                                                         *
  *                                                                      *
  *  This table provides a translation from an marriage status to        *
- *  the text to display to the user for the pre-defined values.         *
- *  This saves issuing an SQL query to obtain the text for these        *
- *  common values.                                                      *
+ *  the text to display to the user for the pre-defined values in       *
+ *  the current language.                                               *
  ************************************************************************/
-static $statusText  = array();
+static $statusText      = array();
 
 /************************************************************************
  *  $nextFootnote       next footnote number to use                     *
@@ -358,15 +361,15 @@ $nextFootnote           = 1;
  *                                                                      *
  *      Each entry in this table is:                                    *
  *      o  an object implementing the method toHtml, such as an         *
- *         instance of Citation                                         *
- *      o  an object implementing the method getNotes                   *
+ *         instance of Citation, or                                     *
+ *      o  an object implementing the method getNotes, or               *
  *      o  a string                                                     *
  ************************************************************************/
 $citTable               = array();
 
 /************************************************************************
- *  $citByVal       table to map displayed unique value to              *
- *                  footnote number                                     *
+ *  $citByVal       table to map displayed unique citation string value *
+ *                  to a footnote number to eliminate duplicates.       *
  ************************************************************************/
 $citByVal               = array();
 
@@ -391,20 +394,20 @@ $locationTable          = array();
 $templeTable            = array();
 
 /************************************************************************
- *  $addressTable       table to map IDAR to instance of Address        *
+ *  $addressTable   table to map IDAR to instance of Address            *
  ************************************************************************/
 $addressTable           = array();
 
 /************************************************************************
  *  function createPopups                                               *
  *                                                                      *
- *  Create popups for any individuals identified by hyper-links in      *
+ *  Create popups for any Persons identified by hyper-links in          *
  *  the supplied text.                                                  *
  *                                                                      *
  *  Parameters:                                                         *
- *      $desc       text to check for hyper-links to individuals		*
+ *      $desc       text to check for hyper-links to Persons		    *
  *                                                                      *
- *  Returns: the supplied text, ensuring that the hyperlinks use		*
+ *  Returns:    the supplied text, ensuring that the hyperlinks use		*
  *              absolute URLs.                                          *
  ************************************************************************/
 function createPopups($desc)
@@ -436,7 +439,7 @@ function createPopups($desc)
                                  $urlend - $urlstart);
         $equalpos = strrpos($url, "idir=");
         if ($equalpos !== false)
-        {       // link to an individual
+        {       // link to a Person
             $refidir     = substr($url, $equalpos + 5);
             if (preg_match('/^\d+/', $refidir, $matches))
             {
@@ -466,7 +469,7 @@ function createPopups($desc)
  *  Parameters:                                                         *
  *      $key            string representation of the citation			*
  *                      for uniqueness check                            *
- *      $cit             instance of Citation, or a string				*
+ *      $cit            instance of Citation, or a string				*
  *                                                                      *
  *  Returns:                                                            *
  *      assigned footnote number                                        *
@@ -495,15 +498,18 @@ function addFootnote($key,
 /************************************************************************
  *  function showCitations                                              *
  *                                                                      *
- *  Given the description of an individual event identify the           *
- *  source citations for that event, emit the HTML for a superscript    *
- *  footnote reference, and add the footnote to the current             *
- *  individual's page.                                                  *
+ *  Given the description of a Person event identify the                *
+ *  source citations for that event, generate the HTML for              *
+ *  superscript footnote references, and add the footnote to the        *
+ *  current page.                                                       *
  *                                                                      *
  *  Input:                                                              *
  *      $event          instance of Event or citation type in tblSX		*
  *      $idime          record identifier of the event or object which	*
  *                      the citation documents                          *
+ *                                                                      *
+ *  Returns:                                                            *
+ *      String containing HTML for citations.                           *
  ************************************************************************/
 function showCitations($event,
                        $idime = null,
@@ -513,6 +519,8 @@ function showCitations($event,
     global  $warn;
     global  $connection;
     global  $template;
+
+    $retval             = '';
 
     // query the database
     if ($event instanceof Event)
@@ -532,10 +540,11 @@ function showCitations($event,
     {       // loop through all citation records
         // manage the tables of citations
         $footnote       = addFootnote($cit->getName(false), $cit);
-        print "<sup>$comma<a href=\"#fn$footnote\">$footnote</a></sup>";
+        $retval         .= "<sup>$comma<a href=\"#fn$footnote\">$footnote</a></sup>";
         $comma          = ',';
     }       // loop through all event records
 
+    return $retval;
 }       // function showCitations
 
 /************************************************************************
@@ -590,27 +599,25 @@ function showCitationTable()
  *  function showEvent                                                  *
  *                                                                      *
  *  Generate the HTML to display information about an event             *
- *  of an individual.                                                   *
+ *  of a Person.                                                        *
  *                                                                      *
  *  Parameters:                                                         *
- *      $pronoun        pronoun appropriate for described individual	*
- *      $gender         gender of individual being described			*
+ *      $pronoun        pronoun appropriate for described Person	    *
+ *      $gender         gender of Person being described			    *
  *      $event          instance of Event containing the event			*
  *                      information                                     *
  *      $template       string template to fill in						*
  *                      This template has substitution points for:      *
- *                          [Pronoun]                                   *
- *                          [onDate]                                    *
- *                          [Location]                                  *
- *                          [Description]                               *
- *                          [Temple]                                    *
- *                          [Notes]                                     *
- *                          [Citations]                                 *
- *                      Anything else inside square brackets is displayed*
- *                      only if the gender of the individual is female, *
- *                      except if it starts with an exclamation mark (!)*
- *                      in which case the remaining text is included    *
- *                      only if the individual is male.                 *
+ *                          $Pronoun                                    *
+ *                          $reflexivePronoun                           *
+ *                          $possesivePronoun                           *
+ *                          $onDate                                     *
+ *                          $Location                                   *
+ *                          $atLocation                                 *
+ *                          $Description                                *
+ *                          $Temple                                     *
+ *                          $Notes                                      *
+ *                          $Citations                                  *
  ***********************************************************************/
 function showEvent($pronoun,
                    $gender,
@@ -623,8 +630,8 @@ function showEvent($pronoun,
     global  $debug;
     global  $warn;
 
-    // determine privacy limits from the associated individual
-    // previously the privacy limits of the primary individual were used
+    // determine privacy limits from the associated Person
+    // previously the privacy limits of the primary Person were used
     // which meant a younger spouse could have private information revealed
     $person         = $event->getPerson();
     $bprivlim       = $person->getBPrivLim();
@@ -663,9 +670,11 @@ function showEvent($pronoun,
          )
         )
        )        // childhood events
-        $date     = $dateo->toString($bprivlim, true, $t);
+        $date           = $dateo->toString($bprivlim, true, $t);
     else        // adult events
-        $date     = $dateo->toString($dprivlim, true, $t);
+        $date           = $dateo->toString($dprivlim, true, $t);
+    if (strtolower($date) == 'private')
+        $somePrivate    = true;
 
     if ($debug)
     {
@@ -677,6 +686,28 @@ function showEvent($pronoun,
                     ", date='" . htmlspecialchars($date) . "'</p>\n";
     }
 
+    // identify pronouns
+    if ($person['gender'] == Person::MALE)
+    {
+        $pronoun            = $t['He'];
+        $reflexivePronoun   = $t['Himself'];
+        $possesivePronoun   = $t['His'];
+    }
+    else
+    if ($person['gender'] == Person::FEMALE)
+    {
+        $pronoun            = $t['She'];
+        $reflexivePronoun   = $t['Herself'];
+        $possesivePronoun   = $t['Hers'];
+    }
+    else
+    {
+        $pronoun            = $t['He/She'];
+        $reflexivePronoun   = $t['His/Herself'];
+        $possesivePronoun   = $t['His/Hers'];
+    }
+
+    $bprivlim       = $person->getBPrivLim();   // birth privacy limit year
     // the first letter of the date text string is folded to lower case
     // so it can be in middle of sentence
     if (strlen($date) >= 1 && substr($date, 0, 1) != 'Q')
@@ -705,165 +736,42 @@ function showEvent($pronoun,
     }       // Address used
 
     // check for description text
-    $desc = $event->get('description');
+    $description            = $event->get('description');
     if (strlen($date) > 0 ||
         $idlr > 1 ||
         $idar > 1 ||
-        strlen($desc) > 0)
+        strlen($description) > 0)
     {       // there is a non-empty event of this kind
-        // split the template so that each piece, except the first
-        // starts with the name of a substitution token
-        $pieces         = explode('[', $template);
-        $split          = false;
-        $pendingWord = '';
-        foreach($pieces as $piece)
-        {   // loop through template
-            if ($split)
-            {   // split substitution name from text
-                $elts       = explode(']', $piece, 2);
-                $subname    = $elts[0];
-                $text       = $elts[1];
-                switch($subname)
-                {           // act upon name of substitution
-                    case 'Pronoun':
-                    {           // pronoun he/she
-                        print $pronoun;
-                        break;
-                    }           // pronoun he/she
+        $notes              = $event->get('desc');
+        if (strlen($notes) > 7 &&
+            substr($notes, 0, 3) == '<p>' &&
+            substr($notes, strlen($notes) - 4) == '</p>')
+            $notes          = substr($notes, 3, strlen($notes) - 7);
+        if (strlen($notes) > 0)
+            $notes          = str_replace("\r\r", "\n<p>", $notes);
 
-                    case 'onDate':
-                    {           // on <date>
-                        print $pendingWord . ' ';
-                        print $date;
-                        if (strtolower($date) == 'private')
-                            $somePrivate = true;
-                        break;
-                    }           // on <date>
+        print str_replace(array('$Pronoun',
+                                '$reflexivePronoun',
+                                '$possesivePronoun',
+                                '$onDate',
+                                '$Location',
+                                '$atLocation',
+                                '$Description',
+                                '$Temple',
+                                '$Notes',
+                                '$Citations'),
+                          array($pronoun,
+                                $reflexivePronoun,
+                                $possesivePronoun,
+                                $date,
+                                showLocation($loc,'',''),
+                                showLocation($loc),
+                                createPopups($description),
+                                showLocation($loc),
+                                $notes,
+                                showCitations($event)),
+                          $template);
 
-                    case 'Location':
-                    {           // display location text here
-                        print $pendingWord . ' ';
-                        if ($loc)
-                        {       // location resolved
-                            showLocation($loc);
-                        }       // location resolved
-                        break;
-                    }           // display location text here
-
-                    case 'toLocation':
-                    {           // display location with 'to' prefix
-                        print $pendingWord . ' ';
-                        if ($loc)
-                        {       // location resolved
-                            showLocation($loc, '', 'to');
-                        }       // location resolved
-                        break;
-                    }           // display location with 'to' prefix
-
-                    case 'Description':
-                    {           // display description text here
-                        $descWords = explode(' ', $desc, 2);
-                        $firstWord = $descWords[0];
-                        if (count($descWords) > 1)
-                            $descRest = $descWords[1];
-                        else
-                            $descRest = '';
-                        if ($firstWord == 'the' ||
-                            $firstWord == 'King' ||
-                            $firstWord == 'Queen' ||
-                            $firstWord == 'Lord' ||
-                            $firstWord == 'Lady' ||
-                            $firstWord == 'Duke' ||
-                            $firstWord == 'Duchess' ||
-                            $firstWord == 'Earl' ||
-                            $firstWord == 'Count' ||
-                            $firstWord == 'Countess' ||
-                            $firstWord == 'Marquis' ||
-                            $firstWord == 'Marchioness')
-                        {       // do not emit article
-                        }       // do not emit article
-                        else
-                        if (isFirstVowel($desc))
-                        {       // description begins with a vowel
-                            if ($pendingWord == 'a')
-                                print 'an ';
-                            else
-                                print $pendingWord . ' ';
-                        }       // description begins with a vowel
-                        else
-                            print $pendingWord . ' ';
-
-                        // create popups for any hyper-links in the desc
-                        print createPopups($desc);
-                        break;
-                    }           // display description text here
-
-                    case 'Temple':
-                    {           // display temple name here
-                        print $pendingWord . ' ';
-                        if ($loc)
-                        {
-                            showLocation($loc);
-                        }
-                        break;
-                    }           // display temple name here
-
-                    case 'Notes':
-                    {           // display notes here
-                        print $pendingWord . ' ';
-                        $note = $event->get('desc');
-                        if (strlen($note) > 7 &&
-                            substr($note, 0, 3) == '<p>' &&
-                            substr($note, strlen($note) - 4) == '</p>')
-                            $note = substr($note, 3, strlen($note) - 7);
-                        if (strlen($note) > 0)
-                            print str_replace("\r\r", "\n<p>", $note);
-                        break;
-                    }           // display notes here
-
-                    case 'Citations':
-                    {           // display citation references here
-                        print $pendingWord . ' ';
-                        showCitations($event);
-                        break;
-                    }           // display citation references here
-
-                    default:
-                    {           // male or female only text
-                        if (substr($subname, 0, 1) == '!')
-                        {   // display text if male
-                            print $pendingWord . ' ';
-                            if ($gender == Person::MALE)
-                                print substr($subname, 1);
-                        }   // display text if male
-                        else
-                        {   // display text if female
-                            print $pendingWord . ' ';
-                            if ($gender == Person::FEMALE)
-                                print $subname;
-                        }   // display text if female
-                        break;
-                    }           // male or female only text
-                }           // act upon name of substitution
-
-                // print the language specific text
-                if (substr($text, strlen($text) - 3) == ' a ')
-                {   // last word in text is article "a"
-                    print substr($text, 0, strlen($text) - 2);
-                    $pendingWord = 'a';
-                }   // last word in text is article "a"
-                else
-                {   // no special final word
-                    print $text;
-                    $pendingWord = '';
-                }   // no special final word
-            }   // split substitution name from text
-            else
-            {   // no substitution name, just text
-                print $piece;
-                $split = true;
-            }   // no substitution name, just text
-        }   // loop through template
     }       // there is an event of this kind
     print "\n";
 }       // function showEvent
@@ -890,11 +798,12 @@ function showLocation($location,
     global  $addressTable;
     global  $lang;
 
+    $retval                 = '';
     if ($location instanceof Location)
     {               // Location
         if ($location->isExisting())
         {
-            $idlr         = $location->getIdlr();
+            $idlr           = $location->getIdlr();
             $locationTable[$idlr] = $location;
         }
         else
@@ -927,35 +836,42 @@ function showLocation($location,
     }               // Address
     else
     {               // unsupported
-        error_log("Person.php: showLocation: ".
-                    "called with invalid object " .
-                    print_r($location, true));
-        return;
+        return "";
     }               // unsupported
 
     $locname            = $location->toString();
     if (strlen($locname) > 0)
     {               // location defined
-        $prep           = $location->getPreposition();
-        if (strlen($prep) > 0)
+        if ($defPrep == 'at')
         {
+            $prep           = $location->getPreposition();
+            if ($prep == '')
+                $prep       = 'at';
             if (array_key_exists($prep, $t))
-                print $t[$prep];
+                $retval	    .= $t[$prep];
             else
-                print $prep;
+                $retval	    .= $prep;
         }
         else
-            print $t[$defPrep];
-        print " <span id=\"{$idprefix}{$locindex}_{$idlr}\">$locname</span>\n";
+        if (strlen($defPrep) > 0)
+        {
+            if (array_key_exists($defPrep, $t))
+                $retval	    .= $t[$defPrep];
+            else
+                $retval	    .= $defPrep;
+        }
+
+        $retval	        .= " <span id=\"{$idprefix}{$locindex}_{$idlr}\">$locname</span>\n";
         $locindex++;
     }               // location defined
+    return $retval;
 }       // function showLocation
 
 /************************************************************************
  *  function showParents                                                *
  *                                                                      *
  *  Generate the HTML to display information about the parents          *
- *  of an individual.                                                   *
+ *  of a Person.                                                   *
  *                                                                      *
  *  Input:                                                              *
  *      $person     reference to an instance of Person                  *
@@ -1138,11 +1054,11 @@ function showParents($person)
 /************************************************************************
  *  function showEvents                                                 *
  *                                                                      *
- *  Given the identifier of an individual, extract information          *
- *  about that individual's Events.                                     *
+ *  Given the identifier of a Person, extract information               *
+ *  about that Person's Events.                                         *
  *                                                                      *
  *  Parameters:                                                         *
- *      $person     individual whose events are to be displayed.		*
+ *      $person     Person whose events are to be displayed.		    *
  ************************************************************************/
 function showEvents($person)
 {
@@ -1182,7 +1098,7 @@ function showEvents($person)
     $bprivlim       = $person->getBPrivLim();   // birth privacy limit year
     $dprivlim       = $person->getDPrivLim();   // death privacy limit year
 
-    // display the event table entries for this individual
+    // display the event table entries for this Person
     $events         = $person->getEvents();
     foreach($events as $ider => $event)
     {               // loop through all event records
@@ -1228,8 +1144,8 @@ function showEvents($person)
     <span id="<?php print $deathid; ?>">
                 <?php print $cause; ?>
 <?php
-                        showCitations(Citation::STYPE_DEATHCAUSE,
-                                      $idir);
+                        print showCitations(Citation::STYPE_DEATHCAUSE,
+                                            $idir);
 ?>
     </span>.
 <?php
@@ -1279,8 +1195,8 @@ function showEvents($person)
     <span id="<?php print $deathid; ?>">
                 <?php print $cause; ?>
 <?php
-                    showCitations(Citation::STYPE_DEATHCAUSE,
-                                  $idir);
+                    print showCitations(Citation::STYPE_DEATHCAUSE,
+                                        $idir);
 ?>
     </span>.
 <?php
@@ -1337,57 +1253,63 @@ function displayEvent($ider,
     global  $warn;
 
     // display event
-    $idet                   = $event->getIdet();
+    $idet                       = $event->getIdet();
     if ($idet == Event::ET_MARRIAGE)
-    {                   // marriage event
-        $date               = $event->getDate();
-        $idlrmar            = $event->get('idlrevent');
-        if (strlen($date) > 0 || $idlrmar > 1)
-        {               // non empty event
-            print $pronoun . ' ' . $t[$family->getStatusVerb()];
-            // only display a sentence about the marriage
-            // if there is a spouse defined
-            if ($spsid > 0)
-            {           // have a spouse
+    {                       // marriage event
+        $date                   = $event->getDate();
+        $idlrmar                = $event->get('idlrevent');
+        print $pronoun . ' ' . $t[$family->getStatusVerb()];
+        // only display a sentence about the marriage
+        // if there is a spouse defined
+        if ($spsid > 0)
+        {                   // have a spouse
 ?>
         <a href="<?php print $directory; ?>Person.php?idir=<?php print $spsid; ?>&amp;lang=<?php print $lang; ?>" class="<?php print $spsclass; ?>"><?php print $spsName->getName(); ?></a>
 <?php
-            }           // have a spouse
+        }                   // have a spouse
+        else
+        {                   // do not have a spouse
+            print " " . $t['an unknown person'];
+        }                   // do not have a spouse
+        
+        if (strlen($date) > 0)
+        {
+            if (ctype_digit($date))
+                print ' ' . $t['in'] . ' ';
             else
-            {           // do not have a spouse
-                print " " . $t['an unknown person'];
-            }           // do not have a spouse
+            if (ctype_digit(substr($date,0,1)))
+                print ' ' . $t['on'] . ' ';
+            print ' ' . $date;
+        }
             
-            if (strlen($date) > 0)
-            {
-                if (ctype_digit($date))
-                    print ' ' . $t['in'] . ' ';
-                else
-                if (ctype_digit(substr($date,0,1)))
-                    print ' ' . $t['on'] . ' ';
-                print ' ' . $date;
-            }
-                
-            // location of marriage
-            if ($idlrmar > 1)
-            {               // have location of marriage
-                print ' ';  // separate from preceding date
-                $marloc         = Location::getLocation($idlrmar);
-                showLocation($marloc);
-            }               // have location of marriage
+        // location of marriage
+        if ($idlrmar > 1)
+        {                   // have location of marriage
+            print ' ';      // separate from preceding date
+            $marloc             = Location::getLocation($idlrmar);
+            print showLocation($marloc);
+        }                   // have location of marriage
+        $mnotes         = $event['notes'];
+        if (strlen($mnotes) == 0)
             print ".\n";
-                
-            // show citations for this marriage
-            if ($ider < 1000000000)
-            {               // real Event
-                showCitations($event);
-            }               // real Event
-            else
-            {               // internal Event
-                showCitations(Citation::STYPE_MAR,
-                              $family->getIdmr());
-            }               // internal Event
-        }                   // non empty event
+            
+        // show citations for this marriage
+        if ($ider < 1000000000)
+        {                   // real Event
+            print showCitations($event);
+        }                   // real Event
+        else
+        {                   // internal Event
+            print showCitations(Citation::STYPE_MAR,
+                                $family->getIdmr());
+        }                   // internal Event
+
+        // show marriage notes
+        if (strlen($mnotes) > 0)
+        {       // notes defined for this family
+            $mnotes     = createPopups($mnotes);
+            print str_replace("\n\n", "\n<p>", $mnotes) . "\n";
+        }       // notes defined for this family
     }                       // marriage event
     else
     if ($idet == Event::ET_LDS_SEALED)
@@ -1412,32 +1334,32 @@ function displayEvent($ider,
 
 // generate unique id values for the <span> enclosing each location
 // reference
-$locindex       = 1;
+$locindex       		= 1;
 
 // process input parameters
-$idir           = null;
-$person         = null;
-$private        = true;
-$somePrivate    = false;
-$prefix         = '';
-$givenName      = '';
-$surname        = '';
-$treeName       = '';
+$idir           		= null;
+$person         		= null;
+$private        		= true;
+$somePrivate    		= false;
+$prefix         		= '';
+$givenName      		= '';
+$surname        		= '';
+$treeName       		= '';
 // parameter to nominalIndex.php
-$nameuri        = '';
-$birthDate      = '';
-$deathDate      = '';
-$lang           = 'en';
-$getParms       = array();
+$nameuri        		= '';
+$birthDate      		= '';
+$deathDate      		= '';
+$lang           		= 'en';
+$getParms       		= array();
 
 foreach($_GET as $key => $value)
 {                   // loop through all parameters
-    $value  = trim($value);
+    $value  		    = trim($value);
     switch(strtolower($key))
     {               // act on specific parameters
         case 'idir':
         case 'id':
-        {           // get the individual by identifier
+        {           // get the Person by identifier
             if (is_int($value) || ctype_digit($value))
             {
                 $idir   = $value;
@@ -1446,10 +1368,10 @@ foreach($_GET as $key => $value)
             else
                 $msg    .= "Invalid IDIR=" . htmlspecialchars($value) . ". ";
             break;
-        }           // get the individual by identifier
+        }           // get the Person by identifier
 
         case 'userref':
-        {           // get the individual by user reference
+        {           // get the Person by user reference
             if (preg_match('/^[a-zA-Z0-9_ ]{1,50}$/', $value))
             {
                 $getParms['userref'] = $value;
@@ -1458,11 +1380,11 @@ foreach($_GET as $key => $value)
                 $msg    .= "Invalid UserRef='" . 
                             htmlspecialchars($value) . "'. ";
             break;
-        }           // get the individual by user reference
+        }           // get the Person by user reference
 
         case 'lang':
         {
-            $lang     = FtTemplate::validateLang($value);
+            $lang       = FtTemplate::validateLang($value);
             break;
         }
     }               // act on specific parameters
@@ -1486,14 +1408,14 @@ $statusText             = $translate['msStmts'];
 $cpRelType              = $translate['cpRelType'];
 
 // interpret event type IDET as a sentence with substitutions
-$eventText              = $translate['eventStmt'];
+$eventText              = $template['eventStmt'];
 
-$malePronoun         = $t['He'];
-$femalePronoun         = $t['She'];
-$otherPronoun         = $t['He/She'];
-$maleChildRole         = $t['son'];
-$femaleChildRole     = $t['daughter'];
-$unknownChildRole     = $t['child'];
+$malePronoun            = $t['He'];
+$femalePronoun          = $t['She'];
+$otherPronoun           = $t['He/She'];
+$maleChildRole          = $t['son'];
+$femaleChildRole        = $t['daughter'];
+$unknownChildRole       = $t['child'];
 
 // translate the gender of a child to the appropriate noun
 $childRole              = array($maleChildRole,         // son
@@ -1501,11 +1423,11 @@ $childRole              = array($maleChildRole,         // son
                                 $unknownChildRole);     // child
 
 // interpret the value of the IDCS field in Child
-$intStatus             = array(1           => '',
-                               2           => $t['None'],
-                               3           => $t['Stillborn'],
-                               4           => $t['Twin'],
-                               5           => $t['Illegitimate']);
+$intStatus              = array(1           => '',
+                                2           => $t['None'],
+                                3           => $t['Stillborn'],
+                                4           => $t['Twin'],
+                                5           => $t['Illegitimate']);
 
 // must have a parameter
 if (count($getParms) == 0)
@@ -1576,7 +1498,7 @@ else
         }
     }
 
-    // determine if the individual is private
+    // determine if the Person is private
     if (($birthDate != 'Private' && $person->get('private') == 0) ||
         $isOwner)
         $private            = false;
@@ -1600,12 +1522,12 @@ else
 ob_start();
 
 if (!is_null($person))
-{       // individual found
+{       // Person found
 
     if ($private)
     {
 ?>
-<p class="label">Information on this individual is Private</p>
+<p class="label">Information on this Person is Private</p>
 <?php
     }
     else
@@ -1621,22 +1543,22 @@ if (!is_null($person))
         // if debugging, dump out details of record
         $person->dump("Person.php: " . __LINE__);
 
-        // Print the name of the individual before the first event
+        // Print the name of the Person before the first event
 ?>
 <p><?php print $person->getName(); ?>
 <?php
         // print citations for the name
-        showCitations(Citation::STYPE_NAME,     // traditional citations
-                      $person->getIdir());
+        print showCitations(Citation::STYPE_NAME,     // traditional 
+                            $person->getIdir());
         $priName        = $person->getPriName();// new citations
         $idnx           = $priName['idnx'];
-        showCitations(Citation::STYPE_ALTNAME,
-                      $idnx);
+        print showCitations(Citation::STYPE_ALTNAME,
+                            $idnx);
         print ' ';      // separate name from following
 
-        // show information about the parents of this individual
+        // show information about the parents of this Person
         // This is always displayed
-        // so the user can trace up the tree to non-private individuals
+        // so the user can trace up the tree to non-private Persons
         showParents($person);
 
         // display any alternate names
@@ -1645,8 +1567,8 @@ if (!is_null($person))
         {
             print $pronoun . ' ' . $t['was also known as'] . ' ' .
                 $altName->getName() . '. ';
-            showCitations(Citation::STYPE_ALTNAME,
-                          $idnx);
+            print showCitations(Citation::STYPE_ALTNAME,
+                                $idnx);
             $note = $altName->get('akanote');
             if (strlen($note) > 0)
                 print $note . ' ';
@@ -1688,18 +1610,18 @@ if (!is_null($person))
                 print str_replace("\n\n", "\n<p>", $notes);
             else
                 print str_replace("<p>", "<p class=\"notes\">", $notes);
-            showCitations(Citation::STYPE_NOTESGENERAL,
-                      $idir);
+            print showCitations(Citation::STYPE_NOTESGENERAL,
+                                $idir);
 ?>
     </p>
 <?php
         }       // notes defined
 
-        // show any images/video files for the main individual
+        // show any images/video files for the main Person
         if (!$private)
             $person->displayPictures(Picture::IDTYPEPerson);
 
-        // show information about families in which this individual
+        // show information about families in which this Person
         // is a spouse or partner
         if ($debug)
             $warn   .= "<p>\$person-&gt;getFamilies()</p>\n";
@@ -1770,32 +1692,36 @@ if (!is_null($person))
                                                         true,
                                                         $t);
 
+                $events             = $family->getEvents();
 ?>
     <p style="clear: both;">
 <?php
-                print $pronoun . ' ' . $t[$family->getStatusVerb()];
-                // only display a sentence about the marriage
-                // if there is a spouse defined
-                if ($spsid > 0)
-                {       // have a spouse
+                $verb               = $family->getStatusVerb();
+                if ($events->count() == 0)
+                {
+                    print $pronoun . ' ' . $t[$verb];
+                    // only display a sentence about the marriage
+                    // if there is a spouse defined
+                    if ($spsid > 0)
+                    {       // have a spouse
 ?>
         <a href="<?php print $directory; ?>Person.php?idir=<?php print $spsid; ?>&amp;lang=<?php print $lang; ?>" class="<?php print $spsclass; ?>"><?php print $spsName->getName(); ?></a>.
 <?php
-                }       // have a spouse
-                else
-                {       // do not have a spouse
-                    print " " . $t['an unknown person'] . '.';
-                }       // do not have a spouse
+                    }       // have a spouse
+                    else
+                    {       // do not have a spouse
+                        print " " . $t['an unknown person'] . '.';
+                    }       // do not have a spouse
+                }
 
                 if ($spsid > 0)
                 {       // have a spouse
                     if ($family->get('notmarried') > 0)
                     {       // never married indicator
-                        print "This couple were never married. ";
+                        print $template['neverMarried']->innerHTML;
                     }       // never married indicator
 
                     // display the event table entries for this family
-                    $events         = $family->getEvents();
                     foreach($events as $ider => $event)
                     {       // loop through all event records
                         displayEvent($ider,
@@ -1806,14 +1732,6 @@ if (!is_null($person))
                                      $spsName,
                                      $spsclass);
                     }       // loop through all event records
-
-                    // show marriage notes
-                    $mnotes         = $family->get('notes');
-                    if (strlen($mnotes) > 0)
-                    {       // notes defined for this family
-                        $mnotes     = createPopups($mnotes);
-                        print str_replace("\n\n", "\n<p>", $mnotes) . "\n";
-                    }       // notes defined for this family
 
                     //***************************************************
                     //  Marriage Ended Event                            *
@@ -1842,8 +1760,8 @@ if (!is_null($person))
                         print $t['The marriage ended'];
                         print $date->toString(9999, true, $t) . '.';
                         // show citations for this marriage
-                        showCitations(Citation::STYPE_MAREND,
-                                      $family->getIdmr());
+                        print showCitations(Citation::STYPE_MAREND,
+                                            $family->getIdmr());
                     }           // marriage ended date present
 
                     // display the final marriage status
@@ -1862,8 +1780,8 @@ if (!is_null($person))
 <p><?php print $spouse->getName(); ?>
 <?php
                     // print citations for the name
-                    showCitations(Citation::STYPE_NAME,
-                          $spouse->getIdir());
+                    print showCitations(Citation::STYPE_NAME,
+                                        $spouse->getIdir());
                     print ' ';      // separate name from following
 
                     // show information about the parents of the spouse
@@ -1876,8 +1794,8 @@ if (!is_null($person))
                         print $spousePronoun . ' ' .
                                 $t['was also known as'] . ' ' .
                                 $altName->getName() . '.';
-                        showCitations(Citation::STYPE_ALTNAME,
-                                      $idnx);
+                        print showCitations(Citation::STYPE_ALTNAME,
+                                            $idnx);
                         $note = $altName->get('akanote');
                         if (strlen($note) > 0)
                             print $note;
@@ -1915,8 +1833,8 @@ if (!is_null($person))
     <p class="notes"><b>Notes:</b>
 <?php
                         print str_replace("\n\n", "\n<p>", $notes);
-                        showCitations(Citation::STYPE_NOTESGENERAL,
-                                      $spouse->getIdir());
+                        print showCitations(Citation::STYPE_NOTESGENERAL,
+                                            $spouse->getIdir());
 ?>
     </p>
 <?php
@@ -2016,6 +1934,7 @@ try {
         if (strlen($userid) == 0)
         {
             $template->updateTag('edit', null);
+            $template->updateTag('reqgrant', null);
         }
         else
         if ($isOwner)
@@ -2025,6 +1944,8 @@ try {
         else
         {
             $template->updateTag('edit', null);
+            if ($user['auth'] == 'visitor')
+                $template->updateTag('reqgrant', null);
         }
 
         $birthPlace         = '';
@@ -2089,10 +2010,17 @@ try {
         if (strlen($userid) > 0)
             $template->updateTag('blogEmailRow', null);
 
+        if ($userid == '' || $user['auth'] == 'visitor')
+        {
+            $template['message']->update(null);
+            $template['blogEmailRow']->update(null);
+            $template['blogPostRow']->update(null);
+        }
+
         // show accumulated citations
         showCitationTable();
-    }       // display public data
-}       // individual found
+    }           // display public data
+}               // Person found
 
 // embed all of the output from the script    
 $template->set('BODY', ob_get_clean());
@@ -2104,7 +2032,7 @@ if ($tag)
     $templateText               = $tag->outerHTML();
     $data                       = '';
     foreach($individTable as $idir => $individ)
-    {       // loop through all referenced individuals
+    {       // loop through all referenced Persons
         $name                   = $individ->getName();
         $evBirth                = $individ->getBirthEvent();
         if ($evBirth)
@@ -2154,7 +2082,7 @@ if ($tag)
         $itemplate      = new Template($templateText);
         $itemplate['Individ$idir']->update($entry);
         $data           .= $itemplate->compile();
-    }       // loop through all referenced individuals
+    }       // loop through all referenced Persons
     $tag->update($data);
 }
 else

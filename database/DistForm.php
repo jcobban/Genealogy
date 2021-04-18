@@ -69,8 +69,9 @@ use \NumberFormatter;
  *		                support deleting Districts                      *
  *		2020/01/22      internationalize numbers                        *
  *		2020/03/13      use FtTemplate::validateLang                    *
+ *		2021/04/04      escape CONTACTSUBJECT                           *
  *																		*
- *  Copyright &copy; 2020 James A. Cobban								*
+ *  Copyright &copy; 2021 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/FtTemplate.inc';
 require_once __NAMESPACE__ . '/Domain.inc';

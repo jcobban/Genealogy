@@ -331,6 +331,7 @@ if ($administrator)
         $rtemplate->set('count10',      $formatter->format($advertiser['count10']));
         $rtemplate->set('count11',      $formatter->format($advertiser['count11']));
         $rtemplate->set('count12',      $formatter->format($advertiser['count12']));
+        $rtemplate->set('total',        $formatter->format($advertiser['total']));
         $total01            += $advertiser['count01'];
         $total02            += $advertiser['count02'];
         $total03            += $advertiser['count03'];

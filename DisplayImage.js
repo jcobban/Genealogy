@@ -17,11 +17,15 @@
  *      2020/06/22      display acknowledgement of owner of image       *
  *                      reenable display image button in caller         *
  *      2021/01/15      use ES2015 syntax                               *
+ *      2021/04/09      use ES2015 import                               *
  *                                                                      *
  *  Copyright &copy; 2021 James A. Cobban                               *
  ************************************************************************/
+import {keyDown, args, actMouseOverHelp, closeFrame} 
+        from "../jscripts6/util.js";
 
-window.onload               = onLoadImage;
+window.addEventListener("load", onLoadImage);
+
 var displayButton           = null;
 
 /************************************************************************
@@ -91,41 +95,59 @@ function onLoadImage()
     // activate popup help for forward and backward links
     element                 = document.getElementById('goToPrevImg');
     if (element)
-        actMouseOverHelp(element);
+        actMouseOverHelp.call(element);
     element                 = document.getElementById('goToNextImg');
     if (element)
-        actMouseOverHelp(element);
+        actMouseOverHelp.call(element);
 
     // update the name of the image in the invoking page
-    let opener              = null;
+    let opener                      = null;
     if (window.frameElement && window.frameElement.opener)
-        opener              = window.frameElement.opener;
+        opener                      = window.frameElement.opener;
     else
-        opener              = window.opener;
+        opener                      = window.opener;
     if (opener)
     {                   // opened from another window
-        let fldName         = 'Image';  // default
-        if ('fldname' in args)
-            fldName         = args.fldname;
-        if ('buttonname' in args)
-            displayButton   = opener.document.getElementById(args.buttonname);
+        let fldName                 = 'Image';  // default
+        let buttonId                = null;
+        let srcId                   = null;
+        for (const property in args)
+        {               // loop through arguments
+            let value               = args[property];
+            switch(property.toLowerCase())
+            {
+                case 'fldname':
+                    fldName         = value;
+                    break;
 
-        let imageElement    = opener.document.getElementById(fldName);
-        if ('src' in args)
+                case 'buttonname':
+                    buttonId        = value;
+                    break;
+
+                case 'src':
+                    srcId           = value;
+                    break;
+            }
+        }               // loop through arguments
+
+        if (srcId)
         {
+            let imageElement    = opener.document.getElementById(fldName);
             if (imageElement)
             {
-                if (args.src.substring(0,7) == 'Images/')
-                    imageElement.value  = args.src.substring(7);
+                if (srcId.substring(0,7) == 'Images/')
+                    imageElement.value  = srcId.substring(7);
                 else
-                    imageElement.value  = args.src;
+                    imageElement.value  = srcId;
             }
             else
                 alert("DisplayImage.js: " +
-                    "opener does not have a field with name '" + fldName + "'");
+            "opener does not have a field with name '" + fldName + "'");
         }
         else
             alert("DisplayImage.js: missing src= argument");
+
+        displayButton           = opener.document.getElementById(buttonId);
     }                   // opened from another window
     else
     if (closeButton)
@@ -140,7 +162,7 @@ function onLoadImage()
  *  "+" button.                                                         *
  *                                                                      *
  *  Input:                                                              *
- *      $this               <button id='plus'>                          *
+ *      this        <button id='plus'>                                  *
  ************************************************************************/
 function zoomIn()
 {
@@ -158,7 +180,8 @@ function zoomIn()
  *  the "-" button.                                                     *
  *                                                                      *
  *  Input:                                                              *
- *      $this               <button id='minus'>                         *
+ *      this        <button id='minus'>                                 *
+ *      ev          Mouse Click Event                                   *
  ************************************************************************/
 function zoomOut()
 {
@@ -176,6 +199,7 @@ function zoomOut()
  *                                                                      *
  *  Parameters:                                                         *
  *      this        <button id='Close'>                                 *
+ *      ev          Mouse Click Event                                   *
  ************************************************************************/
 function close()
 {

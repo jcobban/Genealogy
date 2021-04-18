@@ -224,9 +224,10 @@ use Templating\Template;
  *      2020/09/29      use multiple layouts for Ontario Marriage       *
  *      2020/11/19      add support for Manitoba Registrations          *
  *      2020/11/25      add support for FindAGrave citations            *
- *      2021/03/18      add information to error log messages           *
+ *      2021/02/18      add information to error log messages           *
+ *      2021/03/15      correct toJson output                           *  
  *                                                                      *
- *  Copyright &copy; 2020 James A. Cobban                               *
+ *  Copyright &copy; 2021 James A. Cobban                               *
  ************************************************************************/  
 require_once __NAMESPACE__ . '/RecordPic.inc';
 require_once __NAMESPACE__ . '/Source.inc';
@@ -1912,7 +1913,7 @@ class Citation extends RecordPic
      *  Returns:                                                        *
      *      JSON representation of the object                           *
      ********************************************************************/
-    function toJson($print  = true,
+    function toJson($print      = true,
                     $options    = 0)
     {
         $includeSource  = $options && self::TOXML_INCLUDE_SOURCE;
@@ -1932,19 +1933,17 @@ class Citation extends RecordPic
                     // display the associated instance of Source
                     if ($idsr > 0)
                     {           // IDSR specified in record
-                        try {
-                            $source = $this->getSource();
+                        $source = $this->getSource();
+                        if ($source->isExisting())
+                        {
                             if ($includeSource)
                             {
-                            $retval .= $comma . "\t\"source\":\t";
-                            $retval .= $source->toJson(false);
+                                $retval .= $comma . "\t\"source\":\t";
+                                $retval .= $source->toJson(false);
                             }
                             else
-                            $retval .= $comma . "\t\"source\":\t" . 
-                               json_encode(htmlentities($source->getName(),ENT_XML1));
-                        } catch (Exception $e) {
-                            $retval .= $comma . "\t\"msg\":\t" . 
-                               json_encode($e->getMessage());
+                                $retval .= $comma . "\t\"source\":\t" . 
+                                        json_encode($source->getName());
                         }
                     }           // IDSR specified in record
                     break;

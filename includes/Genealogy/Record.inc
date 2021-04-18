@@ -2529,6 +2529,11 @@ class Record implements Iterator, ArrayAccess
         global  $debug;
         global  $warn;
 
+        if ($tableName == 'Census1901S2')
+        {
+            debug_print_backtrace();
+            exit;
+        }
         if ($tableName == '')
         {
             if ($debug)
@@ -2589,7 +2594,6 @@ class Record implements Iterator, ArrayAccess
             else
                 $nsclass            = __NAMESPACE__ . "\\$className";
 
-
             if (!class_exists($nsclass))
             {                   // ensure the class is loaded
                 $incname        = __NAMESPACE__ . "/$className.inc";
@@ -2636,7 +2640,7 @@ class Record implements Iterator, ArrayAccess
 
         if (!class_exists($nsclass))
         {                   // ensure the class is loaded
-            if (preg_match('/Census\d\d\d\d/', $className))
+            if (preg_match('/^Census\d\d\d\d$/', $className))
                 $incname            = __NAMESPACE__ . "/CensusLine.inc";
             else
                 $incname                = __NAMESPACE__ . "/$className.inc";

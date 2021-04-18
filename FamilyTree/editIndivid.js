@@ -4093,8 +4093,6 @@ function eventFeedback(parms)
         searchForPosition:
         for(let row = table.firstChild; row; row = row.nextSibling)
         {                       // loop through events
-            console.log("editIndivid.js: 4083: datesd=" + datesd +
-                            ", row=" + row.outerHTML);
             if (row.nodeName.toLowerCase() == 'div')
             {                   // an event
                 for (let elt = row.firstChild; elt; elt = elt.nextSibling)
@@ -4774,3 +4772,121 @@ function eiKeyDown(ev)
 
     return true;    // do default action
 }       // function eiKeyDown
+
+/************************************************************************
+ *  function surnameChanged                                             *
+ *                                                                      *
+ *  Take action when the user changes the surname field                 *
+ *                                                                      *
+ *  Input:                                                              *
+ *      this        an instance of an HTML input element.               *
+ *      ev          instance of 'change' Event                          *
+ ************************************************************************/
+function surnameChanged(ev)
+{
+    var form        = this.form;
+
+    changeElt(this);
+
+    if (this.checkfunc)
+        this.checkfunc();
+
+    // if the page title is empty, modify it to include the name fields
+    // that have been filled in so far
+    if (this.name == 'Surname' && updateTitle)
+    {
+        var newName = '';
+        var givennameElt    = form.GivenName;
+        if (givennameElt)
+            newName += givennameElt.value + ' ';
+        newName     += this.value;
+        newName     += ' (';
+        var birthElt    = form.BirthDate;
+        if (birthElt)
+            newName += birthElt.value;
+        newName     += "\u2014";
+        var deathElt    = form.DeathDate;
+        if (deathElt)
+            newName += deathElt.value;
+        newName     += ')';
+        var titleElement    = document.getElementById('title');
+        titleElement.innerHTML  = titlePrefix + newName;
+    }
+}       // function surnameChanged
+
+/************************************************************************
+ *  function givenChanged                                               *
+ *                                                                      *
+ *  This method is called when the user modifies the value of the       *
+ *  given name of the individual.  It adjusts the default gender based  *
+ *  upon the name.                                                      *
+ *                                                                      *
+ *  Input:                                                              *
+ *      this        instance of <input> that invoked this function      *
+ *      ev          instance of 'change' Event                          *
+ ************************************************************************/
+function givenChanged(ev)
+{
+    var form                                    = this.form;
+    var givenName                               = this.value;
+    if (form.Gender)
+    {                   // there is a Gender selection list
+        var givenNameLc                         = givenName.toLowerCase();
+        var names                               = givenNameLc.split(/\s+/);
+        for (var i = 0; i < names.length; i++)
+        {               // loop through individual given names
+            var aName   = names[i];
+            if (aName in givenNames)
+            {
+                var givenName                   = givenNames[aName];
+                if (givenName.gender == 'M')
+                {
+                    form.Gender.selectedIndex   = 0;
+                    form.Gender.className       = 'male';
+                }
+                else
+                if (givenName.gender == 'F')
+                {
+                    form.Gender.selectedIndex   = 1;
+                    form.Gender.className       = 'female';
+                }
+                break;
+            }
+            else
+            if (aName.substring(aName.length - 1) == 'a')
+            {
+                form.Gender.selectedIndex   = 1;
+                form.Gender.className       = 'female';
+                break;
+            }
+        }               // loop through individual given names
+    }                   // there is a Gender selection list
+
+    // fold to upper case and expand abbreviations
+    changeElt(this);
+    capitalize(this);
+
+    if (this.checkfunc)
+        this.checkfunc();
+
+    // if the page title is empty, modify it to include the name fields
+    // that have been filled in so far
+    if (this.name == 'GivenName' && updateTitle)
+    {
+        var newName = this.value;
+        var surnameElt  = form.Surname;
+        if (surnameElt)
+            newName += ' ' + surnameElt.value;
+        newName     += ' (';
+        var birthElt    = form.BirthDate;
+        if (birthElt)
+            newName += birthElt.value;
+        newName     += "\u2014";
+        var deathElt    = form.DeathDate;
+        if (deathElt)
+            newName += deathElt.value;
+        newName     += ')';
+        var titleElement    = document.getElementById('title');
+        titleElement.innerHTML  = titlePrefix + newName;
+    }
+}   // function givenChanged

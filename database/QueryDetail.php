@@ -20,8 +20,9 @@ use \Exception;
  *      2019/04/06      use new FtTemplate::includeSub                  *
  *      2019/07/30      use Record->selected                            *
  *      2019/11/17      move CSS to <head>                              *
+ *		2021/04/04      escape CONTACTSUBJECT                           *
  *                                                                      *
- *  Copyright &copy; 2019 James A. Cobban                               *
+ *  Copyright &copy; 2021 James A. Cobban                               *
  ************************************************************************/
 require_once __NAMESPACE__ . '/FtTemplate.inc';
 require_once __NAMESPACE__ . '/Census.inc';
@@ -170,7 +171,8 @@ $template->set('CENSUSID',          $censusId);
 $template->set('LANG',              $lang);
 $template->set('CENSUS',            $censusYear);
 $template->set('CONTACTTABLE',      'Census' . $censusYear);
-$template->set('CONTACTSUBJECT',    '[FamilyTree]' . $_SERVER['REQUEST_URI']);
+$template->set('CONTACTSUBJECT',    '[FamilyTree]' . 
+                                    urlencode($_SERVER['REQUEST_URI']));
 
 $template->updateTag('stateoption', $stateList);
 

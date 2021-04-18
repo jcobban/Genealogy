@@ -1,0 +1,45 @@
+<!--*********************************************************************
+ *  BlogPosten.html														*
+ *																		*
+ *  Template for a web page for displaying a blog entry in English.		*
+ *																		*
+ * History:																*
+ *		2018/09/12		created											*
+ *      2019/08/26      add support for posting messages to other       *
+ *                      tables                                          *
+ *																		*
+ *  Copyright &copy; 2019 James A. Cobban								*
+ **********************************************************************-->
+	<div id="breadcrumbs" class="hidden">
+	  <a href="index.html">
+			Home
+	  </a>:
+	  <a href="Genealogy.php?lang=$LANG">
+			Genealogy
+	  </a>:
+	  <a href="Services.php?lang=$LANG">
+			Services
+	  </a>:
+	</div>
+    <div class="body">
+      <h1>
+        <span class="right">
+    	  <a href="/FamilyHistoryRequestHelpen.html" target="help">? Help</a>
+        </span>
+	    Family History Request
+        <div style="clear: both;"></div>
+      </h1>
+      $TRACE
+      $MSG
+      <p class="label">Posted Blog $BLOGID</p>
+      <p>$BODY
+      </p>
+    </div> <!-- class="body" -->
+	<!-- the remaining portion of the page is divs containing popup help -->
+	<div class="balloon" id="Helpsubject">
+	    This field supplies a title or a summary of the content of the blog
+	    If this is omitted the first line of the body of the message
+	    is used as subject.
+	</div>
+    <script src="/jscripts6/util.js" type="module">
+    </script>

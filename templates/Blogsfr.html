@@ -1,20 +1,21 @@
 <!--*********************************************************************
- *  Blogsfr.html														*
- *																		*
- *  French language template for the Blogs management page				*
- *																		*
- *  History:															*
- *		2018/09/15		Created											*
- *																		*
- *  Copyright &copy; 2018 James A. Cobban								*
+ *  Blogsfr.html                                                        *
+ *                                                                      *
+ *  French language template for the Blogs management page              *
+ *                                                                      *
+ *  History:                                                            *
+ *      2018/09/15      Created                                         *
+ *      2021/04/09      migrate to ES2015                               *
+ *                                                                      *
+ *  Copyright &copy; 2021 James A. Cobban                               *
  **********************************************************************-->
   <div id="breadcrumbs" class="hidden">
     <a href="/index.html">Accueil</a>:
-  </div>	
+  </div>    
   <div class="body">
     <h1 class="clear">Gestion des Blogues
       <span class="right">
-		<a href="/BlogsHelpfr.html" target="help">?&nbsp;Aide</a>
+        <a href="/BlogsHelpfr.html" target="help">?&nbsp;Aide</a>
       </span>
     </h1>
     $TRACE
@@ -22,17 +23,13 @@
 <h2>Messages:</h2>
   <div id="blog$blid">
     <p class="label">
-		Le $day $month $year à $time employeur '$username' 
-		a écrit: <a href="BlogPost.php?table=Blogs&blogid=$blid&lang=fr">$blogname</a>
+        Le $day $month $year à $time employeur '$username' 
+        a écrit: <a href="BlogPost.php?table=Blogs&blogid=$blid&lang=fr">$blogname</a>
     </p>
   </div>
   <h2>
-	<a href="BlogPost.php?table=Blogs&blogid=0&lang=fr">Nouveau Blogue Message</a>
+    <a href="BlogPost.php?table=Blogs&blogid=0&lang=fr">Nouveau Blogue Message</a>
   </h2>
  </div>
-    <script src="/jscripts/util.js" type="text/javaScript">
-    </script>
-    <script src="/jscripts/js20/http.js" type="text/javaScript">
-    </script>
-    <script src="/Blogs.js" type="text/javaScript">
+    <script src="/jscripts6/util.js" type="module">
     </script>

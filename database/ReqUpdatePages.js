@@ -23,8 +23,10 @@
  *      2019/02/10      no longer need to call pageInit                 *
  *      2019/12/04      redesign to use CSS instead of tables           *
  *      2020/05/02      use addEventListener and dispatchEvent          *
+ *      2021/03/30      do not call divChange                           *
+ *                      get layout of Division selection from template  *
  *                                                                      *
- *  Copyright &copy; 2020 James A. Cobban                               *
+ *  Copyright &copy; 2021 James A. Cobban                               *
  ************************************************************************/
 
 window.onload    = onloadPages;
@@ -46,10 +48,10 @@ function onloadPages(ev)
     // scan through all forms and set dynamic functionality
     // for specific elements
     for(var i = 0; i < document.forms.length; i++)
-    {
+    {               // iterate through all forms  
         var form    = document.forms[i];
         for(var j = 0; j < form.elements.length; j++)
-        {
+        {           // loop through elements in form
             var element    = form.elements[j];
             element.onkeydown    = keyDown;
 
@@ -62,7 +64,7 @@ function onloadPages(ev)
                 case "CensusSel":
                 {
                     element.addEventListener('change', changeCensus);
-                    var evt             = new Event('change',{'bubbles':true});
+                    var evt         = new Event('change',{'bubbles':true});
                     element.dispatchEvent(evt);
                     break;
                 }   // function Census
@@ -86,8 +88,8 @@ function onloadPages(ev)
                 }   // function SubDistrict
 
             }       // act on specific elements
-        }   // loop through elements in form
-    }       // iterate through all forms
+        }           // loop through elements in form
+    }               // iterate through all forms
 }       // function onloadPages
 
 /************************************************************************
@@ -160,19 +162,19 @@ function changeCensus(ev)
 
     if (this.selectedIndex >= 0)
     {           // option chosen
-        var currCensusOpt                = censusOptions[this.selectedIndex];
-        var census                        = currCensusOpt.value;
+        var currCensusOpt               = censusOptions[this.selectedIndex];
+        var census                      = currCensusOpt.value;
         if (census.length > 0)
         {       // non-empty option chosen
-            form.Census.value            = census; 
-            var censusYear                = census.substring(2);
-            var    provSelect                = document.distForm.Province;
-            provSelect.options.length    = 0;   // clear the list
+            form.Census.value           = census; 
+            var censusYear              = census.substring(2);
+            var provSelect              = document.distForm.Province;
             switch(censusYear)
             {           // act on census year
                 case "1831":
                 {       // pre-confederation
-                    addOption(provSelect,   "Quebec",   "QC");
+                    provSelect.options.length   = 0;   // clear the list
+                    addOption(provSelect,   "Quebec",               "QC");
                     provSelect.selectedIndex    = 0;
                     break;
                 }
@@ -180,40 +182,30 @@ function changeCensus(ev)
                 case "1851":
                 case "1861":
                 {       // pre-confederation
+                    provSelect.options.length   = 0;   // clear the list
                     addOption(provSelect,   "Canada East (Quebec)", "CE");
                     addOption(provSelect,   "Canada West (Ontario)","CW");
-                    addOption(provSelect,   "New Brunswick",    "NB");
-                    addOption(provSelect,   "Nova Scotia",      "NS");
+                    addOption(provSelect,   "New Brunswick",        "NB");
+                    addOption(provSelect,   "Nova Scotia",          "NS");
                     addOption(provSelect,   "Prince Edward Island", "PI");
                     provSelect.selectedIndex    = 1;
                     break;
                 }       // pre-confederation
-
-                case "1906":
-                case "1916":
-                {       // prairie provinces
-                    addOption(provSelect,   "All Provinces",    "");
-                    addOption(provSelect,   "Alberta",      "AB");
-                    addOption(provSelect,   "Manitoba",     "MB");
-                    addOption(provSelect,   "Saskatchewan",     "SK");
-                    provSelect.selectedIndex    = 0;
-                    break;
-                }       // prairie provinces
 
                 case "1871":
                 case "1881":
                 case "1891":
                 case "1901":
                 {       // post-confederation
-                    addOption(provSelect,   "All Provinces",    "");
-                    addOption(provSelect,   "British Columbia", "BC");
-                    addOption(provSelect,   "Manitoba",     "MB");
-                    addOption(provSelect,   "New Brunswick",    "NB");
-                    addOption(provSelect,   "Nova Scotia",      "NS");
+                    provSelect.options.length   = 1;   // clear the list
+                    addOption(provSelect,   "British Columbia",     "BC");
+                    addOption(provSelect,   "Manitoba",             "MB");
+                    addOption(provSelect,   "New Brunswick",        "NB");
+                    addOption(provSelect,   "Nova Scotia",          "NS");
                     addOption(provSelect,   "North-West Territories","NT");
-                    addOption(provSelect,   "Ontario",      "ON");
+                    addOption(provSelect,   "Ontario",              "ON");
                     addOption(provSelect,   "Prince Edward Island", "PI");
-                    addOption(provSelect,   "Quebec",       "QC");
+                    addOption(provSelect,   "Quebec",               "QC");
                     provSelect.selectedIndex    = 0;
                     break;
                 }       // post-confederation
@@ -221,20 +213,31 @@ function changeCensus(ev)
                 case "1911":
                 case "1921":
                 {       // post-confederation
-                    addOption(provSelect,   "All Provinces",    "");
-                    addOption(provSelect,   "Alberta",      "AB");
-                    addOption(provSelect,   "British Columbia", "BC");
-                    addOption(provSelect,   "Manitoba",     "MB");
-                    addOption(provSelect,   "New Brunswick",    "NB");
-                    addOption(provSelect,   "Nova Scotia",      "NS");
+                    provSelect.options.length   = 1;   // clear the list
+                    addOption(provSelect,   "Alberta",              "AB");
+                    addOption(provSelect,   "British Columbia",     "BC");
+                    addOption(provSelect,   "Manitoba",             "MB");
+                    addOption(provSelect,   "New Brunswick",        "NB");
+                    addOption(provSelect,   "Nova Scotia",          "NS");
                     addOption(provSelect,   "North-West Territories","NT");
-                    addOption(provSelect,   "Ontario",      "ON");
+                    addOption(provSelect,   "Ontario",              "ON");
                     addOption(provSelect,   "Prince Edward Island", "PI");
-                    addOption(provSelect,   "Quebec",       "QC");
-                    addOption(provSelect,   "Saskatchewan",     "SK");
+                    addOption(provSelect,   "Quebec",               "QC");
+                    addOption(provSelect,   "Saskatchewan",         "SK");
                     provSelect.selectedIndex    = 0;
                     break;
                 }       // post-confederation
+
+                case "1906":
+                case "1916":
+                {       // prairie provinces
+                    provSelect.options.length   = 1;   // clear the list
+                    addOption(provSelect,   "Alberta",              "AB");
+                    addOption(provSelect,   "Manitoba",             "MB");
+                    addOption(provSelect,   "Saskatchewan",         "SK");
+                    provSelect.selectedIndex    = 0;
+                    break;
+                }       // prairie provinces
             }           // act on census year
 
             // check for province passed as a parameter
@@ -333,11 +336,7 @@ function gotDistFile(xmlDoc)
     }
 
     var    distSelect    = document.distForm.District;
-    distSelect.options.length    = 0;   // clear the list
-
-    // create a new HTML Option object representing
-    // the default of all districts and add it to the Select
-    addOption(distSelect, "Select a District", "");
+    distSelect.options.length    = 1;   // clear the list
 
     // get the list of districts from the XML file
     var newOptions    = xmlDoc.getElementsByTagName("option");
@@ -412,19 +411,19 @@ function DistSet()
  ************************************************************************/
 function noDistFile()
 {
-    var    distSelect    = document.distForm.District;
-    distSelect.options.length    = 0;   // clear the selection
-    var    tableNode    = getElt(document.distForm, "TABLE");
-    var tbNode        = getElt(tableNode,"TBODY");
-    var    trNode        = document.getElementById("distRow");
-    var    tdNode        = document.getElementById("msgCell");
+    var distSelect              = document.distForm.District;
+    distSelect.options.length   = 0;   // clear the selection
+    var tableNode               = getElt(document.distForm, "TABLE");
+    var tbNode                  = getElt(tableNode,"TBODY");
+    var trNode                  = document.getElementById("distRow");
+    var tdNode                  = document.getElementById("msgCell");
     while (tdNode.hasChildNodes())
            tdNode.removeChild(tdNode.firstChild);
-    var    spanElt    = document.createElement("span");
+    var spanElt                 = document.createElement("span");
     spanElt.setAttribute("class", "label");
-    spanElt.className    = "label";
+    spanElt.className           = "label";
     tdNode.appendChild(spanElt);
-    var    msg    = document.createTextNode(
+    var msg                     = document.createTextNode(
         "Census summary \"CensusGetDistricts.php?Census=CW1871\" failed");
     spanElt.appendChild(msg);
 }       // function noDistFile
@@ -496,12 +495,8 @@ function changeDist(ev)
 function gotSubDist(xmlDoc)
 {
     var    subdistSelect    = document.distForm.SubDistrict;
-    subdistSelect.options.length    = 0;    // clear the selection
-    addOption(subdistSelect,
-              "All Sub-Districts",
-              "");
+    subdistSelect.options.length    = 1;    // clear the selection
 
-    //alert("ReqUpdatePages.js: gotSubDist: xmlDoc=" + new XMLSerializer().serializeToString(xmlDoc));
     // get the list of subdistricts to select from
     var newOptions        = xmlDoc.getElementsByTagName("option");
 
@@ -548,12 +543,12 @@ function gotSubDist(xmlDoc)
  ************************************************************************/
 function subDistSet()
 {
-    var    newSubDistCode    = args["subdistrict"];
+    var    newSubDistCode   = args["subdistrict"];
     if (newSubDistCode === undefined)
         return true;
 
     var    subDistSelect    = document.distForm.SubDistrict;
-    var    distOpts    = subDistSelect.options;
+    var    distOpts         = subDistSelect.options;
     for(var i = 0; i < distOpts.length; i++)
     {
         if (distOpts[i].value == newSubDistCode)
@@ -577,7 +572,6 @@ function subDistSet()
                 if (divOpts[i].value == newDivCode)
                 {   // found matching entry
                     divSelect.selectedIndex    = i;
-                    changeDiv(divOpts[i].xmlNode);
                     break;
                 }   // found matching entry
             }       // search for division to select
@@ -632,19 +626,19 @@ function noSubDist()
 function changeSubDist(ev)
 {
     // identify the selected district
-    var    subDistSelect        = document.distForm.SubDistrict;
-    var    optIndex            = subDistSelect.selectedIndex;
+    var    subDistSelect    = this;
+    var    optIndex         = subDistSelect.selectedIndex;
     if (optIndex == -1)
         optIndex            = 0;        // default to first entry
-    var    optElt                = subDistSelect.options[optIndex];
-    var    optVal                = optElt.value;
+    var    optElt           = subDistSelect.options[optIndex];
+    var    optVal           = optElt.value;
     //alert("ReqUpdatePages.js: changeSubDist: optIndex=" + optIndex + ", optElt=" + optElt.outerHTML + ", xmlOption=" + new XMLSerializer().serializeToString(optElt.xmlOption));
     
     // determine how many divisions there are in selected subdist
     var tdNode              = document.getElementById('DivisionCell');
     tdNode.innerHTML        = '';
-    var    xmlOpt                = optElt.xmlOption;
-    var    divCt                = 0;
+    var xmlOpt              = optElt.xmlOption;
+    var divCt               = 0;
     var firstDiv;
 
     for (var i = 0; i < xmlOpt.childNodes.length; i++)
@@ -659,13 +653,11 @@ function changeSubDist(ev)
     }       // loop through children of parent
 
     if (divCt > 1)
-    {   // add selections based upon information from XML response
-        var tdNode              = document.getElementById('DivisionCell');
-        tdNode.innerHTML        = '';
-        var select              = document.createElement("select");
-        select                  = tdNode.appendChild(select);
-        select.name             = "Division";
-        select.size             = 1;
+    {               // add selections based upon info from XML response
+        var template        = document.getElementById('divisionTemplate');
+        var select          = template.cloneNode(true);
+        select              = tdNode.appendChild(select);
+        select.name         = "Division";
 
         for (var i = 0; i < xmlOpt.childNodes.length; i++)
         {           // loop through children of parent
@@ -679,12 +671,8 @@ function changeSubDist(ev)
                 newOpt.xmlNode  = cNode;
             }       // element is a "div"
         }           // loop through children of parent
-        // user must select a value
-        select.selectedIndex    = 0;
-    }               // add selections based upon information from XML response
+    }               // add selections based upon info from XML response
 
-    // update page prompt in form
-    changeDiv(firstDiv);
 }       // function changeSubDist
 
 /************************************************************************

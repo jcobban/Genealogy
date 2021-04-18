@@ -29,6 +29,7 @@ use \Templating\TemplateTag;
  *      2019/02/18      use new FtTemplate constructor                  *
  *      2019/11/17      include relevant CSS                            *
  *		2021/01/03      correct XSS vulnerability                       *
+ *		2021/04/02      use ES2015                                      *
  *                                                                      *
  *  Copyright &copy; 2021 James A. Cobban                               *
  ************************************************************************/
@@ -106,7 +107,7 @@ $lang           = 'en';     // default english
 
 // process parameters
 if (count($_GET) > 0)
-{                   // invoked by URL to display current status of account
+{                   // invoked by URL
     $parmsText  = "<p class='label'>\$_GET</p>\n" .
                   "<table class='summary'>\n" .
                   "<tr><th class='colhead'>key</th>" .
@@ -174,10 +175,9 @@ else
     {               // exclude file type
         $templateName   = substr($templateName, 0, strlen($templateName) - 5);
     }               // exclude file type
-    $includeSub         = $templateName . $lang . '.html';
-    $template           = new FtTemplate($includeSub);
-    $template->updateTag('otherStylesheets',    
-                         array('filename'   => $templateName));
+    $includeSub         = "$templateName$lang.html";
+    $template           = new FtTemplate("displayPage$lang.html");
+    $template->includeSub($includeSub, 'TEMPLATE');
 }                   // template location relative to template directory
 
 // create popup balloons for each of the individuals referenced on this page

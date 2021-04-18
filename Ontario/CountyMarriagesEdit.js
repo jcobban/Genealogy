@@ -112,7 +112,7 @@ function findInTree()
         idir        = 0;
 
     let msgDiv      = document.getElementById('msgDiv');
-    hide(msgDiv);
+    msgDiv.style.display    = 'none';
     let role        = form.elements['Role' + rownum].value;
     let surname     = form.elements['Surname' + rownum].value;
     let given       = form.elements['GivenNames' + rownum].value;
@@ -187,7 +187,7 @@ function gotIdir(xmlDoc)
     if (button === null)
     {
         let msgDiv  = document.getElementById('msgDiv');
-        hide(msgDiv);
+        msgDiv.style.display    = 'none';
         alert("CensusForm.js: gotIdir: unable to find element with id='" +
             buttonId + "' rootNode=" + new XMLSerializer().serializeToString(rootNode));
         return;
@@ -479,30 +479,36 @@ function closeIdirDialog()
             let mainForm        = document.countyForm;
             mainForm.elements["IDIR" + line].value      = idir;
             // remove "find" button from cell
-            let findButton      = mainForm.elements["Link" + line];
-            let cell            = findButton.parentNode;
-            cell.removeChild(findButton);   
-            // add "tree" linked button
-            let parms           = {'row'    : line};
-            let template        = document.getElementById('Link$row');
-            let linkButton      = createFromTemplate(template,
-                                     parms,
-                                     null);
-            let newButton       = cell.appendChild(linkButton);
-            newButton.onclick   = linkToTree;
-            // add "clear" button to remove link to tree
-            template            = document.getElementById('Clear$row');
-            let clearButton     = createFromTemplate(template,
-                                     parms,
-                                     null);
-            newButton           = cell.appendChild(clearButton);
-            newButton.onclick   = clearFromTree;
+            let findid          = "Find" + line;
+            let findButton      = document.getElementById(findid);
+            if (findButton)
+            {
+                let cell        = findButton.parentNode;
+                cell.removeChild(findButton);
+                // add "tree" linked button
+                let parms       = {'row'    : line};
+                let template    = document.getElementById('Link$row');
+                let linkButton  = createFromTemplate(template,
+                                                     parms,
+                                                     null);
+                let newButton   = cell.appendChild(linkButton);
+                newButton.onclick   = linkToTree;
+                // add "clear" button to remove link to tree
+                template        = document.getElementById('Clear$row');
+                let clearButton = createFromTemplate(template,
+                                                     parms,
+                                                     null);
+                newButton       = cell.appendChild(clearButton);
+                newButton.onclick   = clearFromTree;
+            }
+            else
+                alert("Cannot find element with name '" + findid + "'");
             }   // individual chosen
         }   // option chosen
     }       // select for IDIR present
 
     let msgDiv  = document.getElementById('msgDiv');
-    hide(msgDiv);
+    msgDiv.style.display    = 'none';
 
     // suppress default action
     return false;

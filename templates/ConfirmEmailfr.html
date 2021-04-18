@@ -1,22 +1,23 @@
 <!--*********************************************************************
- *  ConfirmEmailfr.html													*
- *																		*
- *  This script handles the confirmation of a new user as an			*
- *  authorized user of the web site.									*
- *																		*
- *  History:															*
- *		2019/07/16		created                                         *
- *																		*
- *  Copyright &copy; 2019 James A. Cobban								*
+ *  ConfirmEmailfr.html                                                 *
+ *                                                                      *
+ *  This script handles the confirmation of a new user as an            *
+ *  authorized user of the web site.                                    *
+ *                                                                      *
+ *  History:                                                            *
+ *      2019/07/16      created                                         *
+ *      2021/04/09      migrate to ES2015                               *
+ *                                                                      *
+ *  Copyright &copy; 2021 James A. Cobban                               *
  **********************************************************************-->
     <div class='hidden' id='breadcrumbs'>
       <a href='/genealogy.php?lang=$LANG'>Génealogie</a>:
     </div>
    <div class='body'>
       <h1>
-	    Confirmation du Nouvel Contributeur
+        Confirmation du Nouvel Contributeur
         <span class='right'>
-	      <a href='ConfirmEmailHelpen.html' target='help'>? Aide</a>
+          <a href='ConfirmEmailHelpen.html' target='help'>? Aide</a>
         </span>
         <div style='clear: both;'></div>
       </h1>
@@ -27,13 +28,13 @@
         </p>
         <p>Ce site est une ressource coopérative pour les recherches 
         généalogiques.
-	  En ajoutant vos propres informations sur le site, vous aidez
+      En ajoutant vos propres informations sur le site, vous aidez
       tout le monde.
-	  Vous êtes maintenant autorisé à mettre à jour les transcriptions
+      Vous êtes maintenant autorisé à mettre à jour les transcriptions
       des recensements et des statistiques de l'état civil et à poster 
       des entrées de blog contre n'importe quel individu 
       de l'arbre généalogique.
-	  Vous pouvez également demander l'accès aux données privées
+      Vous pouvez également demander l'accès aux données privées
       de votre famille, en particulier aux informations relatives à 
       des personnes qui vivent ou pourraient vivre.  Vous pouvez également 
       mettre à jour les personnes auxquelles l'accès vous est accordé. 
@@ -42,10 +43,10 @@
         mettre à jour votre famille 
         <a href='/Signon.php?lang=$LANG'>se connecter</a> 
         et ensuite utiliser le
-	  <a href='/FamilyTree/nominalIndex.php?lang=$LANG'>
-	    Indice nominal de l'arbre généalogique
-	  </a>
-	  pour sélectionner un ancêtre commun de votre famille. 
+      <a href='/FamilyTree/nominalIndex.php?lang=$LANG'>
+        Indice nominal de l'arbre généalogique
+      </a>
+      pour sélectionner un ancêtre commun de votre famille. 
       Une fois que vous avez visualisé la page de cet ancêtre commun, 
       vous apprendrez à demander l'accès à la famille.
         </p>
@@ -63,7 +64,5 @@
     <div id="missing" class="hidden">
         Paramètre $name obligatoire manquant. 
     </div>
-    <script src="/jscripts/util.js" type="text/javaScript">
-    </script>
-    <script src="/ConfirmEmail.js" type="text/javaScript">
+    <script src="/jscripts6/util.js" type="module">
     </script>

@@ -30,6 +30,8 @@ use \Exception;
  *		2021/01/13      correct XSS vulnerabilities                     *
  *		                improve parameter validation                    *
  *		                get message texts from template                 *
+ *		2021/03/29      correct handling of partof                      *
+ *		2021/04/04      escape CONTACTSUBJECT                           *
  *																		*
  *  Copyright &copy; 2021 James A. Cobban								*
  ************************************************************************/
@@ -81,7 +83,7 @@ if (isset($_GET) && count($_GET) > 0)
 	
 		    case 'partof':
 		    {
-				if (preg_match('/^[a-zA-Z]{2}$/', $value) == 1)
+				if (preg_match('/^[a-zA-Z]{2}(-|)[a-zA-Z]{2,4}$/', $value) == 1)
 				    $partof			= strtoupper($value);
                 else
                     $partoftext     = htmlspecialchars($value);
@@ -123,79 +125,81 @@ if (isset($_GET) && count($_GET) > 0)
 else
 if (isset($_POST) && count($_POST) > 0)
 {                       // invoked by method=post
-	$parmsText      	= "<p class='label'>\$_POST</p>\n" .
-	                          "<table class='summary'>\n" .
-	                            "<tr><th class='colhead'>key</th>" .
-	                            "<th class='colhead'>value</th></tr>\n";
+	$parmsText      = "<p class='label'>\$_POST</p>\n" .
+	                      "<table class='summary'>\n" .
+	                        "<tr><th class='colhead'>key</th>" .
+	                        "<th class='colhead'>value</th></tr>\n";
 	foreach($_POST as $key => $value)
-	{
+    {
+        $safevalue                  = htmlspecialchars($value);
 	    $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
-	                        "<td class='white left'>$value</td></tr>\n"; 
-		$matches	= array();
+	                       "<td class='white left'>$safevalue</td></tr>\n"; 
+		$matches	                = array();
 		if (strlen($key) > 4 && preg_match("/[A-Z\-]+$/", $key, $matches))
 		{
-		    $code	= $matches[0];
-		    $key	= strtolower(substr($key, 0, strlen($key) - strlen($code)));
+		    $code	                = $matches[0];
+            $key	                = strtolower(
+                            substr($key, 0, strlen($key) - strlen($code)));
 		    if ($key == 'lang')
-				$key	= 'rowlang';
+				$key	            = 'rowlang';
 		}
 		else
 		{
-		    $code	    = '';
-		    $key	    = strtolower($key);
+		    $code	                = '';
+		    $key	                = strtolower($key);
 		}
 
-        $value              = trim($value);
+        $value                      = trim($value);
 
         if (strlen($value) > 0)
 		switch($key)
-		{
+		{                   // act on column identifier
 		    case 'cc':
-		    {
+		    {		        // country code
 				if (preg_match('/^[a-zA-Z]{2}$/', $value) == 1)
 				    $cc			    = strtoupper($value);
                 else
-                    $cctext         = htmlspecialchars($value);
+                    $cctext         = $safevalue;
 				break;
-		    }		// country code
+		    }		        // country code
 	
 		    case 'lang':
 		    case 'language':
-		    {
+		    {		        // language code
                 $lang               = FtTemplate::validateLang($value);
 				break;
-		    }		// language code
+		    }		        // language code
 	
 		    case 'code':
-	        {
-	            $value              = strtoupper($value);
-				if (substr($value, 0, 2) != $cc)
-				{
-				    $newCountry		= true;
-				    break;	// have switched countries
-				}
-				$newCode		    = $value;
-				$domain		        = new Domain(array('domain'	    => $code,
+	        {			    // record identifier, domain code
+                if (preg_match('/^[a-zA-Z]{2,3}$/', $value) == 1)
+                {           // valid entry
+                    $value          = strtoupper($value);
+	                $newCode		= "$cc$value";
+					$domain		    = new Domain(array('domain'	    => $code,
 	                                                   'language'	=> $lang));
-				if (str_replace('-', '', $newCode) != $code)
-				{		// user has changed the code
-				    $chkdomain	    = new Domain(array('domain'	    => $newCode,
-						                			   'language'	=> $lang));
-				    if ($chkdomain->isExisting())
-				    {		// duplicates existing record
-						$warn	.= "<p>You cannot change the code from '$code' to '$newCode' because that value is already in use.</p>\n";
-				    }		// duplicates existing record
-				    else
-				    {		// change the code
-						$domain->set('domain', $newCode);
-				    }		// change the code
-				}		// user has changed the code
+	                if ($newCode != $code)
+					{		// user has changed the code
+					    $chkdomain	= new Domain(array('domain'	    => $newCode,
+							            			   'language'	=> $lang));
+					    if ($chkdomain->isExisting())
+					    {	// duplicates existing record
+							$warn	.= "<p>You cannot change the code from '$code' to '$newCode' because that value is already in use.</p>\n";
+					    }	// duplicates existing record
+					    else
+					    {	// change the code
+							$domain->set('domain', $newCode);
+					    }	// change the code
+					}	    // user has changed the code
+				}		    // new value is valid
+                else
+                    $cctext         = $safevalue;
 				break;
-		    }			// record identifier, domain code
+		    }			    // record identifier, domain code
 	
 		    case 'rowlang':
 		    {
-				$rowlang	        = $value;
+				$rowlang	        = $safevalue;
 				break;
 		    }
 	
@@ -209,14 +213,14 @@ if (isset($_POST) && count($_POST) > 0)
 				}
 				else
 				{
-				    $domain->set('name', $value);
+				    $domain->set('name', $safevalue);
 				}
 				break;
 		    }			// name of domain
 	
 		    case 'partof':
 		    {
-	            $partof			    = strtoupper($value);
+	            $partof			    = strtoupper($safevalue);
                 $sep                = substr($partof, 2, 1);
                 if (strlen($partof) > 2 && substr($partof, 2, 1) != '-')
                 {
@@ -229,7 +233,7 @@ if (isset($_POST) && count($_POST) > 0)
 	
 		    case 'category':
 		    {
-				$domain->set('category', $value);
+				$domain->set('category', $safevalue);
 				$domain->save(null);
 				break;
 		    }		    // category
@@ -238,7 +242,7 @@ if (isset($_POST) && count($_POST) > 0)
 		    {			// link to other info
 				if ($newCountry || $rowlang != $lang)
 				    break;
-				$domain->set('resourcesurl', $value);
+				$domain->set('resourcesurl', $safevalue);
 				$domain->save(null);
 				break;
 		    }			// link to other info
@@ -248,7 +252,7 @@ if (isset($_POST) && count($_POST) > 0)
 				if (ctype_digit($value))
                     $offset	        = $value;
                 else
-                    $offsettext     = htmlspecialchars($value);
+                    $offsettext     = $safevalue;
 				break;
 		    }
 	
@@ -257,16 +261,16 @@ if (isset($_POST) && count($_POST) > 0)
 				if (ctype_digit($value))
                     $limit	        = $value;
                 else
-                    $limittext     = htmlspecialchars($value);
+                    $limittext      = $safevalue;
 				break;
 		    }
 	
-		}		// check supported parameters
-	}			// loop through all parameters
+		}		        // check supported parameters
+	}			        // loop through all parameters
 	if ($debug)
-	{			// ensure listing of parameters not interrupted
-		$warn	.= $parmsText . "  </table>\n";
-	}			// ensure listing of parameters not interrupted
+	{			        // ensure listing of parameters not interrupted
+		$warn	            .= $parmsText . "  </table>\n";
+	}			        // ensure listing of parameters not interrupted
 }                       // invoked by method=post
 
 if (canUser('edit'))
@@ -398,7 +402,8 @@ else
 }
 
 $template->set('CONTACTTABLE',	    'Domains');
-$template->set('CONTACTSUBJECT',	'[FamilyTree]' . $_SERVER['REQUEST_URI']);
+$template->set('CONTACTSUBJECT',    '[FamilyTree]' . 
+                                    urlencode($_SERVER['REQUEST_URI']));
 $template->set('CC',	            $cc);
 $template->set('COUNTRYNAME',	    $countryName);
 if ($partof)
@@ -409,24 +414,24 @@ $template->set('DOMAINTYPE',	    $t[$domainType]);
 $template->set('DOMAINTYPEPLURAL',	$t[$domainType . 's']);
 $template->set('OFFSET',	        $offset);
 $template->set('LIMIT',	            $limit);
+if (is_null($partof))
+    $partof             = '';
 
 if (strlen($msg) == 0)
 {
 	$template->updateTag('languageOpt',
 						 $languageSet);
-	
+
 	if (($offset - $limit) >= 0)
 		$template->updateTag('topPrev',
 						     array('cc'		=> $cc,
 	                               'lang'	=> $lang,
 	                               'partof' => $partof,
 			    				   'offset'	=> $offset - $limit,
-			    				   'limit'	=> $limit));
-	else
-		$template->updateTag('topPrev', null);
+                                   'limit'	=> $limit));
+    else
+        $template->updateTag('topPrev', null);
 			
-	if (is_null($partof))
-	    $partof             = '';
 	if (($offset + $limit) < $totcount)
 		$template->updateTag('topNext',
 						     array('cc'		=> $cc,

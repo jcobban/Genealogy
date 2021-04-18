@@ -40,22 +40,23 @@
  *      2018/10/30      use Node.textContent rather than getText        *
  *      2019/02/10      no longer need to call pageInit                 *
  *      2019/05/19      call element.click to trigger button click      *
+ *      2021/03/29      correct initialization of division list         *
  *                                                                      *
- *  Copyright &copy; 2019 James A. Cobban                               *
+ *  Copyright &copy; 2021 James A. Cobban                               *
  ************************************************************************/
 
-window.onload   = onLoadDetail;
+window.onload                   = onLoadDetail;
 
 /************************************************************************
  *  function onLoadDetail                                               *
  *                                                                      *
  *  The onload method of a QueryDetailYyyy.html web page.               *
  *  This is invoked after the web page has been loaded into the browser.*
- *  Obtain the list of districts in the census as an XML file               *
+ *  Obtain the list of districts in the census as an XML file           *
  *  from the web server.                                                *
  *                                                                      *
  *  Input:                                                              *
- *      this        window object                                               *
+ *      this        window object                                       *
  ************************************************************************/
 function onLoadDetail()
 {
@@ -112,10 +113,6 @@ function onLoadDetail()
 
                 case 'District[]':
                 {
-                    // display an indicator that we are waiting for
-                    // response from the server
-                    popupLoading(element);
-
                     // get the district information file
                     var distUrl = "CensusGetDistricts.php?";
                     if (censusYear < 1867)
@@ -134,14 +131,19 @@ function onLoadDetail()
                         distUrl += "Census=" + censusId;
                     if ('lang' in args)
                         distUrl += '&lang=' + args['lang'];
+                    // display indicator that we are waiting for
+                    // response from the server
+                    popupLoading(element);
+
                     HTTP.getXML(distUrl,
                                 gotDistFile,
                                 noDistFile);
                     break;
-                }   // districts selection
-            }   // act on specific elements by name
-        }   // loop through all form elements
-        //alert("QueryDetail.js: onLoadDetail: listofnames=" + listofnames);
+                }           // districts selection
+            }               // act on specific elements by name
+        }                   // loop through all form elements
+        console.log("QueryDetail.js: onLoadDetail: listofnames=" +
+                    listofnames);
     }       // web page has a form named distForm
     else
         alert("QueryDetail.js: onLoad: invoking web page does not contain " +
@@ -161,13 +163,13 @@ function onLoadDetail()
 }       // function onLoadDetail
 
 /************************************************************************
- *  function gotDistFile                                                        *
+ *  function gotDistFile                                                *
  *                                                                      *
- *  This method is called when the XML file, listing all the districts      *
- *  in the province, has been retrieved from the web server.                *
+ *  This method is called when the XML file, listing all the districts  *
+ *  in the province, has been retrieved from the web server.            *
  *                                                                      *
  *  Input:                                                              *
- *      xmlDoc              Document representing the XML file              *
+ *      xmlDoc              Document representing the XML file          *
  ************************************************************************/
 function gotDistFile(xmlDoc)
 {
@@ -259,7 +261,7 @@ function gotDistFile(xmlDoc)
 }       // function gotDistFile
 
 /************************************************************************
- *  function noDistFile                                                     *
+ *  function noDistFile                                                 *
  *                                                                      *
  *  This method is called if there is no list of districts for this     *
  *  census.  The selection list of districts is cleared.                *
@@ -337,13 +339,13 @@ function changePage()
 
 
 /************************************************************************
- *  function onLoadProv                                                     *
+ *  function onLoadProv                                                 *
  *                                                                      *
  *  Use Ajax to obtain the list of districts in the census              *
- *  for a specific province as an XML file from the Web server.             *
+ *  for a specific province as an XML file from the Web server.         *
  *                                                                      *
  *  Input:                                                              *
- *      prov        two character province code                             *
+ *      prov        two character province code                         *
  ************************************************************************/
 function onLoadProv(prov)
 {
@@ -382,15 +384,15 @@ function onLoadProv(prov)
 }       // function onLoadProv
 
 /************************************************************************
- *  function changeDist                                                     *
+ *  function changeDist                                                 *
  *                                                                      *
- *  This method is called when the user selects a new district.             *
- *  This includes extending or retracting a multiple selection.             *
+ *  This method is called when the user selects a new district.         *
+ *  This includes extending or retracting a multiple selection.         *
  *  A request is sent to the server to retrieve the list of             *
  *  subdistricts associated with the currently selected districts.      *
  *                                                                      *
  *  Input:                                                              *
- *      this        <select name='District[]'>                              *
+ *      this        <select name='District[]'>                          *
  ************************************************************************/
 function changeDist()
 {
@@ -448,17 +450,17 @@ function changeDist()
 }       // function changeDist
 
 /************************************************************************
- *  function addSubDistOption                                               *
+ *  function addSubDistOption                                           *
  *                                                                      *
- *  This method is called when the sub-district information XML             *
- *  document relating to a particular district is retrieved.                *
- *  The sub-district selection list is updated.                             *
+ *  This method is called when the sub-district information XML         *
+ *  document relating to a particular district is retrieved.            *
+ *  The sub-district selection list is updated.                         *
  *                                                                      *
  *  Input:                                                              *
- *      name                name of the sub-district                        *
- *      optval              option value, comma separated list of               *
+ *      name            name of the sub-district                        *
+ *      optval          option value, comma separated list of           *
  *                      dist:subdist pairs                              *
- *      node                XML node with details                               *
+ *      node            XML node with details                           *
  ************************************************************************/
 function addSubDistOption(subdistSelect, name, optval, node)
 {
@@ -477,14 +479,14 @@ function addSubDistOption(subdistSelect, name, optval, node)
 }       // function addSubDistOption
 
 /************************************************************************
- *  function gotSubDist                                                     *
+ *  function gotSubDist                                                 *
  *                                                                      *
- *  This method is called when the sub-district information XML             *
- *  document relating to a particular district is retrieved.                *
- *  The sub-district selection list is updated.                             *
+ *  This method is called when the sub-district information XML         *
+ *  document relating to a particular district is retrieved.            *
+ *  The sub-district selection list is updated.                         *
  *                                                                      *
  *  Input:                                                              *
- *      xmlDoc              Document representing the XML file              *
+ *      xmlDoc          Document representing the XML file              *
  ************************************************************************/
 function gotSubDist(xmlDoc)
 {
@@ -650,12 +652,35 @@ function changeSubDist()
     }   // census form supports division selection
 }       // function changeSubDist
 
+
 /************************************************************************
- *  function gotMultSD                                                      *
+ *  function changeDiv                                                  *
  *                                                                      *
- *  This method is called when there is more than one sub-district in       *
- *  a named township.  This is the case for the 1906, 1911, 1916, and       *
- *  1921 censuses of Canada.                                                *
+ *  This method is called when the user selects a new division.         *
+ *                                                                      *
+ *  Input:                                                              *
+ *      this            <select name="Division">                        *
+ *      ev              change Event                                    *
+ ************************************************************************/
+function changeDiv(ev)
+{
+    console.log("QueryDetail.js: changeDiv: selectedIndex=" +
+                    this.selectedIndex);
+    if (this.selectedIndex == -1)
+    {
+        this.selectedIndex  = 0;
+        this.focus();
+    }
+    else
+        this.form.elements['Page'].focus();
+}       // function changeDiv
+ 
+/************************************************************************
+ *  function gotMultSD                                                  *
+ *                                                                      *
+ *  This method is called when there is more than one sub-district in   *
+ *  a named township.  This is the case for the 1906, 1911, 1916, and   *
+ *  1921 censuses of Canada.                                            *
  *                                                                      *
  *  Input:                                                              *
  *      subDistrict     array of sub-district identifiers               *
@@ -666,10 +691,7 @@ function gotMultSD(subDistrict,
 {
     // create a new selection element
     divSelect.size  = 5;
-    if (typeof(changeDiv) != 'undefined')
-    {       // form has a change handler for the division selection
-        divSelect.addEventListener('change', changeDiv);
-    }       // form has a change handler for the division selection
+    divSelect.addEventListener('change', changeDiv);
     divSelect.onkeydown = keyDown;  // support advanced editing
 
     addOption(divSelect,
@@ -704,13 +726,13 @@ function gotMultSD(subDistrict,
 }       // function gotMultSD
 
 /************************************************************************
- *  function gotDivs                                                        *
+ *  function gotDivs                                                    *
  *                                                                      *
- *  This method is called when the division information XML document        *
- *  relating to a particular sub-district is retrieved.                     *
+ *  This method is called when the division information XML document    *
+ *  relating to a particular sub-district is retrieved.                 *
  *                                                                      *
  *  Input:                                                              *
- *      xmlDoc              Document representing the XML file              *
+ *      xmlDoc          Document representing the XML file              *
  *      divSelect       <select name='Division'>                        *
  ************************************************************************/
 function gotDivs(xmlDoc, divSelect)
@@ -722,10 +744,7 @@ function gotDivs(xmlDoc, divSelect)
     {           // there are divisions in this subdistrict
         // create a new selection element
         divSelect.size  = 5;
-        if (typeof(changeDiv) != 'undefined')
-        {       // form has a change handler for the division selection
-            divSelect.addEventListener('change', changeDiv);
-        }       // form has a change handler for the division selection
+        divSelect.addEventListener('change', changeDiv);
         divSelect.onkeydown = keyDown;  // support advanced editing
         divSelect.options.length= 0;    // clear the selection
 
@@ -775,7 +794,7 @@ function gotDivs(xmlDoc, divSelect)
         }       // no selection
 
         // take action for change in selection
-        // because this does not happen automatically when selectedIndex is set
+        // this does not happen automatically when selectedIndex is set
         var evt                 = new Event('change',{'bubbles':true});
         divSelect.dispatchEvent(evt);
     }           // there are divisions in this subdistrict
@@ -792,7 +811,7 @@ function gotDivs(xmlDoc, divSelect)
  *  census.                                                             *
  *                                                                      *
  *  Input:                                                              *
- *      this        <button id='Coverage'>                                      *
+ *      this        <button id='Coverage'>                              *
  ************************************************************************/
 function showCoverage()
 {
@@ -802,14 +821,14 @@ function showCoverage()
 }       //function showCoverage
 
 /************************************************************************
- *  function qdKeyDown                                                      *
+ *  function qdKeyDown                                                  *
  *                                                                      *
  *  Handle key strokes that apply to the entire dialog window.  For     *
- *  example the key combinations Ctrl-S and Alt-Q are interpreted to        *
+ *  example the key combinations Ctrl-S and Alt-Q are interpreted to    *
  *  close the window. update, as shortcut alternatives to using the     *
  *  mouse to click the Quit button                                      *
  *                                                                      *
- *  Parameters:                                                             *
+ *  Parameters:                                                         *
  *      e       W3C compliant browsers pass an event as a parameter     *
  ************************************************************************/
 function qdKeyDown(e)

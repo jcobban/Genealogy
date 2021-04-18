@@ -188,6 +188,9 @@
       <span id="invisibleTitle">
         Person is not publicly visible
       </span>
+      <span id="neverMarried">
+        This couple were never married. 
+      </span>
     </div> <!-- id="messages" -->
 
     <!--*****************************************************************
@@ -279,6 +282,261 @@
       </form>
     </div> <!-- end of id=showAdrDiv$idar -->
   $DEATHCAUSES
+
+    <!--*****************************************************************
+     *  'eventStmt'                                                     *
+     *                                                                  *
+     *  This table provides a translation from an event type to the     *
+     *  sentence to display to the user in the anecdotal text.          *
+     ******************************************************************-->
+    <div id="eventStmt" class="hidden">
+      <span data-key="1">
+        $Pronoun $Description $onDate $atLocation.$Citations $Notes
+      </span>
+      <span data-key="2">
+        $Pronoun was adopted $onDate $atLocation by $Description.$Citations $Notes
+      </span>
+      <span data-key="3">
+        $Pronoun was born $Description $onDate $atLocation.$Citations $Notes
+      </span>
+      <span data-key="4">
+        $Pronoun was buried $Description $onDate $atLocation.$Citations $Notes
+      </span>
+      <span data-key="5">
+        $Pronoun was christened $Description $onDate $atLocation.$Citations $Notes
+      </span>
+      <span data-key="6">
+        $Pronoun died $onDate $Description $atLocation.$Citations $Notes
+      </span>
+      <span data-key="7">
+        $Pronoun had a marriage annulled $Description, $onDate $atLocation.$Citations $Notes
+      </span>
+      <span data-key="8">
+        $Pronoun was baptized $Description $onDate $atLocation.$Citations $Notes
+      </span>
+      <span data-key="9">
+        He celebrated his bar mitzvah $Description $onDate $atLocation.$Citations $Notes
+      </span>
+      <span data-key="10">
+        She celebrated her bas mitzvah $Description $onDate $atLocation.$Citations $Notes
+      </span>
+      <span data-key="11">
+        $Pronoun was blessed $Description $onDate $atLocation.$Citations $Notes
+      </span>
+      <span data-key="12">
+        $Pronoun appeared on the $Description census $onDate $atLocation.$Citations $Notes
+      </span>
+      <span data-key="13">
+        $Pronoun was circumcised $Description $onDate $atLocation.$Citations $Notes
+      </span>
+      <span data-key="14">
+        $Pronoun became a $Description citizen $onDate $atLocation.$Citations $Notes
+      </span>
+      <span data-key="15">
+        $Pronoun was confirmed $Description $onDate $atLocation.$Citations $Notes
+      </span>
+      <span data-key="16">
+        $Pronoun was confirmed in The Church of Jesus Christ of Latter-day Saints $Description $onDate $atLocation.$Citations $Notes
+      </span>
+      <span data-key="17">
+        $Pronoun was involved in a court case about $Description $onDate $atLocation.$Citations $Notes
+      </span>
+      <span data-key="18">
+        $Pronoun was cremated $Description $onDate $atLocation.$Citations $Notes
+      </span>
+      <span data-key="19">
+        $Pronoun received a degree of $Description $onDate $atLocation.$Citations $Notes
+      </span>
+      <span data-key="20">
+        $Pronoun were divorced $Description $onDate $atLocation.$Citations $Notes
+      </span>
+      <span data-key="21">
+        $Pronoun filed for divorce $Description $onDate $atLocation.$Citations $Notes
+      </span>
+      <span data-key="22">
+        $Pronoun was educated at $Description $onDate $atLocation.$Citations $Notes
+      </span>
+      <span data-key="23">
+        $Pronoun emigrated $Description $onDate from $Location.$Citations $Notes
+      </span>
+      <span data-key="24">
+        $Pronoun was employed as a $Description $onDate $atLocation.$Citations $Notes
+      </span>
+      <span data-key="25">
+        $Pronoun were engaged $Description $onDate $atLocation.$Citations $Notes
+      </span>
+      <span data-key="26">
+        $Pronoun received First Holy Communion $Description $onDate $atLocation.$Citations $Notes
+      </span>
+      <span data-key="27">
+        $Pronoun graduated from $Description $onDate $atLocation.$Citations $Notes
+      </span>
+      <span data-key="28">
+        $Pronoun enjoyed $Description $onDate $atLocation.$Citations $Notes
+      </span>
+      <span data-key="29">
+        $Pronoun was honoured for $Description $onDate $atLocation.$Citations $Notes
+      </span>
+      <span data-key="30">
+        $Pronoun was in the hospital for $Description $onDate $atLocation.$Citations $Notes
+      </span>
+      <span data-key="31">
+        $Pronoun was ill with $Description $onDate $atLocation.$Citations $Notes
+      </span>
+      <span data-key="32">
+        $Pronoun immigrated $Description $onDate to $Location.$Citations $Notes
+      </span>
+      <span data-key="33">
+        $Pronoun was interviewed $Description $onDate $atLocation.$Citations $Notes
+      </span>
+      <span data-key="34">
+        $Pronoun $Description land $onDate $atLocation.$Citations $Notes
+      </span>
+      <span data-key="35">
+        $Pronoun had marriage banns published $Description $onDate $atLocation.$Citations $Notes
+      </span>
+      <span data-key="36">
+        $Pronoun signed a marriage contract $Description $onDate $atLocation.$Citations $Notes
+      </span>
+      <span data-key="37">
+        $Pronoun obtained a marriage license $Description $onDate $atLocation.$Citations $Notes
+      </span>
+      <span data-key="38">
+        $Pronoun published an intent to marry $Description $onDate $atLocation.$Citations $Notes
+      </span>
+      <span data-key="39">
+        $Pronoun obtained a marriage settlement $Description $onDate $atLocation.$Citations $Notes
+      </span>
+      <span data-key="40">
+        $Pronoun received medical attention for $Description $onDate $atLocation.$Citations $Notes
+      </span>
+      <span data-key="41">
+        $Pronoun was a member of $Description $onDate $atLocation.$Citations $Notes
+      </span>
+      <span data-key="42">
+        $Pronoun served in the military $Description $onDate $atLocation.$Citations $Notes
+      </span>
+      <span data-key="43">
+        $Pronoun served a mission $Description $onDate $atLocation.$Citations $Notes
+      </span>
+      <span data-key="44">
+        $Pronoun was named after $Description $onDate $atLocation.$Citations $Notes
+      </span>
+      <span data-key="45">
+        $Pronoun was naturalized $Description $onDate $atLocation.$Citations $Notes
+      </span>
+      <span data-key="46">
+        $Pronoun obituary was published in the $Description $onDate $atLocation.$Citations $Notes
+      </span>
+      <span data-key="47">
+        $Pronoun worked as a $Description $onDate $atLocation.$Citations $Notes
+      </span>
+      <span data-key="48">
+        $Pronoun had the LDS ordinance $Description $onDate $atLocation.$Citations $Notes
+      </span>
+      <span data-key="49">
+        $Pronoun was ordained a $Description $onDate $atLocation.$Citations $Notes
+      </span>
+      <span data-key="50">
+        $Pronoun was described as $Description $onDate $atLocation.$Citations $Notes
+      </span>
+      <span data-key="51">
+        $Pronoun had an estate probated $Description $onDate $atLocation.$Citations $Notes
+      </span>
+      <span data-key="52">
+        $Pronoun $Description property $onDate $atLocation.$Citations $Notes
+      </span>
+      <span data-key="53">
+        $Pronoun belonged to the $Description faith $onDate $atLocation.$Citations $Notes
+      </span>
+      <span data-key="54">
+        $Pronoun lived $Description $onDate $atLocation.$Citations $Notes
+      </span>
+      <span data-key="55">
+        $Pronoun retired $Description $onDate $atLocation.$Citations $Notes
+      </span>
+      <span data-key="56">
+        $Pronoun attended school at $Description $onDate $atLocation.$Citations $Notes
+      </span>
+      <span data-key="57">
+        $Pronoun was assigned US Social Security Number $Description $onDate $atLocation.$Citations $Notes
+      </span>
+      <span data-key="58">
+        $Pronoun signed a will $Description $onDate $atLocation.$Citations $Notes
+      </span>
+      <span data-key="59">
+        $Pronoun had a medical condition of $Description, $onDate, $atLocation.$Citations $Notes
+      </span>
+      <span data-key="60">
+        $Pronoun served in the military: $Description, $onDate, $atLocation.$Citations $Notes
+      </span>
+      <span data-key="61">
+        $Pronoun had a photo taken $Description $onDate $atLocation.$Citations $Notes
+      </span>
+      <span data-key="62">
+        $Pronoun was assigned US Social Security Number $Description $onDate $atLocation.$Citations $Notes
+      </span>
+      <span data-key="63">
+        $Pronoun had another occupation as $Description $onDate $atLocation.$Citations $Notes
+      </span>
+      <span data-key="64">
+        $Pronoun was $Description $onDate $atLocation.$Citations $Notes
+      </span>
+      <span data-key="65">
+        $Pronoun belongs to family group $Description $onDate $atLocation.$Citations $Notes
+      </span>
+      <span data-key="66">
+        $Pronoun identified $reflexivePronoun as $Description $onDate $atLocation.$Citations $Notes
+      </span>
+      <span data-key="67">
+        $Pronoun funeral was held $Description $onDate $atLocation.$Citations $Notes
+      </span>
+      <span data-key="68">
+        $Pronoun was elected as $Description $onDate $atLocation.$Citations $Notes
+      </span>
+      <span data-key="69">
+        $Pronoun were married $Description $onDate and $atLocation.$Citations $Notes
+      </span>
+      <span data-key="70">
+        Marriage event $Description $onDate $atLocation.$Citations $Notes
+      </span>
+      <span data-key="71">
+        $possesivePronoun birth was registered $Description $onDate $atLocation.$Citations $Notes
+      </span>
+      <span data-key="72">
+        $possesivePronoun death was registered $Description $onDate $atLocation.$Citations $Notes
+      </span>
+      <span data-key="73">
+        Their marriage was registered $Description $onDate $atLocation.$Citations $Notes
+      </span>
+      <span data-key="2000">
+        $Pronoun was born $onDate $atLocation.$Citations $Notes
+      </span>
+      <span data-key="3000">
+        $Pronoun was christened $onDate $atLocation.$Citations $Notes
+      </span>
+      <span data-key="4000">
+        $Pronoun died $onDate $atLocation.$Citations $Notes
+      </span>
+      <span data-key="5000">
+        $Pronoun was buried $onDate $atLocation.$Citations $Notes
+      </span>
+      <span data-key="5001">
+        $Pronoun was cremated $onDate $atLocation.$Citations $Notes
+      </span>
+      <span data-key="15000">
+        $Pronoun received LDS Baptism $onDate $atLocation.$Citations $Notes
+      </span>
+      <span data-key="16000">
+        $Pronoun received LDS Endowment $onDate $atLocation.$Citations $Notes
+      </span>
+      <span data-key="26000">
+        $Pronoun received LDS Confirmation $onDate $atLocation.$Citations $Notes
+      </span>
+      <span data-key="27000">
+        $Pronoun received LDS Initiatory $onDate $atLocation.$Citations $Notes
+      </span>
+    </div>
   
     <!-- the remaining portion of the page is divisions containing popup help -->
     <div class="balloon" id="HelpshowDescTree">
@@ -346,16 +604,8 @@
       although this will not be y reflected in the description
       of this individual until the page is refreshed.
     </div>
-    <script src="/jscripts/tinymce/js/tinymce/tinymce.js">
+    <script src="/jscripts/tinymce/js/tinymce/tinymce.js" type="application/javascript">
     </script>
-    <script src="/jscripts/js20/http.js" type="application/javascript">
+    <script src="/FamilyTree/Person.js" type="module">
     </script>
-    <script src="/jscripts/util.js" type="application/javascript">
-    </script>
-    <script src="/jscripts/CommonForm.js" type="application/javascript">
-    </script>
-    <script src="/jscripts/Cookie.js" type="application/javascript">
-    </script>
-    <script src="/FamilyTree/Person.js" type="application/javascript">
-    </script>
-    <script async defer src="https://maps.googleapis.com/maps/api/js?v=3.43&callback=initializeMaps&region=$GOOGLECC&key=$GOOGLEKEY" type="application/javascript"></script>
+    <script defer src="https://maps.googleapis.com/maps/api/js?v=3.43&callback=initializeMaps&region=$GOOGLECC&key=$GOOGLEKEY" type="application/javascript"></script>

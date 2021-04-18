@@ -20,8 +20,6 @@
        <a href="/genealogy.php">Genealogy</a>:
     </div>	
     <div class="body" style="overflow: hidden;">
-      <h1 id="head1" style="display: none;">Display Image '$IMAGENAME'</h1>
-      <h2 id="head2">Display Image '$IMAGENAME'</h2>
       $MSG
       $TRACE
       <div id="top" class="center header">
@@ -48,6 +46,8 @@
         <div style="clear: both;"></div>
       </div>
       <div id="viewport" class="imagebody">
+        <h1 id="head1" style="display: none;">Display Image '$IMAGENAME'</h1>
+        <h2 id="head2">Display Image '$IMAGENAME'</h2>
           <img src="$SRC" id="image" class="white" 
                     alt="Cannot Find Document Image $SRC" 
                     style="width: 100%;">
@@ -91,9 +91,5 @@
     <div class="balloon" id="HelpgoToNextImg">
       Click on this link to display the next image in the image folder.
     </div>
-    <script src="/jscripts/js20/http.js" type="text/javaScript">
-    </script>
-    <script src="/jscripts/util.js" type="text/javaScript">
-    </script>
-    <script src="/DisplayImage.js" type="text/javaScript">
+    <script src="/DisplayImage.js" type="module">
     </script>

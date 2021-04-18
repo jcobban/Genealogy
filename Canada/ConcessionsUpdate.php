@@ -19,8 +19,9 @@ use \Templating\Template;
  *		2017/02/07		use class Country								*
  *		2017/09/12		use get(										*
  *		2020/03/13      use FtTemplate::validateLang                    *
+ *		2021/04/04      escape CONTACTSUBJECT                           *
  *																		*
- *  Copyright &copy; 2020 James A. Cobban								*
+ *  Copyright &copy; 2021 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/County.inc';
 require_once __NAMESPACE__ . '/Township.inc';
@@ -227,7 +228,8 @@ if ($domainObj && $countyObj && is_string($township))
 }
 
 $template->set('CONTACTTABLE',	'Concessions');
-$template->set('CONTACTSUBJECT','[FamilyTree]' . $_SERVER['REQUEST_URI']);
+$template->set('CONTACTSUBJECT',    '[FamilyTree]' . 
+                                    urlencode($_SERVER['REQUEST_URI']));
 $template->set('CC',	    	$cc);
 $template->set('COUNTRYNAME',	$countryName);
 $template->set('DOMAIN',		$domain);

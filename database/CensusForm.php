@@ -84,8 +84,9 @@ use \Templating\Template;
  *		2020/05/10      hide Find button on blank lines                 *
  *		2020/10/10      remove field prefix for Pages table             *
  *		2020/12/01      eliminate XSS vulnerabilities                   *
+ *      2021/04/16      handle subdistrict id with colon better         *
  *																		*
- *  Copyright &copy; 2020 James A. Cobban								*
+ *  Copyright &copy; 2021 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/FtTemplate.inc';
 require_once __NAMESPACE__ . '/Language.inc';
@@ -256,7 +257,7 @@ if (canUser('all'))
 else
 if (canUser('edit'))
 {
-    if ($userid == $transcriber)
+    if (strlen($transcriber) == 0 || $userid == $transcriber)
 		$action		            = 'Update';
     else
 		$action		    		= 'Proofread';
@@ -329,6 +330,11 @@ if (strlen($subDistID) == 0)
 else
 if (strlen($distID) > 0)
 {
+    if (preg_match('/^([0-9.]+):(.+)$/', $subDistID, $matches))
+    {
+        if ($matches[1] == $distID)
+            $subDistID      = $matches[2];
+    }
 	// get information about the sub-district
 	$parms	= array('sd_census'	=> $census, 
 					'sd_distid'	=> $distID, 

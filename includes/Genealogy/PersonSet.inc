@@ -20,6 +20,7 @@ use \Iterator;
  *                      ignoring the last character in longer names     *
  *      2020/07/28      do surname REGEXP against tblNR                 *
  *      2021/01/01      improve performance of surname searches         *
+ *      2021/03/11      optionally generate explain for performance     *
  *                                                                      *
  *  Copyright &copy; 2021 James A. Cobban                               *
  ************************************************************************/
@@ -933,6 +934,43 @@ class PersonSet extends RecordSet
         if (strlen($message) > 0)
             throw new Exception("PersonSet::getWhere: " .
             $message);
+
+        if ($debug)
+        {
+            $explain    = "EXPLAIN SELECT * FROM {$this->table} $where";
+            $stmt               = $connection->prepare($explain);
+            $queryText          = debugPrepQuery($explain, $this->sqlParms);
+            $warn   .= "<p>PersonSet::getWhere: $queryText</p>\n";
+            if ($stmt->execute($this->sqlParms))
+            {           // success
+                $warn           .= "<table style=\"border-style: solid; border-width: thin;\">\n";
+                $result         = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                $needHeader     = true;
+                foreach($result as $row)
+                {
+                    if ($needHeader)
+                    {
+                        $warn       .= "    <tr>\n";
+                        foreach($row as $name => $cell)
+                            $warn   .= "        <th style=\"border-style: solid; border-width: thin;\">$name</td>\n";
+                        $warn       .= "    </tr>\n";
+                        $needHeader = false;
+                    }
+                    $warn           .= "    <tr>\n";
+                    foreach($row as $cell)
+                        $warn       .= "        <td style=\"font-weight: normal; border-style: solid; border-width: thin;\">$cell</td>\n";
+                    $warn           .= "    </tr>\n";
+                }
+                $warn               .= "</table>\n";
+            }
+            else
+            {           // error performing query
+                $warn  .= "PersonSet::getWhere: \"$queryText\", <br>" .
+                    print_r($stmt->errorInfo(),true) .
+                    $parmsText . "<br>" .
+                    ", parms=" . print_r($this->sqlParms,true) . "\n";
+            }           // error performing query
+        }
         return $where;
     }       // PersonSet::getWhere
 

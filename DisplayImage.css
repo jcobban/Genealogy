@@ -5,14 +5,13 @@
  *																		*
  *  History:															*
  *		2019/12/11		created											*
+ *		2021/04/12      reposition image management header              *
  *																		*
- *  Copyright &copy; 2018 James A. Cobban								*
+ *  Copyright &copy; 2021 James A. Cobban								*
  ************************************************************************/
 
     div.header {
-                position: fixed; 
-                top: 0; 
-                width: 100%; 
+                position: static; 
                 background-color:   #FFFDF0;
                 padding: 1px;
             }

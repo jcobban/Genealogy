@@ -12,16 +12,23 @@
  *      2019/08/27      add Close button                                *
  *      2020/06/03      hide right column                               *
  *      2021/01/16      use XMLSerializer for diagnostic output         *
+ *      2021/04/04      use ES2015 import                               *
  *                                                                      *
  *  Copyright &copy; 2021 James A. Cobban                               *
  ************************************************************************/
+import {HTTP} from "../jscripts6/js20/http.js";
+import {actMouseOverHelp, hideRightColumn, openFrame, openSignon,
+        popupAlert, args, iframe}
+            from "../jscripts6/util.js";
+import "../jscripts6/CommonForm.js";
+/* global tinyMCE */
 
 /************************************************************************
  *  Initialization code that is executed when this script is loaded.    *
  *                                                                      *
  *  Define the function to be called once the web page is loaded.       *
  ************************************************************************/
-window.onload               = onLoad;
+window.addEventListener("load", onLoad);
 
 var lang                    = 'en';
 var blogid                  = 0;
@@ -61,28 +68,25 @@ function onLoad()
 {
     document.body.onresize  = onWindowResize;
 
-    var names               = "";
-
     // scan through all forms and set dynamic functionality
     // for specific elements
-    for(var i = 0; i < document.forms.length; i++)
+    for(let i = 0; i < document.forms.length; i++)
     {
-        var form            = document.forms[i];
-        for(var j = 0; j < form.elements.length; j++)
+        let form            = document.forms[i];
+        for(let j = 0; j < form.elements.length; j++)
         {
-            var element     = form.elements[j];
+            let element     = form.elements[j];
 
-            var name        = element.name;
-            var id          = '';
+            let name        = element.name;
             if (name.length == 0)
             {           // button elements usually have id not name
                 name        = element.id;
             }           // button elements usually have id not name
-            var result      = /^([a-zA-Z]*)([0-9]*)$/.exec(name);
+            let result      = /^([a-zA-Z]*)([0-9]*)$/.exec(name);
             if (result !== null)
             {
                 name        = result[1];
-                id          = result[2];
+                //id          = result[2];
             }
 
             // take action specific to the element based on its name
@@ -97,14 +101,14 @@ function onLoad()
 
                 case 'message':
                 {   // blog text area
-                    var msgLabel    = document.getElementById('msgLabel');
-                    var mframe      = tinymce.DOM.get('message_ifr');
-                    var textwidth   = window.innerWidth -
+                    let msgLabel    = document.getElementById('msgLabel');
+                    let mframe      = tinyMCE.DOM.get('message_ifr');
+                    let textwidth   = window.innerWidth -
                                       msgLabel.offsetWidth - 40;
-                    tinymce.DOM.setStyle(mframe, 'width', textwidth + 'px');
+                    tinyMCE.DOM.setStyle(mframe, 'width', textwidth + 'px');
                     if (blogid > 0)
                     {               // focus on the current input element
-                        tinymce.get('message').focus();
+                        tinyMCE.get('message').focus();
                     }               // focus on the current input element
                     break;
                 }   // blog text area
@@ -144,11 +148,10 @@ function onLoad()
 
     // pop up help balloon if the mouse hovers over the message input field
     // for more than 2 seconds
-    element             = document.getElementById('message_ifr');
+    let element         = document.getElementById('message_ifr');
     if (element)
     {
-        element.helpDiv = 'message';
-        actMouseOverHelp(element);
+        actMouseOverHelp.call(element, 'message');
     }
 
     hideRightColumn();
@@ -168,13 +171,13 @@ function onWindowResize()
 {
     if (iframe)
         openFrame(iframe.name, null, "right");
-    var msgLabel            = document.getElementById('msgLabel');
-    var mframe              = tinymce.DOM.get('message_ifr');
-    var textwidth           = window.innerWidth - msgLabel.offsetWidth - 40;
-    tinymce.DOM.setStyle(mframe, 'width', textwidth + 'px');
-    var subject             = document.getElementById('subject');
+    let msgLabel            = document.getElementById('msgLabel');
+    let mframe              = tinyMCE.DOM.get('message_ifr');
+    let textwidth           = window.innerWidth - msgLabel.offsetWidth - 40;
+    tinyMCE.DOM.setStyle(mframe, 'width', textwidth + 'px');
+    let subject             = document.getElementById('subject');
     subject.style.width     = textwidth + 'px';
-    var email               = document.getElementById('emailAddress');
+    let email               = document.getElementById('emailAddress');
     email.style.width       = textwidth + 'px';
 }       // function onWindowResize
 
@@ -186,14 +189,15 @@ function onWindowResize()
  *                                                                      *
  *  Input:                                                              *
  *      this        <button id='PostBlog'>                              *
- *      e           instance of click Event                             *
+ *      ev          instance of click Event                             *
  ************************************************************************/
-function postBlog(e)
+function postBlog(ev)
 {
-    var form                    = this.form;
-    var userid                  = form.userid.value;
-    var email                   = '';
-    var subject                 = form.subject.value;
+    ev.stopPropagation();
+    let form                    = this.form;
+    let userid                  = form.userid.value;
+    let email                   = '';
+    let subject                 = form.subject.value;
     if (form.emailAddress)
         email                   = form.emailAddress.value;
 
@@ -203,9 +207,9 @@ function postBlog(e)
     }                       // not signed on or identified
     else
     {                       // identified
-        var idir                = form.blogid.value;
-        var message             = tinyMCE.get('message').getContent();
-        var parms               = { "idir"          : idir,
+        let idir                = form.blogid.value;
+        let message             = tinyMCE.get('message').getContent();
+        let parms               = { "idir"          : idir,
                                     "table"         : 'Blogs',
                                     "emailAddress"  : email,
                                     "subject"       : subject,
@@ -216,7 +220,7 @@ function postBlog(e)
         }
         if (debug)
         {
-            var blogParms       = JSON.stringify(parms);
+            let blogParms       = JSON.stringify(parms);
             alert("BlogPost.js: postBlog: " + blogParms);
             parms['debug']      = 'y';
         }
@@ -240,10 +244,9 @@ function postBlog(e)
  ************************************************************************/
 function gotBlog(xmlDoc)
 {
-    var evtForm                 = document.evtForm;
-    var root                    = xmlDoc.documentElement;
-    var messageElt              = document.getElementById('PostBlog');
-    var msg                     = "";
+    let root                    = xmlDoc.documentElement;
+    let messageElt              = document.getElementById('PostBlog');
+    let msg                     = "";
 
     if (debug.toLowerCase() == 'y')
     {
@@ -253,9 +256,9 @@ function gotBlog(xmlDoc)
 
     if (root && root.nodeName == 'blog')
     {
-        for(var i = 0; i < root.childNodes.length; i++)
+        for(let i = 0; i < root.childNodes.length; i++)
         {                   // loop through children
-            var node            = root.childNodes[i];
+            let node            = root.childNodes[i];
             if (node.nodeName == 'msg')
                 msg             += node.textContent;
         }                   // loop through children
@@ -264,9 +267,9 @@ function gotBlog(xmlDoc)
     {                       // error
         if (root)
         {
-            for(var i = 0; i < root.childNodes.length; i++)
+            for(let i = 0; i < root.childNodes.length; i++)
             {               // loop through children
-                var node        = root.childNodes[i];
+                let node        = root.childNodes[i];
                 if (node.nodeValue != null)
                     msg += node.nodeValue;
             }               // loop through children
@@ -278,7 +281,7 @@ function gotBlog(xmlDoc)
     if (msg.length > 0)
         popupAlert(msg, messageElt);
 
-    var url                     = location.href;
+    let url                     = location.href;
     url                         = url.replace(/&edit=Y/i, '');
     location                    = url;  // refresh the page
 }       // function gotBlog
@@ -290,11 +293,11 @@ function gotBlog(xmlDoc)
  ************************************************************************/
 function noBlog()
 {
-    var messageElt              = document.getElementById('PostBlog');
+    let messageElt              = document.getElementById('PostBlog');
     popupAlert('BlogPost.js: noBlog: ' +
                     'script "postBlogXml.php" not found on web server',
                messageElt);
-    location                    = location; // refresh the page
+    location.reload(); // refresh the page
 }       // function noBlog
 
 /************************************************************************
@@ -324,16 +327,15 @@ function editBlog(e)
  *                                                                      *
  *  Input:                                                              *
  *      this        <button id='del...'>                                *
- *      e           instance of click Event                             *
+ *      ev          instance of click Event                             *
  ************************************************************************/
-function delBlog(e)
+function delBlog(ev)
 {
-    e.stopPropagation();
+    ev.stopPropagation();
 
-    var form        = this.form;
-    var blid        = this.id.substring(3);
+    let blid        = this.id.substring(3);
 
-    var parms       = {"blid"   : blid};
+    let parms       = {"blid"   : blid};
 
     // invoke script to update blog and return XML result
     HTTP.post('/deleteBlogXml.php',

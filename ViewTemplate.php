@@ -22,6 +22,7 @@ use \Exception;
  *		2019/04/16		created											*
  *		2019/07/28      add option to display the document object model *
  *		2021/01/03      correct XSS vulnerability                       *
+ *      2021/04/04      escape contact subject URL                      *
  *																		*
  *  Copyright &copy; 2021 James A. Cobban								*
  ************************************************************************/
@@ -100,7 +101,8 @@ if ($addLang)
 
 $template->set('TEMPLATENAME',		 htmlspecialchars($templateName));
 $template->set('CONTACTTABLE',	    'Templates');
-$template->set('CONTACTSUBJECT',	'[FamilyTree]' . $_SERVER['REQUEST_URI']);
+$template->set('CONTACTSUBJECT',	'[FamilyTree]' .
+                                    urlencode($_SERVER['REQUEST_URI']));
 $template->set('LANG',              $lang);
 
 $tempBase		        = $document_root . '/templates/';

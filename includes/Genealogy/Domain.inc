@@ -47,6 +47,9 @@ use \Exception;
  *      2019/12/15      inserted extra hyphen in partof                 *
  *      2019/12/19      handle invalid domain better                    *
  *      2021/03/02      use regular expressions to validate parameters  *
+ *      2021/03/29      if record exists in English but not in the      *
+ *                      requested language return the English record    *
+ *                      as existing                                     *
  *                                                                      *
  *  Copyright &copy; 2021 James A. Cobban                               *
  ************************************************************************/
@@ -292,11 +295,13 @@ class Domain extends Record
                                 if (is_array($row))
                                 {           // existing record
                                     $dbrow              = $row;
+                                    $needInsert         = false;
                                     $dbrow['language']  = $language;
                                 }           // existing record
                                 else
                                 {
                                     $dbrow              = self::$initRow;
+                                    $needInsert         = true;
                                     $dbrow['name']      = 'Domain : '. $domain;
                                 }
                             }               // successful execute
@@ -306,6 +311,7 @@ class Domain extends Record
                             $dbrow                      = self::$initRow;
                             $dbrow['domain']            = $domain;
                             $dbrow['name']              = 'Domain : '. $domain;
+                            $needInsert             = true;
                         }
 
                         foreach($parms as $key => $value)
@@ -324,7 +330,6 @@ class Domain extends Record
 
                             }               // act on key fields
                         }                   // loop through parameters
-                        $needInsert             = true;
                     }                       // create new record
                 }                           // successful execute
                 else

@@ -13,7 +13,6 @@ use \Exception;
  *  Record Structure Reference                                          *
  *      CREATE TABLE Advertisers (                                      *
  *      AdName      VARCHAR(255),               -- file name            *
- *      PRIMARY KEY (AdName),                                           *
  *      AdEmail     VARCHAR(255),               -- email address        *
  *      Count01     INT(10) NOT NULL DEFAULT 0, -- count for January    *
  *      Count02     INT(10) NOT NULL DEFAULT 0, -- count for February   *
@@ -28,14 +27,18 @@ use \Exception;
  *      Count11     INT(10) NOT NULL DEFAULT 0, -- count for November   *
  *      Count12     INT(10) NOT NULL DEFAULT 0, -- count for December   *
  *      Row         INT(10) DEFAULT NULL)       -- numeric id           *
+ *      PRIMARY KEY (AdName),                                           *
+ *      KEY `Row` (`Row`),                                              *
+ *      KEY `AdEmail` (`AdEmail`)                                       *
  *                                                                      *
  *  History:                                                            *
  *      2019/12/20      created                                         *
  *      2019/12/23      add column Row                                  *
  *      2020/01/13      fix change adname column                        *
  *      2020/12/02      protect against XSS                             *
+ *      2021/04/01      add virtual field 'total'                       *
  *                                                                      *
- *  Copyright &copy; 2020 James A. Cobban                               *
+ *  Copyright &copy; 2021 James A. Cobban                               *
  ************************************************************************/
 require_once __NAMESPACE__ . '/Record.inc';
 
@@ -291,6 +294,51 @@ class Advertiser extends Record
 
         $msg    .= $this->msg;
     }       // Advertiser::__construct
+
+    /********************************************************************
+     *  function Advertiser::get                                        *
+     *                                                                  *
+     *  Obtain the current value of a field in the object.              *
+     *                                                                  *
+     *  Parameters:                                                     *
+     *      $field      name of field to retrieve                       *
+     *                                                                  *
+     *  Side Effects:                                                   *
+     *      Adds warning if $field is not already defined as a field    *
+     *      or pseudo-field and returns null.                           *
+     ********************************************************************/
+    function get($field)
+    {
+        global  $warn;
+
+        $fieldLc        = strtolower($field);
+        if (array_key_exists($fieldLc, self::$translate))
+            $fieldLc    = self::$translate[$fieldLc];
+
+        switch($fieldLc)
+        {           // act on field name
+            case 'total':
+            {
+                return  $this->row['count01'] +
+                        $this->row['count02'] +
+                        $this->row['count03'] +
+                        $this->row['count04'] +
+                        $this->row['count05'] +
+                        $this->row['count06'] +
+                        $this->row['count07'] +
+                        $this->row['count08'] +
+                        $this->row['count09'] +
+                        $this->row['count10'] +
+                        $this->row['count11'] +
+                        $this->row['count12'];
+            }
+
+            default:
+            {       // other fields
+                return parent::get($fieldLc);
+            }       // other fields
+        }           // act on field name
+    }           // function Advertiser::get
 
     /********************************************************************
      *  function Advertiser::getName                                    *

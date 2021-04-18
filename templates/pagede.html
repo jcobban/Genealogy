@@ -17,12 +17,13 @@
  *      2019/05/03      use classes to style advert and facebook        *
  *		2020/02/16      add right hand notification column              *
  *      2020/03/31      change advert iframe to div                     *
+ *      2021/03/19      drop support for alignment in tinyMCE           *
  *																		*
- *  Copyright &copy; 2020 James A. Cobban								*
+ *  Copyright &copy; 2021 James A. Cobban								*
  **********************************************************************-->
     <meta charset='utf-8'>
     <meta name='author' content='James A. Cobban'>
-    <meta name='copyright' content='&copy; 2019 James A. Cobban'>
+    <meta name='copyright' content='&copy; 2021 James A. Cobban'>
     <meta name='keywords' content='genealogy, family, tree, ontario, canada $KEYWORDS'>
     <meta name="viewport" content="width=device-width; initial-scale=1.0">
     <link rel='stylesheet' type='text/css' href='/styles.css'>
@@ -39,7 +40,6 @@
         language            : '$LANGTINY',
         skin                : 'oxide-dark',
 	    toolbar             : "undo redo | styleselect | bold italic | " 
-	                           + "alignleft aligncenter alignright alignjustify | " 
 	                           + "bullist numlist | link image",
         height              : "170px",
 	    content_css		    : "/styles.css"
@@ -120,8 +120,20 @@
     </div>
     <div class='balloon' id='msgDiv'>
     </div>
+    <div class="hidden">
+      <span id="maxLengthMessage">
+          In dieses Feld dürfen maximal $maxlength Zeichen eingegeben werden.
+      </span>
+      <span id="capitalizationMessage">
+          Der in dieses Feld eingegebene Text wird automatisch großgeschrieben.
+      </span>
+      <span id="abbrMessage">
+          Die folgenden Abkürzungen werden erweitert:
+      </span>
+    </div>
+                
     <div id='hideMsgTemplate' class='hidden'>
-      <!-- template for dialog reporting error from getIndivNamesXml.php -->
+      <!-- template for customized alerts -->
       <form name='Msg\$template' id='Msg\$template'>
 	<p class='message'>\$msg</p>
 	<p>
@@ -130,6 +142,10 @@
 	  </button>
 	</p>
       </form>
+	  <div class="balloon" id="HelpcloseDlg">
+	    Klicken Sie auf diese Schaltfläche, um diesen Nachrichtendialog
+        zu schließen.
+	  </div>
     </div>		<!-- id='hideMsgTemplate'-->
   </body>
 </html>

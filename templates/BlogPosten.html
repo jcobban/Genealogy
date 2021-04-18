@@ -1,42 +1,42 @@
 <!--*********************************************************************
- *  BlogPosten.html														*
- *																		*
- *  Template for a web page for displaying a blog entry in English.		*
- *																		*
- * History:																*
- *		2018/09/12		created											*
+ *  BlogPosten.html                                                     *
+ *                                                                      *
+ *  Template for a web page for displaying a blog entry in English.     *
+ *                                                                      *
+ * History:                                                             *
+ *      2018/09/12      created                                         *
  *      2019/08/26      add support for posting messages to other       *
  *                      tables                                          *
- *																		*
- *  Copyright &copy; 2019 James A. Cobban								*
+ *                                                                      *
+ *  Copyright &copy; 2019 James A. Cobban                               *
  **********************************************************************-->
-	<div id="breadcrumbs" class="hidden">
-	  <a href="index.html">
-			Home
-	  </a>:
-	  <a href="Blogs.php?lang=$LANG">
-			Blogs
-	  </a>:
-	  <span id="parentBlog">
-	  <a href="BlogPost.php?table=Blogs&blogid=$parentblogid&lang=$LANG">
-			Blog $parentblogid
-	  </a>:
-	  </span>
-	</div>
+    <div id="breadcrumbs" class="hidden">
+      <a href="index.html">
+            Home
+      </a>:
+      <a href="Blogs.php?lang=$LANG">
+            Blogs
+      </a>:
+      <span id="parentBlog">
+      <a href="BlogPost.php?table=Blogs&blogid=$parentblogid&lang=$LANG">
+            Blog $parentblogid
+      </a>:
+      </span>
+    </div>
     <div class="body">
       <h1>
         <span class="right">
-    	  <a href="/BlogPostHelpen.html" target="help">? Help</a>
+          <a href="/BlogPostHelpen.html" target="help">? Help</a>
         </span>
-	    $TITLE
+        $TITLE
         <div style="clear: both;"></div>
       </h1>
       <div class="hidden"><!-- choices for page title and h1-->
-    	<span id="NewBlog">Post New General Blog</span>
-    	<span id="NewMessage">Post New General $CLASS Message</span>
-    	<span id="NewSpecific">Post New $CLASS Message for $NAME</span>
-    	<span id="AddBlog">Post a Blog in Response to Blog $BLOGTITLE</span>
-    	<span id="EditBlog">Change Existing Blog $BLOGTITLE</span>
+        <span id="NewBlog">Post New General Blog</span>
+        <span id="NewMessage">Post New General $CLASS Message</span>
+        <span id="NewSpecific">Post New $CLASS Message for $NAME</span>
+        <span id="AddBlog">Post a Blog in Response to Blog $BLOGTITLE</span>
+        <span id="EditBlog">Change Existing Blog $BLOGTITLE</span>
       </div>
       $TRACE
       $MSG
@@ -44,12 +44,12 @@
         Invalid parameter table="$table".
       </p>
       <form name="blogForm" id="blogForm" action="BlogPost.php" method="post"
-        	enctype='multipart/form-data'>
+            enctype='multipart/form-data'>
         <input id="lang" type="hidden" value="fr">
           $POSTS
         <div class="hidden" id="blogTemplate">
           <p class="label" style="margin-left: $margin">
-        	$day $month $year at $time user '$username' wrote:
+            $day $month $year at $time user '$username' wrote:
             <a href="BlogPost.php?table=$TABLE&blogid=$blogid&lang=$LANG">
                 $blogname
             </a>
@@ -61,89 +61,93 @@
             <button id="edit$blogid" type="button">Change</button>
             <button id="del$blogid" type="button">Delete</button>
           </p>
-        </div> <!-- id="blogTemplate" -->	
+        </div> <!-- id="blogTemplate" -->   
         <h2>
           <span id="Response">Follow up:</span>
           <span id="Edit">Edit Message $blogid:</span>
           <span id="NewPost">Post New Message:</span>
         </h2>
         <input type="hidden" name="userid" id="userid"
-	            value="$userid">
+                value="$userid">
         <input type="hidden" name="id" id="id"
-    	        value="$blogid">
+                value="$blogid">
         <input type="hidden" name="keyvalue" id="keyvalue"
-    	        value="$keyvalue">
+                value="$keyvalue">
         <input type="hidden" name="table" id="table"
-    	        value="$TABLE">
+                value="$TABLE">
         <input type="hidden" name="debug" id="debug"
-    	        value="$debug">
+                value="$debug">
         <p class="warning" id="notLoggedOn">
           You are not signed in as a registered user of this site.
           Anything which you supply will be associated with your e-mail address.
         </p>
         <div class="row" id="blogSubjectRow">
             <label class='column1' for='subject'>
-		        Subject:
-	        </label>
-	        <input type="text" class="white left"
-			        id="subject" name="subject"
-			        size="64" value="$BLOGTITLE">
+                Subject:
+            </label>
+            <input type="text" class="white left"
+                    id="subject" name="subject"
+                    size="64" value="$BLOGTITLE">
             <div style="clear: both;"></div>
         </div> <!-- id="blogSubjectRow" -->
-	    <div class="row" id="blogMsgRow">
-	        <label class='column1' for='message' id="msgLabel">
-		        Message:
-	        </label>
-	        <textarea name="message" id="message" placeholder="[enter message]"
-		            rows="30">$posttext</textarea>
+        <div class="row" id="blogMsgRow">
+            <label class='column1' for='message' id="msgLabel">
+                Message:
+            </label>
+            <textarea name="message" id="message" placeholder="[enter message]"
+                    rows="30">$posttext</textarea>
             <div style="clear: both;"></div>
-	    </div>
-	    <div class="row" id="blogEmailRow">
-	        <label class='column1' for='emailAddress'>
-	    	    Your e-mail address:
-	        </label>
-	        <input type="text" class="$EMAILCLASS leftnc" $READONLY
-			        id="emailAddress" name="emailAddress"
-			        size="64" value="$EMAIL">
+        </div>
+        <div class="row" id="blogEmailRow">
+            <label class='column1' for='emailAddress'>
+                Your e-mail address:
+            </label>
+            <input type="text" class="$EMAILCLASS leftnc" $READONLY
+                    id="emailAddress" name="emailAddress"
+                    size="64" value="$EMAIL">
             <div style="clear: both;"></div>
-	    </div>
-	    <p id="blogPostRow">
-	      <button type="submit" id="PostBlog" accessKey="P">
+        </div>
+        <p id="blogPostRow">
+          <button type="submit" id="PostBlog" accessKey="P">
               <u>P</u>ost Message
-	      </button>
+          </button>
           &nbsp;
-	      <button type="button" id="Close">
+          <button type="button" id="Close">
               Close
-	      </button>
-	    </p>
-	  </form> <!-- name="blogform" id="blogform" -->
+          </button>
+        </p>
+      </form> <!-- name="blogform" id="blogform" -->
     </div> <!-- class="body" -->
-	<!-- the remaining portion of the page is divs containing popup help -->
-	<div class="balloon" id="Helpsubject">
-	    This field supplies a title or a summary of the content of the blog
-	    If this is omitted the first line of the body of the message
-	    is used as subject.
-	</div>
-	<div class="balloon" id="Helpmessage">
+    <!-- the remaining portion of the page is divs containing popup help -->
+    <div class="balloon" id="Helpsubject">
+        This field supplies a title or a summary of the content of the blog
+        If this is omitted the first line of the body of the message
+        is used as subject.
+    </div>
+    <div class="balloon" id="Helpmessage">
         This field permits modifying the text of the posted message.
-	</div>
-	<div class="balloon" id="HelpemailAddress">
+    </div>
+    <div class="balloon" id="Helpedit">
+        Click on this button to edit the message.
+    </div>
+    <div class="balloon" id="Helpdel">
+        Click on this button to delete the message.
+    </div>
+    <div class="balloon" id="HelpClose">
+        Click on this button to close the dialog.
+    </div>
+    <div class="balloon" id="HelpemailAddress">
         If you are not logged on as a registered contributer to this web-site 
         you must supply an e-mail address to identify all messages that you
         post.
         This e-mail address will be exposed in the posted message.
-	</div>
-	<div class="balloon" id="HelpPostBlog">
+    </div>
+    <div class="balloon" id="HelpPostBlog">
         Click on this button to post the msssage that you have entered.
         The application also permits using the keystroke Alt-B.
-	</div>
-    <script src="/jscripts/js20/http.js" type="application/javascript">
+    </div>
+    <script src="/jscripts/tinymce/js/tinymce/tinymce.js" 
+            type="application/javascript">
     </script>
-    <script src="/jscripts/tinymce/js/tinymce/tinymce.js">
-    </script>
-    <script src="/jscripts/util.js" type="application/javascript">
-    </script>
-    <script src="/jscripts/CommonForm.js" type="application/javascript">
-    </script>
-    <script src="/BlogPost.js" type="application/javascript">
+    <script src="/BlogPost.js" type="module">
     </script>

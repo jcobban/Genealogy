@@ -69,8 +69,9 @@ use \Exception;
  *		2019/12/13      remove B_ prefix from file names                *
  *		2020/03/13      use FtTemplate::validateLang                    *
  *		2020/11/28      correct XSS error                               *
+ *		2021/04/04      escape CONTACTSUBJECT                           *
  *																		*
- *  Copyright &copy; 2020 James A. Cobban								*
+ *  Copyright &copy; 2021 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/Birth.inc';
 require_once __NAMESPACE__ . '/Domain.inc';
@@ -385,6 +386,7 @@ $template->set('DOMAINNAME',		$domainName);
 $template->set('COUNTYNAME',		$countyName);
 $template->set('REGTOWNSHIP',		$township);
 $template->set('CONTACTTABLE',		'Births');
-$template->set('CONTACTSUBJECT',    '[FamilyTree]' . $_SERVER['REQUEST_URI']);
+$template->set('CONTACTSUBJECT',    '[FamilyTree]' . 
+                                    urlencode($_SERVER['REQUEST_URI']));
 
 $template->display();

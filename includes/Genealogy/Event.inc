@@ -1535,20 +1535,20 @@ class Event extends RecordPic
             return Citation::STYPE_LDSP;
         else
         switch($idet)
-        {       // remap from IDET to STYPE
-            case self::ET_BIRTH;        //   3;
+        {                           // remap from IDET to STYPE
+            case self::ET_BIRTH;            //   3
                 return Citation::STYPE_BIRTH;
-            case self::ET_BURIAL;       //   4;
+            case self::ET_BURIAL;           //   4
                 return Citation::STYPE_BURIED;
-            case self::ET_CHRISTENING;      //   5;
+            case self::ET_CHRISTENING;      //   5
                 return Citation::STYPE_CHRISTEN;
-            case self::ET_DEATH;        //   6;
+            case self::ET_DEATH;            //   6
                 return Citation::STYPE_DEATH;
-            case self::ET_LDS_BAPTISM;      //   8;
+            case self::ET_LDS_BAPTISM;      //   8
                 return Citation::STYPE_LDSB;
-            case self::ET_LDS_CONFIRMATION; //  16;
+            case self::ET_LDS_CONFIRMATION; //  16
                 return Citation::STYPE_LDSC;
-            case self::ET_MARRIAGE;     //  69;
+            case self::ET_MARRIAGE;         //  69
                 return Citation::STYPE_MAR;
 
             default:

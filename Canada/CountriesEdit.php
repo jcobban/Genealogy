@@ -20,8 +20,9 @@ use \Exception;
  *		2021/01/13      correct XSS vulnerabilities                     *
  *		                improve parameter checking                      *
  *		                report database updates                         *
+ *		2021/04/04      escape CONTACTSUBJECT                           *
  *																		*
- *  Copyright &copy; 2020 James A. Cobban								*
+ *  Copyright &copy; 2021 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . "/Country.inc";
 require_once __NAMESPACE__ . "/Language.inc";
@@ -239,7 +240,8 @@ foreach($deleted as $delcc)
 }
 
 $template->set('CONTACTTABLE',	'Countries');
-$template->set('CONTACTSUBJECT','[FamilyTree]' . $_SERVER['REQUEST_URI']);
+$template->set('CONTACTSUBJECT',    '[FamilyTree]' . 
+                                    urlencode($_SERVER['REQUEST_URI']));
 $template->set('lang',          $lang);
 $template->set('offset',        $offset);
 $template->set('limit',         $limit);

@@ -102,8 +102,9 @@ use \Iterator;
  *      2019/03/18      `OriginalPage` VARCHAR(11) DEFAULT NULL,        *
  *      2019/06/12      improve validation of values assigned to Dates  *
  *      2019/12/19      replace xmlentities with htmlentities           *
+ *      2021/03/25      update lastSqlCmd                               *
  *                                                                      *
- *  Copyright &copy; 2019 James A. Cobban                               *
+ *  Copyright &copy; 2021 James A. Cobban                               *
  ************************************************************************/
 require_once __NAMESPACE__ . '/Record.inc';
 require_once __NAMESPACE__ . '/LegacyDate.inc';
@@ -396,6 +397,7 @@ class Death extends Record
                 {       // existing record
                     $dbrow                  = $result[0];
                     $needInsert             = false;
+                    $this->lastSqlCmd       = $queryText;
                 }       // existing record
                 else
                 {       // create a new record
@@ -826,6 +828,7 @@ class Death extends Record
                 if ($debug)
                     $warn           .= "<p>$insert</p>\n<p>count=$count</p>\n";
 
+                $this->lastSqlCmd   = $insertText;
                 $this->changed      = array();  // reset
                 $this->needInsert   = false;
 
@@ -931,6 +934,7 @@ class Death extends Record
                     if ($debug)
                         $warn       .= "<p>Death.inc: " . __LINE__ . 
                                    " '$updateText'</p>\n";
+                    $this->lastSqlCmd   = $updateText;
 
                     // log the update
                     $this->log($update, $sqlParms);
@@ -979,21 +983,21 @@ class Death extends Record
         // delete the record if it is in the database
         if (!$this->needInsert)
         {       // existing record in database
-            $sqlParms       = array();
-            $sqlParms['domain'] = $this->row['regdomain'];
-            $sqlParms['year']   = $this->row['regyear'];
-            $sqlParms['number'] = $this->row['regnum'];
+            $sqlParms               = array();
+            $sqlParms['domain']     = $this->row['regdomain'];
+            $sqlParms['year']       = $this->row['regyear'];
+            $sqlParms['number']     = $this->row['regnum'];
             $delete = "DELETE FROM Deaths WHERE" .
                             ' RegDomain=:domain AND ' .
                             ' RegYear=:year AND RegNum=:number';
-            $deleteText = debugPrepQuery($delete, $sqlParms);
-            $stmt   = $connection->prepare($delete);
+            $deleteText             = debugPrepQuery($delete, $sqlParms);
+            $stmt                   = $connection->prepare($delete);
             if ($stmt->execute($sqlParms))
             {       // delete successful
-                $count          = $stmt->rowCount();
+                $count              = $stmt->rowCount();
                 if ($xml)
                     print "<$xmltag count='$count'>$deleteText</$xmltag>\n";
-
+                $this->lastSqlCmd   = $deleteText;
                 // log the update
                 $this->log($delete, $sqlParms);
 
