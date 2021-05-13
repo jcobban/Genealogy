@@ -18,6 +18,7 @@ use \Exception;
  *      2019/11/17      move CSS to <head>                              *
  *		2021/01/03      correct XSS vulnerability                       *
  *		                improve support for multiple languages          *
+ *		2021/04/25      correct debug output                            *
  *                                                                      *
  *  Copyright &copy; 2021 James A. Cobban                               *
  ************************************************************************/
@@ -147,7 +148,7 @@ if ($tag)
     if ($debug)
     {
         $warn       .= "<p>mail('$email','$emailSubject'," . 
-                            \Templating\escape($emailText) . "</p>\n";
+                            htmlspecialchars($emailBody) . "</p>\n";
     }           // debug
     $sent       = mail( $email,
                         $emailSubject,

@@ -185,7 +185,7 @@ $statusSet	            = new RecordSet('tblCS');
 
 $dataRow                = $template['dataRow$IDCS'];
 if ($dataRow === null)
-    print \Templating\escape($template->getRawTemplate());
+    print htmlspecialchars($template->getRawTemplate());
 $dataRowHtml            = $dataRow->outerHTML();
 $data                   = '';
 

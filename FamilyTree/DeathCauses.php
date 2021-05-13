@@ -969,10 +969,29 @@ for ($i = 1; $i <= count($deathcause); $i++)
                 break;
             }
 
+            case 'malignancy':
+            {
+?>
+            "malignancy": the presence of cancerous cells that have
+            the ability to spread to other sites in the body (metastasize) 
+            or to invade nearby (locally) and destroy tissues.
+<?php
+                break;
+            }
+
             case 'marasmus':
             {
 ?>
             "marasmus": severe malnutrition characterized by a lack of energy.
+<?php
+                break;
+            }
+
+            case 'mediastinal':
+            {
+?>
+            "mediastinal": located in the area of the chest that 
+            separates the lungs.
 <?php
                 break;
             }

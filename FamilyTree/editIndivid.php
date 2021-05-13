@@ -1304,7 +1304,7 @@ else
 if ($template['fatherRow'])
     $template['fatherRow']->update(null);
 else
-    print \Templating\escape($template->getRawTemplate());
+    print htmlspecialchars($template->getRawTemplate());
 if (strlen($motherName) > 0)
     $template->set('MOTHERNAME',    $motherName);
 else

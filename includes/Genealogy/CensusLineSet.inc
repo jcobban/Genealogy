@@ -89,6 +89,7 @@ class CensusLineSet extends RecordSet
     protected   $subdistObj     = null;         // instance of SubDistrict
     protected   $division       = null;         // id of division
     protected   $page           = null;         // page number
+    protected   $autofill       = true;
 
     /********************************************************************
      *  CensusLineSet->notPage                                          *
@@ -176,7 +177,7 @@ class CensusLineSet extends RecordSet
                         $this->censusYear   = $censusYear;
                         $this->table        = $this->census->get('table');
                         if (!$this->census->isExisting())
-                            $this->msg  .= "Invalid Census='" .
+                            $this->msg      .= "Invalid Census='" .
                                     htmlspecialchars($censusId) . "'";
                     }       // specific census
                     break;
@@ -187,7 +188,7 @@ class CensusLineSet extends RecordSet
                     if ($fldname != 'order')
                     {
                         unset($parms[$fldname]);
-                        $parms['order'] = $value;
+                        $parms['order']     = $value;
                     }
                     break;
                 }
@@ -195,8 +196,14 @@ class CensusLineSet extends RecordSet
                 case 'link':
                 case 'join':
                 {
-                    $join   = $value;
+                    $join                   = $value;
                     break;
+                }
+
+                case 'autofill':
+                {
+                    if (is_bool($value))
+                        $this->autofill     = $value;
                 }
             }               // act on specific field name
         }                   // analyze parameters
@@ -670,6 +677,7 @@ class CensusLineSet extends RecordSet
                 case 'query':
                 case 'submit':
                 case 'debug':
+                case 'autofill':
                 {       // handled outside of this loop
                     break;
                 }       // handled outside of this loop
@@ -863,6 +871,7 @@ class CensusLineSet extends RecordSet
         {
             if ($this->district && $this->subdistrict && $this->page)
             {           // response is all or part of a page
+                $censusId           = $this->census['censusid'];
                 $censusYear         = $this->census['year'];
                 $count              = $this->census->get('linesperpage');
                 $distObj            = $this->getDistrict();
@@ -974,7 +983,8 @@ class CensusLineSet extends RecordSet
                 }
 
                 // if possible fill in some columns from AutomatedGenealogy
-                if ($this->census['id'] == "CA1911")
+                if ($this->autofill &&
+                    $this->census['id'] == "CA1911") 
                 {
                     $this->getAg11();
                 }

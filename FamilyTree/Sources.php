@@ -121,9 +121,9 @@ else
 
 // get the appropriate template
 $template               = new FtTemplate("Sources$action$lang.html");
-$tranTab                = $template->getTranslate();
-$srcTypes               = $tranTab['srcTypes'];
-$formatter                          = $template->getFormatter();
+$translate              = $template->getTranslate();
+$srcTypes               = $translate['srcTypes'];
+$formatter              = $template->getFormatter();
 
 // get an associative array of source records matching the
 // supplied parameters

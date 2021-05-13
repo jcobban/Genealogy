@@ -458,7 +458,7 @@ function closeNewDialog()
         let field           = '';
         let elements        = myform.elements;
         for(let ie = 0; ie < elements.length; ie++)
-        {
+        {                       // loop through elements of form
             let element     = elements[ie];
             switch(element.name)
             {
@@ -471,12 +471,10 @@ function closeNewDialog()
                     break;
 
             }
-        }
-        if (formname == '')
-            alert('locationCommon.js: closeNewDialog: missing element name="formname":' .  myform.outerHTML);
-        else
-        if (field.length > 0)
-        {
+        }                       // loop through elements of form
+
+        if (formname != '' && field.length > 0)
+        {                       // form and field for feedback
             let mainForm    = document.forms[formname];
             let element     = mainForm.elements[field];
             if (element)
@@ -494,9 +492,7 @@ function closeNewDialog()
                 }
                 alert("locationCommon.js: closeNewDialog: cannot find input element with name='" + field + "' in form '" + formname + "' elements=" + elementList + "]");
             }                   // issue diagnostic
-        }
-        else
-            alert("locationCommon.js: closeNewDialog: missing element field: " . myform.outerHTML);
+        }                       // form and field for feedback
     }                           // the dialog includes a form
     else
         alert("locationCommon.js: closeNewDialog: cannot find <form> in open dialog");
@@ -511,11 +507,12 @@ function closeNewDialog()
  *                                                                      *
  *  Input:                                                              *
  *      this                <select> element                            *
- *      ev                  instance of 'select' Event                  *
+ *      ev                  instance of change Event                    *
  ************************************************************************/
 function locationChosen(ev)
 {
-    ev.stopPropagation();
+    if (ev)
+        ev.stopPropagation();
     let chosenOption    = this.options[this.selectedIndex];
 
     if (chosenOption.value > 0)

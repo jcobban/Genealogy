@@ -6,8 +6,9 @@
  *																		*
  *  History:															*
  *		2018/05/28		convert to template								*
+ *      2021/04/24      add residence input field                       *
  *																		*
- *  Copyright &amp;copy; 2018 James A. Cobban							*
+ *  Copyright &amp;copy; 2021 James A. Cobban							*
  **********************************************************************-->
   <div class="hidden" id="breadcrumbs">
     <a href="/genealogy.php?lang=$LANG">
@@ -209,6 +210,21 @@
       </div>
       <div style="clear: both"></div>
     </div>
+        <div class="row" id="ResidenceRow">
+          <div class="column1">
+          </div>
+          <div class="column2">
+            <label class="labelCol2" for="Residence">
+              Residence:
+            </label>
+            <input name="Residence" id="Residence"
+                    type="text" size="20" maxlength="128"
+                    value="$RESIDENCE"
+					class="ina leftnc"
+					readonly="readonly"/>
+          </div>
+          <div style="clear: both"></div>
+        </div>    <!-- class="row" -->
 	<div class="row" id="LinkRowSet">
 	  <div class="column2">
 		<label class="labelCol1" for="IDIR">

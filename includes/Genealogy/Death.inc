@@ -33,6 +33,7 @@ use \Iterator;
  *      `Occupation`      VARCHAR(64) DEFAULT NULL,                     *
  *      `MarStat`         CHAR(1) DEFAULT NULL,                         *
  *      `BirthPlace`      VARCHAR(128) DEFAULT NULL,                    *
+ *      `Residence`       VARCHAR(128) DEFAULT NULL,                    *
  *      `ResPlace`        VARCHAR(16) DEFAULT NULL,                     *
  *      `ResOnt`          VARCHAR(16) DEFAULT NULL,                     *
  *      `ResCan`          VARCHAR(16) DEFAULT NULL,                     *
@@ -103,6 +104,7 @@ use \Iterator;
  *      2019/06/12      improve validation of values assigned to Dates  *
  *      2019/12/19      replace xmlentities with htmlentities           *
  *      2021/03/25      update lastSqlCmd                               *
+ *      2021/04/24      add column Residence                            *
  *                                                                      *
  *  Copyright &copy; 2021 James A. Cobban                               *
  ************************************************************************/
@@ -147,6 +149,7 @@ class Death extends Record
                 'occupation'            => '',
                 'marstat'               => '?',
                 'birthplace'            => '',
+                'residence'             => '',
                 'resplace'              => '',
                 'resont'                => '',
                 'rescan'                => '',
@@ -454,6 +457,7 @@ class Death extends Record
                             $dbrow['place']         = $dftPlace;
                             $dbrow['birthplace']    = $dftPlace;
                             $dbrow['burplace']      = $dftPlace;
+                            $dbrow['residence']     = $dftPlace;
                             $dbrow['physaddr']      = $dftPlace;
                             $dbrow['infres']        = $dftPlace;
                             $dbrow['undertkraddr']  = $dftPlace;

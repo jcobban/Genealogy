@@ -56,6 +56,7 @@ use \Exception;
  *      2019/12/19      replace xmlentities with htmlentities           *
  *      2020/12/25      correct minor errors                            *
  *                      remove throw from constructor                   *
+ *      2021/04/23      do not include username in search by IDTD       *
  *                                                                      *
  *  Copyright &copy; 2020 James A. Cobban                               *
  ************************************************************************/
@@ -260,7 +261,7 @@ class ToDo extends Record
         $idtd               = null;
         $idir               = null;
         $todoname           = null;
-        $username           = null;
+        $username           = $userid;
         $where              = '';
         $sqlParms           = array();
         $and                = 'WHERE ';
@@ -284,6 +285,7 @@ class ToDo extends Record
                         $where              .= "$and`IDTD`=:idtd";
                         $sqlParms['idtd']   = $idtd;
                         $and                = ' AND ';
+                        break 2;    // ignore any other parameters
                     }
                     else
                         $this->msg      .= "'IDTD' value $value invalid. ";
@@ -317,9 +319,6 @@ class ToDo extends Record
                 case 'username':
                 {
                     $username               = $value;
-                    $where                  .= "$and`UserName`=:username";
-                    $sqlParms['username']   = $username;
-                    $and                    = ' AND ';
                     break;
                 }           // username
 
@@ -352,15 +351,15 @@ class ToDo extends Record
             }               // act on specific search keys
         }                   // loop through parameters
 
-        // only return record for current user if user not specified
-        if (!is_null($idtd) && is_null($username))
+        // return record for current user if not specific record
+        if (is_null($idtd))
         {
-            $username               = $userid;
-            $where                  .= "$and`UserName`=:username";
+            $where                  .= "$and(`UserName`=:username OR `UserName`='')";
             $sqlParms['username']   = $username;
         }
 
-        if (count($parms) >= count(ToDo::$initRow) && strlen($this->msg) == 0)
+        if (count($parms) >= count(ToDo::$initRow) &&
+            strlen($this->msg) == 0)
         {                   // complete row from database
             $dbrow                  = $parms;
             $needInsert             = $idtd == 0;
@@ -394,6 +393,7 @@ class ToDo extends Record
                     $dbrow                  = self::$initRow;
                     $dbrow['openedsd']      = $sdate;
                     $dbrow['openedd']       = $ldate;
+                    $dbrow['username']      = $username;
                     $this->needInsert       = true;
                 }       // no matching record
                 else
@@ -404,9 +404,9 @@ class ToDo extends Record
             }       // successful execute
             else
             {       // error performing query
+                $errors             = print_r($stmt->errorInfo(), true);
                 $this->msg          .= "ToDo::__construct: " . __LINE__ .
-                                        " '$queryText', " . 
-                                    print_r($stmt->errorInfo(), true) . '. ';
+                                        " '$queryText', $errors. ";
             }       // error performing query
         }           // existing record
         else
@@ -414,7 +414,8 @@ class ToDo extends Record
             $dbrow                  = self::$initRow;
             $dbrow['openedsd']      = $sdate;
             $dbrow['openedd']       = $ldate;
-            $this->needInsert             = true;
+            $dbrow['username']      = $username;
+            $this->needInsert       = true;
         }           // create new record
 
         // invoke constructor of base class

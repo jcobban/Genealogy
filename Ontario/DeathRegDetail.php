@@ -154,8 +154,9 @@ use \Exception;
  *		2020/03/27      $idir was not defined                           *
  *		                calculations failed if RegNum omitted           *
  *		2020/11/28      fix XSS error                                   *
+ *		2021/04/24      add residence field                             *
  *																		*
- *  Copyright &copy; 2020 James A. Cobban								*
+ *  Copyright &copy; 2021 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/Death.inc';
 require_once __NAMESPACE__ . '/Domain.inc';
@@ -346,11 +347,11 @@ if (strlen($msg) == 0)
     $death      		= new Death($domain, $regYear, $regNum);
 
     // copy contents into working variables
-    $surname        	= $death->get('d_surname');
-    $idir	        	= $death->get('d_idir');
-    $givenNames     	= $death->get('d_givennames');
-    $birthDate      	= $death->get('d_birthdate');
-    $sex		        = $death->get('d_sex');
+    $surname        	= $death['d_surname'];
+    $idir	        	= $death['d_idir'];
+    $givenNames     	= $death['d_givennames'];
+    $birthDate      	= $death['d_birthdate'];
+    $sex		        = $death['d_sex'];
     if ($sex == 'M')
     {
         $gender	        = 0;
@@ -428,7 +429,7 @@ if (strlen($msg) == 0)
             else
             {		// need to calculate birth year from age
                 // get the year of death
-                $date		    = $death->get('d_date');
+                $date		    = $death['d_date'];
                 $rxResult		= preg_match('/[0-9]{4}/',
                 		        		     $date,
                 			        	     $matches);
@@ -442,7 +443,7 @@ if (strlen($msg) == 0)
                 }	// assume died in year death was registered
 
                 // check for all numeric age
-                $age		    = trim($death->get('d_age'));
+                $age		    = trim($death['d_age']);
                 $rxResult		= preg_match('/([0-9]+)(y|\s|$)/',
                 	        			     $age,
                 			        	     $matches);
@@ -559,7 +560,7 @@ if (strlen($msg) == 0)
 
     // set $gender to the code in tblIR
     // set $genderClass to the CSS class
-    $sex			= $death->get('d_sex');
+    $sex			= $death['d_sex'];
     if ($sex == 'M')
     {			// male
         $gender		= 0;
@@ -602,20 +603,20 @@ if (strlen($msg) == 0)
 
     // copy contents into working variables
     // some of the fields may have been changed by the cross-ref code
-    $surname		= $death->get('d_surname');
-    $givenNames		= $death->get('d_givennames');
-    $date			= $death->get('d_date');
-    $age			= $death->get('d_age');
-    $birthDate		= $death->get('d_birthdate');
+    $surname		= $death['d_surname'];
+    $givenNames		= $death['d_givennames'];
+    $date			= $death['d_date'];
+    $age			= $death['d_age'];
+    $birthDate		= $death['d_birthdate'];
 
     $subject		= "$domainName Death Registration: number: " .
                 	    $regYear . '-' . $regNum . ', ' .
                 	    $givenNames . ' ' . $surname;
 
-    $regCounty		= $death->get('d_regcounty');
+    $regCounty		= $death['d_regcounty'];
     $countyObj		= new County($domain, $regCounty);
     $countyName		= $countyObj->get('name');
-    $regTownship	= $death->get('d_regtownship');
+    $regTownship	= $death['d_regtownship'];
 }			// no errors, perform query
 else
 {			// error detected
@@ -665,92 +666,94 @@ else
     $template->set('SHOWIMAGE',	'no');
 if (isset($death))
 {
-    $template->set('REGCOUNTY',	$death->get('d_regcounty'));
+    $template->set('REGCOUNTY',	$death['d_regcounty']);
     $template->set('REGTOWNSHIP',
-                   $death->get('d_regtownship'));
+                   $death['d_regtownship']);
     $template->set('MSVOL',
-                   $death->get('d_msvol'));
+                   $death['d_msvol']);
     $template->set('SURNAME',
-                   $death->get('d_surname'));
+                   $death['d_surname']);
     $template->set('SURNAMESOUNDEX',
-                   $death->get('d_surnamesoundex'));
+                   $death['d_surnamesoundex']);
     $template->set('GIVENNAMES',
-                   $death->get('d_givennames'));
+                   $death['d_givennames']);
 	$template->set('PLACE',
-	               $death->get('d_place'));
+	               $death['d_place']);
+	$template->set('RESIDENCE',
+	               $death['residence']);
 	$template->set('DATE',
-	               $death->get('d_date'));
+	               $death['d_date']);
 	$template->set('CALCDATE',
-	               $death->get('d_calcdate'));
+	               $death['d_calcdate']);
 	$template->set('AGE',
-	               $death->get('d_age'));
+	               $death['d_age']);
 	$template->set('BIRTHDATE',
-	               $death->get('d_birthdate'));
+	               $death['d_birthdate']);
 	$template->set('CALCBIRTH',
-	               $death->get('d_calcbirth'));
+	               $death['d_calcbirth']);
 	$template->set('OCCUPATION',
-	               $death->get('d_occupation'));
-	$marStat	= $death->get('d_marstat');
+	               $death['d_occupation']);
+	$marStat	= $death['d_marstat'];
 	$template->set('BIRTHPLACE',
-	               $death->get('d_birthplace'));
+	               $death['d_birthplace']);
 	$template->set('RESPLACE',
-	               $death->get('d_resplace'));
+	               $death['d_resplace']);
 	$template->set('RESONT',
-	               $death->get('d_resont'));
+	               $death['d_resont']);
 	$template->set('RESCAN',
-	               $death->get('d_rescan'));
+	               $death['d_rescan']);
 	$template->set('CAUSE',
-	               $death->get('d_cause'));
+	               $death['d_cause']);
 	$template->set('DURATION',
-	               $death->get('d_duration'));
+	               $death['d_duration']);
 	$template->set('PHYS',
-	               $death->get('d_phys'));
+	               $death['d_phys']);
 	$template->set('PHYSADDR',
-	               $death->get('d_physaddr'));
+	               $death['d_physaddr']);
 	$template->set('INFORMANT',
-	               $death->get('d_informant'));
+	               $death['d_informant']);
 	$template->set('INFREL',
-	               $death->get('d_infrel'));
+	               $death['d_infrel']);
 	$template->set('INFOCC',
-	               $death->get('d_infocc'));
+	               $death['d_infocc']);
 	$template->set('INFRES',
-	               $death->get('d_infres'));
+	               $death['d_infres']);
 	$template->set('RELIGION',
-	               $death->get('d_religion'));
+	               $death['d_religion']);
 	$template->set('FATHERNAME',
-	               $death->get('d_fathername'));
+	               $death['d_fathername']);
 	$template->set('FATHERBPLCE',
-	               $death->get('d_fatherbplce'));
+	               $death['d_fatherbplce']);
 	$template->set('MOTHERNAME',
-	               $death->get('d_mothername'));
+	               $death['d_mothername']);
 	$template->set('MOTHERBPLCE',
-	               $death->get('d_motherbplce'));
+	               $death['d_motherbplce']);
 	$template->set('HUSBANDNAME',
-	               $death->get('d_husbandname'));
+	               $death['d_husbandname']);
 	$template->set('REMARKS',
-	               $death->get('d_remarks'));
+	               $death['d_remarks']);
 	$template->set('BURPLACE',
-	               $death->get('d_burplace'));
+	               $death['d_burplace']);
 	$template->set('BURDATE',
-	               $death->get('d_burdate'));
+	               $death['d_burdate']);
 	$template->set('UNDERTKR',
-	               $death->get('d_undertkr'));
+	               $death['d_undertkr']);
 	$template->set('UNDERTKRADDR',
-	               $death->get('d_undertkraddr'));
+	               $death['d_undertkraddr']);
 	$template->set('REGDATE',
-	               $death->get('d_regdate'));
+	               $death['d_regdate']);
 	$template->set('REGISTRAR',
-	               $death->get('d_registrar'));
+	               $death['d_registrar']);
 	$template->set('RECORDEDBY',
-	               $death->get('d_recordedby'));
+	               $death['d_recordedby']);
 	$template->set('IMAGE',
-	               $death->get('d_image'));
+	               $death['d_image']);
 	$template->set('ORIGINALVOLUME',
-	               $death->get('d_originalvolume'));
+	               $death['d_originalvolume']);
 	$template->set('ORIGINALPAGE',
-	               $death->get('d_originalpage'));
+	               $death['d_originalpage']);
 	$template->set('ORIGINALITEM',
-	               $death->get('d_originalitem'));
+	               $death['d_originalitem']);
 }
 else
 {

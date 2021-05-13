@@ -65,6 +65,7 @@
  *      2020/06/17      DisplayImage moved to top folder                *
  *      2020/07/03      add button to select Ontario Marriage License   *
  *      2020/11/21      move showImage to common utilities script       *
+ *      2021/05/09      expand regdate                                  *
  *                                                                      *
  *  Copyright &copy; 2019 James A. Cobban.                              *
  ************************************************************************/
@@ -93,7 +94,7 @@ function onLoadMarriage()
     var names   = '';
     var comma   = '';
     for (var i = 0; i < theForm.elements.length; i++)
-    {       // act on every element within the form
+    {               // act on every element within the form
         var element = theForm.elements[i];
 
         if (element.nodeName.toUpperCase() == 'FIELDSET')
@@ -115,19 +116,20 @@ function onLoadMarriage()
         // set up references to tables for expanding abbreviations
         // and set defaults for field values
         switch(fldName.toLowerCase())
-        {
+        {           // switch on fldName
             case 'licensetypetxt':
             {       // hidden license type text field
                 if (element.value.length == 0)
-                    element.value   = 'L';
+                    element.value   = 'L';  // default license
                 theForm.LicenseType.value   = element.value;
+                element.onchange    = change;
                 break;
             }       // hidden license type text field
 
             case 'regcounty':
             {       // County of registration
                 element.onchange    = changeCounty;
-                var domain      = theForm.RegDomain.value;
+                var domain          = theForm.RegDomain.value;
                 // get the counties information file
                 HTTP.getXML("/Canada/CountiesListXml.php?Domain=" + domain,
                             gotCountiesFile,
@@ -151,14 +153,15 @@ function onLoadMarriage()
             }       // place of marriage
 
             case 'date':
-            {       // date of the marriage
+            case 'regdate':
+            {       // date of the marriage or registration
                 element.abbrTbl     = MonthAbbrs;
                 element.onchange    = dateChanged;
                 element.checkfunc   = checkDate;
                 element.checkfunc();
                 element.focus();
                 break;
-            }       // date of the marriage
+            }       // date of the marriage or registration
 
             case 'showimage':
             {   // display image button
@@ -206,6 +209,7 @@ function onLoadMarriage()
             {       // surname of a participant
                 element.abbrTbl     = SurnAbbrs;
                 element.checkfunc   = checkName;
+                element.onchange    = change;
                 element.checkfunc();
                 break;
             }       // surname of a participant
@@ -245,6 +249,7 @@ function onLoadMarriage()
             {       // religious affiliation of bride
                 element.abbrTbl     = RlgnAbbrs;
                 element.checkfunc   = checkName;
+                element.onchange    = change;
                 element.checkfunc();
                 break;
             }       // religious affiliation of bride
@@ -256,6 +261,7 @@ function onLoadMarriage()
                     element.value   = 'Farmer';
                 element.abbrTbl     = OccAbbrs;
                 element.checkfunc   = checkOccupation;
+                element.onchange    = change;
                 element.checkfunc();
                 break;
             }       // occupation of groom
@@ -265,6 +271,7 @@ function onLoadMarriage()
             {       // occupation of bride
                 element.abbrTbl     = OccAbbrs;
                 element.checkfunc   = checkOccupation;
+                element.onchange    = change;
                 element.checkfunc();
                 break;
             }       // occupation of bride
@@ -274,6 +281,7 @@ function onLoadMarriage()
                 if (element.value.length == 0)
                     element.value      = 'B';  // Bachelor
                 element.checkfunc   = checkMStat;
+                element.onchange    = change;
                 element.checkfunc();
                 break;
             }       // marital status of groom
@@ -283,6 +291,7 @@ function onLoadMarriage()
                 if (element.value.length == 0)
                     element.value      = 'S';  // Spinster
                 element.checkfunc   = checkMStat;
+                element.onchange    = change;
                 element.checkfunc();
                 break;
             }       // marital status of bride
@@ -293,6 +302,7 @@ function onLoadMarriage()
             {       // given names of a participant
                 element.abbrTbl     = GivnAbbrs;
                 element.checkfunc   = checkName;
+                element.onchange    = change;
                 element.checkfunc();
                 break;
             }       // given names of a participant
@@ -310,6 +320,7 @@ function onLoadMarriage()
             {       // father's name
                 element.abbrTbl     = GivnAbbrs;
                 element.checkfunc   = checkName;
+                element.onchange    = change;
                 element.checkfunc();
                 break;
             }       // father's name
@@ -319,6 +330,7 @@ function onLoadMarriage()
             {       // mother's name
                 element.abbrTbl     = GivnAbbrs;
                 element.checkfunc   = checkName;
+                element.onchange    = change;
                 element.checkfunc();
                 break;
             }       // mother's name
@@ -328,6 +340,7 @@ function onLoadMarriage()
             {       // witness names
                 element.abbrTbl     = GivnAbbrs;
                 element.checkfunc   = checkName;
+                element.onchange    = change;
                 element.checkfunc();
                 break;
             }       // witness names
@@ -348,6 +361,7 @@ function onLoadMarriage()
                 element.abbrTbl     = AgeAbbrs;
                 element.onchange    = changeAge;
                 element.checkfunc   = checkAge;
+                element.onchange    = change;
                 element.checkfunc();
                 break;
             }       // age of bride or groom
@@ -355,6 +369,7 @@ function onLoadMarriage()
             case 'image':
             {
                 element.checkfunc   = checkURL;
+                element.onchange    = change;
                 element.checkfunc();
                 break;
             }       // Image URL
@@ -362,11 +377,17 @@ function onLoadMarriage()
             case 'gbirthyear':
             case 'bbirthyear':
             {       // birth year of bride or groom
+                element.onchange    = change;
                 break;
             }       // birth year of bride or groom
 
-        }   // switch on fldName
-    }       // act on every element within the form
+            default:
+            {
+                element.onchange    = change;
+                break;
+            }
+        }           // switch on fldName
+    }               // act on every element within the form
 }       // function onLoadMarriage
 
 /************************************************************************

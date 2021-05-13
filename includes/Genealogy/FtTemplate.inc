@@ -810,10 +810,10 @@ class FtTemplate extends Template
         global $document_root;
 
         // append location dialog templates if required
-        $locationScript         = strpos($this->page,
-                            '<script src="/jscripts/locationCommon.js"');
-        if ($locationScript > 0)
-        {
+        //$locationScript         = strpos($this->page,
+        //                    '<script src="/jscripts/locationCommon.js"');
+        //if ($locationScript > 0)
+        //{
             $tempBase           = $document_root . '/templates/';
             $lang               = $this->lang;
             if (file_exists($tempBase . "LocationDialogs$lang.html"))
@@ -824,7 +824,7 @@ class FtTemplate extends Template
             $this->page         = substr($this->page, 0, $endmain) . "\n" .
                                     file_get_contents($dialogName) . "\n" .
                                     substr($this->page, $endmain);
-        }
+        //}
 
         // append temple dialog templates if required
         $templeScript           = strpos($this->page,

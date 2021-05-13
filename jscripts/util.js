@@ -222,6 +222,7 @@
  *      2020/12/26      eliminate duplicate URL parm testing            *
  *      2021/01/12      drop support for IE 9 & 10                      *
  *      2021/03/30      remove changeDiv                                *
+ *      2021/04/20      do not scroll menu popup                        *
  *                                                                      *
  *  Copyright &copy; 2021 James A. Cobban                               *
  ************************************************************************/
@@ -725,12 +726,6 @@ function getOffsetTop(elt)
         y           += elt.offsetTop;
         elt         = elt.offsetParent;
     }       // increment up to top element
-    let main        = document.getElementsByTagName('main');
-    if (main.length > 0)
-    {
-        main        = main[0];
-        y           -= main.scrollTop;
-    }
     return y;
 }   // function getOffsetTop
 
@@ -1251,7 +1246,6 @@ function displayDialog(templateId,
     // only one modal dialog at a time is displayed
     if (dialogDiv)
     {               // a dialog balloon is currently displayed
-        console.log('displayDialog: existing dialogDiv=' + dialogDiv.outerHTML);
         dialogDiv.style.display = 'none';   // hide it
         dialogDiv               = null;     // it is no longer displayed
     }               // a dialog balloon is displayed
@@ -1442,7 +1436,6 @@ function hideDialog(ev)
     // no longer displaying the modal dialog popup
     if (dialogDiv)
     {
-        console.log('hideDialog: dialogDiv=' + dialogDiv.outerHTML);
         dialogDiv.style.display = 'none';   // hide
     }
     dialogDiv           = null;
@@ -1523,7 +1516,6 @@ function documentOnClick(event)
 {
     if (dialogDiv)
     {       // a dialog balloon is displayed
-        console.log('documentOnClick: dialogDiv=' + dialogDiv.outerHTML);
         dialogDiv.style.display = 'none';
         dialogDiv               = null;
     }       // a dialog balloon is displayed
@@ -1664,8 +1656,6 @@ function keyDownMenu(e)
  ************************************************************************/
 function statusChangeCallback(response)
 {
-    console.log('statusChangeCallback');
-    console.log(response);
     // The response object is returned with a status field that lets the
     // app know the current login status of the person.
     // Full docs on the response object can be found in the documentation
@@ -2028,7 +2018,6 @@ function commonOrientation(ev)
     x           = w.innerWidth || e.clientWidth || g.clientWidth,
     y           = w.innerHeight|| e.clientHeight|| g.clientHeight;
 
-    console.log("OrientationChange: width=" + x + ", height=" + y);
 }       // function commonOrientation
 
 /************************************************************************

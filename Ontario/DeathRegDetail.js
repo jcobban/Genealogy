@@ -78,6 +78,7 @@
  *		2020/06/17      DisplayImage moved to top folder                *
  *      2020/11/21      move showImage to common utilities script       *
  *      2021/02/23      add abbreviations for durations                 *
+ *      2021/04/24      add Residence field                             *
  *																		*
  *  Copyright &copy; 2021 James A. Cobban								*
  ************************************************************************/
@@ -302,6 +303,7 @@ function onLoadDeath()
 				}	// birthplace fields
 
 				case 'Place':
+				case 'Residence':
 				case 'PhysAddr':
 				case 'InfRes':
 				case 'BurPlace':

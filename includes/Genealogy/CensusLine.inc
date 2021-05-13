@@ -1323,8 +1323,8 @@ class CensusLine extends Record
                 {
                     if (strlen($value) > 1)
                     {
-                        $value          = substr($value, 0, 1);
                         error_log("CensusLine::set('$field','$value')\n");
+                        $value          = substr($value, 0, 1);
                     }
                     if (($value <= ' ') || ($value > '}'))
                         $value          = '';
@@ -1339,13 +1339,13 @@ class CensusLine extends Record
             }                   // single character fields
 
             case 'province':
-            {                   // single character fields
+            {                   // two character fields
                 if (is_string($value))
                 {
                     if (strlen($value) > 2)
                     {
-                        $value          = substr($value, 0, 1);
                         error_log("CensusLine::set('$field','$value')\n");
+                        $value          = substr($value, 0, 2);
                     }
                 }
                 else
@@ -1356,6 +1356,97 @@ class CensusLine extends Record
                 }
                 return parent::set($field, $value);
             }                   // two character fields
+
+            case 'immyear':
+            case 'natyear':
+            case 'family':
+            {                   // six character fields
+                if (is_int($value))
+                {
+                    if ($value > 999999)
+                    {
+                        error_log("CensusLine::set('$field','$value')\n");
+                        $value          = $value % 1000000;
+                    }
+                }
+                else
+                if (is_string($value))
+                {
+                    if (strlen($value) > 6)
+                    {
+                        error_log("CensusLine::set('$field','$value')\n");
+                        $value          = substr($value, 0, 6);
+                    }
+                }
+                else
+                {
+                    error_log("CensusLine::set('$field'," . 
+                                var_export($value) . ")\n");
+                    $value              = null;
+                }
+                return parent::set($field, $value);
+            }                   // six character fields
+
+            case 'age':
+            {                   // eight character fields
+                if (is_string($value))
+                {
+                    if (strlen($value) > 8)
+                    {
+                        error_log("CensusLine::set('$field','$value')\n");
+                        $value          = substr($value, 0, 8);
+                    }
+                }
+                else
+                {
+                    error_log("CensusLine::set('$field'," . 
+                                var_export($value) . ")\n");
+                    $value              = null;
+                }
+                return parent::set($field, $value);
+            }                   // eight character fields
+
+            case 'surname':
+            case 'relation':
+            case 'bplace':
+            case 'fathersbplace':
+            case 'mothersbplace':
+            {                   // 32 character fields
+                if (is_string($value))
+                {
+                    if (strlen($value) > 32)
+                    {
+                        error_log("CensusLine::set('$field','$value')\n");
+                        $value          = substr($value, 0, 32);
+                    }
+                }
+                else
+                {
+                    error_log("CensusLine::set('$field'," . 
+                                var_export($value) . ")\n");
+                    $value              = null;
+                }
+                return parent::set($field, $value);
+            }                   // eight character fields
+
+            case 'remarks':
+            {                   // 50 character fields
+                if (is_string($value))
+                {
+                    if (strlen($value) > 50)
+                    {
+                        error_log("CensusLine::set('$field','$value')\n");
+                        $value          = substr($value, 0, 50);
+                    }
+                }
+                else
+                {
+                    error_log("CensusLine::set('$field'," . 
+                                var_export($value) . ")\n");
+                    $value              = null;
+                }
+                return parent::set($field, $value);
+            }                   // eight character fields
 
             default:
             {       // no validation implemented yet

@@ -1,585 +1,600 @@
 <!--*********************************************************************
- *  DeathRegDetailUpdateen.html											*
- *																		*
- *  Display the contents of an Ontario death registration as a detail	*
- *  form with optional ability to update the record.					*
- *																		*
- *  History:															*
- *		2018/05/28		convert to template								*
+ *  DeathRegDetailUpdateen.html                                         *
+ *                                                                      *
+ *  Display the contents of an Ontario death registration as a detail   *
+ *  form with optional ability to update the record.                    *
+ *                                                                      *
+ *  History:                                                            *
+ *      2018/05/28      convert to template                             *
  *      2019/03/30      move buttons to menu                            *
  *      2020/06/10      use <input type="number"> for original page     *
- *																		*
- *  Copyright &copy; 2020 James A. Cobban							    *
+ *      2021/04/24      add residence input field                       *
+ *                                                                      *
+ *  Copyright &copy; 2021 James A. Cobban                               *
  **********************************************************************-->
     <div class="hidden" id="breadcrumbs">
       <a href="/genealogy.php?lang=$LANG">
-		  Genealogy
+          Genealogy
       </a>:
       <a href='/Canada/CountriesEdit.php?lang=$LANG'>
-	      List of Supported Countries
+          List of Supported Countries
       </a>:
       <a href="/genCountry.php?cc=$CC&amp;lang=$LANG">
-	      $COUNTRYNAME
+          $COUNTRYNAME
       </a>:
       <a href="/Canada/genProvince.php?domain=$DOMAIN&amp;lang=$LANG">
-	      $DOMAINNAME
+          $DOMAINNAME
       </a>:
       <a href="DeathRegQuery.php?lang=$LANG">
-		  New Query
+          New Query
       </a>:
       <a href="DeathRegStats.php?RegDomain=$DOMAIN&amp;lang=$LANG">
-	      $DOMAINNAME Transcription Status
+          $DOMAINNAME Transcription Status
       </a>:
       <a href="DeathRegYearStats.php?RegDomain=$DOMAIN&amp;regyear=$REGYEAR&amp;lang=$LANG">
-	      $DOMAINNAME Status $REGYEAR
+          $DOMAINNAME Status $REGYEAR
       </a>:
       <a href="DeathRegYearStats.php?RegDomain=$DOMAIN&amp;regyear=$REGYEAR&amp;regCounty=$REGCOUNTY&amp;lang=$LANG">
-		  Status $REGYEAR $COUNTYNAME
+          Status $REGYEAR $COUNTYNAME
       </a>:
       <a href="DeathRegResponse.php?RegDomain=$DOMAIN&amp;RegYear=$REGYEAR&amp;RegCounty=$REGCOUNTY&amp;RegTownship=$REGTOWNSHIP&amp;lang=$LANG">
-		  Status $REGYEAR Township $REGTOWNSHIP
+          Status $REGYEAR Township $REGTOWNSHIP
       </a>:
       <a href="DeathRegDetail.php?RegDomain=$DOMAIN&amp;RegYear=$REGYEAR&amp;RegNum=$PREVREGNUM&amp;lang=$LANG&amp;ShowImage=$SHOWIMAGE" id="Previous">Previous</a>:
       <a href="DeathRegDetail.php?RegDomain=$DOMAIN&amp;RegYear=$REGYEAR&amp;RegNum=$PREV5REGNUM&amp;lang=$LANG&amp;ShowImage=$SHOWIMAGE" id="Previous">Skip Back 5</a>:
       <a href="DeathRegDetail.php?RegDomain=$DOMAIN&amp;RegYear=$REGYEAR&amp;RegNum=$NEXTREGNUM&amp;lang=$LANG&amp;ShowImage=$SHOWIMAGE" id="Next">Next</a>:
       <a href="DeathRegDetail.php?RegDomain=$DOMAIN&amp;RegYear=$REGYEAR&amp;RegNum=$NEXT5REGNUM&amp;lang=$LANG&amp;ShowImage=$SHOWIMAGE" id="Next">Skip Forward 5</a>:
-	  <a href="DeathRegResponse.php?RegDomain=$DOMAIN&amp;RegYear=$REGYEAR&amp;RegNum=$REGNUM&amp;lang=$LANG">
-	    Display Death Registrations in Order
-	  </a>:
+      <a href="DeathRegResponse.php?RegDomain=$DOMAIN&amp;RegYear=$REGYEAR&amp;RegNum=$REGNUM&amp;lang=$LANG">
+        Display Death Registrations in Order
+      </a>:
     </div> 
     <div class="body">
       <h1>
         <span class="right">
-	  <a href="DeathRegDetailHelpen.html" target="help">? Help</a>
+      <a href="DeathRegDetailHelpen.html" target="help">? Help</a>
         </span>
         $DOMAINNAME Death Registration: Update
       </h1>
       $MSG
       $TRACE
     <form action="DeathRegUpdate.php"
-		  method="post" 
-		  name="distForm" id="distForm"
-		  enctype="multipart/form-data">
-			<input type="hidden" name="RegDomain" id="RegDomain"
-					value="$DOMAIN"/>
-	  <!-- the following stores the textual value of the county name in
-	       the web page so it can be used by the Javascript code 
-	       to initialize the RegCounty selection list -->
-			<input type="hidden" name="RegCountyTxt" id="RegCountyTxt" 
-		  disabled="disabled" value="$REGCOUNTY"/>
-	  <!-- the following stores the textual value of the county name in
-	       the web page so it can be used by the Javascript code 
-	       to initialize the RegTownship selection list -->
-			<input type="hidden" name="RegTownshipTxt" id="RegTownshipTxt" 
-		  disabled="disabled" value="$REGTOWNSHIP"/>
-			<input type="hidden" name="lang" id="lang"
-					value="$LANG"/>
-			<input type="hidden" name="Debug" id="Debug"
-					value="$DEBUG"/>
-		<div class="row" id="RegYearNumRow">
-		  <div class="column1">
-    	  <div class="left">
-			<label class="labelCol1" for="RegYear">
-		      Identification:&nbsp;Year:
-		    </label>
-			<input name="RegYear" id="RegYear" type="text"
-					class="ina rightnc" readonly="readonly"
-					size="4" maxlength="4"
-					value="$REGYEAR">
-		  </div>
-		  <div class="right">
-			<label class="labelSmall6em" for="RegNum">
-				Number:
-			</label>
-			<input name="RegNum" id="RegNum" type="text"
-					class="ina rightnc" readonly="readonly"
-					size="6" maxlength="6" 
-					value="$REGNUM">
-		  </div>
+          method="post" 
+          name="distForm" id="distForm"
+          enctype="multipart/form-data">
+            <input type="hidden" name="RegDomain" id="RegDomain"
+                    value="$DOMAIN"/>
+      <!-- the following stores the textual value of the county name in
+           the web page so it can be used by the Javascript code 
+           to initialize the RegCounty selection list -->
+            <input type="hidden" name="RegCountyTxt" id="RegCountyTxt" 
+          disabled="disabled" value="$REGCOUNTY"/>
+      <!-- the following stores the textual value of the county name in
+           the web page so it can be used by the Javascript code 
+           to initialize the RegTownship selection list -->
+            <input type="hidden" name="RegTownshipTxt" id="RegTownshipTxt" 
+          disabled="disabled" value="$REGTOWNSHIP"/>
+            <input type="hidden" name="lang" id="lang"
+                    value="$LANG"/>
+            <input type="hidden" name="Debug" id="Debug"
+                    value="$DEBUG"/>
+        <div class="row" id="RegYearNumRow">
+          <div class="column1">
+          <div class="left">
+            <label class="labelCol1" for="RegYear">
+              Identification:&nbsp;Year:
+            </label>
+            <input name="RegYear" id="RegYear" type="text"
+                    class="ina rightnc" readonly="readonly"
+                    size="4" maxlength="4"
+                    value="$REGYEAR">
+          </div>
+          <div class="right">
+            <label class="labelSmall6em" for="RegNum">
+                Number:
+            </label>
+            <input name="RegNum" id="RegNum" type="text"
+                    class="ina rightnc" readonly="readonly"
+                    size="6" maxlength="6" 
+                    value="$REGNUM">
+          </div>
         </div>
-		  <div class="column2">
-			<label class="labelCol2" for="MsVol">
-	        MS 935 Reel:
-	      </label>
-			<input name="MsVol" id="MsVol" type="text"
-					size="4" maxlength="4" class="black white right" 
-					value="$MSVOL"/>
-	    </div>
+          <div class="column2">
+            <label class="labelCol2" for="MsVol">
+            MS 935 Reel:
+          </label>
+            <input name="MsVol" id="MsVol" type="text"
+                    size="4" maxlength="4" class="black white right" 
+                    value="$MSVOL"/>
+        </div>
         <div style="clear: both"></div>
-      </div>
-		<div class="row" id="OriginalRow">
-		  <div class="column1">
-	      <div class="left">
-			<label class="labelCol1" for="OriginalVolume">
-				Volume:
-			</label>
-			<input name="OriginalVolume" id="OriginalVolume"
-					type="text" class="black white right"
-					size="3" maxlength="16"
-					value="$ORIGINALVOLUME"/>
-	      </div>
-	      <div class="right">
-			<label class="labelSmall6em" for="OriginalPage">
-				Page:
-			</label>
-			<input name="OriginalPage" id="OriginalPage"
-					type="number" class="black white right"
-					size="3" maxlength="3" min="0" max="900"
-					value="$ORIGINALPAGE"/>
-	      </div>
-	    </div>
-		  <div class="column2">
-			<label class="labelCol2" for="OriginalItem">
-				Item:
-			</label>
-			<input name="OriginalItem" id="OriginalItem"
-					type="text" class="black white right"
-					size="3" maxlength="3"
-					value="$ORIGINALITEM"/>
+      </div>    <!-- class="row" -->
+        <div class="row" id="OriginalRow">
+          <div class="column1">
+          <div class="left">
+            <label class="labelCol1" for="OriginalVolume">
+                Volume:
+            </label>
+            <input name="OriginalVolume" id="OriginalVolume"
+                    type="text" class="black white right"
+                    size="3" maxlength="16"
+                    value="$ORIGINALVOLUME"/>
+          </div>
+          <div class="right">
+            <label class="labelSmall6em" for="OriginalPage">
+                Page:
+            </label>
+            <input name="OriginalPage" id="OriginalPage"
+                    type="number" class="black white right"
+                    size="3" maxlength="3" min="0" max="900"
+                    value="$ORIGINALPAGE"/>
+          </div>
+        </div>
+          <div class="column2">
+            <label class="labelCol2" for="OriginalItem">
+                Item:
+            </label>
+            <input name="OriginalItem" id="OriginalItem"
+                    type="text" class="black white right"
+                    size="3" maxlength="3"
+                    value="$ORIGINALITEM"/>
           </div>
         <div style="clear: both"></div>
-      </div> <!-- id="OriginalRow"-->
-		<div class="row" id="CountyTownshipRow">
-		  <div class="column1">
-			<label class="labelCol1" for="RegCounty">
-				Regist'n: County:
-			</label>
-		  <select name="RegCounty" id="RegCounty" size="1"
-					class="black white left">
-		  </select>
+      </div> <!-- id="OriginalRow"-->    <!-- class="row" -->
+        <div class="row" id="CountyTownshipRow">
+          <div class="column1">
+            <label class="labelCol1" for="RegCounty">
+                Regist'n: County:
+            </label>
+          <select name="RegCounty" id="RegCounty" size="1"
+                    class="black white left">
+          </select>
         </div>
-		  <div class="column2">
-			<label class="labelCol2" for="RegTownship">
-				Township:
-			</label>
-			<input name="RegTownship" id="RegTownship"
-					type="text" size="20" maxlength="40" 
-					value="$REGTOWNSHIP" 
-					class="black white left">
-        </div>
-        <div style="clear: both"></div>
-      </div>
-		<div class="row" id="NameRow">
-		  <div class="column1">
-			<label class="labelCol1" for="GivenNames">
-				Name: Given:
-			</label>
-			<input name="GivenNames" id="GivenNames"
-					type="text" size="32" maxlength="40"
-					value="$GIVENNAMES" 
-					class="black white left"> 
-        </div>
-		  <div class="column2">
-			<label class="labelCol2" for="Surname">
-				Family:
-			</label>
-			<input name="Surname" id="Surname"
-					type="text" size="20" maxlength="40" 
-					value="$SURNAME" 
-					class="black white left"> 
+          <div class="column2">
+            <label class="labelCol2" for="RegTownship">
+                Township:
+            </label>
+            <input name="RegTownship" id="RegTownship"
+                    type="text" size="20" maxlength="40" 
+                    value="$REGTOWNSHIP" 
+                    class="black white left">
         </div>
         <div style="clear: both"></div>
-      </div>
-		<div class="row" id="SexMarStatRow">
-		  <div class="column1">
-			<label class="labelCol1" for="Sex">
-				Sex:
-			</label>
-		  <!-- enable the selection for input only if updating -->
-		  <select name="Sex" id="Sex" size="1"
-					class="black white left">
-		      <option id="SexM" class="male" value="M" $selected>Male</option>
-		      <option id="SexF" class="female" value="F" $selected>Female</option>
-		      <option id="SexU" class="unknown" value="?" $selected>Unreported</option>
-		  </select>
+      </div>    <!-- class="row" -->
+        <div class="row" id="NameRow">
+          <div class="column1">
+            <label class="labelCol1" for="GivenNames">
+                Name: Given:
+            </label>
+            <input name="GivenNames" id="GivenNames"
+                    type="text" size="32" maxlength="40"
+                    value="$GIVENNAMES" 
+                    class="black white left"> 
+          </div>
+          <div class="column2">
+            <label class="labelCol2" for="Surname">
+                Family:
+            </label>
+            <input name="Surname" id="Surname"
+                    type="text" size="20" maxlength="40" 
+                    value="$SURNAME" 
+                    class="black white left"> 
+          </div>
+          <div style="clear: both"></div>
+        </div>    <!-- class="row" -->
+        <div class="row" id="SexMarStatRow">
+          <div class="column1">
+            <label class="labelCol1" for="Sex">
+                Sex:
+            </label>
+            <!-- enable the selection for input only if updating -->
+            <select name="Sex" id="Sex" size="1"
+                      class="black white left">
+                <option id="SexM" class="male" value="M" $selected>Male</option>
+                <option id="SexF" class="female" value="F" $selected>Female</option>
+                <option id="SexU" class="unknown" value="?" $selected>Unreported</option>
+            </select>
+          </div>
+          <div class="column2">
+            <label class="labelCol2" for="MarStat">
+                Marital Status:
+            </label>
+            <select name="MarStat" id="MarStat" size="1"
+                      class="black white left">
+              <option id="MarStatS" value="S" $selected>Single</option>
+              <option id="MarStatM" value="M" $selected>Married</option>
+              <option id="MarStatW" value="W" $selected>Widowed</option>
+              <option id="MarStatD" value="D" $selected>Divorced</option>
+              <option id="MarStatU" value="?" $selected>Unreported</option>
+            </select>
+          </div>
+          <div style="clear: both"></div>
+        </div>    <!-- class="row" -->
+        <div class="row" id="DeathDatePlaceRow">
+          <div class="column1">
+            <label class="labelCol1" for="Date">
+                Death&nbsp;Date:
+            </label>
+            <input name="Date" id="Date"
+                    type="text" size="12" maxlength="32"
+                    value="$DATE"
+                    class="black white left"/>
         </div>
-		  <div class="column2">
-			<label class="labelCol2" for="MarStat">
-				Marital Status:
-			</label>
-		  <select name="MarStat" id="MarStat" size="1"
-					class="black white left">
-		    <option id="MarStatS" value="S" $selected>Single</option>
-		    <option id="MarStatM" value="M" $selected>Married</option>
-		    <option id="MarStatW" value="W" $selected>Widowed</option>
-		    <option id="MarStatD" value="D" $selected>Divorced</option>
-		    <option id="MarStatU" value="?" $selected>Unreported</option>
-		  </select>
+          <div class="column2">
+            <label class="labelCol2" for="Place">
+                Death Place:
+            </label>
+            <input name="Place" id="Place"
+                    type="text" size="20" maxlength="128"
+                    value="$PLACE"
+                    class="black white leftnc">
         </div>
         <div style="clear: both"></div>
-      </div>
-		<div class="row" id="DeathDatePlaceRow">
-		  <div class="column1">
-			<label class="labelCol1" for="Date">
-				Death&nbsp;Date:
-			</label>
-			<input name="Date" id="Date"
-					type="text" size="12" maxlength="32"
-					value="$DATE"
-					class="black white left"/>
+      </div>    <!-- class="row" -->
+        <div class="row" id="ResidenceRow">
+          <div class="column1">
+          </div>
+          <div class="column2">
+            <label class="labelCol2" for="Residence">
+              Residence:
+            </label>
+            <input name="Residence" id="Residence"
+                    type="text" size="20" maxlength="128"
+                    value="$RESIDENCE"
+                    class="black white leftnc">
+          </div>
+          <div style="clear: both"></div>
+        </div>    <!-- class="row" -->
+        <div class="row" id="LinkRowSet">
+          <div class="column2">
+            <label class="labelCol1" for="IDIR">
+                Link:
+            </label>
+      <a href="/FamilyTree/Person.php?idir=$idir"
+          id="showLink" class="$genderClass"
+          target="_blank">
+          $linkedName
+      </a>
+            <input type="hidden" id="IDIR" name="IDIR" 
+                    value="$idir">
         </div>
-		  <div class="column2">
-			<label class="labelCol2" for="Place">
-				Death Place:
-			</label>
-			<input name="Place" id="Place"
-					type="text" size="20" maxlength="128"
-					value="$PLACE"
-					class="black white leftnc">
-        </div>
+            <button id="clearIdir" type="button">Clear</button>
         <div style="clear: both"></div>
+      </div>    <!-- class="row" -->
+        <div class="row" id="LinkRowMatch">
+          <div class="column2">
+            <label class="labelCol1" for="IDIR">
+                Link:
+            </label>
+      <select name="IDIR" id="IDIR" rows="1"
+                    class="black white left">
+          <option value="0">Possible matches to this registration:
+          </option>
+          <option id="match" value="$idir" class="$sexclass white">
+          $name
+          </option>
+      </select>
       </div>
-		<div class="row" id="LinkRowSet">
-		  <div class="column2">
-			<label class="labelCol1" for="IDIR">
-				Link:
-			</label>
-	  <a href="/FamilyTree/Person.php?idir=$idir"
-		  id="showLink" class="$genderClass"
-		  target="_blank">
-	      $linkedName
-	  </a>
-			<input type="hidden" id="IDIR" name="IDIR" 
-					value="$idir">
-        </div>
-			<button id="clearIdir" type="button">Clear</button>
         <div style="clear: both"></div>
-      </div>
-		<div class="row" id="LinkRowMatch">
-		  <div class="column2">
-			<label class="labelCol1" for="IDIR">
-				Link:
-			</label>
-	  <select name="IDIR" id="IDIR" rows="1"
-					class="black white left">
-	      <option value="0">Possible matches to this registration:
-	      </option>
-	      <option id="match" value="$idir" class="$sexclass white">
-		  $name
-	      </option>
-	  </select>
-	  </div>
-        <div style="clear: both"></div>
-      </div>
-		<div class="row" id="OccupationAgeRow">
-		  <div class="column1">
-			<label class="labelCol1" for="Occupation">
+      </div>    <!-- class="row" -->
+        <div class="row" id="OccupationAgeRow">
+          <div class="column1">
+            <label class="labelCol1" for="Occupation">
               Occupation:
           </label>
-			<input name="Occupation" id="Occupation"
-					type="text" size="20" maxlength="64"
-					value="$OCCUPATION"
-					class="black white leftnc">
+            <input name="Occupation" id="Occupation"
+                    type="text" size="20" maxlength="64"
+                    value="$OCCUPATION"
+                    class="black white leftnc">
         </div>
-		  <div class="column2">
-			<label class="labelCol2" for="Age">
+          <div class="column2">
+            <label class="labelCol2" for="Age">
               Age at Death:
           </label>
-			<input name="Age" id="Age"
-					type="text" size="10" maxlength="16"
-					value="$AGE"
-					class="black white leftnc">
-	    </div>
-        <div style="clear: both"></div>
-      </div>
-		<div class="row" id="BirthDatePlaceRow">
-		  <div class="column1">
-			<label class="labelCol1" for="BirthDate">
-              Birth&nbsp;Date:
-          </label>
-			<input name="BirthDate" id="BirthDate"
-					type="text" size="10" maxlength="32"
-					value="$BIRTHDATE"
-					class="black white left">
+            <input name="Age" id="Age"
+                    type="text" size="10" maxlength="16"
+                    value="$AGE"
+                    class="black white leftnc">
         </div>
-		  <div class="column2">
-			<label class="labelCol2" for="BirthPlace">
+        <div style="clear: both"></div>
+      </div>    <!-- class="row" -->
+        <div class="row" id="BirthDatePlaceRow">
+          <div class="column1">
+            <label class="labelCol1" for="BirthDate">
+              Birth&nbsp;Date:
+            </label>
+            <input name="BirthDate" id="BirthDate"
+                    type="text" size="10" maxlength="32"
+                    value="$BIRTHDATE"
+                    class="black white left">
+          </div>
+          <div class="column2">
+            <label class="labelCol2" for="BirthPlace">
               Birth&nbsp;Place:
-          </label>
-			<input name="BirthPlace" id="BirthPlace"
-					type="text" size="20" maxlength="128"
-					value="$BIRTHPLACE"
-					class="black white leftnc">
-		</div>
-	    <div style="clear: both"></div>
-      </div>
-		<div class="row" id="ResLengthRow">
-		  <div class="column2">
-			<label class="labelCol1" for="ResPlace">
+            </label>
+            <input name="BirthPlace" id="BirthPlace"
+                    type="text" size="20" maxlength="128"
+                    value="$BIRTHPLACE"
+                    class="black white leftnc">
+          </div>
+          <div style="clear: both"></div>
+        </div>    <!-- class="row" -->
+        <div class="row" id="ResLengthRow">
+          <div class="column2">
+            <label class="labelCol1" for="ResPlace">
               Residence:&nbsp;at Place:
           </label>
-			<input name="ResPlace" id="ResPlace"
-					type="text" size="5" maxlength="16"
-					value="$RESPLACE"
-					class="black white right">
+            <input name="ResPlace" id="ResPlace"
+                    type="text" size="5" maxlength="16"
+                    value="$RESPLACE"
+                    class="black white right">
         </div>
-		  <div class="column2">
-			<label class="labelSmall6em" for="ResOnt">
-				in Ontario:
-			</label>
-			<input name="ResOnt" id="ResOnt" 
-					type="text" size="5" maxlength="16"
-					value="$RESONT"
-					class="black white right">
+          <div class="column2">
+            <label class="labelSmall6em" for="ResOnt">
+                in Ontario:
+            </label>
+            <input name="ResOnt" id="ResOnt" 
+                    type="text" size="5" maxlength="16"
+                    value="$RESONT"
+                    class="black white right">
         </div>
-		  <div class="column2">
-			<label class="labelSmall6em" for="ResCan">
-				in Canada:
-			</label>
-			<input name="ResCan" id="ResCan" 
-					type="text" size="5" maxlength="16"
-					value="$RESCAN"
-					class="black white right">
+          <div class="column2">
+            <label class="labelSmall6em" for="ResCan">
+                in Canada:
+            </label>
+            <input name="ResCan" id="ResCan" 
+                    type="text" size="5" maxlength="16"
+                    value="$RESCAN"
+                    class="black white right">
         </div>
         <div style="clear: both"></div>
-      </div>
-		<div class="row" id="DeathCauseRow">
-		  <div class="column1">
-			<label class="labelCol1" for="Cause">
-				Cause:
-			</label>
-			<input name="Cause" id="Cause"
-					type="text" size="32" maxlength="255"
-					value="$CAUSE" 
-					class="black white leftnc"> 
+      </div>    <!-- class="row" -->
+        <div class="row" id="DeathCauseRow">
+          <div class="column1">
+            <label class="labelCol1" for="Cause">
+                Cause:
+            </label>
+            <input name="Cause" id="Cause"
+                    type="text" size="32" maxlength="255"
+                    value="$CAUSE" 
+                    class="black white leftnc"> 
         </div>
-		  <div class="column2">
-			<label class="labelCol2" for="Duration">
-				Duration:
-			</label>
-			<input name="Duration" id="Duration"
-					type="text" size="16" maxlength="64"
-					value="$DURATION"
-					class="black white leftnc">
-	  </div>
-        <div style="clear: both"></div>
+          <div class="column2">
+            <label class="labelCol2" for="Duration">
+                Duration:
+            </label>
+            <input name="Duration" id="Duration"
+                    type="text" size="16" maxlength="64"
+                    value="$DURATION"
+                    class="black white leftnc">
       </div>
-		<div class="row" id="PhysicianRow">
-		  <div class="column1">
-			<label class="labelCol1" for="Phys">
-				Physician:
-			</label>
-			<input name="Phys" id="Phys"
-					type="text" size="20" maxlength="48"
-					value="$PHYS"
-					class="black white left">
+        <div style="clear: both"></div>
+      </div>    <!-- class="row" -->
+        <div class="row" id="PhysicianRow">
+          <div class="column1">
+            <label class="labelCol1" for="Phys">
+                Physician:
+            </label>
+            <input name="Phys" id="Phys"
+                    type="text" size="20" maxlength="48"
+                    value="$PHYS"
+                    class="black white left">
         </div>
-		  <div class="column2">
-			<label class="labelCol2" for="PhysAddr">
-				Address:
-			</label>
-			<input name="PhysAddr" id="PhysAddr"
-					type="text" size="20" maxlength="128"
-					value="$PHYSADDR"
-					class="black white leftnc">
-	  </div>
-        <div style="clear: both"></div>
+          <div class="column2">
+            <label class="labelCol2" for="PhysAddr">
+                Address:
+            </label>
+            <input name="PhysAddr" id="PhysAddr"
+                    type="text" size="20" maxlength="128"
+                    value="$PHYSADDR"
+                    class="black white leftnc">
       </div>
-		<div class="row" id="InformantRow">
-		  <div class="column1">
-			<label class="labelCol1" for="Informant">
-				Informant:&nbsp;Name:
-			</label>
-			<input name="Informant" id="Informant"
-					type="text" size="32" maxlength="48"
-					value="$INFORMANT"
-					class="black white left">
+        <div style="clear: both"></div>
+      </div>    <!-- class="row" -->
+        <div class="row" id="InformantRow">
+          <div class="column1">
+            <label class="labelCol1" for="Informant">
+                Informant:&nbsp;Name:
+            </label>
+            <input name="Informant" id="Informant"
+                    type="text" size="32" maxlength="48"
+                    value="$INFORMANT"
+                    class="black white left">
         </div>
-		  <div class="column2">
-			<label class="labelCol2" for="InfRel">
-				Relation:
-			</label>
-			<input name="InfRel" id="InfRel" type="text"
-					class="black white left" 
-					size="16" maxlength="16" 
-					value="$INFREL">
-	  </div>
-        <div style="clear: both"></div>
+          <div class="column2">
+            <label class="labelCol2" for="InfRel">
+                Relation:
+            </label>
+            <input name="InfRel" id="InfRel" type="text"
+                    class="black white left" 
+                    size="16" maxlength="16" 
+                    value="$INFREL">
       </div>
-		<div class="row" id="InformantOccRow">
-		  <div class="column1">
-			<label class="labelCol1" for="InfOcc">
-				Informant:&nbsp;Occupation:
-			</label>
-			<input name="InfOcc" id="InfOcc"
-					type="text" size="16" maxlength="32"
-					value="$INFOCC"
-					class="black white leftnc">
+        <div style="clear: both"></div>
+      </div>    <!-- class="row" -->
+        <div class="row" id="InformantOccRow">
+          <div class="column1">
+            <label class="labelCol1" for="InfOcc">
+                Informant:&nbsp;Occupation:
+            </label>
+            <input name="InfOcc" id="InfOcc"
+                    type="text" size="16" maxlength="32"
+                    value="$INFOCC"
+                    class="black white leftnc">
         </div>
-		  <div class="column2">
-			<label class="labelCol2" for="InfRes">
-				Residence:
-			</label>
-			<input name="InfRes" id="InfRes"
-					type="text" size="20" maxlength="128"
-					value="$INFRES"
-					class="black white leftnc">
-	  </div>
-        <div style="clear: both"></div>
+          <div class="column2">
+            <label class="labelCol2" for="InfRes">
+                Residence:
+            </label>
+            <input name="InfRes" id="InfRes"
+                    type="text" size="20" maxlength="128"
+                    value="$INFRES"
+                    class="black white leftnc">
       </div>
-		<div class="row" id="ReligionRow">
-		  <div class="column1">
-			<label class="labelCol1" for="Religion">
-				Religion:
-			</label>
-			<input name="Religion" id="Religion"
-					type="text" size="20" maxlength="32"
-					value="$RELIGION"
-					class="black white leftnc">
-	  </div>
         <div style="clear: both"></div>
+      </div>    <!-- class="row" -->
+        <div class="row" id="ReligionRow">
+          <div class="column1">
+            <label class="labelCol1" for="Religion">
+                Religion:
+            </label>
+            <input name="Religion" id="Religion"
+                    type="text" size="20" maxlength="32"
+                    value="$RELIGION"
+                    class="black white leftnc">
       </div>
-		<div class="row" id="FatherNameRow">
-		  <div class="column1">
-			<label class="labelCol1" for="FatherName">
-				Father's&nbsp;Name:
-			</label>
-			<input name="FatherName" id="FatherName"
-					type="text" size="32" maxlength="48"
-					value="$FATHERNAME"
-					class="black white left">
+        <div style="clear: both"></div>
+      </div>    <!-- class="row" -->
+        <div class="row" id="FatherNameRow">
+          <div class="column1">
+            <label class="labelCol1" for="FatherName">
+                Father's&nbsp;Name:
+            </label>
+            <input name="FatherName" id="FatherName"
+                    type="text" size="32" maxlength="48"
+                    value="$FATHERNAME"
+                    class="black white left">
         </div>
-		  <div class="column2">
-			<label class="labelCol2" for="FatherBPlce">
-				Birth&nbsp;Place:
-			</label>
-			<input name="FatherBPlce" id="FatherBPlce"
-					type="text" size="20" maxlength="128"
-					value="$FATHERBPLCE"
-					class="black white leftnc">
-	  </div>
+          <div class="column2">
+            <label class="labelCol2" for="FatherBPlce">
+                Birth&nbsp;Place:
+            </label>
+            <input name="FatherBPlce" id="FatherBPlce"
+                    type="text" size="20" maxlength="128"
+                    value="$FATHERBPLCE"
+                    class="black white leftnc">
+      </div>
           <div style="clear: both"></div>
-        </div>
-		<div class="row" id="MotherNameRow">
-		  <div class="column1">
-			<label class="labelCol1" for="MotherName">
-				Mother's&nbsp;Name:
-			</label>
-			<input name="MotherName" id="MotherName"
-					type="text" size="32" maxlength="48"
-					value="$MOTHERNAME"
-					class="black white left">
+        </div>    <!-- class="row" -->
+        <div class="row" id="MotherNameRow">
+          <div class="column1">
+            <label class="labelCol1" for="MotherName">
+                Mother's&nbsp;Name:
+            </label>
+            <input name="MotherName" id="MotherName"
+                    type="text" size="32" maxlength="48"
+                    value="$MOTHERNAME"
+                    class="black white left">
           </div>
-		  <div class="column2">
-			<label class="labelCol2" for="MotherBPlce">
-				Birth&nbsp;Place:
-			</label>
-			<input name="MotherBPlce" id="MotherBPlce"
-					type="text" size="20" maxlength="128"
-					value="$MOTHERBPLCE"
-					class="black white leftnc">
-	      </div>
-          <div style="clear: both"></div>
-        </div>
-		<div class="row" id="HusbandNameRow">
-		  <div class="column1">
-			<label class="labelCol1" for="HusbandName">
-				Spouse's&nbsp;Name:
-			</label>
-			<input name="HusbandName" id="HusbandName"
-					type="text" size="32" maxlength="48"
-					value="$HUSBANDNAME"
-					class="black white left">
-	      </div>
-          <div style="clear: both"></div>
-        </div>
-		<div class="row" id="BurialRow">
-		  <div class="column1">
-			<label class="labelCol1" for="BurPlace">
-				Burial&nbsp;Place:
-			</label>
-			<input name="BurPlace" id="BurPlace"
-					type="text" size="32" maxlength="128"
-					value="$BURPLACE"
-					class="black white leftnc">
+          <div class="column2">
+            <label class="labelCol2" for="MotherBPlce">
+                Birth&nbsp;Place:
+            </label>
+            <input name="MotherBPlce" id="MotherBPlce"
+                    type="text" size="20" maxlength="128"
+                    value="$MOTHERBPLCE"
+                    class="black white leftnc">
           </div>
-		  <div class="column2">
-			<label class="labelCol2" for="BurDate">
-				Date:
-			</label>
-			<input name="BurDate" id="BurDate"
-					type="text" size="16" maxlength="16"
-					value="$BURDATE"
-					class="black white left">
-	      </div>
           <div style="clear: both"></div>
-        </div>
-		<div class="row" id="UndertakerRow">
-		  <div class="column1">
-			<label class="labelCol1" for="Undertkr">
-				Undertaker:
-			</label>
-			<input name="Undertkr" id="Undertkr"
-					type="text" size="20" maxlength="48"
-					value="$UNDERTKR"
-					class="black white left">
+        </div>    <!-- class="row" -->
+        <div class="row" id="HusbandNameRow">
+          <div class="column1">
+            <label class="labelCol1" for="HusbandName">
+                Spouse's&nbsp;Name:
+            </label>
+            <input name="HusbandName" id="HusbandName"
+                    type="text" size="32" maxlength="48"
+                    value="$HUSBANDNAME"
+                    class="black white left">
           </div>
-		  <div class="column2">
-			<label class="labelCol2" for="UndertkrAddr">
-				Address:
-			</label>
-			<input name="UndertkrAddr" id="UndertkrAddr"
-					type="text" size="20" maxlength="128"
-					value="$UNDERTKRADDR"
-					class="black white leftnc">
-	      </div>
           <div style="clear: both"></div>
-        </div>
-		<div class="row" id="RegistrationDateRow">
-		  <div class="column1">
-			<label class="labelCol1" for="RegDate">
-				Reg. Date:
-			</label>
-			<input name="RegDate" id="RegDate"
-					type="text" size="16" maxlength="16"
-					value="$REGDATE"
-					class="black white left">
+        </div>    <!-- class="row" -->
+        <div class="row" id="BurialRow">
+          <div class="column1">
+            <label class="labelCol1" for="BurPlace">
+                Burial&nbsp;Place:
+            </label>
+            <input name="BurPlace" id="BurPlace"
+                    type="text" size="32" maxlength="128"
+                    value="$BURPLACE"
+                    class="black white leftnc">
           </div>
-		  <div class="column2">
-			<label class="labelCol2" for="Registrar">
-				Registrar:
-			</label>
-			<input name="Registrar" id="Registrar"	
-					type="text" size="20" maxlength="128"
-					value="$REGISTRAR"
-					class="black white left">
-	      </div>
+          <div class="column2">
+            <label class="labelCol2" for="BurDate">
+                Date:
+            </label>
+            <input name="BurDate" id="BurDate"
+                    type="text" size="16" maxlength="16"
+                    value="$BURDATE"
+                    class="black white left">
+          </div>
           <div style="clear: both"></div>
-        </div>
-		<div class="row" id="RemarksRow">
-			<label class="labelCol1" for="Remarks">
-				Remarks:
-			</label>
-	        <textarea name="Remarks" id="Remarks"
-					type="text" cols="55" rows=2 style="height: 80px;"
-					class="black white leftnc">$REMARKS</textarea>
+        </div>    <!-- class="row" -->
+        <div class="row" id="UndertakerRow">
+          <div class="column1">
+            <label class="labelCol1" for="Undertkr">
+                Undertaker:
+            </label>
+            <input name="Undertkr" id="Undertkr"
+                    type="text" size="20" maxlength="48"
+                    value="$UNDERTKR"
+                    class="black white left">
+          </div>
+          <div class="column2">
+            <label class="labelCol2" for="UndertkrAddr">
+                Address:
+            </label>
+            <input name="UndertkrAddr" id="UndertkrAddr"
+                    type="text" size="20" maxlength="128"
+                    value="$UNDERTKRADDR"
+                    class="black white leftnc">
+          </div>
+          <div style="clear: both"></div>
+        </div>    <!-- class="row" -->
+        <div class="row" id="RegistrationDateRow">
+          <div class="column1">
+            <label class="labelCol1" for="RegDate">
+                Reg. Date:
+            </label>
+            <input name="RegDate" id="RegDate"
+                    type="text" size="16" maxlength="16"
+                    value="$REGDATE"
+                    class="black white left">
+          </div>
+          <div class="column2">
+            <label class="labelCol2" for="Registrar">
+                Registrar:
+            </label>
+            <input name="Registrar" id="Registrar"  
+                    type="text" size="20" maxlength="128"
+                    value="$REGISTRAR"
+                    class="black white left">
+          </div>
+          <div style="clear: both"></div>
+        </div>    <!-- class="row" -->
+        <div class="row" id="RemarksRow">
+            <label class="labelCol1" for="Remarks">
+                Remarks:
+            </label>
+            <textarea name="Remarks" id="Remarks"
+                    type="text" cols="55" rows=2 style="height: 80px;"
+                    class="black white leftnc">$REMARKS</textarea>
             <div style="clear: both"></div>
-        </div>
-		<div class="row" id="ImageRow">
-			<label class="labelCol1" for="Image">
-				Image:
-			</label>
-			<button type="button" id="ShowImage">Show Image</button>
-			<input name="Image" id="Image"
-					type="text" size="50" maxlength="256"
-					value="$IMAGE"
-					class="white left wide"> 
+        </div>    <!-- class="row" -->
+        <div class="row" id="ImageRow">
+            <label class="labelCol1" for="Image">
+                Image:
+            </label>
+            <button type="button" id="ShowImage">Show Image</button>
+            <input name="Image" id="Image"
+                    type="text" size="50" maxlength="256"
+                    value="$IMAGE"
+                    class="white left wide"> 
           <div style="clear: both"></div>
-        </div>
+        </div>    <!-- class="row" -->
         <div class="row">
-		    <button type="submit" id="Submit">
-	            <u>U</u>pdate
-	        </button>
-	        &nbsp;
-			<button type="reset" id="Reset">
-	            <u>C</u>lear Form
-	        </button>
-	        &nbsp;
+            <button type="submit" id="Submit">
+                <u>U</u>pdate
+            </button>
+            &nbsp;
+            <button type="reset" id="Reset">
+                <u>C</u>lear Form
+            </button>
+            &nbsp;
             <a href="DeathRegDetail.php?RegDomain=$DOMAIN&amp;RegYear=$REGYEAR&amp;RegNum=$PREVREGNUM&amp;lang=$LANG&amp;ShowImage=$SHOWIMAGE"
                     class="button">
                 Previous
             </a>
-	        &nbsp;
+            &nbsp;
             <a href="DeathRegDetail.php?RegDomain=$DOMAIN&amp;RegYear=$REGYEAR&amp;RegNum=$NEXTREGNUM&amp;lang=$LANG&amp;ShowImage=$SHOWIMAGE"
                     class="button">
                 Next
@@ -792,7 +807,7 @@
     <div class="balloon" id="HelpNewQuery">
       Click on this button to issue a new query of the database.
     </div>
-	<script src="/jscripts/tinymce/js/tinymce/tinymce.js" type="text/javascript"></script>
+    <script src="/jscripts/tinymce/js/tinymce/tinymce.js" type="text/javascript"></script>
     <script src="/jscripts/js20/http.js" type="text/javascript">
     </script>
     <script src="/jscripts/CommonForm.js" type="text/javascript">

@@ -210,6 +210,8 @@
  *                      reissued after image closed                     *
  *      2021/01/16      use XMLSerializer for diagnostic output         *
  *                      use addEventListener                            *
+ *      2021/05/08      add "United States of America" as country       *
+ *                      clear 'S' from marital status column            *
  *                                                                      *
  *  Copyright &copy; 2021 James A. Cobban                               *
  ************************************************************************/
@@ -307,6 +309,7 @@ var  ForeignBplaces = {     'Africa'            : 'Africa',
 			                'U.S.A.'            : 'U.States',
 			                'U.States'          : 'U.States',
 			                'United States'     : 'U.States',
+			                'United States of America' : 'U.States',
 			                'US'                : 'U.States',
 			                'W. I.'             : 'West Indies',
 			                'Wales'             : 'Wales',
@@ -2150,7 +2153,7 @@ function initElement(element, clear)
 
         case 'mstat':
         {   // capitalize flag values
-            if (clear)
+            if (clear || element.value.toLowerCase() == 's')
                 element.value  = "";
             if (element.addEventListener)
                 element.addEventListener('change', change, false);

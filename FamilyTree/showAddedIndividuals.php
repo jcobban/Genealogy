@@ -122,8 +122,8 @@ if (count($_GET) > 0)
 }	        	    // invoked by URL to display information
 
 $template           = new FtTemplate("showAddedIndividuals$lang.html");
-$tranTab            = $template->getTranslate();
-$t                  = $tranTab['tranTab'];
+$translate          = $template->getTranslate();
+$t                  = $translate['tranTab'];
 
 $template['otherStylesheets']->update(array('filename'  => 'showAddedIndiviuals'));
 

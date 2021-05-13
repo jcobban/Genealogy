@@ -316,7 +316,7 @@ if (!is_null($subDistID))
     {
         $text               = $template['subdistrictUndefined']->innertHTML;
         $subDistrictName    = str_replace(array('$subDistID','$distID'),
-                                           array($subDistI, $distID),
+                                           array($subDistID, $distID),
                                            $text);
         $msg                .= $subDistrictName . '. ';
     }
@@ -329,7 +329,7 @@ else
 
 if (is_string($pageText))
 {
-    $text                   = $template['pageInvalid'];
+    $text                   = $template['pageInvalid']->innerHTML;
     $msg                    .= str_replace('$value', $pageText, $text);
 }
 else

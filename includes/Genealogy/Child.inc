@@ -802,22 +802,22 @@ class Child extends Record
             }                       // child status
 
             case 'idcpdad':
-            {                       // child to parent relationship for father
+            {                       // child to parent rel'p for father
                 return $this->setCPRelDad($newvalue);
-            }                       // child to parent relationship for father
+            }                       // child to parent rel'p for father
 
             case 'idcpmom':
-            {                       // child to parent relationship for mother
+            {                       // child to parent rel'p for mother
                 return $this->setCPRelMom($newvalue);
-            }                       // child to parent relationship for mother
+            }                       // child to parent rel'p for mother
 
             case 'parseald':
             {                       // legacy internal date format
                 // validate and interpret new value
                 if ($newvalue instanceof LegacyDate)
-                {                   // parameter is an instance of LegacyDate
+                {                   // an instance of LegacyDate
                     $date               = $newvalue;
-                }                   // parameter is an instance of LegacyDate
+                }                   // an instance of LegacyDate
                 else
                 if (is_string($newvalue) || is_int($newvalue))
                 {                   // convert the value to LegacyDate
@@ -825,13 +825,13 @@ class Child extends Record
                 }                   // convert the value to LegacyDate
                 else
                 {                   // unexpected type
-                    $msg        .= "Child::set: " . "invalid value type " . 
+                    $msg        .= "Child::set: " . "invalid value type " .
                         gettype($newvalue) . ' ' .
-                        htlmlspecialchars(print_r($newvalue, true)) .
+                        htmlspecialchars(var_export($newvalue, true)) .
                         " for field '$field'. ";
                 }                   // unexpected
 
-                $sdname     = substr($fieldlc, 0, strlen($fieldLc)-1) .'sd';
+                $sdname     = substr($fieldlc, 0, strlen($fieldLc)-1).'sd';
                 parent::set($sdname, $date->getSortDate());
                 return parent::set($fieldLc, $date->getDate());
             }                       // sealed to parents date
@@ -841,15 +841,54 @@ class Child extends Record
             case 'ldsp':
             case 'templetag':
             {                       // true/false flags
+                if (is_string($newvalue))
+                {                   // interpret strings
+                    switch (strtolower($newvalue))
+                    {
+                        case '':
+                        case '0':
+                        case 'n':
+                        case 'no':
+                        case 'false':
+                            $newvalue       = 0;
+                            break;
+
+                        case '1':
+                        case 'y':
+                        case 'yes':
+                        case 'true':
+                            $newvalue       = 1;
+                            break;
+
+                        default:
+                            $newvalue       = htmlspecialchars($newvalue);
+                            break;
+                    }
+                }                   // interpret strings
+                else
+                if (is_bool($newvalue))
+                {                   // interpret booleans
+                    if ($newvalue)
+                        $newvalue           = 1;
+                    else
+                        $newvalue           = 0;
+                }                   // interpret booleans
+                else
+                if (!is_int($newvalue))
+                {
+                    $newvalue               = 
+                        htmlspecialchars(var_export($newvalue, true));
+                }
+
                 if ($newvalue == 0 || $newvalue == 1)
                 {
                     return parent::set($fieldLc, $newvalue);
-                }                   // valid valud
+                }                   // valid value
                 else
                 {                   // invalid value
-                    $msg        .= "Child::set: invalid value '" .
-                                    htmlspecialchars($newvalue) .
-                                    "' for field name='$field'. ";
+                    $msg        .=
+        "Child::set: invalid value '$newvalue' for field name='$field'. ";
+                    return $this->row[$fieldLc];
                 }                   // invalid value
             }                       // true/false flags
 
@@ -875,7 +914,7 @@ class Child extends Record
      *      1           if the method updated the database record       *
      *      0           if the database did not need to be updated      *
      ********************************************************************/
-    function save($xml)
+    function save($xml = false)
     {
         // only save records representing an existing instance of Person
         $idir               = $this->row['idir'];

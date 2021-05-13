@@ -142,6 +142,7 @@ use \Exception;
  *		2020/10/01      erroneously matched to Ontario Death Register   *
  *		2020/11/28      correct XSS errors                              *
  *		2021/04/04      escape CONTACTSUBJECT                           *
+ *		2021/05/13      correct regular expression for citation match   *
  *																		*
  *  Copyright &copy; 2021 James A. Cobban								*
  ************************************************************************/
@@ -440,10 +441,11 @@ if (strlen($msg) == 0)
 	if ($idir == 0 && $update)
 	{				// no existing link to this reg
 	    // check for existing citations to this registration
+        $pattern        = "^$regYear-0*{$regNum}($|[^0-9])";
 	    $citparms   	= array('idsr'		=> 97,
     		    	    	    'type'		=> Citation::STYPE_BIRTH,
-	    		    	        'srcdetail'	=> "^$regYear-0*$regNum"); 
-	    $citations		= new CitationSet($citparms);
+	    		    	        'srcdetail'	=> $pattern);
+        $citations		= new CitationSet($citparms);
 
 	    if ($citations->count() > 0)
 	    {				// citation to birth in old location
@@ -454,8 +456,9 @@ if (strlen($msg) == 0)
 	    {				// citation to birth in event
 			$citparms	= array('idsr'		=> 97,
 				                'type'		=> Citation::STYPE_EVENT,
-				                'srcdetail'	=> "^$regYear-0*$regNum"); 
-			$citations	= new CitationSet($citparms);
+				                'srcdetail'	=> $pattern); 
+            $citations	= new CitationSet($citparms);
+
 			foreach($citations as $idsx => $citation)
 			{			// loop through citations
 			    $ider       	= $citation->get('idime');

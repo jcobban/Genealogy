@@ -1452,8 +1452,9 @@ if (count($_POST) > 0)
                       "<th class='colhead'>value</th></tr>\n";
     foreach($_POST as $key => $value)
     {			// loop through all parameters
+        $safevalue          = htmlspecialchars($value);
         $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
-                        "<td class='white left'>$value</td></tr>\n"; 
+                        "<td class='white left'>$safevalue</td></tr>\n"; 
         switch(strtolower($key))
         {
             case 'sqlcommand':
@@ -1470,8 +1471,12 @@ if (count($_POST) > 0)
             }		// Confirm permission to go ahead
 
             case 'submit':
+                break;
+
             case 'debug':
             {
+                if (strtolower($value) == 'y')
+                    $debug          = true;
                 break;
             }		// previously handled
 
@@ -1500,8 +1505,9 @@ if (count($_GET) > 0)
                           "<th class='colhead'>value</th></tr>\n";
     foreach($_GET as $key => $value)
     {			// loop through all parameters
+        $safevalue          = htmlspecialchars($value);
         $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
-                        "<td class='white left'>$value</td></tr>\n"; 
+                        "<td class='white left'>$safevalue</td></tr>\n"; 
         switch(strtolower($key))
         {
             case 'lang':
@@ -1509,12 +1515,22 @@ if (count($_GET) > 0)
 	            $lang               = FtTemplate::validateLang($value);
                 break;
             }
+
+            case 'debug':
+            {
+                if (strtolower($value) == 'y')
+                    $debug          = true;
+                break;
+            }		// previously handled
+
         }
     }			// loop through all parameters
     if ($debug)
         $warn               .= $parmsText . "</table>\n";
 }		        // parameters passed by method=post
 
+if ($debug)
+    $warn       .= "<p>debugging activated</p>\h";
 $template                   = new FtTemplate("SqlCommand$lang.html");
 $translate                  = $template->getTranslate();
 $idetTranslate              = $translate['idetTitleText'];
@@ -2042,8 +2058,10 @@ if (strlen($msg) == 0 && $sqlCommand && strlen($sqlCommand) > 0)
             {
                 // validate authorization
                 if (!canUser('all'))
+                {
                     $msg	.=
-                            'You are not authorized to use this feature. ';
+                        'You are not authorized to use this feature. ';
+                }
 
                 $result	    = preg_match($updatePattern,
                                          $therest,

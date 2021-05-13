@@ -38,6 +38,7 @@ use \Templating\Template;
  *      2018/12/20      change xxxxHelp.html to xxxxHelpen.html         *
  *      2020/04/16      recovery for missing records is in class        *
  *                      CountyMarriageSet                               *
+ *      2021/04/21      correct error if no matches                     *
  *                                                                      *
  *  Copyright &copy; 2021 James A. Cobban                               *
  ************************************************************************/
@@ -646,9 +647,10 @@ if (strlen($msg) == 0)
         $template['topBrowse']->update(null);
 
     // show the response
+	$rowelt             = $template['Row$row'];
+	$data               = '';
     if (count($reports) > 0)
     {
-	    $rowelt         = $template['Row$row'];
 	    $rowtext        = $rowelt->outerHTML;
 	    $reportNo       = 0;
 	    $page           = 1;
@@ -659,7 +661,6 @@ if (strlen($msg) == 0)
 	    $licenseType    = 'L';
 	    $last           = end($reports);
 	    $first          = reset($reports);
-	    $data           = '';
 	    foreach($reports as $record)
 	    {
 	        $itemNo                 = $record->get('itemno'); 

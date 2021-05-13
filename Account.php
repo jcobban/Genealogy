@@ -215,7 +215,8 @@ if (strlen($password) > 0 && !$user->chkPassword($password))
 
 if (strlen($email) > 0 && $email != $oldemail)
 {                   // request to change e-mail address
-    if (strpos($email, "'") !== false)
+    if (strpos($email, "'") !== false ||
+        strpos($email, '@') == false)
 	    $msg	    .= $template['badEmail']->innerHTML;
     else
 	// check for an existing userid with the desired
@@ -229,6 +230,8 @@ if (strlen($email) > 0 && $email != $oldemail)
                                    $text);
     }
 }                   // request to change e-mail address
+else
+    $email          = $oldemail;
 
 // apply changed options
 if (is_bool($useEmail))

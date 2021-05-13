@@ -272,7 +272,7 @@ class Template implements ArrayAccess
                                   substr($init, -97);
                 else
                     $inittext   = $init;
-                $warn   .= "<p>Template::__construct('" . escape($inittext) .
+                $warn   .= "<p>Template::__construct('" . htmlspecialchars($inittext) .
                            "')</p>\n";
             }
             else
@@ -325,7 +325,7 @@ class Template implements ArrayAccess
                 else
                     $this->mainValid    = file_exists($this->main);
                 if (!$this->mainValid)
-                    $warn   .= "<p>Template::construct: " . __LINE__ . " Invalid parameter to Template constructor '" . escape($init) . "'</p>\n";
+                    $warn   .= "<p>Template::construct: " . __LINE__ . " Invalid parameter to Template constructor '" . htmlspecialchars($init) . "'</p>\n";
             }
         }
         else
@@ -492,9 +492,9 @@ class Template implements ArrayAccess
         {
             $warn   .= "<p>Template::updateTag: " .  __LINE__ . " id=";
             if ($id instanceof TemplateTag)
-                $warn   .= escape($tag->outerHTML()) . ", ";
+                $warn   .= htmlspecialchars($tag->outerHTML()) . ", ";
             else
-                $warn   .= escape($id) . ", ";
+                $warn   .= htmlspecialchars($id) . ", ";
             if (is_array($array))
                 $warn   .= "count(\$array)=" . count($array);
             else
@@ -702,7 +702,7 @@ class Template implements ArrayAccess
                     }       // have a valid variable name
                     else
                     {       // a dollar sign as ordinary text
-                            escape(substr($template, $this->cursor + 1, 20)) . "</p>\n";
+                            htmlspecialchars(substr($template, $this->cursor + 1, 20)) . "</p>\n";
                         // for example $15.25 will come here
                         $piece      .= '$';
                         $start      = $this->cursor + 1;
@@ -746,7 +746,7 @@ class Template implements ArrayAccess
                     $text       = substr($text, 0, 80) . "...$skipped..." .
                                     substr($text, -13);
                 }
-                $warn   .= "<th>$i&nbsp;'$name'</th><td>" . escape($text) .
+                $warn   .= "<th>$i&nbsp;'$name'</th><td>" . htmlspecialchars($text) .
                             "</td>\n";
                 $warn   .= "</tr>\n";
             }
@@ -799,7 +799,7 @@ class Template implements ArrayAccess
         $this->page     = $this->loadPage();
         if ($this->debug)
             $warn       .= "<p>Template::compile: " . __LINE__ .
-                        " \$this->page='" . escape($this->page) . "'</p>\n";
+                        " \$this->page='" . htmlspecialchars($this->page) . "'</p>\n";
 
         /****************************************************************
          * Perform site specific customization                          *
@@ -819,7 +819,7 @@ class Template implements ArrayAccess
          *  pass over the template rather than multiple search and      *
          *  replace.  It also supports case-insensitive name matching   *
          ****************************************************************/
-        //$tpage            = escape($this->page);
+        //$tpage            = htmlspecialchars($this->page);
         //$tpage            = str_replace("\n", "</p><p>", $tpage);
         //$tpage            = str_replace("\t", "\\t", $tpage);
 
@@ -917,8 +917,8 @@ class Template implements ArrayAccess
                             $warn   .= "<p>Template::compile: " . __LINE__ .
                             " name='$name', replace=" . gettype($replace) .
                             ' ' .
-                                escape(print_r($replace,true)). ", before '" .
-                                escape($rawtext) . "'</p>\n";
+                                htmlspecialchars(print_r($replace,true)). ", before '" .
+                                htmlspecialchars($rawtext) . "'</p>\n";
                         }               // unsupported
                     }               // name found in substitutions
                     else
@@ -1192,7 +1192,7 @@ class Template implements ArrayAccess
     {
         if ($this->test)
             $this->log("Template::startTag: " . __LINE__ .
-                        " '$tagName' '" . escape($tagText) . "' cursor  ={$this->cursor}");
+                        " '$tagName' '" . htmlspecialchars($tagText) . "' cursor  ={$this->cursor}");
 
         $tag                    = new TemplateTag($this,
                                                   $this->cursor,
@@ -1218,7 +1218,7 @@ class Template implements ArrayAccess
             if ($this->test)
                 $this->log("Template::startTag: " . __LINE__ .
                             " push tag->start={$tag->start} ".
-                escape(substr($this->page, $tag->start, $tag->tagLength)));
+                htmlspecialchars(substr($this->page, $tag->start, $tag->tagLength)));
             array_push($this->tagStack, $tag);
         }       // duplicate start tag
         else
@@ -1248,14 +1248,14 @@ class Template implements ArrayAccess
                                          $remainder);
             $this->log("Template::startTag: " . __LINE__ .
                            ' missing closing tag for "' .
-                            escape($topTagStart) .
-                            "\" before \"" . escape($tagStart) .
+                            htmlspecialchars($topTagStart) .
+                            "\" before \"" . htmlspecialchars($tagStart) .
                             "\" template={$this->main}");
             $topTag->addChild($tag);
             if ($this->test)
                 $this->log("Template::startTag: " . __LINE__ .
                             " push tag->start={$tag->start} ".
-                escape(substr($this->page, $tag->start, $tag->tagLength)));
+                htmlspecialchars(substr($this->page, $tag->start, $tag->tagLength)));
             array_push($this->tagStack, $tag);
         }       // check for tags that cannot be nested
         else
@@ -1275,7 +1275,7 @@ class Template implements ArrayAccess
                 if ($this->test)
                     $this->log("Template::startTag: " . __LINE__ .
                     " push tag->start={$tag->start} " .
-                    escape(substr($this->page, $tag->start, $tag->tagLength)));
+                    htmlspecialchars(substr($this->page, $tag->start, $tag->tagLength)));
                 array_push($this->tagStack, $tag);
             }                   // push tag
         }       // add to the stack of enclosing tags
@@ -1313,7 +1313,7 @@ class Template implements ArrayAccess
 
         if ($this->test)
             $this->log("Template::closeTag: " . __LINE__ .
-                        " '$tagName' '" . escape($tagText) . "' cursor={$this->cursor}");
+                        " '$tagName' '" . htmlspecialchars($tagText) . "' cursor={$this->cursor}");
 
         if ($tagName == 'template')
             $this->inTemplate       = false;
@@ -1322,7 +1322,7 @@ class Template implements ArrayAccess
         if ($this->test)
             $this->log("Template::closeTag: " . __LINE__ .
                 " pop tag->start={$tag->start} " .
-                escape(substr($this->page, $tag->start, $tag->tagLength)));
+                htmlspecialchars(substr($this->page, $tag->start, $tag->tagLength)));
         if ($tag)
         {                       // have top of stack
             if ($tagName == $tag->tagName)
@@ -1337,7 +1337,7 @@ class Template implements ArrayAccess
                 $length         = $this->cursor - $tag->start;
                 if ($length > 100)
                     $length     = 100;
-                $contents       = escape(substr($this->page, $tag->start, $length));
+                $contents       = htmlspecialchars(substr($this->page, $tag->start, $length));
                 if (substr($this->main, 0, 7) != 'string ')
                 {
                     $this->log("Template::closeTag: " . __LINE__ .
@@ -1365,7 +1365,7 @@ class Template implements ArrayAccess
                             if ($this->test)
                                 $this->log("Template::closeTag: " . __LINE__ .
                                     " tagStack[$ii]=". $stack->tagName . ' ' .
-                                    escape(substr($this->page, $stack->start, 70)) .
+                                    htmlspecialchars(substr($this->page, $stack->start, 70)) .
                                     " at {$stack->start}");
                             if ($tagName == $stack->tagName)
                             {       // found matching tag
@@ -1410,7 +1410,7 @@ class Template implements ArrayAccess
                         if ($this->test)
                             $this->log("Template::closeTag: " . __LINE__ .
                                         " push tag->start={$tag->start} ".
-                    escape(substr($this->page, $tag->start, $tag->tagLength)));
+                    htmlspecialchars(substr($this->page, $tag->start, $tag->tagLength)));
                         array_push($this->tagStack, $tag);
                     }           // push tag back on stack
                 }               // top of stack is a block style tag
@@ -1419,7 +1419,7 @@ class Template implements ArrayAccess
                     if ($this->test)
                         $this->log("Template::closeTag: " . __LINE__ .
                                     " push tag->start={$tag->start} ".
-                escape(substr($this->page, $tag->start, $tag->tagLength)));
+                htmlspecialchars(substr($this->page, $tag->start, $tag->tagLength)));
                     array_push($this->tagStack, $tag);
                 }               // push the tag back on the stack
 
@@ -1519,7 +1519,7 @@ class Template implements ArrayAccess
             {                       // parse of tag failed
                 // for example there is a space after the opening <
                 $this->log("Template.inc:parseHTML: " . __LINE__ . " preg_match(\"#^<([^\s>]+)\s*([^>]*)(>?)#\", \"" .
-                        escape(substr($this->page, $this->cursor, 100)) .
+                        htmlspecialchars(substr($this->page, $this->cursor, 100)) .
                         "...\") failed");
                 $this->cursor++;    // fix infinite loop
             }                       // parse of tag failed
@@ -1966,7 +1966,7 @@ class Template implements ArrayAccess
                 $tSubTemplate   = $subTemplate;
             $warn   .= "<p>Template::substitute: " . __LINE__ .
                             ' parms=(subTemplate=\'' .
-                            escape($tSubTemplate) . "',<br>" .
+                            htmlspecialchars($tSubTemplate) . "',<br>" .
                             "array count=" . count($array).',';
             foreach($array as $index => $value)
             {
@@ -2007,7 +2007,7 @@ class Template implements ArrayAccess
                 if (strlen($field) > 0)
                 {
                     if ($this->debug)
-                        $warn   .= "<p>Template:: " . __LINE__ . " undefined field '$field' remainder=" . escape($remainder) . " ";
+                        $warn   .= "<p>Template:: " . __LINE__ . " undefined field '$field' remainder=" . htmlspecialchars($remainder) . " ";
                 }
             }
             else
@@ -2021,14 +2021,14 @@ class Template implements ArrayAccess
                 if ($this->debug)
                     $warn   .= "<p>Template:: " . __LINE__ .
                                   " undefined field '$field' remainder='" .
-                                  escape($remainder) . "'</p>\n";
+                                  htmlspecialchars($remainder) . "'</p>\n";
             }
             $this->insertions++;
             $result     .= $text . $remainder;
         }           // loop through pieces of template
         if ($this->debug)
             $warn   .= "<p>Template::substitute: " . __LINE__ .
-                           " return '" . escape($result) . "</p>\n";
+                           " return '" . htmlspecialchars($result) . "</p>\n";
         return $result;
     }       // function substitute
 
@@ -2050,7 +2050,7 @@ class Template implements ArrayAccess
                            " count=" .  count($this->tagUpdates) . "</p>\n";
             ob_start();
             debug_print_backtrace();
-            $warn   .= '<p>' . escape(ob_get_clean()) . "</p>\n";
+            $warn   .= '<p>' . htmlspecialchars(ob_get_clean()) . "</p>\n";
         }
 
         if (count($this->tagUpdates) == 0)
@@ -2135,11 +2135,11 @@ class Template implements ArrayAccess
                 else
                     $tagText    = $template;
                 $warn   .= "<p>Template::doTagUpdates: " . __LINE__ .
-                               " id='"      . escape($id) .
+                               " id='"      . htmlspecialchars($id) .
                                "' start="   . $start .
                                " end="      . $end .
                                " length="   . $length .
-                               " tag='"     . escape($tagText) .
+                               " tag='"     . htmlspecialchars($tagText) .
                                "', array=";
                 if (is_array($replace))
                 {
@@ -2158,7 +2158,7 @@ class Template implements ArrayAccess
                         else
                         if (is_string($element))
                             $warn   .= $index . " => '" .
-                                           escape($element) . "'";
+                                           htmlspecialchars($element) . "'";
                         else
                             $warn   .= $index . ' => ' .
                                            print_r($element, true);
@@ -2208,11 +2208,11 @@ class Template implements ArrayAccess
                     " \$start=$start, \$end=$end, \$origLength=$origLength</p>\n";
                 $line   = __LINE__;
                 $warn   .= "<p>Template::doTagUpdates: $line \$before='" .
-                                   escape($tbefore) .  "'</p>\n";
+                                   htmlspecialchars($tbefore) .  "'</p>\n";
                 $warn   .= "<p>Template::doTagUpdates: $line \$template='" .
-                                   escape($template) .  "'</p>\n";
+                                   htmlspecialchars($template) .  "'</p>\n";
                 $warn   .= "<p>Template::doTagUpdates: $line \$after='" .
-                                   escape($tafter) .  "'</p>\n";
+                                   htmlspecialchars($tafter) .  "'</p>\n";
             }           // debug
 
             // if the id attribute of the template tag does not contain
@@ -2242,7 +2242,7 @@ class Template implements ArrayAccess
                     {
                         $startId    = false;
                         $warn   .= "<p>doTagUpdates: " . __LINE__ .
-                                   " failed for " . escape(substr($template, $startId, 64)) . "</p>\n";
+                                   " failed for " . htmlspecialchars(substr($template, $startId, 64)) . "</p>\n";
                     }
                 }       // id= is present
             }           // remove id attribute from template
@@ -2250,7 +2250,7 @@ class Template implements ArrayAccess
             if ($this->debug)
                 $warn   .= "<p>Template::doTagUpdates: " . __LINE__ .
                                " \$template='" .
-                                   escape($template) . "'</p>\n";
+                                   htmlspecialchars($template) . "'</p>\n";
 
             // expand template for each record in array
             $result             = new SplDoublyLinkedList;
@@ -2289,7 +2289,7 @@ class Template implements ArrayAccess
                     else
                     if (is_string($record))
                         $warn   .= "'" .
-                               escape($record) . "'";
+                               htmlspecialchars($record) . "'";
                     else
                         $warn   .= print_r($record, true);
                     $warn       .= " number of insertions=" . count($insertions) . "</p>\n";
@@ -2472,7 +2472,7 @@ class Template implements ArrayAccess
         $page       = $this->page;
         if (strlen($page) > 200)
             $page       = substr($page, 0, 100) . '...' . substr($page, -97);
-        print "<p class=\"indent\">template::page='"    . escape($page) . "'</p>\n";
+        print "<p class=\"indent\">template::page='"    . htmlspecialchars($page) . "'</p>\n";
         if($this->db)
             print "<p class=\"indent\">template::db=true</p>\n";
         else
@@ -2511,7 +2511,13 @@ class Template implements ArrayAccess
         print "<p class=\"indent\">template::lastDelete="   . $this->lastDelete . "</p>\n";
         print "<p class=\"indent\">template::insertions="   . $this->insertions . "</p>\n";
         foreach($this->fields as $name => $field)
-            print "<p class=\"indent\">template::fields['$name']='" . escape($field) . "'</p>\n";
+            print "<p class=\"indent\">template::fields['$name']='" . htmlspecialchars($field) . "'</p>\n";
+    }       // function print
+
+    function printFields()
+    {
+        foreach($this->fields as $name => $field)
+            print "<p class=\"indent\">template::fields['$name']='" . htmlspecialchars($field) . "'</p>\n";
     }       // function print
 
     /********************************************************************
@@ -2595,10 +2601,3 @@ class Template implements ArrayAccess
     }       // public function Template::offsetGet($id)
 
 }       // class Template
-
-function escape($string)
-{
-    return str_replace('<', '&lt;',
-                        str_replace('>', '&gt;',
-                                    str_replace('&', '&amp;', $string)));
-}

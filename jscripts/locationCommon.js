@@ -486,10 +486,8 @@ function closeNewDialog()
 
             }
         }
-        if (formname == '')
-            alert('locationCommon.js: closeNewDialog: missing element name="formname":' .  myform.outerHTML);
-        else
-        if (field.length > 0)
+
+        if (formname.length > 0 && field.length > 0)
         {
             let mainForm    = document.forms[formname];
             let element     = mainForm.elements[field];
@@ -509,8 +507,6 @@ function closeNewDialog()
                 alert("locationCommon.js: closeNewDialog: cannot find input element with name='" + field + "' in form '" + formname + "' elements=" + elementList + "]");
             }                   // issue diagnostic
         }
-        else
-            alert("locationCommon.js: closeNewDialog: missing element field: " . myform.outerHTML);
     }                           // the dialog includes a form
     else
         alert("locationCommon.js: closeNewDialog: cannot find <form> in open dialog");

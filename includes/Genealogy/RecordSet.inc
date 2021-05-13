@@ -114,6 +114,7 @@ use \Templating\Template;
  *      2020/09/06      correct handling of surnames containing '       *
  *      2021/02/01      do not pass SQL JOIN to ReflectionClass         *
  *      2021/02/21      improve performance of surname searches         *
+ *      2021/05/03      add some error handling                         *
  *                                                                      *
  *  Copyright &copy; 2021 James A. Cobban                               *
  ************************************************************************/
@@ -590,8 +591,9 @@ class RecordSet implements Iterator, Countable, ArrayAccess
                     else
                     {
                         $warn               .= "<p>RecordSet::__construct: " .
-                           "unexpected order value " . print_r($value,true) .
-                                   " ignored</p>\n";
+                                        "unexpected order value " .
+                                        print_r($value,true) .
+                                        " ignored</p>\n";
                         ob_start();
                         debug_print_backtrace();
                         $warn               .= ob_get_clean();
@@ -908,6 +910,20 @@ class RecordSet implements Iterator, Countable, ArrayAccess
         global  $debug;
         global  $warn;
 
+        if ($debug || is_null($value))
+        {
+            $warn   .= "<p>RecordSet::getWhereCommon('$fldname', " .
+                        var_export($value, true) . ', ' . 
+                        ($refname?'true':'false') .
+                        ")</p>\n";
+            if (is_null($value))
+            {
+                ob_start();
+                debug_print_backtrace();
+                $warn   .= "<p>" . ob_get_clean();
+            }
+        }
+
         // default is to generate positional insertion points (?)
         // use name insertion points (:name) if either the $refname parameter
         // is passed or the the constructor sets $this->usenames
@@ -1188,9 +1204,24 @@ class RecordSet implements Iterator, Countable, ArrayAccess
         global  $debug;
         global  $warn;
 
+        if ($debug || is_null($value))
+        {
+            $warn   .= "<p>RecordSet::getWhereInt('$fldname', " .
+                        var_export($value, true) . ', ' . 
+                        ($refname?'true':'false') .
+                        ")</p>\n";
+            if (is_null($value))
+            {
+                ob_start();
+                debug_print_backtrace();
+                $warn   .= "<p>" . ob_get_clean();
+            }
+        }
+
         // default is to generate positional insertion points (?)
-        // use name insertion points (:name) if either the $refname parameter
-        // is passed or the the constructor sets $this->usenames
+        // use name insertion points (:name) if either 
+        // the $refname parameter
+        // is passed or the constructor sets $this->usenames
         if (is_null($refname) && $this->usenames)
             $refname        = true;
 
@@ -1468,6 +1499,19 @@ class RecordSet implements Iterator, Countable, ArrayAccess
         global  $debug;
         global  $warn;
 
+        if (is_null($pattern) || $debug)
+        {
+            $warn   .= "<p>RecordSet::getWherePattern('$fldname', " .
+                        var_export($pattern, true) . ', ' . 
+                        ($refname?'true':'false') .
+                        ")</p>\n";
+            if (is_null($pattern))
+            {
+                ob_start();
+                debug_print_backtrace();
+                $warn   .= "<p>" . ob_get_clean();
+            }
+        }
         // default is to generate positional insertion points (?)
         // use name insertion points (:name) if either the $refname
         // parameter is passed or the the constructor sets $this->usenames
@@ -1909,6 +1953,8 @@ require_once __NAMESPACE__ . '/Surname.inc';
                 $orExpression   = '';
                 foreach($value as $fld2 => $val2)
                 {
+            $warn   .= "<p>RecordSet::getWhere: " . __LINE__ .
+                " '$fld2' => " . var_export($val2,true) . "</p>\n";
                     $fieldLc    = $nsclass::getRealFieldName($fld2);
                     if (is_null($fieldLc))
                     {
@@ -1955,11 +2001,25 @@ require_once __NAMESPACE__ . '/Surname.inc';
                         $loose          = true;
                     continue;
                 }
-                $fieldLc            = $nsclass::getRealFieldName($fldname);
+                if (preg_match('/^(\w+)\.(\w+)/', $fldname, $matches))
+                {
+                    $subtable       = $matches[1];
+                    $info           = Record::getInformation($subtable);
+                    $subclass       = $info['classname'];
+                    $initRow        = $info['initrow'];
+                    $fieldLc        = strtolower($matches[2]);
+                }
+                else
+                {
+                    $subclass       = $nsclass;
+                    $fieldLc        = $nsclass::getRealFieldName($fldname);
+                    $initRow        = $this->information['initrow'];
+                }
+
                 if (is_null($fieldLc))
                 {
                     $warn           .= "<p>RecordSet::getWhere: " . __LINE__ .
-            "  Unrecognized field name '$fldname' in selection criteria</p>\n";
+            "  Unrecognized field name '$fldname' in selection criteria for class $nsclass</p>\n";
                 }
                 else
                 {               // valid field names
@@ -1970,21 +2030,22 @@ require_once __NAMESPACE__ . '/Surname.inc';
                         else
                         if (is_string($initRow[$fieldLc]))
                             $expression = $this->getWherePattern($fieldLc,
-                                                     $value);
+                                                                 $value);
                         else
                         if (is_int($initRow[$fieldLc]))
                             $expression = $this->getWhereInt($fieldLc,
-                                                     $value);
+                                                             $value);
                         else
                         {
                             if ($debug)
                             {
-    $warn   .= "<p>RecordSet::getWhere: " . __LINE__ .
-                    " \$initRow['$fieldLc']=" . gettype($initRow[$fieldLc]) .
-                    "</p>\n";
-    foreach($initRow as $f => $v)
-    $warn   .= "<p>RecordSet::getWhere: " . __LINE__ . ' ' .
-                    $f . '=' . gettype($v) . "='$v'</p>\n";
+                $warn   .= "<p>RecordSet::getWhere: " . __LINE__ .
+                                " \$initRow['$fieldLc']=" .
+                                gettype($initRow[$fieldLc]) .
+                                "</p>\n";
+                foreach($initRow as $f => $v)
+                $warn   .= "<p>RecordSet::getWhere: " . __LINE__ . ' ' .
+                                $f . '=' . gettype($v) . "='$v'</p>\n";
                             }
                             $expression = $this->getWhereCommon($fieldLc,
                                                                 $value);
@@ -1995,6 +2056,9 @@ require_once __NAMESPACE__ . '/Surname.inc';
                             $and    = ' AND ';
                         }
                     }           // field defined in initrow
+                    else
+                        $warn   .= "<p>RecordSet::getWhere: " . __LINE__ .
+    " '$fieldLc' <b>not</b> defined in initRow for class $subclass</p>\n";
                 }               // valid field names
             }                   // field name
             else
