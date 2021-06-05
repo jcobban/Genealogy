@@ -16,9 +16,9 @@ use \Exception;
  *      2018/10/15      get language apology text from Languages        *
  *      2019/02/18      use new FtTemplate constructor                  *
  *      2019/11/17      move CSS to <head>                              *
- *		2021/01/03      correct XSS vulnerability                       *
- *		                improve support for multiple languages          *
- *		2021/04/25      correct debug output                            *
+ *      2021/01/03      correct XSS vulnerability                       *
+ *                      improve support for multiple languages          *
+ *      2021/04/25      correct debug output                            *
  *                                                                      *
  *  Copyright &copy; 2021 James A. Cobban                               *
  ************************************************************************/
@@ -28,22 +28,22 @@ require_once __NAMESPACE__ . '/common.inc';
 
 // the user is not signed on so we must act on the userid or e-mail
 // supplied by the user
-$user           = null;     // instance of User
-$username       = null;     // name
-$email          = null;     // e-mail address
-$lang           = 'en';
+$user               = null;     // instance of User
+$username           = null;     // name
+$email              = null;     // e-mail address
+$lang               = 'en';
 
 if (isset($_POST) && count($_POST) > 0)
 {                   // invoked by post
-    $parmsText  = "<p class='label'>\$_POST</p>\n" .
-                  "<table class='summary'>\n" .
-                  "<tr><th class='colhead'>key</th>" .
-                      "<th class='colhead'>value</th></tr>\n";
+    $parmsText      = "<p class='label'>\$_POST</p>\n" .
+                      "<table class='summary'>\n" .
+                        "<tr><th class='colhead'>key</th>" .
+                          "<th class='colhead'>value</th></tr>\n";
     foreach($_POST as $key => $value)
     {   // loop through all parameters
-        if ($debug)
-            $warn   .= "<p>\$_POST['$key']='$value'</p>\n";
-        $value                      = trim($value);
+        $safevalue                  = htmlspecialchars($value);
+        $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
+                        "<td class='white left'>$safevalue</td></tr>\n"; 
         switch(strtolower($key))
         {       // act on specific parameter
             case 'userid':
@@ -56,38 +56,37 @@ if (isset($_POST) && count($_POST) > 0)
             case 'email':
             {
                 if (is_null($email))
-                    $email              = $value;
+                    $email          = $value;
                 break;
             }               // email
 
             case 'lang':
             {
-                if (strlen($value) >= 2)
-                    $lang       = strtolower(substr($value,0,2));
+	            $lang               = FtTemplate::validateLang($value);
                 break;
             }
         }       // act on specific parameter
     }           // loop through all parameters
     if ($debug)
-        $warn       .= $parmsText . "</table>\n";
+        $warn           .= $parmsText . "</table>\n";
 }               // invoked by post 
 else
 {
-    $shapassword    = null;
+    $shapassword        = null;
 }
 
-$template       = new FtTemplate("forgotPassword$lang.html");
-$translate      = $template->getTranslate();
-$t              = $translate['tranTab'];
+$template               = new FtTemplate("forgotPassword$lang.html");
+$translate              = $template->getTranslate();
+$t                      = $translate['tranTab'];
 $template->updateTag('otherStylesheets',    
-                     array('filename'   => 'forgotPassword'));
+                     array('filename'       => 'forgotPassword'));
 if (!isset($_POST) || count($_POST) == 0)
-    $msg            .= $template['notPost']->innerHTML;
+    $msg                .= $template['notPost']->innerHTML;
 
 // get existing account details
 if (is_string($username))
 {
-    $user           = new User(array("username" => $username));
+    $user               = new User(array("username" => $username));
     if ($user->isExisting())
     {
         $email          = $user->get('email');

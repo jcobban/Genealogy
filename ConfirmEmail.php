@@ -11,7 +11,7 @@ use \Exception;
  *  Parameters (passed by GET):											*
  *		userid			new userid requested by user					*
  *		id				record number of new userid						*
- *		hash			verification hash code							*
+ *		confirmid       verification hash code							*
  *																		*
  *  History:															*
  *		2014/08/01		Created											*
@@ -22,6 +22,7 @@ use \Exception;
  *		2018/10/15      get language apology text from Languages        *
  *		2019/02/18      use new FtTemplate constructor                  *
  *		2021/01/03      correct XSS vulnerability                       *
+ *		2021/05/31      validate that confirmid parameter is numeric    *
  *																		*
  *  Copyright &copy; 2021 James A. Cobban								*
  ************************************************************************/
@@ -34,39 +35,52 @@ $userid				= null;
 $id					= null;
 $idtext             = null;
 $confirmid			= null;
+$confirmidtext		= null;
 $lang				= 'en';
 
 if (isset($_GET) && count($_GET) > 0)
 {
+    $parmsText              = "<p class='label'>\$_GET</p>\n" .
+                               "<table class='summary'>\n" .
+                                  "<tr><th class='colhead'>key</th>" .
+                                    "<th class='colhead'>value</th></tr>\n";
 	foreach($_GET as $key => $value)
 	{			    // loop through parametersa
+        $safevalue          = htmlspecialchars($value);
+        $parmsText          .= "<tr><th class='detlabel'>$key</th>" .
+                                "<td class='white left'>" .
+                                "$safevalue</td></tr>\n"; 
 	    $value                  = trim($value);
 		switch(strtolower($key))
 		{		    // act on specific parameters
 		    case 'userid':
+		    case 'clientid':
 		    {
-				$userid		    = $value;
+				$userid		        = $value;
 				break;
 		    }
 	
 		    case 'id':
 	        {
 	            if (ctype_digit($id))
-	                $id		    = $value;
+	                $id		        = $value;
 	            else
-	                $idtext     = htmlspecialchars($id);
+	                $idtext         = $safevalue;
 				break;
 		    }
 	
 		    case 'confirmid':
 		    {
-				$confirmid		= $value;
+	            if (ctype_digit($id))
+				    $confirmid		= $value;
+	            else
+	                $confirmidtext  = $safevalue;
 				break;
 		    }
 	
 		    case 'lang':
 		    {
-	            $lang           = FtTemplate::validateLang($value);
+	            $lang               = FtTemplate::validateLang($value);
 				break;
 		    }
 	
@@ -116,12 +130,19 @@ if ($user)
     }               // username does not match
 }		            // user name supplied
 
+if (is_string($confirmidtext))
+{
+    $text               = $template['invalidconfirm']->innerHTML();
+    $msg	            .= str_replace('$confirmid', $confirmidtext, $text);
+    $user               = null;
+}
+
 if ($user)
 {                   // id and confirmid supplied
     if (is_null($confirmid) || $confirmid == $user['confirmid'])
     {		        // confirmid matches
 	    $user->set('auth', 'edit,blog');
-        $user->save(false);
+        $user->save();
         $user->dump('auth set');
     }		        // confirmid matches
     else

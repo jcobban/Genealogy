@@ -864,7 +864,7 @@ export function displayHelp()
             if (oldElt === null)
             {           // information not already appended to help
                 let text    = document.getElementById('maxLengthMessage').innerHTML;
-                let span    = document.createthis('span');
+                let span    = document.createElement('span');
                 span.setAttribute('id', spanId);
                 text        = document.createTextNode(
                               text.replace('$maxlength', this.maxLength));

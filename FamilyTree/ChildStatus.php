@@ -125,7 +125,7 @@ if (count($_POST) > 0)
                         $record['tag1']         = $tag1;
                         $record['qstag']        = $qstag;
                         $record['childstatus']  = $childstatus;
-                        $record->save(false);
+                        $record->save();
                         $lastcmd        = $record->getLastSqlCmd();
                         if (strlen($lastcmd) > 0)
                             $warn       .= "<p>Table updated '$lastcmd'</p>\n";

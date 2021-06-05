@@ -410,7 +410,7 @@ if ($updating && $todo instanceof ToDo)
     {
         $locobj             = new Location(array('location' => $location));
         if (!$locobj->isExisting())
-            $locobj->save(false);
+            $locobj->save();
         $idtl                       = $locobj->getIdlr();
         $todo['idtl']               = $idtl;
     }
@@ -441,7 +441,7 @@ if ($updating && $todo instanceof ToDo)
     if ($used !== null)
         $todo['used']               = $used;
 
-    $todo->save(false);
+    $todo->save();
     $idtd                           = $todo['idtd'];
 }               // update record
 

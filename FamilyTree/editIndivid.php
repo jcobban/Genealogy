@@ -878,7 +878,7 @@ if ($person instanceof Person)
                 {                   // birth location name
                     $loc      = new Location(array('location' => $value));
                     if (!$loc->isExisting())
-                        $loc->save(false);  // get IDLR
+                        $loc->save();  // get IDLR
                     if (is_null($evBirth))
                         $evBirth      = $person->getBirthEvent(true);
                     $evBirth->set('idlrevent', $loc->getIdlr());
@@ -890,7 +890,7 @@ if ($person instanceof Person)
                 {                   // christening location name
                     $loc      = new Location(array('location' => $value));
                     if (!$loc->isExisting())
-                        $loc->save(false);  // get IDLR
+                        $loc->save();  // get IDLR
                     if (is_null($evChristen))
                         $evChristen      = $person->getChristeningEvent(true);
                     $evChristen->set('idlrevent', $loc->getIdlr());
@@ -902,7 +902,7 @@ if ($person instanceof Person)
                 {
                     $loc      = new Location(array('location' => $value));
                     if (!$loc->isExisting())
-                        $loc->save(false);  // get IDLR
+                        $loc->save();  // get IDLR
                     if (is_null($evDeath))
                         $evDeath      = $person->getDeathEvent(true);
                     $evDeath->set('idlrevent', $loc->getIdlr());
@@ -914,7 +914,7 @@ if ($person instanceof Person)
                 {
                     $loc      = new Location(array('location' => $value));
                     if (!$loc->isExisting())
-                        $loc->save(false);  // get IDLR
+                        $loc->save();  // get IDLR
                     if (is_null($evBuried))
                         $evBuried          = $person->getBuriedEvent(true);
                         $evBuried->set('idlrevent', $loc->getIdlr());
@@ -1041,12 +1041,12 @@ if ($person && $person->isExisting())
         {               // got parents' family
             if ($idir == 0)
             {           // new child
-                $person->save(false);
+                $person->save();
                 $idir           = $person->getIdir();
             }           // new child
             $childr             = new Child(array('idmr'   => $parentsIdmr,
                                                   'idir'   => $idir));
-            $childr->save(false);
+            $childr->save();
             $idcr               = $childr['idcr'];
             $fatherName         = $family->getHusbName();
             $fatherName         = trim($fatherName);

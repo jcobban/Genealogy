@@ -716,7 +716,7 @@ class CensusLine extends Record
                                 $province   = substr($censusId, 0, 2);
                         }           // valid census identifier
                         else
-                            $this->msg  .= "Invalid Census='" .
+                            $this->msg  .= "new CensusLine: Invalid Census='" .
                                     htmlspecialchars($censusId) . "'";
                     }           // string
                     else
@@ -732,7 +732,7 @@ class CensusLine extends Record
                             $province   = substr($censusId, 0, 2);
                     }
                     else
-                        $this->msg  .= "Invalid Census=" .
+                        $this->msg  .= "new CensusLine: Invalid Census=" .
                                 htmlspecialchars(print_r($value, true));
                     break;
                 }
@@ -750,7 +750,7 @@ class CensusLine extends Record
                         if (count($value) == 1)
                             $subDistID      = $value[0];
                         else
-                            $this->msg      .= 'SubDistrict value ' .
+                            $this->msg      .= 'new CensusLine: SubDistrict value ' .
                                 htmlspecialchars(print_r($value, true));
                     }
                     else
@@ -783,9 +783,9 @@ class CensusLine extends Record
         if ($censusId == null)
         {
             showTrace();
-            $this->msg              .= "Missing parameter Census. ";
-            print "<p>new Census_Line(" . 
-                htmlspecialchars(print_r($parms, true)) . ")</p>\n";
+            $this->msg              .= "new CensusLine: Missing parameter Census. ";
+            error_log("new Census_Line(" . 
+                        htmlspecialchars(print_r($parms, true)) . ")");
         }
 
         if (is_array($line))
@@ -798,7 +798,7 @@ class CensusLine extends Record
         {           // $line is a line number
             $line                   = intval($line);
             if ($distID == null)
-                $this->msg              .= "Missing parameter District. ";
+                $this->msg          .= "new CensusLine: Missing parameter District. ";
             else
             {           // have district parameter
                 if ($distID instanceof District)
@@ -816,13 +816,13 @@ class CensusLine extends Record
             }           // have district parameter
 
             if ($subDistID == null)
-                $this->msg  .= "Missing parameter SubDistrict. ";
-            if ($div == null)
+                $this->msg  .= "new CensusLine: Missing parameter SubDistrict. ";
+            if ($div === null)
                 $div    = '';
-            if ($page == null)
-                $this->msg  .= "Missing parameter Page. ";
-            if ($line == null)
-                $this->msg  .= "Missing parameter Line. ";
+            if ($page === null)
+                $this->msg  .= "new CensusLine: Missing parameter Page. ";
+            if ($line === null)
+                $this->msg  .= "new CensusLine: Missing parameter Line. ";
             else
             {
                 $line       = intval($line);
@@ -918,7 +918,7 @@ class CensusLine extends Record
                 }       // query successful
                 else
                 {       // error performing query
-                    $this->msg  .= "CensusLine::__construct:" .
+                    $this->msg  .= "new CensusLine:" .
                                     " '$queryText', " .
                                     print_r($stmt->errorInfo(),true) .
                                     ". ";
@@ -927,7 +927,7 @@ class CensusLine extends Record
         }           // $line is null or a line number
         else
         {           // invalid parameter
-            $this->msg  .= "CensusLine::__construct: called with Line " .
+            $this->msg  .= "new CensusLine: called with Line " .
                 gettype($line) . ", value='" . 
                 htmlspecialchars(print_r($line,true)) . "'";
         }           // invalid parameter
@@ -1374,6 +1374,7 @@ class CensusLine extends Record
                 {
                     if (strlen($value) > 6)
                     {
+                        if ($value != '[blank]')
                         error_log("CensusLine::set('$field','$value')\n");
                         $value          = substr($value, 0, 6);
                     }

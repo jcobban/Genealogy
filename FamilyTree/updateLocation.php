@@ -174,7 +174,7 @@ if (is_string($locationName))
 
     // make the current user an owner of this location
     if (!$location->isExisting())
-        $location->save(false);
+        $location->save();
     $location->addOwner();
 }       // create new location
 else
@@ -197,7 +197,7 @@ if ($location instanceof Location)
         $pattern            = substr($pattern, 0, 5);
 
     if ($location->isOwner())
-        $location->save(false);
+        $location->save();
 }
 else
     $pattern                = '';

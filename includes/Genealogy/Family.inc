@@ -2173,7 +2173,9 @@ try {
             try {
                 foreach($children as $index => $childr)
                 {
-                    $childr->save(true);
+                    $childr->save();
+                    $cmd    = $childr->getLastSqlCmd();
+                    print "<cmd>$cmd</cmd>\n";
                     $child  = $childr->getPerson();
                     $parms  = array('idcr'  => $childr->getIdcr(),
                                     'print' => false);
@@ -2404,7 +2406,9 @@ catch(Exception $e)
                 try {
                     foreach($children as $index => $childr)
                     {
-                        $childr->save(true);
+                        $childr->save();
+                        $cmd        = $childr->getLastSqlCmd();
+                        print "<cmd>$cmd</cmd>\n";
                         $child      = $childr->getPerson();
                         $parms      = array('idcr'  => $childr->getIdcr(),
                                         'print' => false);
@@ -3287,7 +3291,7 @@ catch(Exception $e)
      *  Throws:                                                         *
      *      exception if user is not authorized to update the database  *
      ********************************************************************/
-    function save($xml)
+    function save($xml = false)
     {
         global  $debug;
         global  $warn;
@@ -3333,7 +3337,7 @@ catch(Exception $e)
             if ($xml)
                 $this->husband->save('husb' . __LINE__);
             else
-                $this->husband->save(false);
+                $this->husband->save();
             parent::set('idirhusb', $this->husband->getIdir());
         }       // husband defined
 
@@ -3377,7 +3381,7 @@ catch(Exception $e)
                 if ($xml)
                     $wife->save('wife' . __LINE__);
                 else
-                    $wife->save(false);
+                    $wife->save();
                 parent::set('idirwife', $wife->getIdir());
             }                   // new Person
         }                       // wife defined
@@ -3510,7 +3514,7 @@ catch(Exception $e)
                         if ($xml)
                             $child->save('child' . __LINE__);
                         else
-                            $child->save(false);
+                            $child->save();
                     }
 
                     // make the current user an owner of the new family

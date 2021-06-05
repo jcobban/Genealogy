@@ -339,7 +339,7 @@ if ($address)
 			$name			= $address['name'];
 
 			// update or insert the record into the database
-			$address->save(false);
+			$address->save();
 	    }			            // update
 	    else
 			$name			= $address['name'];
@@ -353,7 +353,7 @@ if ($address)
         {                       // we have an instance of Address
             if ($idar == 0)
             {
-                $address->save(false);
+                $address->save();
                 $idar		= $address->getIdar();
             }
 

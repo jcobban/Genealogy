@@ -581,7 +581,7 @@ class ToDo extends Record
                 {
                     $location       = new Location(array('name' => $value));
                     if (!$location->isExisting())
-                        $location->save(false);
+                        $location->save();
                     return parent::set('idtl', $location['idlr']);
                 }
                 else

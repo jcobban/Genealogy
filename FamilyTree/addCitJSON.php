@@ -338,7 +338,7 @@ function censusCitation($year, $page, $idir, $type)
     								            'Page'		=> $pagenum),
     								            $line);
     					$line->set('idir', $idir);
-                        $result		= $line->save(false);
+                        $result		= $line->save();
                         print ",\n    \"sqlcmd" . __LINE__ . "\" : " .
                                     json_encode($sqlcmd);
     			    }		// unique match
@@ -410,7 +410,7 @@ function birthCitation($page, $idir, $type)
     			$birth->set('birthplace',
     						 $evBirth->getLocation()->toString());
     	    }		// new record
-            $result	= $birth->save(false);
+            $result	= $birth->save();
             if ($result)
                 print ",\n    \"sqlcmd" . __LINE__ . "\" : " . json_encode($birth->getLastSqlCmd());
     	}		    // detail matches pattern
@@ -475,7 +475,7 @@ function deathCitation($page, $idir, $type)
     			$deathYear	= floor($evDeath->get('eventsd') / 10000);
     			$death->set('age', $deathYear - $birthYear);
     	    }		// new record
-    	    $result	= $death->save(false);
+    	    $result	= $death->save();
             if ($result)
                 print ",\n    \"sqlcmd" . __LINE__ . "\" : " . json_encode($death->getLastSqlCmd());
     	}	        // detail matches pattern
@@ -582,7 +582,7 @@ function marriageCitation($page, $idmr, $type)
     			else
     			    $marloc	= $marriage->get('place');
     			// update marriage transcription record
-    			$result     = $marriage->save(false);
+    			$result     = $marriage->save();
                 if ($result)
                     print ",\n    \"sqlcmd" . __LINE__ . "\" : " . json_encode($marriage->getLastSqlCmd());
 
@@ -622,7 +622,7 @@ function marriageCitation($page, $idmr, $type)
     					$groom->set('residence', $marloc);
     					$groom->set('birthplace', $birthloc);
     			    }		// not initialized
-    			    $result	= $groom->save(false);
+    			    $result	= $groom->save();
             if ($result)
                 print ",\n    \"sqlcmd" . __LINE__ . "\" : " . json_encode($groom->getLastSqlCmd());
     			}			// add information on husband
@@ -661,7 +661,7 @@ function marriageCitation($page, $idmr, $type)
     					$bride->set('residence', $marloc);
     					$bride->set('birthplace', $birthloc);
     			    }		// not initialized
-    			    $result	= $bride->save(false);
+    			    $result	= $bride->save();
             if ($result)
                 print ",\n    \"sqlcmd" . __LINE__ . "\" : " . json_encode($bride->getLastSqlCmd());
     			}			// add information on wife
@@ -723,7 +723,7 @@ function countyMarriageCitation($page, $idmr, $type)
     	    if ($idirhusb)
     	    {			// add information on husband
     			$groom->set('idir', $idirhusb);
-    			$result	= $groom->save(false);
+    			$result	= $groom->save();
             if ($result)
                 print ",\n    \"sqlcmd" . __LINE__ . "\" : " . json_encode($groom->getLastSqlCmd());
     	    }			// add information on husband
@@ -733,7 +733,7 @@ function countyMarriageCitation($page, $idmr, $type)
     	    if ($idirwife)
     	    {			// add information on wifeand
     			$bride->set('idir', $idirwife);
-    			$result	+= $bride->save(false);
+    			$result	+= $bride->save();
             if ($result)
                 print ",\n    \"sqlcmd" . __LINE__ . "\" : " . json_encode($bride->getLastSqlCmd());
     	    }			// add information on wife
@@ -1045,7 +1045,7 @@ else
 						'srcsurety'	    => $surety);
 
 	$citation	= new Citation($citParms);
-    $count      = $citation->save(false);	// write into the database
+    $count      = $citation->save();	// write into the database
     if ($count > 0)
         print ",\n    \"sqlcmd" . __LINE__ . "\" : " .
                 json_encode($citation->getLastsqlcmd());

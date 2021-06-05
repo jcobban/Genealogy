@@ -720,7 +720,7 @@ class Census extends Record
      *  Throws:                                                         *
      *      Exception if user is not authorized to update the database  *
      ********************************************************************/
-    function save($xml)
+    function save($xml = false)
     {
         if (count($this->changed) > 0)
         {                   // update

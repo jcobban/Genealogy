@@ -93,7 +93,8 @@ else
     		$idir		= $childr->get('idir');
     		$oldorder	= $childr->set('order', $order);
 print "<order oldorder='$oldorder' neworder='$order' idcr='$idcr' idir='$idir'/>\n";
-    		$childr->save(true);
+            $childr->save();
+            print "    <cmd>" . $childr->getLastSqlCmd() . "</cmd>\n";
     		$childr->toXml("child");
     		$order++;
         }		// loop in order by birth

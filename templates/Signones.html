@@ -1,0 +1,180 @@
+<!--*********************************************************************
+ *  Signonen.html                                                       *
+ *                                                                      *
+ *  This is the English version of the template for displaying the      *
+ *  sign-on dialog for the site.                                        *
+ *                                                                      *
+ *  History:                                                            *
+ *      2017/11/16      created                                         *
+ *      2018/01/04      remove Template from template file names        *
+ *      2018/01/25      add local CSS and Javascript references         *
+ *                                                                      *
+ *  Copyright &copy; 2018 James A. Cobban                               *
+ **********************************************************************-->
+    <div class='hidden' id='breadcrumbs'>
+      <a href='/genealogy.php?lang=$LANG'>Genealogía</a>:
+    </div>
+    <div class='body'>
+      <h1>
+      Iniciar Sesión para Contribuir
+        <span class='right'>
+        <a href='/SignonHelpen.html' target='help'>? Ayuda</a>
+        </span>
+        <div style='clear: both;'></div>
+      </h1>
+      $TRACE
+      $MSG 
+      <p>Puede contribuir a este sitio web agregando transcripciones
+        de páginas del censo, registros de nacimiento / matrimonio / 
+        defunción, o agregando información sobre su familia al árbol 
+        genealógico.
+      </p>
+      <p>De acuerdo con las regulaciones de la Unión Europea,
+        tenga en cuenta que al registrarse, acepta que el sitio puede 
+        usar cookies para rastrear su uso del sitio.
+      </p>
+      <form action='/Signon.php'
+          name='signonForm' id='signonForm'
+          method='post'  
+          enctype='multipart/form-data'>
+        <p class='clear' id='useridRow'>
+        <label class='label' for='userid'>
+          Nombre de usuario:
+        </label>
+        <input type='text' size='32' maxlength='64'
+                name='userid' id='userid'
+                class='white leftnc' value='$USERID'/>
+        <input type='hidden' name='debug' id='debug' value='$DEBUG'>
+        <input type='hidden' name='lang' id='lang' value='$LANG'>
+        </p>
+        <p class='clear' id='passRow'>
+        <label class='label' for='password'>
+            Contraseña:
+        </label>
+        <input type='password' size='16' name='password' id='password'
+            class='white leftnc'/>
+        </p>
+        <p class='clear' id='emailRow'>
+        <label class='label' for='email'>
+          Dirección de correo electrónico:
+        </label>
+        <input type='text' size='64' maxlength='256' name='email' id='email'
+            class='white leftnc' value=''/>
+        </p>
+        <p class='clear' id='rememberRow'>
+        <label class='label' for='remember'>
+          Recuerda:
+        </label>
+        <input type='checkbox' name='remember' id='remember' 
+                value='on'/>
+            Recuerdame en esta computadora.
+        </p>
+        <p class='clear'>
+        <span class='pad'>
+            <button type='submit' id='Submit' accesskey='I'> 
+            <u>I</u>niciar sesión
+            </button>
+        </span>
+        <span class='pad'>
+            <button type='button' id='Signoff' accesskey='O'>
+            Cerrar sesión
+            </button>
+        </span>
+        <span class='pad'>
+            <button type='button' id='Register' accesskey='R'>
+            <u>R</u>egistrarse
+            </button>
+        </span>
+        <span class='pad'>
+            <button type='button' id='ForgotPassword' accesskey='F'>
+            Olvidé mi contraseña
+            </button>
+        </span>
+        <span class='pad'>
+            <button type='button' id='Close' accesskey='C'>
+            <u>C</u>errar pagina
+            </button>
+        </span>
+        <span class='pad'>
+          <a href='/ContactAuthor.php?subject=Sign On' class="button">
+            Contactar con el administrador</a>
+        </span>
+        <input type='hidden' name='act' value=''>
+        <input type='hidden' name='redirect' 
+            value='$REDIRECTTO'>
+        </p>
+      </form>
+    </div>
+    <div class="hidden" id='signedoff'>Firmado.</div>
+    <div class="hidden" id='specify'>
+            Por favor especifique su nombre de usuario y contraseña.</div>
+    <div class="hidden" id='enterpassword'>
+            Por favor, introduzca su contraseña.</div>
+    <div class="hidden" id='incorrect'>
+            Nombre de usuario y/o contraseña incorrectos.</div>
+    <div class='balloon' id='Helpuserid'>
+    <p>Ingrese el nombre de usuario único que ha registrado previamente.
+      Tiene hasta 64 caracteres y puede contener casi cualquier carácter,
+      incluidos los espacios.  Por ejemplo, puede ser su nombre.
+      Evite el uso de cualquier cosa que contenga información privada 
+      que lo identifique de manera única, como su dirección de 
+      correo electrónico.
+    </p>
+    </div>
+    <div class='balloon' id='Helpemail'>
+    <p>Ingrese la dirección de correo electrónico que utilizó cuando
+        se suscribió por primera vez al servicio. Este campo solo 
+        se utiliza para fines administrativos relacionados con 
+        el sitio web y no se compartirá con ninguna otra organización.
+    </p>
+    </div>
+    <div class='balloon' id='Helppassword'>
+    <p>Esta es la contraseña que registró para el nombre de usuario
+        anterior.  Debe tener al menos 6 caracteres y debe ser
+        difícil de adivinar.
+    </p>
+    </div>
+    <div class='balloon' id='Helpremember'>
+    <p>If you are accessing the site from a trusted computer, for example one that
+      belongs to you and is not used by any other person, then selecting this
+      option will cause the userid and password you have entered to be remembered
+      in a file on your computer and you will be automatically logged to the
+      site when you access it in the future.
+    </p>
+    </div>
+    <div class='balloon' id='HelpSubmit'>
+    <p>Click on this button to sign on.  You may also sign on by pressing the
+      Enter key after completing typing your userid and password, or by the
+      keyboard short-cuts Alt-I or Ctrl-S.
+    </p>
+    </div>
+    <div class='balloon' id='HelpSignoff'>
+    <p>Click on this button to sign off.  You may also sign off by the keyboard
+      short-cut Alt-O (letter 'O').
+    </p>
+    </div>
+    <div class='balloon' id='HelpRegister'>
+    <p>Click on this button, or use the keyboard short-cut Alt-R, to register 
+      a new user identifier and associated password. 
+      You will be prompted to enter additional registration information.
+    </p>
+    </div>
+    <div class='balloon' id='HelpForgotPassword'>
+    <p>Click on this button, or use the keyboard short-cut Alt-F,
+        if you have forgotten either your password or your userid. 
+        If you have forgotten your password enter your userid.  
+        If you have forgotten your userid enter the
+        electronic mail address that you used when you first registered.
+    </p>
+    </div>
+    <div class='balloon' id='HelpClose'>
+    <p>Click on this button, or use the keyboard short-cut Alt-C, 
+      to close the dialog.
+    </p>
+    </div>
+    <script src='/jscripts/util.js' type='text/javascript'>
+    </script>
+    <script src='/jscripts/Cookie.js' type='text/javascript'>
+    </script>
+    <script src='/Signon.js' type='text/javascript'>
+    </script>

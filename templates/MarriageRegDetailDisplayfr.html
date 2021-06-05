@@ -44,6 +44,9 @@
           Statut $REGYEAR Canton $REGTOWNSHIP
         </a>:
       </span>
+	  <a href="MarriageRegResponse.php?RegDomain=$DOMAIN&amp;RegYear=$REGYEAR&amp;RegNum=$REGNUM&amp;lang=$LANG">
+	    Display Marriage Registrations in Order
+	  </a>:
     </div>
     <div class="body" style="overflow: auto; overflow-x: scroll">
       <h1>$DOMAINNAME: Montrer l'enregistrement du mariage
@@ -167,7 +170,7 @@
 			<div class="column2">
               <label class="labelSmall">Lieu:</label>
                 <input name="Place" id="Place"
-                        type="text" size="20" maxlength="64"
+                        type="text" size="20" maxlength="128"
                         value="$MPLACE"
                         class="ina leftnc" readonly="readonly" />
             </div>

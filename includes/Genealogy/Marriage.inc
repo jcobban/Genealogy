@@ -478,12 +478,12 @@ class Marriage extends Record
 
                     // set defaults
                     $dbrow                  = self::$initRow;
-                    $dbrow['regdomain'] = $domain;
+                    $dbrow['regdomain']     = $domain;
                     $dbrow['regyear']       = $year;
                     $dbrow['regnum']        = $number;
-                    $dbrow['date']      = $year;
+                    $dbrow['date']          = $year;
                     $dbrow['regdate']       = $year;
-                    $dbrow['msvol']     = $msvol;
+                    $dbrow['msvol']         = $msvol;
                     $mregdomain             = $domain;
                     $mregyear               = $year;
                     $mregnum                = $number;
@@ -528,7 +528,7 @@ class Marriage extends Record
                             $dbrow['image']             = $row['image'];
                             $dbrow['originalvolume']    = $row['originalvolume'];
                             $dbrow['originalpage']      = $row['originalpage'];
-                            $dbrow['originalitem']  = $row['originalitem'] + 1;
+                            $dbrow['originalitem']      = $row['originalitem'] + 1;
                             if (strlen($row['regdate']) > 0)
                                 $dbrow['regdate']       = $row['regdate'];
 
@@ -967,7 +967,7 @@ class Marriage extends Record
      *  Throws:                                                         *
      *      Exception if user is not authorized to update the database  *
      ********************************************************************/
-    function save($xml)
+    function save($xml = false)
     {
         global  $debug;
         global  $warn;
@@ -1104,7 +1104,7 @@ class Marriage extends Record
                             $participant->save($role);
                     }       // XML output
                     else
-                        $participant->save(false);
+                        $participant->save();
                     $this->lastSqlCmd       .= '<br>' .
                                         $participant->getLastSqlCmd();
                 }           // loop through participants
@@ -1254,7 +1254,7 @@ class Marriage extends Record
                         $participant->save($role);
                 }           // XML output
                 else
-                    $participant->save(false);
+                    $participant->save();
                 $this->lastSqlCmd   .= '<br>' . 
                                         $participant->getLastSqlCmd();
             }               // loop through participants

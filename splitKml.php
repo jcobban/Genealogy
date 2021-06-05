@@ -3,14 +3,14 @@ namespace Genealogy;
 use \PDO;
 use \Exception;
 /************************************************************************
- *  splitKml.php													    *
- *																		*
+ *  splitKml.php                                                        *
+ *                                                                      *
  *  This script processes the Ontario Townships Boundaries KML file.    *
- *																		*
- *  History:															*
- *		2021/01/14      Created											*
- *																		*
- *  Copyright &copy; 2021 James A. Cobban								*
+ *                                                                      *
+ *  History:                                                            *
+ *      2021/01/14      Created                                         *
+ *                                                                      *
+ *  Copyright &copy; 2021 James A. Cobban                               *
  ************************************************************************/
 require_once __NAMESPACE__ . "/FtTemplate.inc";
 require_once __NAMESPACE__ . "/Location.inc";
@@ -124,7 +124,7 @@ foreach($_GET as $key => $value)
 }
 
 // get the template
-$template		        = new FtTemplate("splitKmlen.html");
+$template               = new FtTemplate("splitKmlen.html");
 
 if (canUser('yes'))
 {
@@ -182,18 +182,18 @@ while($start)
     $coordstart     = strpos($entry, $coordtag) + $coordtaglen;
     if ($coordstart == 0)
         $results    .= "<p>could not find '$coordtag'</p>\n";
-    $coordend   	= strpos($entry, '<', $coordstart);
-    $coords     	= substr($entry, $coordstart, $coordend - $coordstart);
-    $coordsnum  	= '';
-    $comma      	= '';
-    $oldstart   	= 0;
-    $oldpair    	= 0;
-    $coordstart 	= 0;
-    $lontot     	= 0;
-    $lattot     	= 0;
-    $ccount     	= 0;
-    $oldlat     	= 0;
-    $oldlon     	= 0;
+    $coordend       = strpos($entry, '<', $coordstart);
+    $coords         = substr($entry, $coordstart, $coordend - $coordstart);
+    $coordsnum      = '';
+    $comma          = '';
+    $oldstart       = 0;
+    $oldpair        = 0;
+    $coordstart     = 0;
+    $lontot         = 0;
+    $lattot         = 0;
+    $ccount         = 0;
+    $oldlat         = 0;
+    $oldlon         = 0;
     $skipcount      = 0;
     while(preg_match('/\s*(-?\d+\.\d+),(-?\d+\.\d+)/',
                      substr($coords,$coordstart),
@@ -207,21 +207,21 @@ while($start)
         //$results        .= "<p>distance=$distance</p>\n";
         if ($distance > 0.002)
         {           // greater than 200m from old position
-	        $look       = substr($coords,$coordstart,20);
-	        $coordsnum  .= $comma . '(' . number_format($lat, 6) .
-	                                ',' . number_format($lon, 6) . ')';
-	        $comma      = ',';
-	        $ccount++;
+            $look       = substr($coords,$coordstart,20);
+            $coordsnum  .= $comma . '(' . number_format($lat, 6) .
+                                    ',' . number_format($lon, 6) . ')';
+            $comma      = ',';
+            $ccount++;
             $oldlat     = $lat;
             $oldlon     = $lon;
-	        $lontot     += $lon;
-	        $lattot     += $lat;
-	        $prevstart   = $oldstart;
-	        $prevpair   = $oldpair;
-	        $oldstart   = $coordstart;
-	        $oldpair    = $pair;
-	        if (strlen($coordsnum) > 32000)
-	            break;
+            $lontot     += $lon;
+            $lattot     += $lat;
+            $prevstart   = $oldstart;
+            $prevpair   = $oldpair;
+            $oldstart   = $coordstart;
+            $oldpair    = $pair;
+            if (strlen($coordsnum) > 32000)
+                break;
         }           // greater than 200m from old position
         else
         {
@@ -254,21 +254,21 @@ while($start)
         // search Ontario Locator web site
         $url            = "http://www.geneofun.on.ca/db.php";
         $parms          = array("account"   => "spettit",
-								"database"  => "onlocator",
-								"template" => "ontariolocator-results.html",
-								"sort"      => "PLACE",
-								"search"    => "PLACE",
-								"max"       => "150",
-								"find"      => $name);
+                                "database"  => "onlocator",
+                                "template" => "ontariolocator-results.html",
+                                "sort"      => "PLACE",
+                                "search"    => "PLACE",
+                                "max"       => "150",
+                                "find"      => $name);
         $postopts = array(
-	        'http' => array (
-	            'method'    => "POST",
-	            'header'    =>
-	              "Accept-language: en\r\n".
-	              "Content-type: application/x-www-form-urlencoded\r\n",
-	            'content'   => http_build_query($parms)
-	            )
-	        );
+            'http' => array (
+                'method'    => "POST",
+                'header'    =>
+                  "Accept-language: en\r\n".
+                  "Content-type: application/x-www-form-urlencoded\r\n",
+                'content'   => http_build_query($parms)
+                )
+            );
 
         $context            = stream_context_create($postopts);
 
@@ -281,9 +281,9 @@ while($start)
         $simplename         = null;
 
         $getopts = array(   'http'    => array(
-					            'method'    => "GET",
-					            'header'    => "Accept-language: en\r\n"
-					            )
+                                'method'    => "GET",
+                                'header'    => "Accept-language: en\r\n"
+                                )
                         );
         $dcontext       = stream_context_create($getopts);
 
@@ -345,18 +345,18 @@ while($start)
         {
             if ($location->isExisting())
                 $results        .= "<p>update boundary</p>\n";
-	        $location['boundary']   = $coordsnum;
-	        $location['zoom']       = 12;
-	        $location['notes']      = "Township. ";
-	        $locname                = $location['location'];
-	        $ucount             = $location->save(false);
-	        if ($ucount)
-	        {
-	            $last           = $location->getLastSqlCmd();
-	            if (strlen($last) > 200)
+            $location['boundary']   = $coordsnum;
+            $location['zoom']       = 12;
+            $location['notes']      = "Township. ";
+            $locname                = $location['location'];
+            $ucount             = $location->save();
+            if ($ucount)
+            {
+                $last           = $location->getLastSqlCmd();
+                if (strlen($last) > 200)
                     $last       = substr($last,0,187) . '...' .
                                     substr($last,-20);
-	            $results        .= "<p>$locname: $last</p>\n";
+                $results        .= "<p>$locname: $last</p>\n";
             }
             $idlr               = $location['idlr'];
             $results            .= "<p>Location: <a href=\"FamilyTree/Location.php?id=$idlr&lang=en\" target=\"_blank\">$locname</a></p>\n";

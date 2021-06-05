@@ -29,7 +29,7 @@ require_once __NAMESPACE__ . '/Citation.inc';
 require_once __NAMESPACE__ . '/common.inc';
 
 // emit the XML header
-print("<?xml version='1.0' encoding='UTF-8'?>\n");
+print("<?xml version='1.0' encoding='UTF-8'?".">\n");
 print "<update>\n";
 
 // get the updated values of the fields in the record
@@ -42,7 +42,8 @@ $citation	= new Citation(array('idsx' => $idsx));
 $citation->postUpdate(true);
 
 // save object state to server
-$citation->save(true);
+$citation->save();
+print "    <cmd>" . $citation->getLastSqlCmd() . "</cmd>\n";
 
 // include XML representation of updated record in response
 $citation->toXml('citation');

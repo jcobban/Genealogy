@@ -395,13 +395,13 @@ if (strlen($msg) == 0)
                                         '[delete]')
                         $record->delete();
                     else
-                        $record->save(false);   // save changes
+                        $record->save();   // save changes
                 }   // updating existing record
                 else
                 {   // inserting new record
                     if (strtolower($record->get('surname')) !=
                         '[delete]')
-                        $record->save(false);
+                        $record->save();
                 }   // inserting new record
             }       // have an instance of CensusLine 
             $oldrow             = $row;
@@ -432,7 +432,7 @@ if (strlen($msg) == 0)
                     if ($birthloc->isExisting())
                         $birth['idlrevent'] = $birthloc['idlr'];
                 }
-                $birth->save(false);
+                $birth->save();
                 if ($debug)
                     $warn   .= "<p>citparms=array(" .
                                     "'idime' => " .$birth->getIder(). "," .
@@ -444,7 +444,7 @@ if (strlen($msg) == 0)
                                     'type'  => Citation::STYPE_EVENT,
                                     'srcdetail' => $srcdetail);
                 $cit    = new Citation($citparms);
-                $cit->save(false);
+                $cit->save();
             }
         }
         else
@@ -476,12 +476,12 @@ if (strlen($msg) == 0)
             if (strtolower($record->get('surname')) == '[delete]')
                 $record->delete();
             else
-                $record->save(false);   // save changes
+                $record->save();   // save changes
         }           // updating existing record
         else
         {           // inserting new record
             if (strtolower($record->get('surname')) != '[delete]')
-                $record->save(false);
+                $record->save();
         }           // inserting new record
     }               // have a record
 
@@ -489,7 +489,7 @@ if (strlen($msg) == 0)
     $pageEntry->set('population',$count);
     $pageEntry->set('transcriber',$userid);
     $pageEntry->set('image', $image);
-    $count              = $pageEntry->save(false);
+    $count              = $pageEntry->save();
     if ($debug && $count > 0)
         $warn           .= "<p>" . $pageEntry->getLastSqlCmd() . "</p>\n";
 
@@ -497,7 +497,7 @@ if (strlen($msg) == 0)
     // are synchronized
     $district   = $subDist->getDistrict();
     $district->synchPopulation();
-    $district->save(false);
+    $district->save();
 
     if (strlen($warn) == 0)
     {

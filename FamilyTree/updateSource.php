@@ -43,7 +43,7 @@ require_once __NAMESPACE__ . '/Source.inc';
 require_once __NAMESPACE__ . '/common.inc';
 
 // emit the XML header
-print("<?xml version='1.0' encoding='UTF-8'?>\n");
+print("<?xml version='1.0' encoding='UTF-8'?" . ">\n");
 print "<update>\n";
 
 // get the updated values of the fields in the record
@@ -218,7 +218,7 @@ foreach($_POST as $key => $value)
 				        	array('addrname'	=> $value,
 					              'kind'		=> Address::REPOSITORY));
 			    if (!$repo->isExisting())
-					$repo->save(false);
+					$repo->save();
 			    $idar	    	= $repo->getIdar();
 			}
 			break;
@@ -343,7 +343,8 @@ foreach($_POST as $field => $value)
 }                   // loop through new values
 
 // save object state to server
-$source->save(true);
+$source->save();
+print "<cmd>" . $source->getLastSqlCmd() . "</cmd>\n";
 
 if (strlen($msg) > 0)
     print "<p class='message'>$msg</p>\n";

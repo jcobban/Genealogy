@@ -643,7 +643,7 @@ try {
                         {           // have an event
                             if ($idir > 0 && !is_null($event))
                             {
-                                $event->save(false);
+                                $event->save();
                                 $command        = $event->getLastSqlCmd();
                                 print "$comma\"cmd\": " .
                                                     json_encode($command);
@@ -860,11 +860,11 @@ try {
     if (canUser('edit'))
     {                       // user authorized to update database
         // write the changes to the individual record
-        $person->save(false);
+        $person->save();
         $command                    = $person->getLastSqlCmd();
         print "$comma\"savePerson\": " . json_encode($command);
         // write the changes to the individual record
-        $priName->save(false);
+        $priName->save();
         $command                    = $priName->getLastSqlCmd();
         print "$comma\"saveName\": " . json_encode($command);
         // in case its a new individual get IDIR assigned by server
@@ -884,7 +884,7 @@ try {
                     $husbPriName && $husbPriName['surname'] != '')
                 {           // wife's married surname is husband's surname
                     $name['surname']        = $husbPriName['surname'];
-                    $name->save(false);
+                    $name->save();
                     $command                = $name->getLastSqlCmd();
                     print "$comma\"name$idnx\": " . json_encode($command);
                 }           // wife's married surname is husband's surname
@@ -902,14 +902,14 @@ try {
                     $event->get('idet') == Event::ET_BIRTH)
                 {
                     $person->set('birthsd', $event->get('eventsd'));
-                    $person->save(false);
+                    $person->save();
                     $command            = $person->getLastSqlCmd();
                     print "$comma\"person$ie\": " . json_encode($command);
                     $command            = $person->getPriName()->getLastSqlCmd();
                     if ($command !== '')
                         print "$comma\"name$ie\": " . json_encode($command);
                 }
-                $event->save(false);
+                $event->save();
                 $command            = $event->getLastSqlCmd();
                 print "$comma\"eventCmd$ie\": " . json_encode($command) .
                         ",\n\"event$ie\": " . $event->toJson(false);
@@ -923,7 +923,7 @@ try {
         // check for updates to the child relationship record
         if ($idcr > 0 && !is_null($childr))
         {                   // individual updated as child in a family
-            $childr->save(false);
+            $childr->save();
             $command                = $childr->getLastSqlCmd();
             print "$comma\"childcmd$ie\": " . json_encode($command) .
                     ",\n\"child$ie\": " . $childr->toJson(false);
@@ -933,7 +933,7 @@ try {
         {                   // individual added to family
             try {
                 $childr             = $family->addChild($idir);
-                $childr->save(false);
+                $childr->save();
                 $command            = $childr->getLastSqlCmd();
                 print "$comma\"child$ie\": " . json_encode($command);
                 print "$comma\"child\": " . $childr->toJson(false);

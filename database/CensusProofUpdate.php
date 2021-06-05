@@ -48,7 +48,7 @@ foreach($_POST as $key => $value)
         if ($rownum != $oldrownum)
         { 
             if ($comment && canUser('edit'))
-                $comment->save(false);
+                $comment->save();
             if (strlen($msg) == 0)
                 $comment    = new FieldComment(array(
                                 'fc_census'     => $census,

@@ -3,40 +3,40 @@ namespace Genealogy;
 use \PDO;
 use \Exception;
 /************************************************************************
- *  orderMarriagesByDate.php											*
- *																		*
- *  Handle a request to reorder the marriage records for an				*
- *  individual in the Legacy family tree database.  The					*
- *  `Husb/WifeOrder` field in each record is updated so the marriages	*
- *  will display in chronological order by the `MarSD` field.  This		*
- *  file generates an XML file, so it can be invoked from Javascript.	*
- *																		*
- *  Parameters:															*
- *		idir		unique numeric key of the individual				*
- *																		*
- *  History:															*
- *		2010/08/10		created											*
- *		2010/09/25		Check error on $result, not $connection after	*
- *						query/exec										*
- *		2010/10/23		move connection establishment to common.inc		*
- *		2012/01/13		change class names								*
- *		2013/12/07		$msg and $debug initialized by common.inc		*
- *		2014/04/26		formUtil.inc obsoleted							*
- *		2014/12/12		print $warn, which may contain debug trace		*
- *						rename to orderMarriagesByDateXml.php			*
- *						ensure IDIR parameter is numeric and greater	*
- *						than 0											*
- *		2015/02/21		use LegacyFamily::getFamilies					*
- *						use LegacyFamily::setField and ::save			*
- *		2015/03/20		wrong order field used for wife order			*
- *		2015/07/02		access PHP includes using include_path			*
- *		2015/08/08		handle case of no spouse						*
- *		2016/01/19		add id to debug trace							*
- *		2017/09/12		use get( and set(								*
- *		2017/11/02		use RecordSet for families						*
- *		2019/12/19      replace xmlentities with htmlentities           *
- *																		*
- *  Copyright &copy; 2019 James A. Cobban								*
+ *  orderMarriagesByDate.php                                            *
+ *                                                                      *
+ *  Handle a request to reorder the marriage records for an             *
+ *  individual in the Legacy family tree database.  The                 *
+ *  `Husb/WifeOrder` field in each record is updated so the marriages   *
+ *  will display in chronological order by the `MarSD` field.  This     *
+ *  file generates an XML file, so it can be invoked from Javascript.   *
+ *                                                                      *
+ *  Parameters:                                                         *
+ *      idir        unique numeric key of the individual                *
+ *                                                                      *
+ *  History:                                                            *
+ *      2010/08/10      created                                         *
+ *      2010/09/25      Check error on $result, not $connection after   *
+ *                      query/exec                                      *
+ *      2010/10/23      move connection establishment to common.inc     *
+ *      2012/01/13      change class names                              *
+ *      2013/12/07      $msg and $debug initialized by common.inc       *
+ *      2014/04/26      formUtil.inc obsoleted                          *
+ *      2014/12/12      print $warn, which may contain debug trace      *
+ *                      rename to orderMarriagesByDateXml.php           *
+ *                      ensure IDIR parameter is numeric and greater    *
+ *                      than 0                                          *
+ *      2015/02/21      use LegacyFamily::getFamilies                   *
+ *                      use LegacyFamily::setField and ::save           *
+ *      2015/03/20      wrong order field used for wife order           *
+ *      2015/07/02      access PHP includes using include_path          *
+ *      2015/08/08      handle case of no spouse                        *
+ *      2016/01/19      add id to debug trace                           *
+ *      2017/09/12      use get( and set(                               *
+ *      2017/11/02      use RecordSet for families                      *
+ *      2019/12/19      replace xmlentities with htmlentities           *
+ *                                                                      *
+ *  Copyright &copy; 2019 James A. Cobban                               *
  ************************************************************************/
 header("Content-Type: text/xml");
 require_once __NAMESPACE__ . '/RecordSet.inc';
@@ -53,101 +53,110 @@ require_once __NAMESPACE__ . '/common.inc';
 
 // get the updated values of the fields in the record
 // list parameters passed to this script
+$idir               = null;
+$sex                = null;
+
 print "    <parms>\n";
 foreach($_POST as $key => $value)
-{	
+{                       // loop through parameters
     print "\t<$key>" . htmlentities($value,ENT_XML1) . "</$key>\n";
-}
+    switch(strtolower($key))
+    {
+        case 'idir':
+            if (ctype_digit($idir) && $idir > 0)
+                $idir       = $value;
+            else
+                $msg        .= "Invalid value IDIR=$value. ";
+            break;
+
+        case 'sex':
+            if (preg_match('/^[mfMF]$/', $value))
+                $sex        = $value;
+            else
+                $msg        .= "Invalid value Sex=$value. ";
+            break;
+
+    }
+}                       // loop through parameters
 print "    </parms>\n";
 
 // determine if permitted to update database
 if (($authorized != 'yes') &&
     (strpos($authorized, 'edit') === false))
-{		// take no action
-    $msg	.= 'Not authorized. ';
-}		// take no action
+{       // take no action
+    $msg    .= 'Not authorized. ';
+}       // take no action
 
 // validate parameters
-if (array_key_exists('idir', $_POST))
-{		// idir to be updated
-    $idir		= $_POST['idir'];
-    if (!ctype_digit($idir) || $idir < 1)
-        $msg	.= "Invalid value IDIR=$idir. ";
-}		// idir to be updated
-else
+if (is_null($idir))
 {
-    $idir		= null;
-    $msg		.= 'Mandatory parameter "idir" omitted. ';
+    $msg        .= 'Mandatory parameter "idir" omitted. ';
 }
-
-if (array_key_exists('sex', $_POST))
-{		// sex to be updated
-    $sex		= $_POST['sex'];
-}		// sex to be updated
-else
+if (is_null($sex))
 {
-    $sex		= null;
-    $msg		.= 'Mandatory parameter "sex" omitted. ';
+    $msg        .= 'Mandatory parameter "sex" omitted. ';
 }
 
 showTrace();
 
 if (strlen($msg) == 0)
-{		// no errors detected
+{       // no errors detected
     // get the current set of event records for the requested
     // individual.
     if ($sex == 0)
     {
-        $parms	= array("IDIRHusb"	=> $idir,
-    				'order'		=> 'MarSD');
-        $orderFld	= 'husborder';
+        $parms              = array("IDIRHusb"  => $idir,
+                                    'order'     => 'MarSD');
+        $orderFld           = 'husborder';
     }
     else
     {
-        $parms	= array("IDIRWife"	=> $idir,
-    				'order'		=> 'MarSD');
-        $orderFld	= 'wifeorder';
+        $parms              = array("IDIRWife"  => $idir,
+                                    'order'     => 'MarSD');
+        $orderFld           = 'wifeorder';
     }
-    $families	= new RecordSet('Families',$parms);
-    $order		= 0;
+    $families               = new RecordSet('Families',$parms);
+    $order                  = 0;
     foreach($families as $idmr => $family)
     {
-        $marsd		= $family->get('MarSD');
+        $marsd              = $family->get('MarSD');
         if ($sex == 0)
-    		$spouse		= $family->getWife();
+            $spouse         = $family->getWife();
         else
-    		$spouse		= $family->getHusband();
+            $spouse         = $family->getHusband();
         if ($spouse)
         {
-    		$spouseSur	= $spouse->getSurname();
-    		$spouseGiv	= $spouse->getGivenName();
+            $spouseSur      = $spouse->getSurname();
+            $spouseGiv      = $spouse->getGivenName();
         }
         else
         {
-    		$spouseSur	= '';
-    		$spouseGiv	= '';
+            $spouseSur      = '';
+            $spouseGiv      = '';
         }
         $family->set($orderFld, $order);
-        $family->save(true);
+        $ucount             = $family->save();
+        if ($ucount > 0)
+            print "    <cmd>" . $family->getLastSqlCmd() . "</cmd>\n";
 
         // include results of update in XML response
         print "    <new>\n";
-        print "\t<idmr>" . $idmr . "</idmr>\n";
-        print "\t<spouseGiv>" . $spouseGiv . "</spouseGiv>\n";
-        print "\t<spouseSur>" . $spouseSur . "</spouseSur>\n";
-        print "\t<order>" . $order . "</order>\n";
-        print "\t<marsd>" . $marsd . "</marsd>\n";
+        print "\t<idmr>$idmr</idmr>\n";
+        print "\t<spouseGiv>$spouseGiv</spouseGiv>\n";
+        print "\t<spouseSur>$spouseSur</spouseSur>\n";
+        print "\t<order>$order</order>\n";
+        print "\t<marsd>$marsd</marsd>\n";
         print "    </new>\n";
         $order++;
-    }		// loop through all matching families
+    }       // loop through all matching families
 
-}		// no errors detected
+}       // no errors detected
 else
-{		// errors in parameters
+{       // errors in parameters
     print "    <msg>\n";
     print htmlentities($msg,ENT_XML1);
     print "    </msg>\n";
-}		// errors in parameters
+}       // errors in parameters
 
 // close root node of XML output
 print "</ordered>\n";

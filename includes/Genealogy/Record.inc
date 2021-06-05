@@ -1115,7 +1115,7 @@ class Record implements Iterator, ArrayAccess
             $connector  = ':';
             foreach($prime as $fieldName)
             {
-                $name   .= ": $fieldName=" . $this->row[$fieldName];
+                $name   .= "$connector $fieldName=" . $this->row[$fieldName];
                 $connector  = ',';
             }
         }
@@ -1309,7 +1309,7 @@ class Record implements Iterator, ArrayAccess
      *  Throws:                                                         *
      *      Exception if user is not authorized to update the database  *
      ********************************************************************/
-    function save($output)
+    function save($output   = false)
     {
         global  $debug;
         global  $warn;
@@ -1840,7 +1840,7 @@ class Record implements Iterator, ArrayAccess
                         if ($xml)
                             $citation->save('cmd');
                         else
-                            $citation->save(false);
+                            $citation->save();
                     }
                     else
                         $warn   .= "<p>Record::postCheckCitation: " .
@@ -2169,7 +2169,10 @@ class Record implements Iterator, ArrayAccess
             $trace              = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
             foreach($trace as $l => $caller)
             {
-                $warn   .= "<p style='padding-bottom: 0px; margin-bottom: 0px; margin-top: 0px;'>$l called {$caller['class']}::{$caller['function']}, at {$caller['file']} line {$caller['line']}</p>\n";
+                if (array_key_exists('class', $caller))
+                    $warn   .= "<p style='padding-bottom: 0px; margin-bottom: 0px; margin-top: 0px;'>$l called {$caller['class']}::{$caller['function']}, at {$caller['file']} line {$caller['line']}</p>\n";
+                else
+                    $warn   .= "<p style='padding-bottom: 0px; margin-bottom: 0px; margin-top: 0px;'>$l called {$caller['function']}, at {$caller['file']} line {$caller['line']}</p>\n";
             }
             $retval             = null;
         }                       // unrecognized field name
@@ -2365,7 +2368,7 @@ class Record implements Iterator, ArrayAccess
             return false;
         else
         {
-            $recOwner->save(false);
+            $recOwner->save();
             return true;
         }
     }       // function Record::addOwner

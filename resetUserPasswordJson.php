@@ -130,7 +130,7 @@ if ($user)
     $newPassword	= randomPassword(10);
     $user->set('password', null);
     $user->set('shapassword', hash('sha512', $newPassword));
-    $user->save(false);
+    $user->save();
 
     // bcc the e-mail to the administrators
     $getparms		= array('auth'	=> 'all');

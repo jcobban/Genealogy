@@ -225,7 +225,9 @@ use Templating\Template;
  *      2020/11/19      add support for Manitoba Registrations          *
  *      2020/11/25      add support for FindAGrave citations            *
  *      2021/02/18      add information to error log messages           *
- *      2021/03/15      correct toJson output                           *  
+ *      2021/03/15      correct toJson output                           *
+ *      2021/05/19      add support for 'page' as a county marriage     *
+ *                      identifier                                      *  
  *                                                                      *
  *  Copyright &copy; 2021 James A. Cobban                               *
  ************************************************************************/  
@@ -441,6 +443,7 @@ class Citation extends RecordPic
      *  array containing synonyms for field names                       *
      ********************************************************************/
     protected static    $translate  = array(
+                        'stype'                 => 'type',
                         'detail'                => 'srcdetail',
                         'printdetail'           => 'srcprintdetail',
                         'dettext'               => 'srcdettext',
@@ -1731,11 +1734,8 @@ class Citation extends RecordPic
      *      false       if the method was unable to update the database *
      *      1           if the method updated the database record       *
      *      0           if the database did not need to be updated      *
-     *                                                                  *
-     *  Throws:                                                         *
-     *      exception if user is not authorized to update the database  *
      ********************************************************************/
-    function save($xml)
+    function save($xml = false)
     {
         global  $connection;
         global  $debug;
@@ -1744,7 +1744,7 @@ class Citation extends RecordPic
 
         if (!array_key_exists('idsx', $this->row))
             $warn   .= "<p>Citation::save: " . __LINE__ .
-                    $this->dump("not initialized");
+                            $this->dump("not initialized");
         if ($this->row['idsx'] == 0)
         {       // creating new record, ensure not a duplicate
             // construct a query for duplicate citations
@@ -1792,10 +1792,33 @@ class Citation extends RecordPic
             }               // successful query
             else
             {               // error performing query
-                throw new Exception("Citation::save: '$queryText', " .
-                                print_r($stmt->errorInfo(),true));
+                ob_start();
+                debug_print_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS); 
+                error_log("Citation::save: '$queryText', " .
+                            print_r($stmt->errorInfo(),true) .
+                            "\n" . ob_get_clean() . "\n");
+                return 0;
             }               // error performing query
         }                   // creating new record
+        else
+        {                   // update existing record
+            if (array_key_exists('idime', $this->changed) &&
+                $this->former['idime'] != $this->changed['idime'])
+            {               // unexpected change to associated event
+                if ($this->row['type'] == self::STYPE_EVENT ||  
+                    $this->row['type'] == self::STYPE_MAREVENT)
+                {
+                    $newevent       = new Event($this->changed['idime']);
+                    if ($newevent['idir'] != $this->former['idime'])
+                    {
+                        ob_start();
+                        debug_print_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
+                        error_log("Citation::save: attempt to change event the citation is associated with from idime={$this->former['idime']} type={$this->former['type']} to {$this->changed['idime']}} type={$this->changed['type']} \n" . ob_get_clean() . "\n");
+                        return 0;
+                    }
+                } 
+            }               // unexpected change to associated event
+        }                   // update existing record
 
         // invoke parent's implementation
         $count      = parent::save($xml);
@@ -2035,6 +2058,7 @@ class Citation extends RecordPic
         $text               = trim($this->getDetailText());
         $note               = trim($this->getDetailNote());
 
+        $patternCountyReport = '/(vol[^0-9]*([0-9]+)|).*(#|No|sect|sched|report|page)[^0-9]*([0-9]+\x{00BD}?)[^0-9]+([0-9]+|)/ui';
         // start the template
         $tempBase           = $document_root . '/templates/';
         $includeSub         = "CitationRef$lang.html";
@@ -2162,21 +2186,30 @@ class Citation extends RecordPic
             case 'Marriage Register, CA, CW, County Registers':
             {       // use detail to build link
                 $id             = 'sourceMarriageCounty$IDSX';
-                $count  = preg_match('/(vol[^0-9]*([0-9]+)|).*(#|No|sect|sched|report)[^0-9]*([0-9]+\x{00BD}?)[^0-9]+([0-9]+|)/ui',
-                                 $detail,
-                                 $matches);
-                if ($count == 1)
+                $countReport    = preg_match($patternCountyReport,
+                                             $detail,
+                                             $matches);
+                if ($countReport == 1)
                 {       // detail matches pattern
-                    $volume     = $matches[2];
-                    if ($volume == '')
-                        $volume     = 16;
-                    $report     = $matches[4];
-                    $item       = $matches[5];
-                    $updates    = array('VOLUME'    => $volume,
-                                        'REPORT'    => $report,
-                                        'ITEM'      => $item,
-                                        'LANG'      => $lang,
-                                        'DETAIL'    => $detail);
+                    if (count($matches) < 5)
+                    {
+                        $warn   .= "<p>Citation::toHTML: " . __LINE__ .
+                        ' ' . print_r($matches, true) . "</p>\n";
+                        $updates    = array('DETAIL'    => $detail);
+                    }
+                    else
+                    {
+                        $volume     = $matches[2];
+                        if ($volume == '')
+                            $volume     = 16;
+                        $report     = $matches[4];
+                        $item       = $matches[5];
+                        $updates    = array('VOLUME'    => $volume,
+                                            'REPORT'    => $report,
+                                            'ITEM'      => $item,
+                                            'LANG'      => $lang,
+                                            'DETAIL'    => $detail);
+                    }
                 }       // detail matches pattern
                 else
                 if (preg_match('#https?://\S*#', $detail, $matches) == 1)

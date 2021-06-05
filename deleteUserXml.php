@@ -30,7 +30,7 @@ use \Exception;
     require_once __NAMESPACE__ . '/common.inc';
 
     // emit the XML header
-    print("<?xml version='1.0' encoding='UTF-8'?>\n");
+    print "<?xml version='1.0' encoding='UTF-8'?".">\n";
     print "<deleted>\n";
 
     $userid     = null;

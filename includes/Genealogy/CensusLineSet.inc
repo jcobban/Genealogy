@@ -204,6 +204,10 @@ class CensusLineSet extends RecordSet
                 {
                     if (is_bool($value))
                         $this->autofill     = $value;
+                    else
+                    if (is_int($value))
+                        $this->autofill     = $value != 0;
+                    break;
                 }
             }               // act on specific field name
         }                   // analyze parameters
@@ -571,7 +575,7 @@ class CensusLineSet extends RecordSet
 
                 case 'page':
                 {
-                    $this->page             = $value;
+                    $this->page             = intval($value);
                     $expression             = $this->getIdentifier($fieldLc,
                                                                    $value);
                     if (strlen($expression) > 0)
@@ -869,7 +873,9 @@ class CensusLineSet extends RecordSet
     {
         if (is_null($this->list))
         {
-            if ($this->district && $this->subdistrict && $this->page)
+            if ($this->district &&
+                $this->subdistrict && 
+                is_int($this->page))
             {           // response is all or part of a page
                 $censusId           = $this->census['censusid'];
                 $censusYear         = $this->census['year'];

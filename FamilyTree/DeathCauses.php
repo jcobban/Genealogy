@@ -29,6 +29,7 @@ use \Exception;
  *      2016/06/09      add "carcinoma" and "pyelitis"                  *
  *      2016/06/24      add "quinsy"                                    *
  *      2020/12/06      issue error message if referenced incorrectly   *
+ *      2021/05/22      add "Parenchymatous"                            *
  *                                                                      *
  *  Copyright &copy; 2020 James A. Cobban                               *
  ************************************************************************/
@@ -1086,6 +1087,16 @@ for ($i = 1; $i <= count($deathcause); $i++)
             "Paraplegia": impairment in motor or sensory function of the
             lower extremities, typically as a result of damage to the
             spinal cord.
+<?php
+                break;
+            }
+
+            case 'parenchymatous':
+            {
+?>
+            "Parenchymatous": of, relating to, made up of, or affecting
+            the essential and distinctive tissue of an organ as opposed
+            to supporting tissue.
 <?php
                 break;
             }

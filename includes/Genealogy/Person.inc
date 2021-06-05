@@ -1397,7 +1397,7 @@ class Person extends RecordPic
     function getIdir()
     {
         if ($this->needInsert)
-            $this->save(false);
+            $this->save();
         $idir       = $this->row['idir'];
         return $idir;
     }       // Person::getIdir
@@ -1697,7 +1697,7 @@ class Person extends RecordPic
         }
         if ($this->priName->isExisting())
             $this->treeName         = $this->priName['treename'];
-        $this->priName->save(false);    // update primary name record
+        $this->priName->save();    // update primary name record
         return $this->treeName;
     }       // function Person::getTreeName
 
@@ -1724,7 +1724,7 @@ class Person extends RecordPic
             foreach($names as $idnx => $name)
             {
                 $name->set('treename', $newname);
-                $name->save(false);
+                $name->save();
             }
         }
         return $oldname;
@@ -2480,7 +2480,7 @@ class Person extends RecordPic
                 if ($idmrprefbad && $this->isOwner())
                 {       // only owner can repair
                     $this->set('idmrpref', 0);
-                    $this->save(false);
+                    $this->save();
                 }       // only owner can repair
             }           // preferred IDMR specified
         }               // need to perform query for families
@@ -2608,7 +2608,7 @@ class Person extends RecordPic
                 $birthsd != -99999999)
             {                   // correct bad sort date in Person
                 $this->set('birthsd', $birthsd);
-                $this->save(false);
+                $this->save();
             }                   // correct bad sort date in Person
             $chrisEvent         = $this->chrisEvent;
             if ($chrisEvent)
@@ -4755,7 +4755,7 @@ class Person extends RecordPic
                     if ($xml)
                         $priName->save('save' . __LINE__);
                     else
-                        $priName->save(false);
+                        $priName->save();
                     $cmd                        = $priName->getLastSqlCmd();
                     if (strlen($cmd) > 500)
                     {
@@ -4820,7 +4820,7 @@ class Person extends RecordPic
                 if ($xml)
                     $priName->save('save' . __LINE__);
                 else
-                    $priName->save(false);
+                    $priName->save();
                 $cmd                        = $priName->getLastSqlCmd();
                 if (strlen($cmd) > 0)
                     $this->lastSqlCmd       .= ";$cmd";
@@ -4832,20 +4832,24 @@ class Person extends RecordPic
                     $families                   = $this->getFamilies();
                     foreach($families as $idmr => $family)
                     {               // loop through families
-                        $nameParms              = array('idir'      => $this,
-                                                        'idmr'      => $family);
+                        $nameParms              = array('idir'  => $this,
+                                                        'idmr'  => $family);
                         $altName                = new Name($nameParms);
                         $altName['treename']    = $this->treeName;
                         if ($altName->get('birthsd') == -99999999 &&
                             $this['birthsd'] != -99999999)
+                        {
                             $altName['birthsd'] = $this['birthsd'];
-                        if ($xml)
-                            $altName->save('save' . __LINE__);
-                        else
-                            $altName->save(false);
-                        $cmd                    = $priName->getLastSqlCmd();
-                        if (strlen($cmd) > 0)
-                            $this->lastSqlCmd   .= ";$cmd";
+                            $altName->save();
+                            $cmd                = $altName->getLastSqlCmd();
+                            if (strlen($cmd) > 0)
+                                $this->lastSqlCmd   .= ";$cmd";
+                            if ($xml)
+                            {
+                                $tag            ='save' . __LINE__;
+                                print "<$tag>$cmd</$tag>\n";
+                            }
+                        }
                     }               // loop through families
                 }                   // wife
 

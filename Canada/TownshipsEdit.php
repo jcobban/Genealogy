@@ -343,7 +343,7 @@ if (canUser('edit') && strlen($msg) == 0 &&
                 case 'code':
                 {       // first field in row
                     if ($township instanceof Township)
-                        $township->save(false);
+                        $township->save();
                     $code       = $value;
                     break;
                 }       // first field in row
@@ -406,37 +406,37 @@ $template->set('OFFSET',            $offset);
 $template->set('LIMIT',             $limit);
 if (strlen($msg) == 0)
 {
-	$template->set('TOTALROWS',         $count);
-	$template->set('FIRST',             $offset + 1);
-	$template->set('LAST',              min($count, $offset + $limit));
-	$template->set('$line',             '$line');
-	//if ($offset > 0)
-	//  $template->set('npPrev', "&offset=" . ($offset-$limit) . "&limit=$limit");
-	//else
-	//  $template->updateTag('prenpprev', null);
-	//if ($offset < $count - $limit)
-	//  $template->set('npNext', "&offset=" . ($offset+$limit) . "&limit=$limit");
-	//else
-	//  $template->updateTag('prenpnext', null);
-	
-	$rowElt                     = $template->getElementById('Row$line');
-	$rowHtml                    = $rowElt->outerHTML();
-	$data                       = '';
-	$line                       = 1;
-	foreach($townships as $township)
-	{
-	    $code                   = $township->get('code');
-	    $name                   = $township->get('name');
-	    $location               = $township->get('location');
-	    $rtemplate              = new Template($rowHtml);
-	    $rtemplate->set('line',     $line);
-	    $rtemplate->set('code',     $code);
-	    $rtemplate->set('name',     $name);
-	    $rtemplate->set('location', $location);
-	    $data                   .= $rtemplate->compile();
-	    $line++;
-	}
-	$rowElt->update($data);
+    $template->set('TOTALROWS',         $count);
+    $template->set('FIRST',             $offset + 1);
+    $template->set('LAST',              min($count, $offset + $limit));
+    $template->set('$line',             '$line');
+    //if ($offset > 0)
+    //  $template->set('npPrev', "&offset=" . ($offset-$limit) . "&limit=$limit");
+    //else
+    //  $template->updateTag('prenpprev', null);
+    //if ($offset < $count - $limit)
+    //  $template->set('npNext', "&offset=" . ($offset+$limit) . "&limit=$limit");
+    //else
+    //  $template->updateTag('prenpnext', null);
+    
+    $rowElt                     = $template->getElementById('Row$line');
+    $rowHtml                    = $rowElt->outerHTML();
+    $data                       = '';
+    $line                       = 1;
+    foreach($townships as $township)
+    {
+        $code                   = $township->get('code');
+        $name                   = $township->get('name');
+        $location               = $township->get('location');
+        $rtemplate              = new Template($rowHtml);
+        $rtemplate->set('line',     $line);
+        $rtemplate->set('code',     $code);
+        $rtemplate->set('name',     $name);
+        $rtemplate->set('location', $location);
+        $data                   .= $rtemplate->compile();
+        $line++;
+    }
+    $rowElt->update($data);
 }
 else
 {

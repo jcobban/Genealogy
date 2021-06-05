@@ -141,7 +141,7 @@ if (count($_POST) > 0)
     if ($debug)
         $warn   .= $parmsText . "</table>\n";
 
-	$report->save(false);
+	$report->save();
 }			// update
 else
 {			// validate parameters

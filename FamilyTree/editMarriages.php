@@ -378,7 +378,7 @@ if (!is_null($idir))
     if (count($families) == 0 && $idmrpref > 0)
     {           // correct database error
         $indiv->set('idmrpref', 0);
-        $indiv->save(false);
+        $indiv->save();
         $idmrpref           = 0;
     }           // correct database error
 
@@ -393,7 +393,7 @@ if (!is_null($idir))
                 $idmrpref   = $family->getIdmr();
                 // update field in Person
                 $indiv->set('idmrpref', $idmrpref);
-                $indiv->save(false);
+                $indiv->save();
             }           // have first family
         }               // at least one marriage
         else            // no families
@@ -442,7 +442,7 @@ if (!is_null($child))
                     $idmrparents    = $family->getIdmr();
                     // update field in Person
                     $childObj->set('idmrparents', $idmrparents);
-                    $childObj->save(false);
+                    $childObj->save();
                 }       // have first family
             }           // preferred parents not set
             else
@@ -793,7 +793,7 @@ if (strlen($msg) == 0 || $family instanceof Family)
     $data                           = '';
     if ($child && !$family->isExisting())
     {
-        $family->save(false);
+        $family->save();
         $newChild                   = $family->addChild($childObj);
     }
     $children                       = $family->getChildren();

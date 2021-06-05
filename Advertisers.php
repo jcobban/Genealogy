@@ -91,7 +91,7 @@ if (isset($_GET) && count($_GET) > 0)
     {               // only the administrator can use this dialog
         // create the main counter entry if it does not already exist
         $advertiser                 = new Advertiser(array('adname' => ''));
-        $advertiser->save(false);
+        $advertiser->save();
 
         // synchronize the statistics with the Advertisements folder
         $dh                         = opendir("$document_root/Advertisements");
@@ -105,7 +105,7 @@ if (isset($_GET) && count($_GET) > 0)
                 {           // advertiser banner ad
                     $adname         = substr($filename, 0, strlen($filename) - 5);
                     $advertiser     = new Advertiser(array('adname' => $adname));
-                    $advertiser->save(false);
+                    $advertiser->save();
                 }           // advertiser banner ad
             }               // loop through files
         }                   // found advertisements directory
@@ -147,7 +147,7 @@ if (isset($_POST) && count($_POST) > 0)
             {               // advertiser name
                 if ($administrator && $advertiser)
                 {
-                    $advertiser->save(false);
+                    $advertiser->save();
                     $adname         = $advertiser['adname'];
                     $adurl          = "Advertisements/$adname.html";
                     if (!file_exists("$document_root/$adurl"))

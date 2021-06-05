@@ -36,6 +36,7 @@
 			    class="white leftnc" name="userid" id="userid"
 			    autocomplete="off" readonly="readonly"
 			    value="$USERID"/>
+            Mandatoire
           </p>
           <p id="passRow" class="clear">
 		    <label class="label" for="password">
@@ -86,6 +87,7 @@
 		    <input type="text" size="64" name="email" id="email"
 			    class="white leftnc" autocomplete="off"
 			    value="$EMAIL"/>
+            Mandatoire pour régistration
           </p>
           <p id="useEmailRow" class="clear">
 		    <label class="label" for="usemail">
@@ -94,13 +96,42 @@
 		    <input type="checkbox" name="usemail" id="usemail"
 				    $chkusemail/>
           </p>
-          <p id="nopRow" class="clear">
+	      <p id="cellphoneRow" class="clear">
+			<label class="label" for="cellphone">
+    		  Numéro de téléphone portable:
+			</label>
+			<input type="text" size="32" name="cellphone" id="email"
+        			class="white leftnc" autocomplete="off"
+        			value="$CELLPHONE"/>
+            Optional
+	      </p>
+	      <p id="usetextRow" class="clear">
+			<label class="label" for="usetext">
+    		  Envoyer des avis par Texte:
+			</label>
+			<input type="checkbox" name="usetext" id="usetext"
+    				$chkusetext/>
+	      </p>
+          <p id="nohelpRow" class="clear">
 		    <label class="label" for="nohelp">
-		      Supprimer de l'Aide Pop-up:
+		      Supprimer de l'Aide Contextuelle:
 		    </label>
 		    <input type="checkbox" name="nohelp" id="nohelp"
 				    $chknohelp/>
           </p>
+	      <p id="languageRow" class="clear">
+			<label class="label" for="language">
+    		  Langue Préférée:
+			</label>
+            <input type="hidden" id="accountLang" name="accountLang"
+                    value="$LANGUAGE">
+            <select name="language" id="language">
+                <option value='en'>English</option>
+                <option value='fr' selected="selected">Français</option>
+                <option value='de'>Deutsche</option>
+                <option value='es'>Español</option>
+            </select>
+	      </p>
     
           <p class="clear">
 		    <span class="pad">
@@ -164,10 +195,14 @@
     </div> <!-- div class="body" -->
     <div class="hidden" id="templates">
       <span id="badPassword">
-        Le mot de passe doit correspondre au mot de passe actuel sur le compte. 
+        Le mot de passe doit correspondre au mot de passe actuel
+        sur le compte. 
       </span>
       <span id="badEmail">
-        Adresse courriel invalide.  
+        Adresse courriel $email invalide.  
+      </span>
+      <span id="badcellphone">
+        Numéro de téléphone portable $cellphone invalide .  
       </span>
       <span id="emailInUse">
         L'adresse courriel demandée «$email» est déjà utilisée.  
@@ -214,21 +249,46 @@
 	  La valeur du mot de passe neuf n'est pas affichée.
     </div>
     <div class="balloon" id="Helpemail">
-	  This is the e-mail address associated with the account.  This e-mail address
-	  is used only for authorization purposes.
+	  This is the e-mail address associated with the account.
+      This e-mail address is used for authorization verification and
+      with your permission may also be used for notification messages
+      related to the operation of the site.  This address will not be 
+      shared with any other organization
     </div>
     <div class="balloon" id="Helpusemail">
 	  If this is checked then messages will be sent to the associated e-mail
-	  address regarding changes in the web-site such as new features and capabilities.
+	  address regarding changes in the web-site such as new features
+      and capabilities.
 	  Generally this will be no more frequently than once a month.
 	  These notices will also be posted to the web-site.
-	  If you clear this checkbox then the only e-mail you will receive will be the
+	  If you clear this checkbox then the only e-mail you will receive
+      will be the
 	  one used to verify the existence of your e-mail address.
+    </div>
+    <div class="balloon" id="Helpcellphone">
+	  This is the mobile telephone number associated with the account.
+	  This number may be used for text notifications if you permit.
+      This number will not be shared with any other organization.
+    </div>
+    <div class="balloon" id="Helpusetext">
+	  If this is checked then text messages may be sent to the associated
+      mobile phone number
+	  regarding changes in the web-site such as new features
+      and capabilities.
+	  Generally this will be no more frequently than once a month.
+	  These notices will also be posted to the web-site.
     </div>
     <div class="balloon" id="Helpnohelp">
 	  If this option is checked then the feature to pop up element specific
 	  help if the mouse if held over a button or input field for more than 2
 	  seconds is turned off.
+    </div>
+    <div class="balloon" id="Helplanguage">
+      This selection list is used to specify your preferred language
+      of communication with the site administrator.  Automatic messages 
+      sent by the site with regard to your account will be customized
+      to this language choice.  This is independent of the language which
+      you choose to use for viewing the contents of the web-site.
     </div>
     <div class="balloon" id="HelpSubmit">
 	  Clicking on this button with the mouse applies the changes to the account.

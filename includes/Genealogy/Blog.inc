@@ -432,7 +432,7 @@ class Blog extends Record
      *                  if a string use it as tag name of top tag       *
      *                  of XML output                                   *
      ********************************************************************/
-    function save($xml)
+    function save($xml  = false)
     {
         global  $debug;
         global  $warn;

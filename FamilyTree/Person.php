@@ -49,14 +49,14 @@ use \Templating\TemplateTag;
  *                      sacraments                                      *
  *      2010/12/29      Add 'button' to invoke descendants report       *
  *                      Add 'button' to invoke ancestor report          *
- *                      Move Edit URL and make a 'button'.				*
+ *                      Move Edit URL and make a 'button'.              *
  *      2011/01/01      Break long text notes into paragraphs whereever *
  *                      two new-lines occur in the original             *
  *      2011/01/02      add reporting of LDS individual events          *
  *      2011/01/03      add alternate name list                         *
  *      2011/01/07      correct case where there is a mother and no     *
  *                      father known                                    *
- *                      Report on alternate names for the individual.	*
+ *                      Report on alternate names for the individual.   *
  *      2011/01/10      use LegacyRecord::getField method               *
  *      2011/01/16      add 'button' to invoke relationship calculator  *
  *      2011/01/28      pronoun missing from christening event          *
@@ -85,8 +85,8 @@ use \Templating\TemplateTag;
  *      2012/02/26      easier to understand code for parentage         *
  *      2012/05/28      support unknown sex                             *
  *      2012/07/25      display general notes for each spouse           *
- *      2012/08/12      add button to display tree picture of family.	*
- *                      display sealing to parents if present.			*
+ *      2012/08/12      add button to display tree picture of family.   *
+ *                      display sealing to parents if present.          *
  *      2012/10/08      display user reference field for spouse         *
  *      2012/11/20      include father's title and suffix               *
  *      2012/11/25      catch exceptions allocating spouse and children *
@@ -119,7 +119,7 @@ use \Templating\TemplateTag;
  *      2013/06/01      remove use of deprecated interfaces             *
  *      2013/06/13      use parameter idir= in invoking web pages       *
  *      2013/07/01      use <a class="button"> instead of               *
- *                      <td class="button">								*
+ *                      <td class="button">                             *
  *      2013/08/02      show family and parent information in the       *
  *                      individual popup                                *
  *      2013/10/26      display citations for marriage ended date       *
@@ -130,7 +130,7 @@ use \Templating\TemplateTag;
  *      2013/12/07      $msg and $debug initialized by common.inc       *
  *      2013/12/19      correct display of child to parent relationships*
  *      2014/01/31      do not use obsolete LegacyIndiv::getChildRecord *
- *      2014/01/16      show not married indicator before death.		*
+ *      2014/01/16      show not married indicator before death.        *
  *      2014/03/17      use CSS rather than tables to lay out list      *
  *                      of children, and list of footnotes              *
  *                      interface to Picture made more intuitive        *
@@ -150,7 +150,7 @@ use \Templating\TemplateTag;
  *                      add id parameter to elements with only name     *
  *      2014/07/11      remove 'Notes:' prefix on marriage notes        *
  *      2014/07/15      support for popupAlert moved to common code     *
- *      2014/07/19      remove 'Note:' prefix from individual events.	*
+ *      2014/07/19      remove 'Note:' prefix from individual events.   *
  *      2014/08/05      add explicit instructions for requestin access  *
  *                      to a private individual                         *
  *      2014/09/08      strip paragraph tags off event note             *
@@ -158,8 +158,8 @@ use \Templating\TemplateTag;
  *                      use Record method isOwner to check ownership    *
  *      2014/10/03      clean up initialization                         *
  *                      use Record::displayPictures                     *
- *                      display pictures associated with birth,			*
- *                      christening, death, and burial.					*
+ *                      display pictures associated with birth,         *
+ *                      christening, death, and burial.                 *
  *      2014/10/15      events moved from tblIR and tblMR to tblER      *
  *      2014/11/29      print $warn, which may contain debug trace      *
  *      2014/12/03      handle exception on bad mother idir             *
@@ -167,7 +167,7 @@ use \Templating\TemplateTag;
  *                      now return arrays indexed on IDMR               *
  *      2014/12/19      always use LegacyIndiv::getBirthEvent and       *
  *                      getDeathEvent, not obsolete fields to get       *
- *                      birth and death information.					*
+ *                      birth and death information.                    *
  *      2015/01/11      add support for Ancestry Search                 *
  *      2015/01/12      hide support for Ancestry Search as it makes    *
  *                      more sense to move that to editIndivid.php      *
@@ -177,13 +177,13 @@ use \Templating\TemplateTag;
  *      2015/02/21      correct reflexive pronoun in ethnicity phrase   *
  *      2015/03/30      provide more explicit instructions for          *
  *                      accessing private individuals if user is        *
- *                      not signed on.									*
+ *                      not signed on.                                  *
  *                      use LegacyIndiv::getName to format child name   *
  *      2015/04/06      use LegacyIndiv::getName to format title        *
  *                      use LegacyIndiv::getBPrivLim and ::getDPrivLim  *
  *                      to obtain event privacy limits                  *
  *      2015/05/01      missing space after closing period if only      *
- *                      the father defined.								*
+ *                      the father defined.                             *
  *                      source popup laid out here instead of built     *
  *                      at runtime from template                        *
  *                      individ popup laid out here instead of built    *
@@ -197,7 +197,7 @@ use \Templating\TemplateTag;
  *      2015/05/25      handle URL redirected from old static site      *
  *                      move formatting of source citations here from   *
  *                      class Citation                                  *
- *                      standardize <h1>								*
+ *                      standardize <h1>                                *
  *      2015/05/29      add individuals from event descriptions         *
  *                      into popups                                     *
  *                      ensure that links to individuals are absolute   *
@@ -222,7 +222,7 @@ use \Templating\TemplateTag;
  *                      marital status single                           *
  *      2015/08/09      if the individual has a parents record, but     *
  *                      there are not parents identified by that record *
- *                      indicate no parents and check for siblings.		*
+ *                      indicate no parents and check for siblings.     *
  *      2015/08/11      support treename                                *
  *      2015/08/26      suppress article in front of titles of nobility *
  *                      as an occupation                                *
@@ -236,7 +236,7 @@ use \Templating\TemplateTag;
  *                      for some county marriage references provide     *
  *                      link to see the transcription                   *
  *      2016/03/24      display events with IDET=1                      *
- *      2016/11/25      display aka note for alternate name.			*
+ *      2016/11/25      display aka note for alternate name.            *
  *      2016/12/09      determine geocoder search parm for each location*
  *      2016/12/30      undefined $unknownChildRole                     *
  *                      catch invalid IDIR in showEvent                 *
@@ -261,7 +261,7 @@ use \Templating\TemplateTag;
  *      2017/08/18      class LegacyName renamed to Name                *
  *      2017/09/02      class LegacyTemple renamed to Temple            *
  *      2017/09/09      change class LegacyLocation to class Location   *
- *      2017/09/12      use get( and set(								*
+ *      2017/09/12      use get( and set(                               *
  *      2017/09/28      change class LegacyEvent to class Event         *
  *      2017/10/05      change class LegacyFamily to class Family       *
  *                      $idir not set if userref parameter used         *
@@ -405,9 +405,9 @@ $addressTable           = array();
  *  the supplied text.                                                  *
  *                                                                      *
  *  Parameters:                                                         *
- *      $desc       text to check for hyper-links to Persons		    *
+ *      $desc       text to check for hyper-links to Persons            *
  *                                                                      *
- *  Returns:    the supplied text, ensuring that the hyperlinks use		*
+ *  Returns:    the supplied text, ensuring that the hyperlinks use     *
  *              absolute URLs.                                          *
  ************************************************************************/
 function createPopups($desc)
@@ -467,9 +467,9 @@ function createPopups($desc)
  *  Add a footnote.                                                     *
  *                                                                      *
  *  Parameters:                                                         *
- *      $key            string representation of the citation			*
+ *      $key            string representation of the citation           *
  *                      for uniqueness check                            *
- *      $cit            instance of Citation, or a string				*
+ *      $cit            instance of Citation, or a string               *
  *                                                                      *
  *  Returns:                                                            *
  *      assigned footnote number                                        *
@@ -504,8 +504,8 @@ function addFootnote($key,
  *  current page.                                                       *
  *                                                                      *
  *  Input:                                                              *
- *      $event          instance of Event or citation type in tblSX		*
- *      $idime          record identifier of the event or object which	*
+ *      $event          instance of Event or citation type in tblSX     *
+ *      $idime          record identifier of the event or object which  *
  *                      the citation documents                          *
  *                                                                      *
  *  Returns:                                                            *
@@ -602,11 +602,11 @@ function showCitationTable()
  *  of a Person.                                                        *
  *                                                                      *
  *  Parameters:                                                         *
- *      $pronoun        pronoun appropriate for described Person	    *
- *      $gender         gender of Person being described			    *
- *      $event          instance of Event containing the event			*
+ *      $pronoun        pronoun appropriate for described Person        *
+ *      $gender         gender of Person being described                *
+ *      $event          instance of Event containing the event          *
  *                      information                                     *
- *      $template       string template to fill in						*
+ *      $template       string template to fill in                      *
  *                      This template has substitution points for:      *
  *                          $Pronoun                                    *
  *                          $reflexivePronoun                           *
@@ -783,7 +783,7 @@ function showEvent($pronoun,
  *                                                                      *
  *      Input:                                                          *
  *          $location   instance of Location, Temple, or                *
- *                      Address	                                        *
+ *                      Address                                         *
  *          $comma      separator between footnote references           *
  *          $defPrep    default preposition before place names          *
  ************************************************************************/
@@ -848,20 +848,20 @@ function showLocation($location,
             if ($prep == '')
                 $prep       = 'at';
             if (array_key_exists($prep, $t))
-                $retval	    .= $t[$prep];
+                $retval     .= $t[$prep];
             else
-                $retval	    .= $prep;
+                $retval     .= $prep;
         }
         else
         if (strlen($defPrep) > 0)
         {
             if (array_key_exists($defPrep, $t))
-                $retval	    .= $t[$defPrep];
+                $retval     .= $t[$defPrep];
             else
-                $retval	    .= $defPrep;
+                $retval     .= $defPrep;
         }
 
-        $retval	        .= " <span id=\"{$idprefix}{$locindex}_{$idlr}\">$locname</span>\n";
+        $retval         .= " <span id=\"{$idprefix}{$locindex}_{$idlr}\">$locname</span>\n";
         $locindex++;
     }               // location defined
     return $retval;
@@ -931,7 +931,7 @@ function showParents($person)
                     {
                         $dad['givenname']   = "Father of " . $person['givenname'];
                         $dad['surname']     = $person['surname'];
-                        $dad->save(false);
+                        $dad->save();
                     }
                     $individTable[$dadid] = $dad;
                     $dadrel             = $cpRelType[$childRec['idcpdad']];
@@ -962,7 +962,7 @@ function showParents($person)
                         $mom['givenname']   = "Mother";
                         $mom['surname']     = "Motherof" . 
                             str_replace(' ','', $person['givenname'] . $person['surname']);
-                        $mom->save(false);
+                        $mom->save();
                     }           // fixup
                     $individTable[$momid] = $mom;
                     $momrel             = $cpRelType[$childRec['idcpmom']];
@@ -1058,7 +1058,7 @@ function showParents($person)
  *  about that Person's Events.                                         *
  *                                                                      *
  *  Parameters:                                                         *
- *      $person     Person whose events are to be displayed.		    *
+ *      $person     Person whose events are to be displayed.            *
  ************************************************************************/
 function showEvents($person)
 {
@@ -1334,27 +1334,27 @@ function displayEvent($ider,
 
 // generate unique id values for the <span> enclosing each location
 // reference
-$locindex       		= 1;
+$locindex               = 1;
 
 // process input parameters
-$idir           		= null;
-$person         		= null;
-$private        		= true;
-$somePrivate    		= false;
-$prefix         		= '';
-$givenName      		= '';
-$surname        		= '';
-$treeName       		= '';
+$idir                   = null;
+$person                 = null;
+$private                = true;
+$somePrivate            = false;
+$prefix                 = '';
+$givenName              = '';
+$surname                = '';
+$treeName               = '';
 // parameter to nominalIndex.php
-$nameuri        		= '';
-$birthDate      		= '';
-$deathDate      		= '';
-$lang           		= 'en';
-$getParms       		= array();
+$nameuri                = '';
+$birthDate              = '';
+$deathDate              = '';
+$lang                   = 'en';
+$getParms               = array();
 
 foreach($_GET as $key => $value)
 {                   // loop through all parameters
-    $value  		    = trim($value);
+    $value              = trim($value);
     switch(strtolower($key))
     {               // act on specific parameters
         case 'idir':
@@ -1676,7 +1676,7 @@ if (!is_null($person))
                     {           // fixup
                         $spouse['givenname']    = $spsName['givenname'];
                         $spouse['surname']      = $spsName['surname'];
-                        $spouse->save(false);
+                        $spouse->save();
                         if ($debug)
                             $warn   .= $spouse->dump('fixup Person.php:' . __LINE__);
                     }           // fixup

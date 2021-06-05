@@ -644,7 +644,7 @@ class Domain extends Record
      *      1           if the method updated the database record       *
      *      0           if the record did not need to be updated        *
      ********************************************************************/
-    function save($xml)
+    function save($xml = false)
     {
         global  $debug;
         global  $warn;

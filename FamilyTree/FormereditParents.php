@@ -233,7 +233,7 @@ require_once __NAMESPACE__ . '/common.inc';
             if (count($families) == 0 && $idmrpref > 0)
             {           // correct database error
                 $person->set('idmrparents', 0);
-                $person->save(false);
+                $person->save();
                 $idmrpref   = 0;
             }           // correct database error
 
@@ -250,7 +250,7 @@ require_once __NAMESPACE__ . '/common.inc';
                             $idmrpref   = $id;
                             // update field in individual
                             $person->set('idmrparents', $idmrpref);
-                            $person->save(false);
+                            $person->save();
                         }   // set preferred parents in child
                         if ($id == $idmr)
                         {   // match requested set of parents

@@ -63,71 +63,83 @@ $user           = null;
 $lang           = 'en';
 $record         = null;
 
-foreach($_GET as $name => $value)
+if (isset($_GET) && count($_GET) > 0)
 {
-    switch(strtolower($name))
+    $parmsText              = "<p class='label'>\$_GET</p>\n" .
+                               "<table class='summary'>\n" .
+                                  "<tr><th class='colhead'>key</th>" .
+                                    "<th class='colhead'>value</th></tr>\n";
+    foreach($_GET as $name => $value)
     {
-        case 'id':
-        case 'idir':
+        $safevalue          = htmlspecialchars($value);
+        $parmsText          .= "<tr><th class='detlabel'>$name</th>" .
+                                "<td class='white left'>" .
+                                "$safevalue</td></tr>\n"; 
+        switch(strtolower($name))
         {
-            $recordid       = $value;
-            break;
-        }       // key value
-
-        case 'tablename':
-        {
-            $info           = Record::getInformation($value);
-            if ($info)
-                $tableName  = $info['table'];
-            else
-                $tableName  = $value;
-            break;
-        }       // table name
-
-        case 'subject':
-        {
-            $about          = $value;
-            break;
-        }       // table name
-
-        case 'text':
-        {
-            $text           = $value;
-            break;
-        }       // table name
-
-        case 'username':
-        {
-            $username       = $value;
-            $user           = new User(array('username' => $username));
-            if ($user->isExisting())
+            case 'id':
+            case 'idir':
             {
-                $tableName  = 'Users';
-                $recordid   = $user['id'];
+                $recordid       = $value;
+                break;
+            }       // key value
+    
+            case 'tablename':
+            {
+                $info           = Record::getInformation($value);
+                if ($info)
+                    $tableName  = $info['table'];
+                else
+                    $tableName  = $value;
+                break;
+            }       // table name
+    
+            case 'subject':
+            {
+                $about          = $safevalue;
+                break;
+            }       // table name
+    
+            case 'text':
+            {
+                $text           = $safevalue;
+                break;
+            }       // table name
+    
+            case 'username':
+            {
+                $username       = $safevalue;
+                $user           = new User(array('username' => $value));
+                if ($user->isExisting())
+                {
+                    $tableName  = 'Users';
+                    $recordid   = $user['id'];
+                }
+                break;
+            }       // table name
+    
+            case 'lang':
+            {
+                $lang       = FtTemplate::validateLang($value);
+                break;
+            }       // language selection
+    
+            case 'debug':
+            {
+                break;
+            }       // handled by common code
+    
+            default:
+            {
+                if (is_string($value))
+                    $about      .= "&$name=$value";
+                break;
             }
-            break;
-        }       // table name
-
-        case 'lang':
-        {
-            if (strlen($value) >= 2)
-                $lang       = strtolower(substr($value,0,2));
-            break;
-        }       // language selection
-
-        case 'debug':
-        {
-            break;
-        }       // handled by common code
-
-        default:
-        {
-            if (is_string($value))
-                $about      .= "&$name=$value";
-            break;
-        }
-    }           // act on specific keys
-}               // loop through all parameters
+        }           // act on specific keys
+    }               // loop through all parameters
+    if ($debug)
+        $warn               .= $parmsText . "</table>\n";
+}                   // invoked by URL
 
 $template           = new FtTemplate("ContactAuthor$lang.html");
 

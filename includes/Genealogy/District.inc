@@ -564,7 +564,7 @@ class District extends Record
      *      $xml        If true diagnostic output is emitted in XML     *
      *                  format. If a string use it as top tag name      *
      ********************************************************************/
-    function save($xml)
+    function save($xml = false)
     {
         global  $debug;
         global  $warn;

@@ -20,8 +20,9 @@ use \Iterator;
  *      Auth            VARCHAR(32),                                    *
  *      id              INT(10) AUTOINCREMENT                           *
  *      Options         INT(10),                // bit mask             *
- *      ConfirmId       INT(10),                                        *
+ *      ConfirmId       BIGINT(10),                                     *
  *      Persistence     VARCHAR(64) DEFAULT NULL,                       *
+ *      Language        VARCHAR(8) DEFAULT 'en',                        *
  *      PRIMARY KEY (`UserName`),                                       *
  *      KEY `persistence` (`persistence`),                              *
  *      UNIQUE KEY `id` (`id`),                                         *
@@ -75,8 +76,10 @@ use \Iterator;
  *                      add function getId() to override default        *
  *      2019/12/28      change implementation of persistence            *
  *      2020/07/09      correct creation of pending account             *
+ *      2021/05/31      add field `Language`                            *
+ *                      change `ConfirmId` to BIGINT to avoid negative  *
  *                                                                      *
- *  Copyright &copy; 2020 James A. Cobban                               *
+ *  Copyright &copy; 2021 James A. Cobban                               *
  ************************************************************************/
 require_once __NAMESPACE__ . '/Record.inc';
 
@@ -106,7 +109,8 @@ class User extends Record
                         'id'                => 0,
                         'options'           => 1,
                         'confirmid'         => null,
-                        'persistence'       => null);
+                        'persistence'       => null,
+                        'language'          => 'en');
 
     /********************************************************************
      *  User::$info                                                     *
@@ -130,6 +134,7 @@ class User extends Record
     protected static    $translate  = array(
                         'userid'            => 'username',
                         'name'              => 'username',
+                        'lang'              => 'language',
                         'recordid'          => 'recordid',
                         'table'             => 'table');
 
@@ -143,7 +148,7 @@ class User extends Record
     // masks to turn on an off specific options
     const OPT_USEMAIL_ON        = 1;
     const OPT_NOHELP_ON         = 2;
-    const OPT_RESERVED          = 4;
+    const OPT_USETEXT_ON        = 4;
 
     /********************************************************************
      *  function User::__construct                                      *
@@ -477,15 +482,15 @@ class User extends Record
      ********************************************************************/
     function get($field)
     {
-        $fieldLc    = strtolower($field);
+        $fieldLc            = strtolower($field);
         if (array_key_exists($fieldLc, self::$translate))
-            $fieldLc    = self::$translate[$fieldLc];
+            $fieldLc        = self::$translate[$fieldLc];
         switch($fieldLc)
         {
             case 'id':
             {
                 if ($this->needInsert)
-                    $this->save(false);
+                    $this->save();
                 return $this->row['id'];
             }
 
@@ -515,7 +520,7 @@ class User extends Record
         if ($this->needInsert && $retval == 0)
         {
             $warn   .= "<p>User::getId: table " . $this->table .
-                " record does not exist in database</p>\n";
+                        " record does not exist in database</p>\n";
             return null;
         }
         else
@@ -529,9 +534,9 @@ class User extends Record
      ********************************************************************/
     function getName($options   = null)
     {
-        $retval = $this->row['username'];
+        $retval                 = $this->row['username'];
         if ($retval === null)
-            $retval = '';
+            $retval             = '';
         return $retval;
     }       // User::getName
 
@@ -557,6 +562,7 @@ class User extends Record
                         "password=$newPassword, hash=$hash</p>\n";
         parent::set('shapassword',
                     $hash);
+        parent::set('password', null);
         return null;
     }       // function User::setPassword
 
@@ -588,7 +594,7 @@ class User extends Record
                 $persistence    = bin2hex(random_bytes(32));
         }
         parent::set('persistence', $persistence);
-        $this->save(false);
+        $this->save();
         return $valid;
     }       // function User::chkPassword
 
@@ -646,7 +652,7 @@ class User extends Record
                 if ($value == 'pending')
                 {
                     if ($this->row['auth'] != 'pending')
-                        return parent::set('confirmid', time());
+                        parent::set('confirmid', time());
                 }
                 else
                     parent::set('confirmid', null);
@@ -710,7 +716,7 @@ class User extends Record
      *      1           if the method updated the database record       *
      *      0           if the database did not need to be updated      *
      ********************************************************************/
-    function save($xml)
+    function save($xml  = false)
     {
         global  $connection;
         global  $debug;

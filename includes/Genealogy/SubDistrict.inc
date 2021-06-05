@@ -82,6 +82,7 @@ use \Iterator;
  *      2021/01/24      do not initialize district pointer until        *
  *                      object is initialized                           *
  *      2021/02/24      fixup for divisions with bad pagination         *
+ *      2021/05/17      get Pages returned a maximum of 50 pages        *
  *                                                                      *
  *  Copyright &copy; 2021 James A. Cobban                               *
  ************************************************************************/
@@ -698,7 +699,7 @@ class SubDistrict extends Record
      *      $xml        If true diagnostic output is emitted in XML     *
      *                  format. If a string use it as top tag name      *
      ********************************************************************/
-    function save($xml)
+    function save($xml = false)
     {
         global  $debug;
         global  $warn;
@@ -1019,7 +1020,7 @@ class SubDistrict extends Record
                 $frm    = floor(($page - $page1) * 2 / $bypage) + $relFrame;
                 $website    = "https://central.bac-lac.gc.ca/";
                 $image  = $website .
-                            '.item/%3Fapp=Census1851%26op=%26id=%26img=e' .
+                            '.item/?app=Census1851&op=&img&id=e' .
                             substr('000000000', 0, 9 - strlen($frm)) .
                             $frm;
                 break;
@@ -1515,9 +1516,12 @@ class SubDistrict extends Record
      ********************************************************************/
     function getPages($first = 1)
     {
-        return new PageSet(array('sdid'     => $this,
-                                 'page'     => $first,
-                                 'limit'    => 50));
+        global      $warn;
+        $limit              = $this->row['sd_pages'] + 1;
+        $result             = new PageSet(array('sdid'     => $this,
+                                                'page'     => $first,
+                                                'limit'    => $limit));
+        return $result;
     }       // SubDistrict::getPages
 
     /********************************************************************
@@ -1588,10 +1592,7 @@ class SubDistrict extends Record
             if ($debug)
                 $warn       .= "<p>SubDistrict::getStatistics: " . __LINE__ . " \$this->getSubDistrict()</p>\n";
             $sdpage1        = $this->row['sd_page1'];
-            if ($sdpage1 == 0)
-                $nextpage   = 1;    // fixup for certain bad divisions
-            else
-                $nextpage   = $sdpage1;
+            $nextpage       = $sdpage1;
             $bypage         = $this->row['sd_bypage'];
             $pages          = $this->row['sd_pages'];
 
@@ -1615,11 +1616,7 @@ class SubDistrict extends Record
                     $row            = next($result);
                 }
 
-                // fixup for divisions with bad image pagination
-                if ($sdpage1 == 0 && $nextpage == 1)
-                    $nextpage       = $bypage;
-                else
-                    $nextpage       += $bypage;
+                $nextpage           += $bypage;
             }
             return $retval;
         }       // successful query

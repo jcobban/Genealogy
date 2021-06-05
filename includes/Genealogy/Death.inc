@@ -734,7 +734,7 @@ class Death extends Record
      *  Throws:                                                         *
      *      exception if user is not authorized to update the database  *
      ********************************************************************/
-    function save($xml)
+    function save($xml = false)
     {
         global  $debug;
         global  $warn;

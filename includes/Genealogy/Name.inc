@@ -1156,7 +1156,7 @@ class Name extends Record
                 $this->person->setLocal('surname', $newname);
 
             $this->surnameRec       = new Surname(array('surname' => $newname));
-            $this->surnameRec->save(false);
+            $this->surnameRec->save();
             if ($this['order'] == Name::PRIMARY)
             {                       // primary name
                 $idir               = $this['idir'];
@@ -1168,7 +1168,7 @@ class Name extends Record
                     if ($nameRec->get('surname') == $oldsurname)
                     {               // matches old surname
                         $nameRec->setSurname($newname);
-                        $nameRec->save(false);
+                        $nameRec->save();
                     }               // matches old surname
                 }                   // loop through other names
             }                       // primary name
@@ -1876,7 +1876,7 @@ class Name extends Record
         {
             $surname            = $this['surname'];
             $this->surnameRec   = new Surname(array('surname' => $surname));
-            $this->surnameRec->save(false);
+            $this->surnameRec->save();
         }
         return $this->surnameRec;
     }       //      function Name::getSurnameRec

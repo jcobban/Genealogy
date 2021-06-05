@@ -157,9 +157,9 @@ if (strlen($userid) > 0 && $advertisers->count() > 0)
     if ($ademail)
     {                       // permit advertiser to change e-mail
         $advertiser['ademail']          = $ademail;
-        $advertiser->save(false);
+        $advertiser->save();
         $user['email']                  = $ademail;
-        $user->save(false);
+        $user->save();
     }                       // permit advertiser to change e-mail
     $adname                             = $advertiser['adname'];
     $adurl                              = "Advertisements/$adname.html";

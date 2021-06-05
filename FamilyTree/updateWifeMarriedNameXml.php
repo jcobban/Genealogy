@@ -86,7 +86,8 @@ if (is_object($wife))
 	try {
 	    // update the associated nominal index record
 	    $altNameRec		= new Name($family);
-	    $altNameRec->save(true);
+	    $altNameRec->save();
+        print "    <cmd>" . $altNameRec->getLastSqlCmd() . "</cmd>\n";
 	} catch(Exception $e)
 	{		// setName failed
 	    print "<msg>Wife changed: " . $e->getMessage() . "</msg>\n";

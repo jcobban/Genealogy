@@ -8,8 +8,9 @@
  *		2019/11/03      created                                         *
  *      2020/06/10      use <input type="number"> for original page     *
  *      2020/11/04      increase maximum size of some input fields      *
+ *      2021/05/15      retain language through previous and next       *
  *																		*
- *  Copyright &copy; 2020 James A. Cobban								*
+ *  Copyright &copy; 2021 James A. Cobban								*
  **********************************************************************-->
     <div id="breadcrumbs" class="hidden">
 	  <a href="/index.html">Accueil</a>:
@@ -67,10 +68,10 @@
             for the buttons: id="previous", id="next", and id="newQuery" -->
           <input type="hidden" name="previousHref" id="previousHref"
 			        disabled="disabled"
-                    value="MarriageRegDetail.php?RegDomain=$DOMAIN&RegYear=$REGYEAR&amp;RegNum=$PREVNUM">
+                    value="MarriageRegDetail.php?RegDomain=$DOMAIN&RegYear=$REGYEAR&amp;RegNum=$PREVNUM&amp;lang=fr">
           <input type="hidden" name="nextHref" id="nextHref"
 			        disabled="disabled"
-                    value="MarriageRegDetail.php?RegDomain=$DOMAIN&RegYear=$REGYEAR&amp;RegNum=$NEXTNUM" >
+                    value="MarriageRegDetail.php?RegDomain=$DOMAIN&RegYear=$REGYEAR&amp;RegNum=$NEXTNUM&amp;lang=fr" >
           <input type="hidden" name="newQueryHref" id="newQueryHref"
 			        disabled="disabled"
                     value="MarriageRegQuery.html">
@@ -95,6 +96,10 @@
           <button type="button" id="next">Prochai<u>N</u>e</button>
             &nbsp;
           <button type="button" id="newQuery">Nouvelle Re<u>Q</u>uête</button>
+            &nbsp;
+          <button type="button" id="ontarioLicense">
+              Montre Disposition Licence de Mariage de l'Ontario
+          </button>
         </p>
         <fieldset class="other" id="IdentificationSet">
           <legend class="labelSmall">Identification:</legend>
@@ -179,7 +184,7 @@
             <div class="column2">
               <label class="labelSmall">Lieu:</label>
               <input name="Place" id="Place"
-                    type="text" size="20" maxlength="255"
+                    type="text" size="20" maxlength="128"
                     value="$MPLACE" class="act leftnc"  />
             </div>
             <div style="clear: both;"></div>

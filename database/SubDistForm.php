@@ -288,7 +288,7 @@ if (count($_POST) > 0)
             {
                 if ($subDistrict)
                 {                   // apply pending changes
-                    if ($subDistrict->save(false) > 0)
+                    if ($subDistrict->save() > 0)
                     {               // database changed
                         $sqlcmd         = $subDistrict->getLastSqlCmd();
                         $warn   .= "<p>SubDistForm.php: " . __LINE__ .

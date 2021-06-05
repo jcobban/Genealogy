@@ -458,7 +458,7 @@ if (isset($_POST) && count($_POST) > 0)
             $keyvalue               = $id;
             //$warn   .= "<p>" . __LINE__ .  " new Blog(array('table'        => '$table', 'keyvalue'     => $id, 'keyname'      => '" . $tableInfo['prime'] . "', 'username'     => $userid, 'blogname'     => $subject, 'text'         => ...))," .  " \$keyvalue=$keyvalue</p>\n";
         }
-        $blog->save(false);
+        $blog->save();
         //$warn   .= "<p>" . __LINE__ . " bl_index=" . $blog['index'] . "</p>\n";
         $warn           .= "<p>Message posted</p>\n";
         $table          = 'Blogs';

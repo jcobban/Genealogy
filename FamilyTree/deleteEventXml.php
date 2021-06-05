@@ -52,7 +52,7 @@ require_once __NAMESPACE__ . '/Family.inc';
 require_once __NAMESPACE__ . '/common.inc';
 
 // emit the xml header
-print("<?xml version='1.0' encoding='utf-8'?>\n");
+print("<?xml version='1.0' encoding='utf-8'?" . ">\n");
 
 $idime		            = null;
 $idimetext	            = null;
@@ -147,7 +147,8 @@ if (strlen($msg) == 0)
 			    $person->set('idtrbaptism',	1);
 			    $person->set('baptismnote',	'');
 			    $person->set('ldsb',	0);
-			    $person->save(true);		// write to database
+                $person->save();		// write to database
+                print "<cmd>" . $person->getLastSqlCmd() . "</cmd>\n";
             } 
             else // nothing to delete
 			    $msg	.= "No record for key $idime type $cittype. ";
@@ -166,7 +167,8 @@ if (strlen($msg) == 0)
 			    $person->set('idtrendow',	1);
 			    $person->set('endownote',	'');
 			    $person->set('ldse',	0);
-			    $person->save(true);		// write to database
+			    $person->save();		// write to database
+                print "<cmd>" . $person->getLastSqlCmd() . "</cmd>\n";
             }
             else // nothing to delete
 			    $msg	.= "No record for key $idime type $cittype. ";
@@ -184,7 +186,8 @@ if (strlen($msg) == 0)
 			    $family->set('sealsd',	-99999999);
 			    $family->set('idtrseal',	1);
 			    $family->set('ldss',	0);
-			    $family->save(true);	// write to database
+			    $family->save();	// write to database
+                print "<cmd>" . $family->getLastSqlCmd() . "</cmd>\n";
             }
             else // nothing to delete
 			    $msg	.= "No record for key $idime type $cittype. ";
@@ -200,7 +203,8 @@ if (strlen($msg) == 0)
             {
 			    $family->toXml('family');
 			    $family->set('notmarried',	0);
-			    $family->save(true);	// write to database
+			    $family->save();	// write to database
+                print "<cmd>" . $family->getLastSqlCmd() . "</cmd>\n";
             }
             else // nothing to delete
 			    $msg	.= "No record for key $idime type $cittype. ";
@@ -217,7 +221,8 @@ if (strlen($msg) == 0)
 			    $family->set('mard',	'');
 			    $family->set('marsd',	-99999999);
 			    $family->set('idlrmar',	1);
-			    $family->save(true);	// write to database
+			    $family->save();	// write to database
+                print "<cmd>" . $family->getLastSqlCmd() . "</cmd>\n";
             } 
             else // nothing to delete
 			    $msg	.= "No record for key $idime type $cittype. ";
@@ -232,7 +237,8 @@ if (strlen($msg) == 0)
             {
 			    $family->toXml('family');
 			    $family->set('notes',	'');
-			    $family->save(true);	// write to database
+			    $family->save();	// write to database
+                print "<cmd>" . $family->getLastSqlCmd() . "</cmd>\n";
             }
             else    // nothing to delete
 			    $msg	.= "No record for key $idime type $cittype. ";
@@ -246,7 +252,8 @@ if (strlen($msg) == 0)
             {
 			    $family->toXml('family');
 			    $family->set('nochildren',		0);
-			    $family->save(true);	// write to database
+			    $family->save();	// write to database
+                print "<cmd>" . $family->getLastSqlCmd() . "</cmd>\n";
 			}
             else    // nothing to delete
 			    $msg	.= "No record for key $idime type $cittype. ";
@@ -262,7 +269,8 @@ if (strlen($msg) == 0)
 			    $family->toXml('family');
 			    $family->set('marendd',		'');
 			    $family->set('marendsd',		-99999999);
-			    $family->save(true);	// write to database
+			    $family->save();	// write to database
+                print "<cmd>" . $family->getLastSqlCmd() . "</cmd>\n";
 			}
             else    // nothing to delete
 			    $msg	.= "No record for key $idime type $cittype. ";
@@ -282,7 +290,8 @@ if (strlen($msg) == 0)
 			    $person->set('idtrconfirmation',	1);
 			    $person->set('confirmationnote',	'');
 			    $person->set('ldsc',		0);
-			    $person->save(true);		// write to database
+			    $person->save();		// write to database
+                print "<cmd>" . $person->getLastSqlCmd() . "</cmd>\n";
 			}
             else   // nothing to delete
 			    $msg	.= "No record for key $idime type $cittype. ";
@@ -301,7 +310,8 @@ if (strlen($msg) == 0)
 			    $person->set('idtrinitiatory',	1);
 			    $person->set('initiatorynote',	'');
 			    $person->set('ldsi',		0);
-			    $person->save(true);		// write to database
+			    $person->save();		// write to database
+                print "<cmd>" . $person->getLastSqlCmd() . "</cmd>\n";
             }
             else
 			    $msg	.= "No record for key $idime type $cittype. ";

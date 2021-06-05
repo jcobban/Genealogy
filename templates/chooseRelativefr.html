@@ -1,0 +1,104 @@
+<!--*********************************************************************
+ *  chooseRelativefr.html   											*
+ *																		*
+ *  Display a web page to select a specific existing individual			*
+ *  from the Legacy table of individuals.								*
+ *																		*
+ *  History:															*
+ *		2019/02/19		Created											*
+ *      2020/12/06      missing $TRACE and $MSG fields                  *
+ *      2021/05/13      add close button                                *
+ *																		*
+ *  Copyright &copy; 2021 James A. Cobban								*
+ **********************************************************************-->
+  <div id="breadcrumbs" class="hidden">
+	<a href="/index.html">Home</a>:
+    <a href="/genealogy.php?lang=$LANG">
+			Généalogie
+    </a>:
+    <a href="/FamilyTree/Services.php?lang=$LANG">
+			Services
+    </a>:
+    <a href="/genCountry.php?cc=CA&lang=$LANG">
+			Canada
+    </a>:
+    <a href="/FamilyTree/nominalIndex.php?name=$NAMEURI&treename=$TREENAME&lang=$LANG">
+			Indice Nominale
+    </a>:
+    <a href="/FamilyTree/Surnames.php?initial=$PREFIX&lang=$LANG">
+			Surnoms qui commence avec '$PREFIX'
+    </a>:
+    <a href="/FamilyTree/Names.php?Surname=$SURNAME&lang=$LANG">
+			Surnom '$SURNAME'
+    </a>:
+  </div>
+    <div class="body">
+      <h1>
+        <span class="right">
+		  <a href="chooseRelativeHelpen.html" target="help">? Help</a>
+        </span>
+        <span id='title'>
+		  Choisir un Relatif pour $NAME
+        </span>
+        <div style="clear: both;"></div>
+      </h1>
+      $TRACE
+      $MSG
+    <form name="indForm" id="indForm"
+        action="relationshipCalculator.php" method="get">
+      <div class="row">
+		<label class="column1" for="Close">Fermer:
+		</label>
+		<button type="button" id="Close" accessKey="C">
+		  Fermer
+		</button>
+      </div> <!-- class="row" -->
+      <div class="row" style="margin-top: 8px;">
+		<label class="column1" for="Name">Nom:
+		</label>
+		<input type="text" name="Name" id="Name"
+                size="56" class="white left" value="$NAME">
+		<input type="hidden" name="idir1" id="idir1"
+				value="$IDIR">
+		<div style="clear: both;"></div>
+      </div> <!-- class="row" -->
+      <div class="row" style="margin-top: 8px;">
+		<label class="column1" for="idir2">
+		  Select:
+		</label>
+		<select name="idir2" id="idir2" size="10" class="white left">
+		    <option value="0">Choisir une Personne</option>
+		</select>
+		<div style="clear: both;"></div>
+      </div>
+	  </form>
+	</div>	<!-- end of <div id="body"> -->
+	<div class="balloon" id="HelpClose">
+      Cliquez sur ce bouton pour fermer la boîte de dialogue sans
+      sélectionner de relatif.
+	</div>
+	<div class="balloon" id="HelpName">
+      Tapez un nom, commençant par le nom de famille, une virgule et
+      les prénoms. Au fur et à mesure de la saisie, le texte que vous 
+      avez saisi permet de sélectionner les personnes à lister, 
+      en commençant par la première personne dont le nom commence par 
+      le texte que vous avez saisi.
+	</div>
+	<div class="balloon" id="Helpidir2">
+	  Cette liste de sélection affiche une liste d'individus par ordre
+      alphabétique, par nom, puis par prénom, qui commence par l'individu 
+      de la base de données qui est le premier à venir après le texte 
+      saisi dans le champ du nom. Cliquez sur un individu dans cette 
+      liste pour déterminer le degré de relation entre cet individu et 
+      l'individu identifié en haut de la page.
+	</div>
+	<div class="balloon" id="HelpincMarried">
+	  Si cette option est cochée, la liste des personnes comprendra 
+      les noms de mariés ainsi que les noms de naissance.
+	</div>
+	<div class="popup" id="loading">
+	  Chargement en cours...
+	</div>
+    <script src="/jscripts/js20/http.js" type="text/javascript"></script>
+    <script src="/jscripts/util.js" type="text/javascript"></script>
+    <script src="chooseRelative.js" type="text/javascript"></script>

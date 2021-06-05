@@ -6,13 +6,13 @@ use \Exception;
  *  editEvent.php                                                         *
  *                                                                      *
  *  Display a web page for editting one event from the family tree      *
- *  database which is represented by an instance of Event.				*
+ *  database which is represented by an instance of Event.              *
  *                                                                      *
- *  Parameters (passed by method="get"):								*
+ *  Parameters (passed by method="get"):                                *
  *      type numeric type value as used by the Citation                 *
  *              record to identify a specific event and which           *
  *              record type it is defined in.  If omitted the default   *
- *              value is 0.												*
+ *              value is 0.                                             *
  *                                                                      *
  *          idir parameter must point to Person record                  *
  *              STYPE_NAME              = 1                             *
@@ -45,12 +45,12 @@ use \Exception;
  *              STYPE_MARNOTE           = 21 Marriage Note              *
  *              STYPE_MARNEVER          = 22 Never Married              *
  *              STYPE_MARNOKIDS         = 23 This couple had no children*
- *              STYPE_MAREND            = 24 marriage ended **added**	*
+ *              STYPE_MAREND            = 24 marriage ended **added**   *
  *                                                                      *
  *          ider parameter points to Event Record                       *
- *              STYPE_EVENT             = 30 Individual Event,			*
+ *              STYPE_EVENT             = 30 Individual Event,          *
  *                                          idir mandatory              *
- *              STYPE_MAREVENT          = 31 Marriage Event,			*
+ *              STYPE_MAREVENT          = 31 Marriage Event,            *
  *                                          idmr mandatory              *
  *                                                                      *
  *          idtd parameter points to To-Do records tblTD.IDTD           *
@@ -63,7 +63,7 @@ use \Exception;
  *              required as defined above or                            *
  *      ider unique numeric key of instance of Event                    *
  *              if set to zero with type=STYPE_EVENT or STYPE_MAREVENT  *
- *              causes new Event record to be created.					*
+ *              causes new Event record to be created.                  *
  *      idnx unique numeric key of instance of Alternate Name           *
  *              Record tblNX                                            *
  *      idcr unique numeric key of instance of Child Record tblCR       *
@@ -95,9 +95,9 @@ use \Exception;
  *      2010/09/05      Permit explictly supplying name of individual   *
  *      2010/10/11      Simplify interface for adding citations         *
  *      2010/10/15      Use cookies to default to last source citation  *
- *                      Remove header and trailer sections from dialog.	*
+ *                      Remove header and trailer sections from dialog. *
  *                      Support all event types, not just Event         *
- *      2010/10/16      Use Event->getNotes()							*
+ *      2010/10/16      Use Event->getNotes()                           *
  *      2010/10/17      Import citTable.inc and citTable.js to manage   *
  *                      citations                                       *
  *      2010/10/19      Ensure $notes is not null for NAME event        *
@@ -130,7 +130,7 @@ use \Exception;
  *                      short names                                     *
  *      2011/08/08      trim supplied location name                     *
  *      2011/08/21      do not initially display Temple vs. Live kind   *
- *                      row for generic event.							*
+ *                      row for generic event.                          *
  *      2011/10/01      provide database lookup assist for setting      *
  *                      location names                                  *
  *                      document month name abbreviations in context    *
@@ -140,8 +140,8 @@ use \Exception;
  *                      provide a button to selectively delete an       *
  *                      alternate name                                  *
  *      2011/12/23      always display married surnames                 *
- *                      display all events in dialog and permit adding,	*
- *                      modifying, and deleting events.					*
+ *                      display all events in dialog and permit adding, *
+ *                      modifying, and deleting events.                 *
  *                      add help panels for all fields                  *
  *      2012/01/08      reorder to put the event type before the date   *
  *      2012/01/13      change class names                              *
@@ -183,7 +183,7 @@ use \Exception;
  *                      event type without creating a new record        *
  *      2013/08/25      add clear button for note textarea              *
  *      2013/12/07      $msg and $debug initialized by common.inc       *
- *      2014/02/08      standardize appearance of <select>				*
+ *      2014/02/08      standardize appearance of <select>              *
  *      2014/02/12      replace tables with CSS for layout              *
  *      2014/02/17      define local CSS for this form                  *
  *      2014/02/19      add id to <form>                                *
@@ -222,13 +222,13 @@ use \Exception;
  *      2014/09/27      RecOwners class renamed to RecOwner             *
  *                      use Record method isOwner to check ownership    *
  *                      use LegacyTemple::getTemples to get list for    *
- *                      <select>										*
+ *                      <select>                                        *
  *      2014/10/01      add delete confirmation dialog                  *
  *      2014/10/03      add support for associating instances of        *
- *                      Picture with an event.							*
+ *                      Picture with an event.                          *
  *      2014/10/15      events moved out of tblIR into tblER            *
  *      2014/11/19      provide alternative occupation input row        *
- *      2014/11/20      bad generated name for <input name="IDSR...">	*
+ *      2014/11/20      bad generated name for <input name="IDSR...">   *
  *      2014/11/27      use Event::getCitations                         *
  *      2014/11/29      do not crash on new location                    *
  *      2014/11/29      print $warn, which may contain debug trace      *
@@ -256,7 +256,7 @@ use \Exception;
  *      2017/07/27      class LegacyCitation renamed to class Citation  *
  *      2017/08/08      class LegacyChild renamed to class Child        *
  *      2017/08/15      class LegacyToDo renamed to class ToDo          *
- *      2017/09/12      use get( and set(								*
+ *      2017/09/12      use get( and set(                               *
  *      2017/09/23      add a "Choose a Temple" option to temple select *
  *      2017/09/28      change class LegacyEvent to class Event         *
  *      2017/10/13      class LegacyIndiv renamed to class Person       *
@@ -289,7 +289,7 @@ require_once __NAMESPACE__ . '/common.inc';
      *                                                                  *
      *  This table provides a translation from an event type to the text*
      *  to display to the user.  This is ordered alphabetically for use *
-     *  constructing a select element in a web page.					*
+     *  constructing a select element in a web page.                    *
      ********************************************************************/
     static $eventText = array(
                              2         =>'was adopted',
@@ -352,9 +352,9 @@ require_once __NAMESPACE__ . '/common.inc';
                             73         =>'marriage was registered',
                             38         =>'was married',
                             69         =>'married',
-                         20000         =>'married',			// obsolete
+                         20000         =>'married',         // obsolete
                             77         =>'marriage ended',
-                            70         =>'',	// type is in description
+                            70         =>'',    // type is in description
                             59         =>'had a medical condition',
                             40         =>'had a medical event',
                             42         =>'served in the military',
@@ -373,7 +373,7 @@ require_once __NAMESPACE__ . '/common.inc';
                             53         =>'belonged to the religious affiliation ',
                             55         =>'retired',
                             76         =>'sealed to spouse',
-                         18000         =>'sealed to spouse',	// obsolete
+                         18000         =>'sealed to spouse',    // obsolete
                             57         =>'had Social Security Number',
                             62         =>'had Social Security Number (62)',
                             51         =>'will was probated',
@@ -385,7 +385,7 @@ require_once __NAMESPACE__ . '/common.inc';
     /********************************************************************
      *  function getEventType                                           *
      *                                                                  *
-     *  Get the type of the event as descriptive text.					*
+     *  Get the type of the event as descriptive text.                  *
      ********************************************************************/
     function getEventType($event)
     {
@@ -409,7 +409,7 @@ require_once __NAMESPACE__ . '/common.inc';
      *  events specific to an individual.  Where the event type         *
      *  is greater than 999 it indicates an event recorded in the       *
      *  Person record itself, and the code is the citation              *
-     *  type times 1000.												*
+     *  type times 1000.                                                *
      ********************************************************************/
 
     static $personEvents = array(
@@ -489,7 +489,7 @@ require_once __NAMESPACE__ . '/common.inc';
      *  events specific to a marriage.  Where the event type            *
      *  is greater than 999 it indicates an event recorded in the       *
      *  Family record itself, and the code is the citation              *
-     *  type times 1000.												*
+     *  type times 1000.                                                *
      ********************************************************************/
 
     static $marriageEvents = array(
@@ -518,7 +518,7 @@ require_once __NAMESPACE__ . '/common.inc';
      *  $idetTitleText                                                  *
      *                                                                  *
      *  This table is used to construct a customized title for events   *
-     *  represented by a row in table tblER.							*
+     *  represented by a row in table tblER.                            *
      ********************************************************************/
     static $idetTitleText = array(
                 Event::ET_NULL                  => '',
@@ -604,9 +604,9 @@ require_once __NAMESPACE__ . '/common.inc';
  *                                                                  *
  *      If the values for date and location have been explicitly    *
  *      provided, use them.  Otherwise obtain the values from the   *
- *      associated database record.									*
+ *      associated database record.                                 *
  *                                                                  *
- *  Parameters:														*
+ *  Parameters:                                                     *
  *      $record             data base record as instance of Record  *
  *      $dateFldName        field name containing date of event     *
  *      $locFldName         field name containing IDLR of location  *
@@ -619,7 +619,7 @@ function getDateAndLocation($record,
     global $debug;
     global $warn;
     global $date;
-    global $location;	// instance of Location
+    global $location;   // instance of Location
     global $msg;
     global $idlr;
 
@@ -643,9 +643,9 @@ function getDateAndLocation($record,
  *                                                                  *
  *  If the values for date and location have been explicitly        *
  *  provided, use them.  Otherwise obtain the values from the       *
- *  associated database record.										*
+ *  associated database record.                                     *
  *                                                                  *
- *  Parameters:														*
+ *  Parameters:                                                     *
  *      $record             data base record as instance of Record  *
  *      $kind               temple indicator                        *
  *      $dateFldName        field name containing date of event     *
@@ -684,7 +684,7 @@ function getDateAndLocationLds($record,
  *                                                                  *
  *  Get information from an instance of Event                       *
  *                                                                  *
- *  Parameters:														*
+ *  Parameters:                                                     *
  *      $event             instance of Event                        *
  ********************************************************************/
 function getEventInfo($event)
@@ -699,7 +699,7 @@ function getEventInfo($event)
     global $preferred;
     $etype                  = getEventType($event);
     if ($idet <= 1)
-        $idet               = $event['idet'];	// numeric key of tblET
+        $idet               = $event['idet'];   // numeric key of tblET
     $order                  = $event['order'];
 
     if (is_null($notes))
@@ -743,22 +743,22 @@ $heading            = 'Edit Event Error';
 // defaults
 // parameter values from URI
 $stype              = 0;    // see Citation::STYPE_...
-$ider               = null;	// index of Event
-$idet               = null;	// index of EventType
-$idir               = null;	// index of Person
-$idnx               = null;	// index of Name
-$idcr               = null;	// index of Child
-$idmr               = null;	// index of Family
-$idtd               = null;	// index of ToDo
-$typetext           = null;	// error text for event type
-$idertext           = null;	// error text for key of Event
-$idettext           = null;	// error text for key of EventType
-$idirtext           = null;	// error text for key of Person
-$idnxtext           = null;	// error text for key of Name
-$idcrtext           = null;	// error text for key of Child
-$idmrtext           = null;	// error text for key of Family
-$idtdtext           = null;	// error text for key of ToDo
-$idtrtext           = null;	// error text for key of Temple
+$ider               = null; // index of Event
+$idet               = null; // index of EventType
+$idir               = null; // index of Person
+$idnx               = null; // index of Name
+$idcr               = null; // index of Child
+$idmr               = null; // index of Family
+$idtd               = null; // index of ToDo
+$typetext           = null; // error text for event type
+$idertext           = null; // error text for key of Event
+$idettext           = null; // error text for key of EventType
+$idirtext           = null; // error text for key of Person
+$idnxtext           = null; // error text for key of Name
+$idcrtext           = null; // error text for key of Child
+$idmrtext           = null; // error text for key of Family
+$idtdtext           = null; // error text for key of ToDo
+$idtrtext           = null; // error text for key of Temple
 $date               = null;
 $descn              = null;
 $location           = null;
@@ -774,15 +774,15 @@ $rownum             = null;
 $lang               = 'en';
 
 // database records
-$event              = null;	// instance of Event
-$person             = null;	// instance of Person
-$family             = null;	// instance of Family
-$child              = null;	// instance of Child
-$altname            = null;	// instance of Name
-$todo               = null;	// instance of ToDo
+$event              = null; // instance of Event
+$person             = null; // instance of Person
+$family             = null; // instance of Family
+$child              = null; // instance of Child
+$altname            = null; // instance of Name
+$todo               = null; // instance of ToDo
 
 // other
-$readonly         = '';	// attribute value to insert in <input> elements
+$readonly         = ''; // attribute value to insert in <input> elements
 $submit             = false;
 
 // process input parameters from the search string passed by method=get
@@ -1043,7 +1043,7 @@ if (!is_null($ider) && $ider > 0)
 }                       // existing event
 else
 {                       // request to create new event
-    $event                  = null;		// is done later
+    $event                  = null;     // is done later
     if ($stype == 0)
     {
         if (!is_null($idir))
@@ -1072,7 +1072,7 @@ else
 // create Name record based upon IDNX keyword
 if (!is_null($idnx))
 {                       // IDNX was specified in parameters
-    $altname        = new Name(array('idnx'			=> $idnx));
+    $altname        = new Name(array('idnx'         => $idnx));
     if (!$altname->isExisting())
     {       // no matching Name
         $altname    = null;
@@ -1194,9 +1194,9 @@ if (strlen($msg) == 0)
     {                   // create new Event
         if (is_null($idet))
             $idet           = Event::ET_NULL;
-        $event              = new Event(array('ider'			=> 0,
-                                              'idet'			=> $idet,
-                                              'idir'			=> $idir));
+        $event              = new Event(array('ider'            => 0,
+                                              'idet'            => $idet,
+                                              'idir'            => $idir));
         
     }                   // create new Event
 
@@ -1211,7 +1211,7 @@ if (strlen($msg) == 0)
 
     switch($stype)
     {       // take action according to type
-        case Citation::STYPE_UNSPECIFIED:		// 0;
+        case Citation::STYPE_UNSPECIFIED:       // 0;
         {   // type not determined yet
             // will be either IDCR, IDIR, IDMR, or IDER based event
             if (is_int($idcr) && $idcr > 0)
@@ -1250,7 +1250,7 @@ if (strlen($msg) == 0)
         }   // type not determined yet
     
         //    idir parameter points to Person record
-        case Citation::STYPE_NAME:		// 1
+        case Citation::STYPE_NAME:      // 1
         {
             if (is_null($idir) || $idir == 0)
             {               // individual event requires IDIR
@@ -1269,18 +1269,18 @@ if (strlen($msg) == 0)
             break;
         }                   // primary name of individual
     
-         case Citation::STYPE_BIRTH:		    // 2
-         case Citation::STYPE_CHRISTEN:		    // 3
-         case Citation::STYPE_DEATH:		    // 4
-         case Citation::STYPE_BURIED:		    // 5
-         case Citation::STYPE_NOTESGENERAL:	    // 6
-         case Citation::STYPE_NOTESRESEARCH:	// 7
-         case Citation::STYPE_NOTESMEDICAL:	    // 8
-         case Citation::STYPE_DEATHCAUSE:	    // 9
-         case Citation::STYPE_LDSB:		        // 15  LDS Baptism
-         case Citation::STYPE_LDSE:		        // 16  LDS Endowment
-         case Citation::STYPE_LDSC:		        // 26  LDS Confirmation
-         case Citation::STYPE_LDSI:		        // 27  LDS Initiatory
+         case Citation::STYPE_BIRTH:            // 2
+         case Citation::STYPE_CHRISTEN:         // 3
+         case Citation::STYPE_DEATH:            // 4
+         case Citation::STYPE_BURIED:           // 5
+         case Citation::STYPE_NOTESGENERAL:     // 6
+         case Citation::STYPE_NOTESRESEARCH:    // 7
+         case Citation::STYPE_NOTESMEDICAL:     // 8
+         case Citation::STYPE_DEATHCAUSE:       // 9
+         case Citation::STYPE_LDSB:             // 15  LDS Baptism
+         case Citation::STYPE_LDSE:             // 16  LDS Endowment
+         case Citation::STYPE_LDSC:             // 26  LDS Confirmation
+         case Citation::STYPE_LDSI:             // 27  LDS Initiatory
         {
             if (is_null($idir))
             {       // individual event requires IDIR
@@ -1289,7 +1289,7 @@ if (strlen($msg) == 0)
             }       // individual event requires IDIR
             else
             {       // proceed with edit
-                $idime     = $idir;	// key for citations
+                $idime     = $idir; // key for citations
                 $heading = "Edit " . $citText[$stype] .
         " for <a href=\"Person.php?idir=$idir\">$given $surname</a>";
                 if ($stype <= Citation::STYPE_BURIED &&
@@ -1300,7 +1300,7 @@ if (strlen($msg) == 0)
         }
     
         //    idnx parameter points to Alternate Name Record tblNX
-         case Citation::STYPE_ALTNAME:	// 10
+         case Citation::STYPE_ALTNAME:  // 10
         {
             if (is_null($idnx))
                 $msg     .= 'Mandatory idnx parameter missing. ';
@@ -1313,28 +1313,28 @@ if (strlen($msg) == 0)
         }
     
         //    idcr parameter points to Child Record tblCR
-         case Citation::STYPE_CHILDSTATUS:	// 11 Child Status    
-         case Citation::STYPE_CPRELDAD:		// 12 Relationship to Father  
-         case Citation::STYPE_CPRELMOM:		// 13 Relationship to Mother  
-         case Citation::STYPE_LDSP:		    // 17 Sealed to Parents
+         case Citation::STYPE_CHILDSTATUS:  // 11 Child Status    
+         case Citation::STYPE_CPRELDAD:     // 12 Relationship to Father  
+         case Citation::STYPE_CPRELMOM:     // 13 Relationship to Mother  
+         case Citation::STYPE_LDSP:         // 17 Sealed to Parents
         {
             if (is_null($idcr))
                 $msg     .= 'Mandatory idcr parameter missing. ';
             else
-                $idime     = $idcr;	// key for citations
+                $idime     = $idcr; // key for citations
             $heading     = "Edit " . $citText[$stype] .
                 " for <a href=\"Person.php?idir=$idir\">$given $surname</a>";
             break;
         }
     
         //    idmr parameter points to LegacyMarriage Record
-        case Citation::STYPE_LDSS:		    // 18 Sealed to Spouse
-        case Citation::STYPE_NEVERMARRIED:	// 19 individual never married 
-        case Citation::STYPE_MAR:		    // 20 Marriage 
-        case Citation::STYPE_MARNOTE:		// 21 Marriage Note
-        case Citation::STYPE_MARNEVER:		// 22 Never Married
-        case Citation::STYPE_MARNOKIDS:	    // 23 No children  
-        case Citation::STYPE_MAREND:		// 24 marriage end date
+        case Citation::STYPE_LDSS:          // 18 Sealed to Spouse
+        case Citation::STYPE_NEVERMARRIED:  // 19 individual never married 
+        case Citation::STYPE_MAR:           // 20 Marriage 
+        case Citation::STYPE_MARNOTE:       // 21 Marriage Note
+        case Citation::STYPE_MARNEVER:      // 22 Never Married
+        case Citation::STYPE_MARNOKIDS:     // 23 No children  
+        case Citation::STYPE_MAREND:        // 24 marriage end date
         {       // event defined in marriage record
             $heading     = "Edit " . $citText[$stype];
             if (is_null($idmr))
@@ -1343,7 +1343,7 @@ if (strlen($msg) == 0)
             }
             else
             {
-                $idime     = $idmr;	// key for citations
+                $idime     = $idmr; // key for citations
                 if ($family)
                 {       // family specified
                     $heading .= " for <a href=\"Person.php?idir=$idirhusb\">$husbname</a> and <a href=\"Person.php?idir=$idirwife\" class=\"female\">$wifename</a>";
@@ -1355,7 +1355,7 @@ if (strlen($msg) == 0)
         }       // event defined in marriage record
     
         //    ider parameter points to Event Record
-        case Citation::STYPE_EVENT:	// 30 Individual Event
+        case Citation::STYPE_EVENT: // 30 Individual Event
         {
             if (is_null($event))
             {
@@ -1368,7 +1368,7 @@ if (strlen($msg) == 0)
             if ($idet > 1)
                 $event->setIdet($idet);
     
-            $idime                 = $ider;	// key for citations
+            $idime                 = $ider; // key for citations
             if ($debug)
                 $warn .= "<p>\$idir set to $idir from event IDER=$ider</p>\n";
             if (is_null($person))
@@ -1407,7 +1407,7 @@ if (strlen($msg) == 0)
             break;
         }
     
-        case Citation::STYPE_MAREVENT:	// 31 Marriage Event
+        case Citation::STYPE_MAREVENT:  // 31 Marriage Event
         {
             if (is_null($idet))
                 $heading            = 'Edit Marriage fact';
@@ -1447,13 +1447,13 @@ if (strlen($msg) == 0)
                 $heading            .= " for <a href=\"Person.php?idir=$idirhusb\">$husbname</a> and <a href=\"Person.php?idir=$idirwife\" class=\"female\">$wifename</a>";
             }       // existing event
     
-            $idime                  = $ider;	// key for citations
+            $idime                  = $ider;    // key for citations
             $picIdType              = Picture::IDTYPEEvent;
             break;
         }
     
         //    idtd parameter points to To-Do records tblTD.IDTD
-        case Citation::STYPE_TODO:		// 40 To-Do Item
+        case Citation::STYPE_TODO:      // 40 To-Do Item
         {
             if (is_null($idtd) || $idtd == 0)
             {
@@ -1461,7 +1461,7 @@ if (strlen($msg) == 0)
                 $todo       = null;
                 break;
             }
-            $idime          = $idtd;	// key for citations
+            $idime          = $idtd;    // key for citations
             $heading        = "Edit To Do Fact: IDTD=$idtd";
             break;
         }
@@ -1477,12 +1477,12 @@ if (strlen($msg) == 0)
 
     switch($stype)
     {       // act on major event type
-        case Citation::STYPE_UNSPECIFIED:	// 0
+        case Citation::STYPE_UNSPECIFIED:   // 0
         {   // to be determined
             break;
         }   // to be determined
     
-        case Citation::STYPE_NAME:		// 1
+        case Citation::STYPE_NAME:      // 1
         {
             if ($person)
             {
@@ -1504,7 +1504,7 @@ if (strlen($msg) == 0)
             break;
         }
     
-        case Citation::STYPE_BIRTH:		// 2
+        case Citation::STYPE_BIRTH:     // 2
         {
             if ($person)
             {
@@ -1521,7 +1521,7 @@ if (strlen($msg) == 0)
             break;
         }
     
-        case Citation::STYPE_CHRISTEN:		// 3
+        case Citation::STYPE_CHRISTEN:      // 3
         {
             if ($person)
             {
@@ -1538,7 +1538,7 @@ if (strlen($msg) == 0)
             break;
         }
     
-        case Citation::STYPE_DEATH:		// 4
+        case Citation::STYPE_DEATH:     // 4
         {
             if ($person)
             {
@@ -1559,7 +1559,7 @@ if (strlen($msg) == 0)
             break;
         }
     
-        case Citation::STYPE_BURIED:		// 5
+        case Citation::STYPE_BURIED:        // 5
         {
             if ($person)
             {
@@ -1589,7 +1589,7 @@ if (strlen($msg) == 0)
             break;
         }
     
-        case Citation::STYPE_NOTESGENERAL:	// 6
+        case Citation::STYPE_NOTESGENERAL:  // 6
         {
             if ($person)
             {
@@ -1603,7 +1603,7 @@ if (strlen($msg) == 0)
             break;
         }
     
-        case Citation::STYPE_NOTESRESEARCH:	// 7
+        case Citation::STYPE_NOTESRESEARCH: // 7
         {
             if ($person)
             {
@@ -1619,7 +1619,7 @@ if (strlen($msg) == 0)
             break;
         }
     
-        case Citation::STYPE_NOTESMEDICAL:	// 8
+        case Citation::STYPE_NOTESMEDICAL:  // 8
         {
             if ($person)
             {
@@ -1633,7 +1633,7 @@ if (strlen($msg) == 0)
             break;
         }
     
-        case Citation::STYPE_DEATHCAUSE:	// 9
+        case Citation::STYPE_DEATHCAUSE:    // 9
         {
             if ($person)
             {
@@ -1647,7 +1647,7 @@ if (strlen($msg) == 0)
             break;
         }
     
-        case Citation::STYPE_LDSB:		// 15
+        case Citation::STYPE_LDSB:      // 15
         {
             if ($person)
             {
@@ -1663,7 +1663,7 @@ if (strlen($msg) == 0)
             break;
         }
     
-        case Citation::STYPE_LDSE:		// 16
+        case Citation::STYPE_LDSE:      // 16
         {
             if ($person)
             {
@@ -1679,7 +1679,7 @@ if (strlen($msg) == 0)
             break;
         }
     
-        case Citation::STYPE_LDSC:		// 26
+        case Citation::STYPE_LDSC:      // 26
         {
             if ($person)
             {
@@ -1695,7 +1695,7 @@ if (strlen($msg) == 0)
             break;
         }
     
-        case Citation::STYPE_LDSI:		// 27
+        case Citation::STYPE_LDSI:      // 27
         {
             if ($person)
             {
@@ -1711,14 +1711,14 @@ if (strlen($msg) == 0)
             break;
         }
     
-         case Citation::STYPE_ALTNAME:		// 10
+         case Citation::STYPE_ALTNAME:      // 10
         {
             $notes              = '';
             break;
         }
     
         //    idcr parameter points to Child Record tblCR
-         case Citation::STYPE_CHILDSTATUS:	// 11 Child Status    
+         case Citation::STYPE_CHILDSTATUS:  // 11 Child Status    
         {
             if ($child)
             {
@@ -1727,7 +1727,7 @@ if (strlen($msg) == 0)
             break;
         }
     
-         case Citation::STYPE_CPRELDAD:	// 12 Relationship to Father  
+         case Citation::STYPE_CPRELDAD: // 12 Relationship to Father  
         {
             if ($child)
             {
@@ -1736,7 +1736,7 @@ if (strlen($msg) == 0)
             break;
         }
     
-         case Citation::STYPE_CPRELMOM:	// 13 Relationship to Mother  
+         case Citation::STYPE_CPRELMOM: // 13 Relationship to Mother  
         {
             if ($child)
             {
@@ -1745,7 +1745,7 @@ if (strlen($msg) == 0)
             break;
         }
     
-         case Citation::STYPE_LDSP:	// 17 Sealed to Parents
+         case Citation::STYPE_LDSP: // 17 Sealed to Parents
         {
             if ($child)
             {
@@ -1762,7 +1762,7 @@ if (strlen($msg) == 0)
         }
     
         //    idmr parameter points to LegacyMarriage Record
-         case Citation::STYPE_LDSS:	// 18 Sealed to Spouse
+         case Citation::STYPE_LDSS: // 18 Sealed to Spouse
         {
             if ($family)
             {
@@ -1776,7 +1776,7 @@ if (strlen($msg) == 0)
         }
     
          case Citation::STYPE_NEVERMARRIED:// 19 individual never married 
-         case Citation::STYPE_MARNEVER:	// 22 Never Married
+         case Citation::STYPE_MARNEVER: // 22 Never Married
         {
             if ($family)
             {
@@ -1787,7 +1787,7 @@ if (strlen($msg) == 0)
             break;
         }
     
-         case Citation::STYPE_MAR:		// 20 Marriage 
+         case Citation::STYPE_MAR:      // 20 Marriage 
         {
             if ($family)
             {
@@ -1800,7 +1800,7 @@ if (strlen($msg) == 0)
             break;
         }
     
-         case Citation::STYPE_MARNOTE:	// 21 Marriage Note
+         case Citation::STYPE_MARNOTE:  // 21 Marriage Note
         {
             if (is_null($family && $notes))
             {
@@ -1811,7 +1811,7 @@ if (strlen($msg) == 0)
             break;
         }
     
-         case Citation::STYPE_MARNOKIDS:	// 23 couple had no children  
+         case Citation::STYPE_MARNOKIDS:    // 23 couple had no children  
         {
             if ($family)
             {
@@ -1822,7 +1822,7 @@ if (strlen($msg) == 0)
             break;
         }
     
-         case Citation::STYPE_MAREND:	// 24 marriage ended date
+         case Citation::STYPE_MAREND:   // 24 marriage ended date
         {
             if ($family)
             {
@@ -1831,7 +1831,7 @@ if (strlen($msg) == 0)
             }       // family defined
             break;
         }
-         case Citation::STYPE_EVENT:	// 30 Individual Event
+         case Citation::STYPE_EVENT:    // 30 Individual Event
         {
             if ($event)
             {
@@ -1848,7 +1848,7 @@ if (strlen($msg) == 0)
             break;
         }   // Citation::STYPE_EVENT
     
-         case Citation::STYPE_MAREVENT:	// 31 Marriage Event
+         case Citation::STYPE_MAREVENT: // 31 Marriage Event
         {
             if ($event)
             {
@@ -1859,13 +1859,13 @@ if (strlen($msg) == 0)
         }   // Citation::STYPE_MAREVENT
     
         //    idtd parameter points to To-Do records tblTD.IDTD
-         case Citation::STYPE_TODO:	// 40 To-Do Item
+         case Citation::STYPE_TODO: // 40 To-Do Item
         {
             $notes              = '';
             break;
         }
     
-        default:				// unsupported values
+        default:                // unsupported values
         {
             break;
         }
@@ -1877,7 +1877,7 @@ if (strlen($msg) == 0)
      *  associated instance of Location.  This will ensure that         *
      *  short form names are resolved, and the name is displayed with   *
      *  the proper case. Also format the location name so that it can   *
-     *  be inserted into the value attribute of the text input field.	*
+     *  be inserted into the value attribute of the text input field.   *
      ********************************************************************/
     if (!is_null($location))
     {                   // location supplied
@@ -1886,7 +1886,7 @@ if (strlen($msg) == 0)
             $locName        = $location;
             $location       = new Location(array('location' => $locName));
             if (!$location->isExisting())
-                $location->save(false);
+                $location->save();
             $idlr = $location->getIdlr();
             if ($debug)
                 $warn   .= "<p>\$idlr set to $idlr from location '$locName'</p>\n";
@@ -2385,8 +2385,8 @@ debug:
     // citations for the event
     if (is_null($event))
     {
-        $citParms = array('idime'			=> $idime,
-                            'type'			=> $stype);
+        $citParms = array('idime'           => $idime,
+                            'type'          => $stype);
         $citations = new CitationSet($citParms);
     }
     else
@@ -2546,8 +2546,8 @@ debug:
     </div>
 <?php
         // citations for the cause of death
-        $citParms = array('idime'			=> $idir,
-                        'type'			=> Citation::STYPE_DEATHCAUSE);
+        $citParms = array('idime'           => $idir,
+                        'type'          => Citation::STYPE_DEATHCAUSE);
         $citations = new CitationSet($citParms);
 ?>
       <table id="DcCitTable">

@@ -339,7 +339,7 @@ if (is_object($picture))
         {
             $picture[$field]        = $value;
         }
-        $picture->save(false);
+        $picture->save();
     }                           // apply updates
 
 	if (is_object($record))

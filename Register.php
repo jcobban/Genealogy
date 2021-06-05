@@ -61,8 +61,9 @@ use \Exception;
  *      2019/11/17      move CSS to <head>                              *
  *      2020/07/09      title was not set in all cases                  *
  *      2020/12/03      correct XSS vulnerability                       *
+ *      2021/05/31      pass confirmid to send Email                    *
  *																		*
- *  Copyright &copy; 2020 James A. Cobban								*
+ *  Copyright &copy; 2021 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . "/User.inc";
 require_once __NAMESPACE__ . "/Language.inc";
@@ -290,17 +291,17 @@ if ($user)
 		    $user->set('usemail', 1);
 		else
 		    $user->set('usemail', 0);
-		$user->save(false);
+		$user->save();
 		$id		        = $user->get('id');
-		$shapassword	= $user->get('shapassword');
+		$confirmid	    = $user->get('confirmid');
 
 		$subjectTag	    = $template->getElementById('emailSubject');
 		$subject	    = str_replace('$newuserid',
 						    	      $newuserid,
 							          trim($subjectTag->innerHTML()));
 		$bodyTag    	= $template->getElementById('emailBody');
-		$body		    = str_replace(array('$newuserid','$servername','$id','$shapassword'),
-						    		  array($newuserid,$servername,$id,$shapassword),
+		$body		    = str_replace(array('$newuserid','$servername','$id','$confirmid'),
+						    		  array($newuserid,$servername,$id,$confirmid),
 							    	  trim($bodyTag->innerHTML()));
 		// send e-mail to the new user to validate the address
 		$sent		    = mail($email,

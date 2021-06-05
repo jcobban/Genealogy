@@ -463,7 +463,7 @@ foreach($users as $username => $user)
                                  'username'     => $username,
                                  'blogname'     => $subject,
                                  'text'         => $body));
-    $blog->save(false);
+    $blog->save();
     $blogid     .= $comma . $blog['id'] . " to family historian $username";
     $comma      = ',';
 }

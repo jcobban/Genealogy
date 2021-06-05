@@ -328,7 +328,8 @@ function censusCitation($year, $page, $idir, $type)
     								'Page'		=> $pagenum),
     								 $line);
     					$line->set('idir', $idir);
-    					$result		= $line->save(true);
+                        $result		= $line->save();
+                        print "<cmd>" . $line->getLastSqlCmd() ."</cmd>\n";
     			    }		// unique match
     			}		    // found matches in census
     	    }		        // select succeeded
@@ -394,7 +395,8 @@ function birthCitation($page, $idir, $type)
     			$birth->set('birthplace',
     						 $evBirth->getLocation()->toString());
     	    }		// new record
-    	    $result	= $birth->save(true);
+    	    $result	= $birth->save();
+            print "<cmd>" . $birth->getLastSqlCmd() . "</cmd>\n";
     	}		    // detail matches pattern
     }			    // citation to birth
     else
@@ -459,7 +461,8 @@ function deathCitation($page, $idir, $type)
     			$deathYear	= floor($evDeath->get('eventsd') / 10000);
     			$death->set('age', $deathYear - $birthYear);
     	    }		// new record
-    	    $result	= $death->save(true);
+    	    $result	= $death->save();
+            print "<cmd>" . $death->getLastSqlCmd() . "</cmd>\n";
     	}	        // detail matches pattern
     }		        // citation to death
     return;
@@ -564,7 +567,8 @@ function marriageCitation($page, $idmr, $type)
     			else
     			    $marloc	= $marriage->get('place');
     			// update marriage transcription record
-    			$marriage->save(true);
+    			$marriage->save();
+                print "<cmd>" . $marriage->getLastSqlCmd() . "</cmd>\n";
 
     			// update record for groom
     			$idirhusb	= $family->get('idirhusb');
@@ -602,7 +606,8 @@ function marriageCitation($page, $idmr, $type)
     					$groom->set('residence', $marloc);
     					$groom->set('birthplace', $birthloc);
     			    }		// not initialized
-    			    $result	= $groom->save(true);
+    			    $result	= $groom->save();
+                    print "<cmd>" . $groom->getLastSqlCmd() . "</cmd>\n";
     			}			// add information on husband
 
     			// update record for bride
@@ -639,7 +644,8 @@ function marriageCitation($page, $idmr, $type)
     					$bride->set('residence', $marloc);
     					$bride->set('birthplace', $birthloc);
     			    }		// not initialized
-    			    $result	= $bride->save(true);
+    			    $result	= $bride->save();
+                    print "<cmd>" . $bride->getLastSqlCmd() . "</cmd>\n";
     			}			// add information on wife
     	    }			    // found Marriage transcription
     	}			        // have a marriage event
@@ -699,7 +705,8 @@ function countyMarriageCitation($page, $idmr, $type)
     	    if ($idirhusb)
     	    {			// add information on husband
     			$groom->set('idir', $idirhusb);
-    			$result	= $groom->save(true);
+    			$result	= $groom->save();
+                print "<cmd>" . $groom->getLastSqlCmd() . "</cmd>\n";
     	    }			// add information on husband
 
     	    // update record for bride
@@ -707,7 +714,8 @@ function countyMarriageCitation($page, $idmr, $type)
     	    if ($idirwife)
     	    {			// add information on wifeand
     			$bride->set('idir', $idirwife);
-    			$result	+= $bride->save(true);
+    			$result	+= $bride->save();
+                print "<cmd>" . $bride->getLastSqlCmd() . "</cmd>\n";
     	    }			// add information on wife
     	}	// detail matches pattern
     }		// citation to marriage
@@ -1016,7 +1024,8 @@ else
 						'srcsurety'	    => $surety);
 
 	$citation	= new Citation($citParms);
-	$citation->save(true);	// write into the database
+    $citation->save();	// write into the database
+    print "<cmd>" . $citation->getLastSqlCmd() . "</cmd>\n";
 
 	// get the unique numeric identifier of the inserted citation record
 	// and feed it back to the invoker 

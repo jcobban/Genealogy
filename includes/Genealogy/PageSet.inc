@@ -97,8 +97,6 @@ class PageSet extends RecordSet
             if (strtolower($field) == 'limit')
                 $limit          = $value;
         }
-        if ($limit > 100)
-            $parms['limit']     = 50;
         parent::__construct('Pages', $parms);
     }       // PageSet::__construct
 

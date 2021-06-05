@@ -39,6 +39,7 @@ use \Templating\Template;
  *      2020/04/16      recovery for missing records is in class        *
  *                      CountyMarriageSet                               *
  *      2021/04/21      correct error if no matches                     *
+ *      2021/05/19      inconsistent spelling of $reportNotext          *
  *                                                                      *
  *  Copyright &copy; 2021 James A. Cobban                               *
  ************************************************************************/
@@ -138,14 +139,14 @@ if (count($_POST) > 0)
                 if (is_int($value) || ctype_digit($value))
                 {       // valid
                     $reportNo               = $value;
-                    $reportNoText           = $value;
+                    $reportNotext           = $value;
                     $getParms['reportno']   = $reportNo;
                 }       // valid
                 else
                 if (preg_match('/^(\d+)(½|.5)$/', $value, $matches))
                 {
                     $reportNo               = $matches[1] + 0.5;
-                    $reportNoText           = $matches[1] . '½';
+                    $reportNotext           = $matches[1] . '½';
                     $getParms['reportno']   = $reportNo;
                 }
                 else
@@ -188,6 +189,7 @@ if (count($_POST) > 0)
                                         'itemno'    => $itemNo,
                                         'role'      => $role);
                     $record     = new CountyMarriage($getParms);
+                    $msg        .= $record->getErrors();
                 }       // a role field in a row of the table
                 break;
             }           // role
@@ -276,14 +278,14 @@ else
                 if (is_int($value) || ctype_digit($value))
                 {       // valid
                     $reportNo       = $value;
-                    $reportNoText   = $value;
+                    $reportNotext   = $value;
                     $getParms['reportno']   = $reportNo;
                 }       // valid
                 else
                 if (preg_match('/^(\d+)(½|.5)$/', $value, $matches))
                 {
                     $reportNo       = $matches[1] + 0.5;
-                    $reportNoText   = $matches[1] . '½';
+                    $reportNotext   = $matches[1] . '½';
                     $getParms['reportno']   = $reportNo;
                 }
                 else
@@ -452,17 +454,19 @@ else
         }       // create one empty entry
 
         $getParms   = array('domain'    => $domain,
-                    'volume'    => $volume,
-                    'reportNo'  => $reportNo);
+                            'volume'    => $volume,
+                            'reportNo'  => $reportNo);
         for(;$item <= $lastItem; $item++)
         {       // loop creating new empty records
             $getParms['itemNo'] = $item;
             $getParms['role']   = 'G';
             $groom              = new CountyMarriage($getParms);
+            $msg                .= $groom->getErrors();
             $groom->set('givennames', 'New Groom');
             $reports[]          = $groom;
             $getParms['role']   = 'B';
             $bride              = new CountyMarriage($getParms);
+            $msg                .= $bride->getErrors();
             $bride->set('givennames', 'New Bride');
             $reports[]          = $bride;
         }       // loop creating new empty records
@@ -550,59 +554,56 @@ $template->set('FAITH',             $faith);
 $template->set('RESIDENCE',         $residence);
 $template->set('PAGE',              $page);
 $template->set('IMAGE',             $image);
+$template->set('VOLUME',            $volume);
+$template->set('REPORTNO',          $reportNo);
+$template->set('REPORTNOTEXT',      $reportNotext);
+if (is_null($itemNo))
+{
+    $template['itemTitle']->update(null);
+    $template->set('ITEMNO',            'null');
+}
+else
+    $template->set('ITEMNO',            $itemNo);
 
 if (strlen($msg) == 0)
 {
-	if (is_null($volume))
-	{
-	    $template['volumeLink']->update(null);
-	    $template['volumeTitle']->update(null);
-	}
-	else
-	    $template->set('VOLUME',            $volume);
-	if (is_null($reportNo))
-	{
-	    $template['reportLink']->update(null);
-	    $template['reportTitle']->update(null);
-	}
-	else
-	{
-	    $template->set('REPORTNO',          $reportNo);
-	    $template->set('REPORTNOTEXT',      $reportNoText);
-	}
-	if (is_null($itemNo))
-	{
-	    //$warn   .= "<p>itemTitle=" . htmlspecialchars($template['itemTitle']->outerHTML) . "</p>\n";
-	    $template['itemTitle']->update(null);
-	    $template->set('ITEMNO',            'null');
-	}
-	else
-	    $template->set('ITEMNO',            $itemNo);
-	if (is_null($report))
+    if (is_null($volume))
+    {
+        $template['volumeLink']->update(null);
+        $template['volumeTitle']->update(null);
+    }
+
+    if (is_null($reportNo))
+    {
+        $template['reportLink']->update(null);
+        $template['reportTitle']->update(null);
+    }
+
+    if (is_null($report))
         $template['ministerLink']->update(null);
 
     if (strlen($image) == 0)
         $template['imageButton']->update(null);
     
-	
-	// notify the invoker if they are not authorized to update the form
-	if (canUser('edit'))
-	{       // authorized to update database
-	    $readonly   = '';
-	    $disabled   = '';
-	    $template['notauth']->update(null);
-	    if ($create)
-	        $template->set('ACTION',            $t["Create"]);
-	    else
-	        $template->set('ACTION',            $t["Update"]);
-	}       // authorized to update database
-	else
-	{
-	    $readonly   = 'readonly="readonly"';
-	    $disabled   = 'disabled="disabled"';
-	    $template->set('ACTION',            $t["Display"]);
-	}       // not authorized to update database
-	$template->set('READONLY',              $readonly);
+    
+    // notify the invoker if they are not authorized to update the form
+    if (canUser('edit'))
+    {       // authorized to update database
+        $readonly   = '';
+        $disabled   = '';
+        $template['notauth']->update(null);
+        if ($create)
+            $template->set('ACTION',            $t["Create"]);
+        else
+            $template->set('ACTION',            $t["Update"]);
+    }       // authorized to update database
+    else
+    {
+        $readonly   = 'readonly="readonly"';
+        $disabled   = 'disabled="disabled"';
+        $template->set('ACTION',            $t["Display"]);
+    }       // not authorized to update database
+    $template->set('READONLY',              $readonly);
     $template->set('DISABLED',              $disabled);
 
     if ($domain && $volume && $reportNo)
@@ -619,8 +620,8 @@ if (strlen($msg) == 0)
         else
         {
             $prevUri    = "Domain=$domain&Volume=$volume&ReportNo=" .
-                            $reportNoText . "&ItemNo=" . ($itemNo - 1);
-            $prevText   = $reportNoText . '-' . ($itemNo - 1);
+                            $reportNotext . "&ItemNo=" . ($itemNo - 1);
+            $prevText   = $reportNotext . '-' . ($itemNo - 1);
         }
         if (is_null($itemNo))
         {
@@ -634,8 +635,8 @@ if (strlen($msg) == 0)
         else
         {
             $nextUri    = "Domain=$domain&Volume=$volume&ReportNo=" .
-                            $reportNoText . "&ItemNo=" . ($itemNo + 1);
-            $nextText   = $reportNoText . '-' . ($itemNo + 1);
+                            $reportNotext . "&ItemNo=" . ($itemNo + 1);
+            $nextText   = $reportNotext . '-' . ($itemNo + 1);
         }
 
         $template->set('PREVTEXT',      $prevText);
@@ -647,95 +648,95 @@ if (strlen($msg) == 0)
         $template['topBrowse']->update(null);
 
     // show the response
-	$rowelt             = $template['Row$row'];
-	$data               = '';
+    $rowelt             = $template['Row$row'];
+    $data               = '';
     if (count($reports) > 0)
     {
-	    $rowtext        = $rowelt->outerHTML;
-	    $reportNo       = 0;
-	    $page           = 1;
-	    $row            = 0;
-	    $nextRole       = 'G';
-	    $tempRecord     = null;
-	    $date           = '';
-	    $licenseType    = 'L';
-	    $last           = end($reports);
-	    $first          = reset($reports);
-	    foreach($reports as $record)
-	    {
-	        $itemNo                 = $record->get('itemno'); 
-	        $role                   = $record->get('role');
-	        $givennames             = $record->get('givennames');
-	        $surname                = $record->get('surname');
-	        $row++;
-	        if ($row < 10)
-	            $row        = '0' . $row;
-	        $domain                 = $record->get('domain'); 
-	        $volume                 = $record->get('volume'); 
-	        $reportNo               = $record->get('reportno'); 
-	        if ($reportNo == floor($reportNo))
-	            $reportNoText       = intval($reportNo);
-	        else
-	            $reportNoText       = floor($reportNo) . '½';
-	        $itemNo                 = $record->get('itemno'); 
-	        $role                   = $record->get('role');
-	
-	        // get values in a form suitable for presenting in HTML
-	        $givennames             = $record->get('givennames');
-	        $givennames             = str_replace("'","&#39;",$givennames);
-	        $surname                = $record->get('surname');
-	        $surname                = str_replace("'","&#39;",$surname);
-	        $age                    = $record->get('age'); 
-	        $residence              = $record->get('residence'); 
-	        $residence              = str_replace("'","&#39;",$residence);
-	        $birthplace             = $record->get('birthplace'); 
-	        $birthplace             = str_replace("'","&#39;",$birthplace);
-	        $fathername             = $record->get('fathername'); 
-	        $fathername             = str_replace("'","&#39;",$fathername);
-	        $mothername             = $record->get('mothername'); 
-	        $mothername             = str_replace("'","&#39;",$mothername);
-	        $witness                = $record->get('witnessname');
-	        $witness                = str_replace("'","&#39;",$witness);
-	        $remarks                = $record->get('remarks');
-	        $remarks                = str_replace("'","&#39;",$remarks);
-	        $date                   = $record->get('date');
-	        $licenseType            = $record->get('licensetype');
-	        $idir                   = $record->get('idir');
-	
-	        if ($role == 'G')
-	        {       // groom record
-	            $sexclass               = 'male';
-	        }       // groom record
-	        else
-	        {
-	            $sexclass               = 'female';
-	        }
-	        $rtemplate                  = new Template($rowtext);
-	        $rtemplate->set('rtemplate',		$rtemplate);
-	        $rtemplate->set('itemNo',		    $itemNo);
-	        $rtemplate->set('role',		        $role);
-	        $rtemplate->set('givennames',		$givennames);
-	        $rtemplate->set('surname',		    $surname);
-	        $rtemplate->set('row',		        $row);
-	        $rtemplate->set('domain',		    $domain);
-	        $rtemplate->set('volume',		    $volume);
-	        $rtemplate->set('reportNo',		    $reportNo);
-	        $rtemplate->set('reportNoText',		$reportNoText);
-	        $rtemplate->set('givennames',		$givennames);
-	        $rtemplate->set('surname',		    $surname);
-	        $rtemplate->set('age',		        $age);
-	        $rtemplate->set('residence',		$residence);
-	        $rtemplate->set('birthplace',		$birthplace);
-	        $rtemplate->set('fathername',		$fathername);
-	        $rtemplate->set('mothername',		$mothername);
-	        $rtemplate->set('witness',		    $witness);
-	        $rtemplate->set('remarks',		    $remarks);
-	        $rtemplate->set('date',		        $date);
-	        $rtemplate->set('licenseType',		$licenseType);
-	        $rtemplate->set('idir',		        $idir);
-	        $rtemplate->set('sexclass',		    $sexclass);
-	        $rtemplate->set('readonly',		    $readonly);
-            $rtemplate->set('disabled',		    $disabled);
+        $rowtext        = $rowelt->outerHTML;
+        $reportNo       = 0;
+        $page           = 1;
+        $row            = 0;
+        $nextRole       = 'G';
+        $tempRecord     = null;
+        $date           = '';
+        $licenseType    = 'L';
+        $last           = end($reports);
+        $first          = reset($reports);
+        foreach($reports as $record)
+        {
+            $itemNo                 = $record->get('itemno'); 
+            $role                   = $record->get('role');
+            $givennames             = $record->get('givennames');
+            $surname                = $record->get('surname');
+            $row++;
+            if ($row < 10)
+                $row        = '0' . $row;
+            $domain                 = $record->get('domain'); 
+            $volume                 = $record->get('volume'); 
+            $reportNo               = $record->get('reportno'); 
+            if ($reportNo == floor($reportNo))
+                $reportNotext       = intval($reportNo);
+            else
+                $reportNotext       = floor($reportNo) . '½';
+            $itemNo                 = $record->get('itemno'); 
+            $role                   = $record->get('role');
+    
+            // get values in a form suitable for presenting in HTML
+            $givennames             = $record->get('givennames');
+            $givennames             = str_replace("'","&#39;",$givennames);
+            $surname                = $record->get('surname');
+            $surname                = str_replace("'","&#39;",$surname);
+            $age                    = $record->get('age'); 
+            $residence              = $record->get('residence'); 
+            $residence              = str_replace("'","&#39;",$residence);
+            $birthplace             = $record->get('birthplace'); 
+            $birthplace             = str_replace("'","&#39;",$birthplace);
+            $fathername             = $record->get('fathername'); 
+            $fathername             = str_replace("'","&#39;",$fathername);
+            $mothername             = $record->get('mothername'); 
+            $mothername             = str_replace("'","&#39;",$mothername);
+            $witness                = $record->get('witnessname');
+            $witness                = str_replace("'","&#39;",$witness);
+            $remarks                = $record->get('remarks');
+            $remarks                = str_replace("'","&#39;",$remarks);
+            $date                   = $record->get('date');
+            $licenseType            = $record->get('licensetype');
+            $idir                   = $record->get('idir');
+    
+            if ($role == 'G')
+            {       // groom record
+                $sexclass               = 'male';
+            }       // groom record
+            else
+            {
+                $sexclass               = 'female';
+            }
+            $rtemplate                  = new Template($rowtext);
+            $rtemplate->set('rtemplate',        $rtemplate);
+            $rtemplate->set('itemNo',           $itemNo);
+            $rtemplate->set('role',             $role);
+            $rtemplate->set('givennames',       $givennames);
+            $rtemplate->set('surname',          $surname);
+            $rtemplate->set('row',              $row);
+            $rtemplate->set('domain',           $domain);
+            $rtemplate->set('volume',           $volume);
+            $rtemplate->set('reportNo',         $reportNo);
+            $rtemplate->set('reportNoText',     $reportNotext);
+            $rtemplate->set('givennames',       $givennames);
+            $rtemplate->set('surname',          $surname);
+            $rtemplate->set('age',              $age);
+            $rtemplate->set('residence',        $residence);
+            $rtemplate->set('birthplace',       $birthplace);
+            $rtemplate->set('fathername',       $fathername);
+            $rtemplate->set('mothername',       $mothername);
+            $rtemplate->set('witness',          $witness);
+            $rtemplate->set('remarks',          $remarks);
+            $rtemplate->set('date',             $date);
+            $rtemplate->set('licenseType',      $licenseType);
+            $rtemplate->set('idir',             $idir);
+            $rtemplate->set('sexclass',         $sexclass);
+            $rtemplate->set('readonly',         $readonly);
+            $rtemplate->set('disabled',         $disabled);
             if ($idir == 0)
             {
                 $rtemplate['Link$row']->update(null);
@@ -743,8 +744,8 @@ if (strlen($msg) == 0)
             }
             else
                 $rtemplate['Find$row']->update(null);
-	
-	        $data           .= $rtemplate->compile();
+    
+            $data           .= $rtemplate->compile();
         }                       // process all rows
         $template['norecords']->update(null);
     }

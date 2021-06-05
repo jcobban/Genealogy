@@ -622,7 +622,7 @@ if (strlen($msg) == 0)
     // check all other fields in the main record
     $retval         = $person1->mergeFrom($person2);
 
-    $person1->save(false);
+    $person1->save();
     if (strlen($evBirth1->getDate()) > 0 ||
         $evBirth1['idlrevent'] > 1)
         $evBirth1->save('p');
@@ -797,7 +797,7 @@ if (strlen($msg) == 0)
         foreach($blogSet as $blid => $blog)
         {       // loop through all blogs
             $blog->set('keyvalue', $idir1);
-            $blog->save(false);
+            $blog->save();
         }       // loop through all blogs
     }
     else

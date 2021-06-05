@@ -7,8 +7,9 @@
  *  History:															*
  *		2019/02/19		Created											*
  *      2020/12/06      missing $TRACE and $MSG fields                  *
+ *      2021/05/13      add close button                                *
  *																		*
- *  Copyright &copy; 2020 James A. Cobban								*
+ *  Copyright &copy; 2021 James A. Cobban								*
  **********************************************************************-->
   <div id="breadcrumbs" class="hidden">
 	<a href="/index.html">Home</a>:
@@ -46,16 +47,22 @@
     <form name="indForm" id="indForm"
         action="relationshipCalculator.php" method="get">
       <div class="row">
+		<label class="column1" for="Close">Close:
+		</label>
+		<button type="button" id="Close" accessKey="C">
+		  <u>C</u>lose
+		</button>
+      </div> <!-- class="row" -->
+      <div class="row" style="margin-top: 8px;">
 		<label class="column1" for="Name">Name:
 		</label>
-		<input type="text" name="Name" id="Name" size="56" class="white left"
-				value="$NAME">
+		<input type="text" name="Name" id="Name"
+                size="56" class="white left" value="$NAME">
 		<input type="hidden" name="idir1" id="idir1"
 				value="$IDIR">
 		<div style="clear: both;"></div>
-      </div>
-      <p><!-- leave a little extra space --></p>
-      <div class="row">
+      </div> <!-- class="row" -->
+      <div class="row" style="margin-top: 8px;">
 		<label class="column1" for="idir2">
 		  Select:
 		</label>
@@ -66,26 +73,32 @@
       </div>
 	  </form>
 	</div>	<!-- end of <div id="body"> -->
+	<div class="balloon" id="HelpClose">
+      Click on this button to close the dialog without selecting
+      a relative.
+	</div>
 	<div class="balloon" id="HelpName">
-      Type a name, starting with the surname, a comma, and the given names.  
-      As you 
-	  type the text you have entered is used to select the individuals to list,
+      Type a name, starting with the surname, a comma, and the given
+      names.  As you type the text you have entered is used to select
+      the individuals to list,
 	  starting with the first individual whose name begins with the text
 	  you have entered.
 	</div>
 	<div class="balloon" id="Helpidir2">
-	  This selection list displays a list of individuals in alphabetical order,
-	  by surname, and then by given name, that starts with the individual
-	  in the database who is the first to come after the text entered in the
-	  name field.  Click on an individual in this list to display the information
-	  known about that individual.
+	  This selection list displays a list of individuals in alphabetical
+      order, by surname, and then by given name, that starts with
+      the individual in the database who is the first to come after
+      the text entered in the name field.  Click on an individual
+      in this list to determine the degree of relationship between
+      that individual and the individual identified at the top of
+      the page.
 	</div>
 	<div class="balloon" id="HelpincMarried">
 	  If this option is checked then the list of individuals will include
-	 married names as well as birth names.
+	  married names as well as birth names.
 	</div>
 	<div class="popup" id="loading">
-	Loading...
+	  Loading...
 	</div>
     <script src="/jscripts/js20/http.js" type="text/javascript"></script>
     <script src="/jscripts/util.js" type="text/javascript"></script>

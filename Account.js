@@ -25,12 +25,16 @@
  *      2019/02/08      use addEventListener                            *
  *      2019/12/03      change random password generator to exclude "   *
  *      2020/04/23      increase generated password length to 32        *
+ *      2021/06/02      add support for account language preference     *
+ *                      validate userid, email, and phone number        *
  *                                                                      *
- *  Copyright &copy; 2020 James A. Cobban                               *
+ *  Copyright &copy; 2021 James A. Cobban                               *
  ************************************************************************/
 import {HTTP} from "../jscripts6/js20/http.js";
 import {eltMouseOver, eltMouseOut, keyDown, args}
             from "../jscripts6/util.js";
+import {change, setErrorFlag}
+            from "../jscripts6/CommonForm.js";
 
 window.addEventListener("load", onLoad);
 
@@ -77,60 +81,69 @@ function onLoad()
                 case 'userid':
                 {
                     element.focus();    // put focus in userid field
+                    element.addEventListener("change",
+                                             change); 
+                    element.checkfunc   = checkUserid;
                     break;
                 }
 
                 case 'Close':
                 {
-                    element.onclick = finish;
+                    element.onclick     = finish;
                     break;
                 }
 
                 case 'Signoff':
                 {
-                    element.onclick = signoff;
+                    element.onclick     = signoff;
                     break;
                 }
 
                 case 'newPassword':
                 {
-                    if (element.addEventListener) 
-                    {       // For all major browsers, except IE 8 and earlier
-                        element.addEventListener("keypress",
-                                                 newPasswordKeyPress, 
-                                                 false);
-                        element.addEventListener("change",
-                                                 newPasswordChange, 
-                                                 false);
-                    }       // For all major browsers, except IE 8 and earlier
-                    else 
-                    if (element.attachEvent) 
-                    {       // For IE 8 and earlier versions
-                        element.attachEvent("onkeypress",
-                                            newPasswordKeyPress);
-                        element.attachEvent("onchange",
-                                            newPasswordChange);
-                    }       // For IE 8 and earlier versions
+                    element.addEventListener("keypress",
+                                             newPasswordKeyPress);
+                    element.addEventListener("change",
+                                             newPasswordChange);
                     break;
                 }
 
                 case 'newPassword2':
                 {
-                    element.onchange    = checkNewPassword2;
+                    element.addEventListener("change",
+                                             checkNewPassword2);
                     break;
                 }
 
                 case 'generatePassword':
                 {
-                    element.onclick = generatePassword;
+                    element.onclick     = generatePassword;
                     break;
                 }
 
                 case 'email':
                 {
-                    element.onchange    = checkEmail;
+                    element.addEventListener("change",
+                                             change); 
+                    element.checkfunc   = checkEmail;
                     break;
                 }
+
+                case 'cellphone':
+                {
+                    element.addEventListener("change",
+                                             change); 
+                    element.checkfunc   = checkPhoneNumber;
+                    break;
+                }
+
+                case 'language':
+                {
+                    let accountLang     = document.getElementById('accountLang');
+                    element.value       = accountLang.value;
+                    break;
+                }
+
 
                 default:
                 {       // others
@@ -186,7 +199,7 @@ function signoff()
     form.act.value      = 'logoff';
     form.lang.value     = lang;
     form.submit();      // clears session data
-}       // signoff
+}       // function signoff
 
 /************************************************************************
  *  function finish                                                     *
@@ -199,7 +212,21 @@ function signoff()
 function finish()
 {
     window.close();
-}       // finish
+}       // function finish
+
+/************************************************************************
+ *  checkUserid                                                         *
+ *                                                                      *
+ *  Validate the user name.                                             *
+ *                                                                      *
+ *  Input:                                                              *
+ *      this        <input type='text' id='userid'>                     *
+ ************************************************************************/
+function checkUserid()
+{
+    let UseridPattern   = /^[^@]+$/;
+    setErrorFlag(this, UseridPattern.test(this.value));
+}       // function checkUserid
 
 /************************************************************************
  *  checkEmail                                                          *
@@ -211,12 +238,23 @@ function finish()
  ************************************************************************/
 function checkEmail()
 {
-    let emailPattern    = /^\w+@[.a-zA-Z0-9]+$/;
-    if (emailPattern.test(this.value))
-        this.className  = 'actleftnc';
-    else
-        this.className  = 'actleftncerror';
-}       // checkEmail
+    let emailPattern    = /^[A-Za-z0-9+_!#$%&'*+/=?`{}~^..-]+@[.a-zA-Z0-9_-]+$/;
+    setErrorFlag(this, emailPattern.test(this.value));
+}       // function checkEmail
+
+/************************************************************************
+ *  checkPhoneNumber                                                    *
+ *                                                                      *
+ *  Validate the mobile phone number.                                   *
+ *                                                                      *
+ *  Input:                                                              *
+ *      this        <input type='text' id='cellphone'>                  *
+ ************************************************************************/
+function checkPhoneNumber()
+{
+    let phoneNumberPattern   = /^[0-9() +-]+$/;
+    setErrorFlag(this, phoneNumberPattern.test(this.value));
+}       // function checkPhoneNumber
 
 /************************************************************************
  *  newPasswordKeyPress                                                 *

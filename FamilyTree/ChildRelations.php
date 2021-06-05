@@ -155,7 +155,7 @@ function chkUpdate($post)
             $status->set('used',		$used);
             $status->set('tag1',		$tag1); 
             $status->set('qstag',		$qstag);
-            $status->save(false);
+            $status->save();
         }		// update
     }			// row updated
 }		// function chkUpdate

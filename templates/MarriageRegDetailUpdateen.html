@@ -8,8 +8,9 @@
  *      2020/06/10      use <input type="number"> for original page     *
  *      2020/07/03      support selecting Ontario Marriage Licence      *
  *      2020/11/04      increase maximum size of some input fields      *
+ *      2021/05/15      preserve language through previous and next     *
  *																		*
- *  Copyright &copy; 2020 James A. Cobban								*
+ *  Copyright &copy; 2021 James A. Cobban								*
  **********************************************************************-->
     <div id="breadcrumbs" class="hidden">
       <a href="/index.html">Home</a>:
@@ -61,10 +62,10 @@
             for the buttons: id="previous", id="next", and id="newQuery" -->
           <input type="hidden" name="previousHref" id="previousHref"
 			        disabled="disabled"
-                    value="MarriageRegDetail.php?RegDomain=$DOMAIN&RegYear=$REGYEAR&amp;RegNum=$PREVNUM">
+                    value="MarriageRegDetail.php?RegDomain=$DOMAIN&RegYear=$REGYEAR&amp;RegNum=$PREVNUM&amp;lang=$LANG">
           <input type="hidden" name="nextHref" id="nextHref"
 			        disabled="disabled"
-                    value="MarriageRegDetail.php?RegDomain=$DOMAIN&RegYear=$REGYEAR&amp;RegNum=$NEXTNUM" >
+                    value="MarriageRegDetail.php?RegDomain=$DOMAIN&RegYear=$REGYEAR&amp;RegNum=$NEXTNUM&amp;lang=$LANG" >
           <input type="hidden" name="newQueryHref" id="newQueryHref"
 			        disabled="disabled"
                     value="MarriageRegQuery.html">
@@ -183,7 +184,7 @@
             <div class="column2">
               <label class="labelSmall">Place:</label>
               <input name="Place" id="Place"
-                    type="text" size="20" maxlength="255"
+                    type="text" size="20" maxlength="128"
                     value="$MPLACE" class="act leftnc"  />
             </div>
             <div style="clear: both;"></div>

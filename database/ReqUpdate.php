@@ -114,6 +114,7 @@ if (count($domainset) > 0)
 }
 else
     $cl                 = 2;
+
 $provList               = array();
 for($io = 0; $io < strlen($provinces); $io += $cl)
 {		        // loop through provinces
@@ -122,7 +123,8 @@ for($io = 0; $io < strlen($provinces); $io += $cl)
     if (is_null($domainObj))
     {
         error_log("ReqUpdate.php: " . __LINE__ .
-                    " no entry in \$domainset for '$cc$province'\n");
+                    " no entry in \$domainset for '$cc$province', " .
+                "DomainSet(array('cc' => '$cc', 'language' => '$lang'))");
         $provinceName   = "$cc$province";
     }
     else

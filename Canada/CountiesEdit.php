@@ -47,7 +47,7 @@ use \Templating\Template;
  *      2021/01/13      correct XSS exposures                           *
  *                      improve parameter validation                    *
  *                      get message texts from template                 *
- *		2021/04/04      escape CONTACTSUBJECT                           *
+ *      2021/04/04      escape CONTACTSUBJECT                           *
  *                                                                      *
  *  Copyright &copy; 2021 James A. Cobban                               *
  ************************************************************************/
@@ -343,7 +343,7 @@ if (isset($_POST) && count($_POST) > 0)
             else
             if ($county->isExisting())
             {                   // update existing county
-                $count              = $county->save(false);
+                $count              = $county->save();
                 if ($count > 0)
                 {
                     $changeCount    += $count;
@@ -361,7 +361,7 @@ if (isset($_POST) && count($_POST) > 0)
             }                   // update existing county
             else
             {                   // create new county
-                $count              = $county->save(false);
+                $count              = $county->save();
                 $changeCount++;
                 $ttemplate          = new Template($addedHTML);
                 $ttemplate->set('COUNTY',           $county->get('code'));
@@ -395,10 +395,10 @@ if (isset($_POST) && count($_POST) > 0)
 else
 if ($changed)
 {                       // invoked to display table
-	$changed->update(null);
-	$deleted->update(null);
-	$added->update(null);
-	$summary->update(null);
+    $changed->update(null);
+    $deleted->update(null);
+    $added->update(null);
+    $summary->update(null);
 }                       // invoked to display table
 
 $template->set('CONTACTTABLE',      'Counties');
@@ -425,15 +425,15 @@ if (strlen($msg) == 0)
     $info       = $counties->getInformation();
     $count      = $info['count'];
 
-	$template->set('TOTALROWS',         $count);
-	$template->set('FIRST',             $offset + 1);
-	$template->set('LAST',              min($count, $offset + $limit));
-	if ($offset > 0)
-	    $template->set('npPrev', "&domain=$domain&offset=" . ($offset-$limit) . "&limit=$limit");
-	else
-	    $template->updateTag('prenpprev', null);
-	if ($offset < $count - $limit)
-	    $template->set('npNext', "&domain=$domain&offset=" . ($offset+$limit) . "&limit=$limit");
+    $template->set('TOTALROWS',         $count);
+    $template->set('FIRST',             $offset + 1);
+    $template->set('LAST',              min($count, $offset + $limit));
+    if ($offset > 0)
+        $template->set('npPrev', "&domain=$domain&offset=" . ($offset-$limit) . "&limit=$limit");
+    else
+        $template->updateTag('prenpprev', null);
+    if ($offset < $count - $limit)
+        $template->set('npNext', "&domain=$domain&offset=" . ($offset+$limit) . "&limit=$limit");
     else
         $template->updateTag('prenpnext', null);
     $template->updateTag('Row$code',

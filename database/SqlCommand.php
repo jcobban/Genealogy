@@ -63,8 +63,10 @@ use \Exception;
  *		2019/06/15      support subqueries in SELECT                    *
  *		2020/03/13      use FtTemplate::validateLang                    *
  *		2020/11/02      add limited support for SOURCE                  *
+ *		2021/05/15      extend support for SOURCE to include DROP and   *
+ *		                CREATE                                          *
  *																		*
- *  Copyright &copy; 2020 James A. Cobban								*
+ *  Copyright &copy; 2021 James A. Cobban								*
  ************************************************************************/
     require_once __NAMESPACE__ . '/Address.inc';
     require_once __NAMESPACE__ . '/Child.inc';
@@ -1536,7 +1538,7 @@ $translate                  = $template->getTranslate();
 $idetTranslate              = $translate['idetTitleText'];
 
 // parse patterns for SQL commands
-$cmdPattern					= '/^(\w+)\s+(.*)$/i';
+$cmdPattern					= '/^\s*(\w+)\s+(.*)$/';
 $deletePattern				= '/^(\w*)\s*FROM\s+(\w+)\s+(.*)$/i';
 $insertPattern				= '/^INTO\s+(\w+)\s+(.*)$/i';
 $updatePattern				= '/^(\w+)\s+(.*)\s+WHERE\s+(.*)$/i';
@@ -2299,17 +2301,23 @@ if (strlen($msg) == 0 && $sqlCommand && strlen($sqlCommand) > 0)
         $line               = 1;
         while(!feof($source))
         {
-            $sqlCommand     = fgets($source);
+            $sqlCommand     = preg_replace('/--.*/', '', fgets($source));
             while(!feof($source) && 
                   preg_match('/;\s*$/', $sqlCommand) == 0)
-                $sqlCommand .= preg_replace('/--[ a-zA-Z-]+/', '', fgets($source));
+                $sqlCommand .= preg_replace('/--.*/', '', fgets($source));
             $sqlCommand     = preg_replace('/;\s*$/', '', $sqlCommand);
-            $result		    = preg_match($cmdPattern, $sqlCommand, $matches);
+            $result		    = preg_match($cmdPattern . 'm',
+                                         $sqlCommand, 
+                                         $matches);
             if ($result)
             {
                 $command	    = strtoupper($matches[1]);
                 $sresult[]      = array('line' => $line, 'cmd' => $sqlCommand, 'error' => '');
-                if ($command == 'UPDATE' || $command == 'INSERT' || $command == 'DELETE')
+                if ($command == 'UPDATE' ||
+                    $command == 'INSERT' || 
+                    $command == 'DELETE' ||
+                    $command == 'CREATE' ||
+                    $command == 'DROP')
                 {
                     $stmt		= $connection->query($sqlCommand);
                     if ($stmt === false)
@@ -2330,10 +2338,18 @@ if (strlen($msg) == 0 && $sqlCommand && strlen($sqlCommand) > 0)
                     }
                 }
                 else
-                    $sresult[]      = array('line' => '', 'cmd' => 'Unsupported', 'error' => 'Y');
+                    $sresult[]      = array('line' => '', 'cmd' => "$command Unsupported", 'error' => 'Y');
             }
             else
+            if ($sqlCommand == '' || substr($sqlCommand, 0, 2) == '--')
+            {
+                $sresult[]      = array('line' => $line, 'cmd' => $sqlCommand, 'error' => '');
+            }
+            else
+            {
                 $sresult[]      = array('line' => $line, 'cmd' => $sqlCommand, 'error' => 'Y');
+                $warn           .= "<p>parse failed for pattern '$cmdPattern' string '$sqlCommand'</p>\n";
+            }
             $line++;
         }
     }                   // execute a script

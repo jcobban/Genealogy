@@ -145,6 +145,15 @@ class RecordSet implements Iterator, Countable, ArrayAccess
     protected   $template       = null;
 
     /********************************************************************
+     *  $this->lastSqlCmd                                               *
+     *                                                                  *
+     *  This string contains a representation of the last command       *
+     *  against the database.  It is set by RecordSet::save and         *
+     *  RecordSet::delete.                                              *
+     ********************************************************************/
+    protected   $lastSqlCmd         = '';
+
+    /********************************************************************
      *  $externalName                                                   *
      *                                                                  *
      *  External Table name to present to casual users.                 *
@@ -786,6 +795,7 @@ class RecordSet implements Iterator, Countable, ArrayAccess
                     $this->information['count'] = $row[0];
                 else
                     $this->information['count'] = 0;
+                $this->lastSqlCmd   = $queryText;
             }           // success
             else
             {           // error performing query
@@ -1755,6 +1765,24 @@ class RecordSet implements Iterator, Countable, ArrayAccess
     }       // function RecordSet::getWherePattern
 
     /********************************************************************
+     *  function RecordSet::getLastSqlCmd                               *
+     *                                                                  *
+     *  Returns a string containing a representation of the last        *
+     *  SQL command issued by the class.                                *
+     *  After the constructor this is the SELECT command that was       *
+     *  issued to populate the instance, regardless of whether it       *
+     *  succeeded or not.                                               *
+     *  After calling method save this is the INSERT or UPDATE command  *
+     *  that was issued to update the database, if save returned 1.     *
+     *  After calling method delete this is the DELETE command that     *
+     *  was issued to update the database, if delete returned 1.        *
+     ********************************************************************/
+    function getLastSqlCmd()
+    {
+        return $this->lastSqlCmd;
+    }       // function RecordSet::getLastSqlCmd
+
+    /********************************************************************
      *  function RecordSet::getSurnameChk                               *
      *                                                                  *
      *  Get a MySQL expression that performs a loose comparison for a   *
@@ -1805,14 +1833,16 @@ require_once __NAMESPACE__ . '/Surname.inc';
                                             "WHERE `Surname` REGEXP ?";
                 $surnParms              = array($pattern);
                 $stmt                   = $connection->prepare($findSurnames);
+                $queryText              = debugPrepQuery($findSurnames, $surnParms);
                 if ($stmt->execute($surnParms))
                 {       // success
-                    $count      = $stmt->rowCount();
+                    $this->sqlLastCmd   = $queryText;
+                    $count              = $stmt->rowCount();
                     if ($count > 0)
                     {
                         $retval             = '(';
                         $op                 = '';
-                        $result = $stmt->fetchAll(PDO::FETCH_NUM);
+                        $result         = $stmt->fetchAll(PDO::FETCH_NUM);
                         foreach($result as $row)
                         {
                             $nm             = $row[0];
@@ -2117,16 +2147,16 @@ require_once __NAMESPACE__ . '/Surname.inc';
      *                                                                  *
      *  Parameters:                                                     *
      *      $output     if true emit XML                                *
-     *                  if Record::JSON emit JSON (to do)               *
+     *                  if Record::JSON emit JSON                       *
      *                  if a string emit XML using as tag name          *
+     *                  deprecated, use getLastSqlCmd                   *
      *      $simulate   if true just display SQL command                *
+     *                  deprecated                                      *
      *                                                                  *
      *  Returns:                                                        *
      *          number of records deleted                               *
      *                                                                  *
      *  Side Effects:                                                   *
-     *      An exception is thrown if the SQL server rejects the        *
-     *      DELETE command                                              *
      *      If any unusual data is encountered it is reported by        *
      *      adding a message to $warn.  A specific case is if the       *
      *      an attempt is made to delete all the records in the table.  *
@@ -2142,8 +2172,8 @@ require_once __NAMESPACE__ . '/Surname.inc';
         if ($this->information['count'] > 1000)
         {
             $msg        .= "RecordSet::delete: " .
-                                number_format($this->information['count']) .
-                                " is too many records to delete.";
+                            number_format($this->information['count']) .
+                            " is too many records to delete.";
             return 0;
         }
 
@@ -2151,10 +2181,15 @@ require_once __NAMESPACE__ . '/Surname.inc';
         $indent             = '';
         $xmlparms           = '';
         $xml                = $output === Record::XML;
-        $json               = $output === Record::JSON;
-
-        if (is_string($output) && !$json)
-        {               // string tag name
+        if ($output === Record::JSON)
+        {
+            $json           = true;
+            $output         = false;
+            $xmltext        = 'Record::JSON';
+        }
+        else
+        if (is_string($output))
+        {               // string XML tag name
             $xmltext        = "'$output'";
             $matches        = array();
             if (preg_match('/^(\s*)(\w*)(.*)$/', $output, $matches))
@@ -2175,33 +2210,31 @@ require_once __NAMESPACE__ . '/Surname.inc';
             $tagname        = 'cmd';
         }               // boolean true
         else
-        if ($json)
-            $xmltext        = 'Record::JSON';
-        else
             $xmltext        = 'false';
 
         if (strlen($this->where) == 0)
         {
-            $warn   .= "<p>RecordSet: delete: " .
+            $warn           .= "<p>RecordSet: delete: " .
                                 "not permitted to delete all records in ".
                                 $this->externalName . "</p>\n";
             return 0;
         }
 
         // update the database
-        $delete     = "DELETE FROM " . $this->table . ' ' . $this->where;
-        $deleteText = debugPrepQuery($delete, $this->sqlParms);
+        $delete             = "DELETE FROM  {$this->table} {$this->where}";
+        $deleteText         = debugPrepQuery($delete, $this->sqlParms);
         if ($simulate)
-        {       // no not update database
+        {       // do not update database
             print "<p>Simulate: '$deleteText'</p>\n";
-            $result = 0;
+            $result         = 0;
         }       // do not update database
         else
         {       // update database
-            $stmt   = $connection->prepare($delete);
+            $stmt           = $connection->prepare($delete);
             if ($stmt->execute($this->sqlParms))
             {       // success
-                $result = $stmt->rowCount();
+                $this->sqlLastCmd   = $deleteText;
+                $result     = $stmt->rowCount();
             }       // success
             else
             {       // error performing query
@@ -2228,7 +2261,7 @@ require_once __NAMESPACE__ . '/Surname.inc';
             if ($debug)
                 $warn   .= "<p>RecordSet::delete: " . __LINE__ .
                                 " '$deleteText'</p>\n" .
-                        "<p>Deleted $result records</p>\n";
+                             "<p>Deleted $result records</p>\n";
             logSqlUpdate($delete,
                          $this->sqlParms,
                          0,
@@ -2445,6 +2478,7 @@ require_once __NAMESPACE__ . '/Surname.inc';
                 $stmt       = $connection->prepare($update);
                 if ($stmt->execute($sqlParms))
                 {       // success
+                    $this->sqlLastCmd   = $updateText;
                     $count      = $stmt->rowCount();
                 }       // success
                 else
@@ -2598,12 +2632,13 @@ require_once __NAMESPACE__ . '/Surname.inc';
         $stmt       = $connection->prepare($query);
         if ($stmt->execute($this->sqlParms))
         {       // success
+            $this->sqlLastCmd   = $queryText;
             if ($debug)
-                $warn   .= "<p>RecordSet.inc: " . __LINE__ .
+                $warn           .= "<p>RecordSet.inc: " . __LINE__ .
                                    " \"$queryText\"</p>\n";
             $result = $stmt->fetchAll(PDO::FETCH_NUM);
             foreach($result as $row)
-                $retval[]   = $row[0];
+                $retval[]       = $row[0];
             return $retval;
         }       // success
         else
@@ -2762,6 +2797,7 @@ require_once __NAMESPACE__ . '/Surname.inc';
             $stmt               = $connection->prepare($query);
             if ($stmt->execute($this->sqlParms))
             {       // success
+                $this->sqlLastCmd   = $queryText;
                 $result         = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 if ($debug)
                 {

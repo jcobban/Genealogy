@@ -3,26 +3,26 @@ namespace Genealogy;
 use \PDO;
 use \Exception;
 /************************************************************************
- *  CountriesEdit.php													*
- *																		*
- *  Display form for editting information about 						*
- *  countries for managing record transcriptions.						*
- *																		*
- *  History:															*
- *		2017/02/04		created											*
- *		2017/02/07		use class Country								*
- *		2017/02/25		use class Template								*
- *		2018/01/04		remove "Template" from template file names		*
- *		2018/01/22		display only part of the table at a time		*
- *		2018/10/15      get language apology text from Languages        *
- *		2019/02/21      use new FtTemplate constructor                  *
- *		2020/03/13      use FtTemplate::validateLang                    *
- *		2021/01/13      correct XSS vulnerabilities                     *
- *		                improve parameter checking                      *
- *		                report database updates                         *
- *		2021/04/04      escape CONTACTSUBJECT                           *
- *																		*
- *  Copyright &copy; 2021 James A. Cobban								*
+ *  CountriesEdit.php                                                   *
+ *                                                                      *
+ *  Display form for editting information about                         *
+ *  countries for managing record transcriptions.                       *
+ *                                                                      *
+ *  History:                                                            *
+ *      2017/02/04      created                                         *
+ *      2017/02/07      use class Country                               *
+ *      2017/02/25      use class Template                              *
+ *      2018/01/04      remove "Template" from template file names      *
+ *      2018/01/22      display only part of the table at a time        *
+ *      2018/10/15      get language apology text from Languages        *
+ *      2019/02/21      use new FtTemplate constructor                  *
+ *      2020/03/13      use FtTemplate::validateLang                    *
+ *      2021/01/13      correct XSS vulnerabilities                     *
+ *                      improve parameter checking                      *
+ *                      report database updates                         *
+ *      2021/04/04      escape CONTACTSUBJECT                           *
+ *                                                                      *
+ *  Copyright &copy; 2021 James A. Cobban                               *
  ************************************************************************/
 require_once __NAMESPACE__ . "/Country.inc";
 require_once __NAMESPACE__ . "/Language.inc";
@@ -31,192 +31,192 @@ require_once __NAMESPACE__ . "/FtTemplate.inc";
 require_once __NAMESPACE__ . '/common.inc';
 
 // validate parameters
-$getParms			= array();
-$pattern			= '';
-$lang		    	= 'en';
-$offset		    	= 0;
+$getParms           = array();
+$pattern            = '';
+$lang               = 'en';
+$offset             = 0;
 $offsettext         = null;
-$limit		    	= 20;
+$limit              = 20;
 $limittext          = null;
 $deleted            = array();
 
 // initial invocation by method='get'
 if (isset($_GET) && count($_GET) > 0)
-{			// method='get'
+{           // method='get'
     $parmsText  = "<p class='label'>\$_GET</p>\n" .
                   "<table class='summary'>\n" .
                   "<tr><th class='colhead'>key</th>" .
                       "<th class='colhead'>value</th></tr>\n";
-	foreach($_GET as $key => $value)
-	{			// loop through parameters
+    foreach($_GET as $key => $value)
+    {           // loop through parameters
         $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
                         "<td class='white left'>$value</td></tr>\n"; 
-	    switch(strtolower($key))
-	    {
-			case 'lang':
-			{
+        switch(strtolower($key))
+        {
+            case 'lang':
+            {
                 $lang       = FtTemplate::validateLang($value);
-			    break;
-			}		// language
+                break;
+            }       // language
 
-			case 'pattern':
-			{
-			    $pattern		    = $value;
-			    $getParms['name']	= $value;
-			    break;
-			}		// pattern match
+            case 'pattern':
+            {
+                $pattern            = $value;
+                $getParms['name']   = $value;
+                break;
+            }       // pattern match
 
-			case 'offset':
-			{
-			    if (is_numeric($value) || ctype_digit($value))
-					$offset		    = $value;
+            case 'offset':
+            {
+                if (is_numeric($value) || ctype_digit($value))
+                    $offset         = $value;
                 else
                     $offsettext     = htmlspecialchars($value);
-			    break;
-			}
+                break;
+            }
 
-			case 'limit':
-			{
-			    if (is_numeric($value) || ctype_digit($value))
-					$limit		    = $value;
+            case 'limit':
+            {
+                if (is_numeric($value) || ctype_digit($value))
+                    $limit          = $value;
                 else
                     $limittext      = htmlspecialchars($value);
-			    break;
-			}
-	    }		// act on specific parameters
-	}		    // loop through parameters
-	if ($debug)
-	    $warn	.= $parmsText . "</table>";
-}		    	    // method='get'
+                break;
+            }
+        }       // act on specific parameters
+    }           // loop through parameters
+    if ($debug)
+        $warn   .= $parmsText . "</table>";
+}                   // method='get'
 else
 if (isset($_POST) && count($_POST) > 0)
-{		            // when submit button is clicked invoked by method='post'
+{                   // when submit button is clicked invoked by method='post'
     $parmsText      = "<p class='label'>\$_POST</p>\n" .
                       "<table class='summary'>\n" .
                         "<tr><th class='colhead'>key</th>" .
                             "<th class='colhead'>value</th></tr>\n";
-	$country		= null;
-	foreach($_POST as $key => $value)
-	{
+    $country        = null;
+    foreach($_POST as $key => $value)
+    {
         $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
                         "<td class='white left'>$value</td></tr>\n"; 
-	    $matches	= array();
-	    $pres	    = preg_match("/^(\w+)([A-Z]{2})$/", $key, $matches);
-	    if ($pres)
-	    {			// last 2 characters are upper case
-			$key    = $matches[1];
-			$cc	    = $matches[2];
-	    }			// last 2 characters are upper case
-	    else
-	    {
-			$cc	    = '';
-	    }
+        $matches    = array();
+        $pres       = preg_match("/^(\w+)([A-Z]{2})$/", $key, $matches);
+        if ($pres)
+        {           // last 2 characters are upper case
+            $key    = $matches[1];
+            $cc     = $matches[2];
+        }           // last 2 characters are upper case
+        else
+        {
+            $cc     = '';
+        }
 
-	    switch(strtolower($key))
+        switch(strtolower($key))
         {                   // act on specific column names
             case 'la':
                 if ($cc != 'NG')    // accept 'laNG' or 'LANG'
                     break;
-			case 'lang':
-			{
+            case 'lang':
+            {
                 $lang           = FtTemplate::validateLang($value);
-			    break;
-			}		        // language
+                break;
+            }               // language
 
-			case 'code':
-			{
+            case 'code':
+            {
                 if ($country)
                 {
-                    $count      = $country->save(null);
+                    $count      = $country->save();
                     if ($count > 0)
                         $warn   .= "<p>" . $country->getLastSqlCmd() . "</p>\n";
                 }
-                $country	    = new Country(array('code'	=> $cc));
+                $country        = new Country(array('code'  => $cc));
                 $messages       = $country->getErrors();
                 if (strlen($messages) > 0)
-                    $warn       .= "<p>new Country(array('code'	=> $cc)) constructor failed $messages</p>\n";
-			    break;
-			}
+                    $warn       .= "<p>new Country(array('code' => $cc)) constructor failed $messages</p>\n";
+                break;
+            }
 
-			case 'name':
+            case 'name':
             {
                 if ($cc == '66')
                     $warn       .= "<p>138 $country->set('name', $value);</p>\n";
-			    $country->set('name', $value);
-			    break;
-			}
+                $country->set('name', $value);
+                break;
+            }
 
-			case 'dialingcode':
-			{
-			    if (ctype_digit($value))
-			    {
-			        $country->set('dialingcode', $value);
-			    }
-			    break;
-			}
+            case 'dialingcode':
+            {
+                if (ctype_digit($value))
+                {
+                    $country->set('dialingcode', $value);
+                }
+                break;
+            }
 
-			case 'currency':
-			{
-			    if (preg_match("/^[a-zA-Z]{3}$/", $value))
-			    {
-			         $country->set('currency', strtoupper($value));
-			    }
-			    break;
-			}
+            case 'currency':
+            {
+                if (preg_match("/^[a-zA-Z]{3}$/", $value))
+                {
+                     $country->set('currency', strtoupper($value));
+                }
+                break;
+            }
 
-			case 'deletecountry':
+            case 'deletecountry':
             {
                 $deleted[]          = $cc;
-			    break;
-			}
+                break;
+            }
 
-			case 'pattern':
-			{
-			    $pattern		    = $value;
-			    $getParms['name']	= $value;
-			    break;
-			}		// pattern match
+            case 'pattern':
+            {
+                $pattern            = $value;
+                $getParms['name']   = $value;
+                break;
+            }       // pattern match
 
-			case 'offset':
-			{
-			    if (is_numeric($value) || ctype_digit($value))
-                    $offset		    = $value;
+            case 'offset':
+            {
+                if (is_numeric($value) || ctype_digit($value))
+                    $offset         = $value;
                 else
                     $offsettext     = htmlspecialchars($value);
-			    break;
-			}
+                break;
+            }
 
-			case 'limit':
-			{
-			    if (is_numeric($value) || ctype_digit($value))
-					$limit		    = $value;
+            case 'limit':
+            {
+                if (is_numeric($value) || ctype_digit($value))
+                    $limit          = $value;
                 else
                     $limittext      = htmlspecialchars($value);
-			    break;
-			}
+                break;
+            }
 
-	    }			// check supported parameters
-	}			    // loop through all parameters
+        }           // check supported parameters
+    }               // loop through all parameters
 
     if ($country)
     {
-        $count      = $country->save(null);
+        $count      = $country->save();
         if ($count > 0)
             $warn   .= "<p>" . $country->getLastSqlCmd() . "</p>\n";
     }
-	if ($debug)
-	    $warn	.= $parmsText . "</table>";
-}		// when submit button is clicked invoked by method='post'
+    if ($debug)
+        $warn   .= $parmsText . "</table>";
+}       // when submit button is clicked invoked by method='post'
 
 if (canUser('all'))
-	$action		= 'Admin';
+    $action     = 'Admin';
 else
 if (canUser('edit'))
-	$action		= 'Update';
+    $action     = 'Update';
 else
-	$action		= 'Display';
+    $action     = 'Display';
 
-$template		= new FtTemplate("Countries$action$lang.html");
+$template       = new FtTemplate("Countries$action$lang.html");
 
 if (is_string($offsettext))
 {
@@ -236,41 +236,41 @@ foreach($deleted as $delcc)
     $country    = new Country(array('cc' => $delcc));
     $country->delete(false);
     $warn       .= "<p>" . $country->getLastSqlCmd() . "</p>\n";
-    $warn	    .= str_replace('$delcc', $delcc, $text);
+    $warn       .= str_replace('$delcc', $delcc, $text);
 }
 
-$template->set('CONTACTTABLE',	'Countries');
+$template->set('CONTACTTABLE',  'Countries');
 $template->set('CONTACTSUBJECT',    '[FamilyTree]' . 
                                     urlencode($_SERVER['REQUEST_URI']));
 $template->set('lang',          $lang);
 $template->set('offset',        $offset);
 $template->set('limit',         $limit);
-$template->set('PATTERN',		htmlspecialchars($pattern));
+$template->set('PATTERN',       htmlspecialchars($pattern));
 
 if (strlen($msg) == 0)
-{			// no errors detected
-	$getParms['offset']	= $offset;
-	$getParms['limit']	= $limit;
-	$countries		    = new RecordSet('Countries', $getParms);
+{           // no errors detected
+    $getParms['offset'] = $offset;
+    $getParms['limit']  = $limit;
+    $countries          = new RecordSet('Countries', $getParms);
 
-	$info	            = $countries->getInformation();
-	$count	            = $info['count'];
-	$template->set('totalrows',     $count);
-	$template->set('first',         $offset + 1);
-	$template->set('last',          min($count, $offset + $limit));
-	if ($offset > 0)
-		$template->set('npPrev',    "&offset=" . ($offset-$limit) . "&limit=$limit");
-	else
-		$template->updateTag('prenpprev', null);
-	if ($offset < $count - $limit)
-		$template->set('npNext',    "&offset=" . ($offset+$limit) . "&limit=$limit");
-	else
-	    $template->updateTag('prenpnext', null);
-	$template->updateTag('Row$code',
-						 $countries);
-}			// no errors detected
+    $info               = $countries->getInformation();
+    $count              = $info['count'];
+    $template->set('totalrows',     $count);
+    $template->set('first',         $offset + 1);
+    $template->set('last',          min($count, $offset + $limit));
+    if ($offset > 0)
+        $template->set('npPrev',    "&offset=" . ($offset-$limit) . "&limit=$limit");
+    else
+        $template->updateTag('prenpprev', null);
+    if ($offset < $count - $limit)
+        $template->set('npNext',    "&offset=" . ($offset+$limit) . "&limit=$limit");
+    else
+        $template->updateTag('prenpnext', null);
+    $template->updateTag('Row$code',
+                         $countries);
+}           // no errors detected
 else
-	$template->updateTag('countryForm',
+    $template->updateTag('countryForm',
                          null);
 
 $template->display();

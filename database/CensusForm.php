@@ -128,6 +128,7 @@ $subDistrictName                = '';
 $subDistID                      = '';
 $division                       = '';
 $page                           = null;
+$pagetext                       = null;
 $lang                           = 'en';
 $transcriber                    = '';
 $proofreader                    = '';
@@ -233,8 +234,7 @@ if (isset($_GET) && count($_GET) > 0)
                     $getParms['page']           = $page;
                 }
                 else
-                    $msg                    .= "Invalid value of Page='" .
-                                $safevalue . "'. ";
+                    $pagetext                   = $safevalue;
                 break;
             }           // "Page"
     
@@ -400,9 +400,12 @@ if (strlen($distID) > 0)
         $subDistrictName    = substr($subDistrictName, 0, 45) . '...';
 }
 
+if (is_string($pagetext))
+    $msg            .= "Invalid value of Page='$pagetext'. ";
+else
 if (strlen($page) == 0)
 {       // missing mandatory parameter
-    $msg    .= 'Missing mandatory parameter Page. ';
+    $msg            .= 'Missing mandatory parameter Page. ';
 }       // missing mandatory parameter
 
 if (strlen($msg) == 0)
@@ -546,7 +549,7 @@ if (strlen($msg) == 0)
     if ($numLines > 0)
     {
         $template->set('NUMLINES', $numLines);
-        $pageSizeP      = $template['pageSize'];
+        $pageSizeP                  = $template['pageSize'];
         if ($pageSizeP instanceof \Templating\TemplateTag)
             $pageSizeP->update(null);
         $rowElt                     = $template->getElementById('Row$line');

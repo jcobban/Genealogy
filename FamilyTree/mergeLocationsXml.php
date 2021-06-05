@@ -135,7 +135,8 @@ else
     }		// loop through all from values
 
     // save any changed made to the target location
-    $toLocation->save(true);
+    $toLocation->save();
+    print "<cmd>" . $toLocation->getLastSqlCmd() . "</cmd>\n";
 }			// no errors
 
 // close the XML document

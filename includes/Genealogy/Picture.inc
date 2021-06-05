@@ -539,7 +539,7 @@ class Picture extends Record
     function getIdbr()
     {
         if ($this->needInsert)
-            $this->save(false);
+            $this->save();
 
         return $this->row['idbr'];
     }   // function Picture::getIdbr
@@ -983,7 +983,7 @@ class Picture extends Record
                 {       // success
                     $this->lastSqlCmd   = $reorderText;
                     parent::set('picorder', $neworder);
-                    $this->save(false);
+                    $this->save();
                     return $oldorder;
                 }       // success
                 else

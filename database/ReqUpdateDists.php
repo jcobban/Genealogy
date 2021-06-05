@@ -116,35 +116,45 @@ $template           = new FtTemplate("ReqUpdateDists$lang.html");
  ************************************************************************/
 if (strlen($censusId) >= 6)
 {
-    $census         = new Census(array('censusid'   => $censusId));
-    $cc             = $census['cc'];
+    $census             = new Census(array('censusid'   => $censusId));
+    $cc                 = $census['cc'];
     if (strlen($census['province']) > 0)
-        $province   = $census['province'];
-    $censusYear     = $census['year'];
-}
-$censusList         = array();
-$getParms           = array('cc'    => $cc);
-$censuses           = new CensusSet($getParms);
-foreach($censuses as $census)
-{
-    $censusList[$census->get('censusid')] =
-                    array(  'id'        => $census->get('censusid'),
-                            'name'      => $census->get('name'),
-                            'selected'  => '');
-}
+        $province       = $census['province'];
+    $censusYear         = $census['year'];
 
-if ($census->isExisting())
-{
-    $provinces      = $census->get('provinces');
-    $censusList[$censusId]['selected'] = "selected='selected'";
+    $censusList         = array();
+    $getParms           = array('cc'    => $cc);
+    $censuses           = new CensusSet($getParms);
+    foreach($censuses as $tcensus)
+    {
+        $censusList[$tcensus->get('censusid')] =
+                        array(  'id'        => $tcensus->get('censusid'),
+                                'name'      => $tcensus->get('name'),
+                                'selected'  => '');
+    }
+    
+    if ($census->isExisting())
+    {
+        $provinces      = $census->get('provinces');
+        $censusList[$censusId]['selected'] = "selected='selected'";
+    }
+    else
+    {
+        $warn           .= "<p>Census '$censusId' is unsupported</p>\n";
+        $provinces      = '';
+    }
 }
 else
 {
-    $warn           .= "<p>Census '$censusId' is unsupported</p>\n";
-    $provinces      = '';
+    $census             = null;
+    $cc                 = substr($censusId, 0, 2);
+    $warn               .= "<p>Census '$censusId' is unsupported</p>\n";
+    $provinces          = '';
+    $censusList         = array();
 }
-$country            = new Country(array('code' => $cc));
-$countryName        = $country->get('name');
+
+$country                = new Country(array('code' => $cc));
+$countryName            = $country->get('name');
 
 $template->set('CENSUSYEAR',    $censusYear);
 $template->set('CC',            $cc);
@@ -160,10 +170,10 @@ if ($censusYear > 1867)
 {           // post confederation census
     if ($province == 'CW' || $province == '')
         $template->updateTag('allProvincesOpt',
-                         array('selected' => "selected='selected'"));
+                             array('selected' => "selected='selected'"));
     else
         $template->updateTag('allProvincesOpt',
-                         array('selected' => ''));
+                             array('selected' => ''));
 }
 else
     $template->updateTag('allProvincesOpt', null);

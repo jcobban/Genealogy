@@ -303,31 +303,31 @@ function searchParticipant($participant)
 // update the database
 if(canUser('edit'))
 {
-    $action         			= "Update";
+    $action                     = "Update";
 }
 else
 {
-    $action         			= "Display";
+    $action                     = "Display";
 }
 
 // validate parameters
-$regYear            			= '';
-$regNum             			= '';
-$paddedRegNum       			= '0000000';
-$volume             			= '';
-$page               			= '';
-$item               			= '';
-$cc                 			= 'CA';         // default country code
-$countryName        			= 'Canada';     // default country name
-$domain             			= 'CAON';       // default domain
-$domainName         			= 'Ontario';    // default domain name
-$countyName         			= '';
-$regCounty          			= '';
-$regTownship        			= '';
-$templateName        			= null;
-$lang               			= 'en';
+$regYear                        = '';
+$regNum                         = '';
+$paddedRegNum                   = '0000000';
+$volume                         = '';
+$page                           = '';
+$item                           = '';
+$cc                             = 'CA';         // default country code
+$countryName                    = 'Canada';     // default country name
+$domain                         = 'CAON';       // default domain
+$domainName                     = 'Ontario';    // default domain name
+$countyName                     = '';
+$regCounty                      = '';
+$regTownship                    = '';
+$templateName                   = null;
+$lang                           = 'en';
 
-$parmsText      			    = "<p class='label'>\$_GET</p>\n" .
+$parmsText                      = "<p class='label'>\$_GET</p>\n" .
                                     "<table class='summary'>\n" .
                                     "<tr><th class='colhead'>key</th>" .
                                     "<th class='colhead'>value</th></tr>\n";
@@ -345,21 +345,21 @@ foreach($_GET as $key => $value)
 
         case 'regnum':
         {
-            $regNum         	= $value;
+            $regNum             = $value;
             break;
         }                   // RegNum passed
 
         case 'originalvolume':
         {
-            $volume         	= $value;
-            $numVolume      	= preg_replace('/[^0-9]/', '', $value);
+            $volume             = $value;
+            $numVolume          = preg_replace('/[^0-9]/', '', $value);
             break;
         }                   // Original Volume Number
 
         case 'originalpage':
         {
             if (ctype_digit($value))
-                $page       	= $value;
+                $page           = $value;
             else
                 $msg            .= "Page Number $value must be a number. ";
             break;
@@ -368,7 +368,7 @@ foreach($_GET as $key => $value)
         case 'originalitem':
         {
             if (ctype_digit($value))
-                $item       	= $value;
+                $item           = $value;
             else
                 $msg        .= "Item Number $value must be a number. ";
             break;
@@ -377,7 +377,7 @@ foreach($_GET as $key => $value)
         case 'regdomain':
         case 'domain':
         {
-            $domain         	= $value;
+            $domain             = $value;
             break;
         }                   // Registration Domain
 
@@ -394,7 +394,7 @@ foreach($_GET as $key => $value)
 
         case 'lang':
         {                   // preferred locale
-            $lang       	    = FtTemplate::validateLang($value);
+            $lang               = FtTemplate::validateLang($value);
             break;
         }                   // preferred locale
 
@@ -450,56 +450,53 @@ else
 if (ctype_digit($regNum))
     $paddedRegNum               = str_pad($regNum,7,"0",STR_PAD_LEFT);
 else
-    $msg                        .= "Registration Number $regNum must be a number. ";
-
-// the number of the immediately preceding and following registrations
-if (!ctype_digit($regNum))
 {
-    error_log("MarriageRegDetail.php: " . __LINE__ .
-        " \$regNum='$regNum' is not a number)\n");
-    $regNum         			= intval($regNum);
+    $msg                        .= "Registration Number $regNum must be a number. ";
+    $regNum                     = 0;
 }
+
+// get the number of the immediately preceding and following registrations
 if (!isset($volume) || ($volume == '' && $regNum > 9999))
-    $volume         			= floor($regNum/10000);
+    $volume                     = floor($regNum/10000);
 if ($regYear <= 1872 && isset($volume))
 {
     if (!isset($page) || $page == '')
     {
-        $page       			= (int)(($regNum % 10000)/10);
-        $item       			= $regNum % 10;
+        $page                   = (int)(($regNum % 10000)/10);
+        $item                   = $regNum % 10;
     }
     if ($regNum % 10 == 1)
     {
-        $prevNum    			= $regNum - 8;
-        $nextNum    			= $regNum + 1;
+        $prevNum                = $regNum - 8;
+        $nextNum                = $regNum + 1;
     }
     else
     if ($regNum % 10 == 3)
     {
-        $prevNum    			= intval($regNum) - 1;
-        $nextNum    			= intval($regNum) + 8;
+        $prevNum                = intval($regNum) - 1;
+        $nextNum                = intval($regNum) + 8;
     }
     else
     {
-        $prevNum    			= intval($regNum) - 1;
-        $nextNum    			= intval($regNum) + 1;
+        $prevNum                = intval($regNum) - 1;
+        $nextNum                = intval($regNum) + 1;
     }
 }
 else
 {       // sequentially numbered
-    $prevNum        			= intval($regNum) - 1;
-    $nextNum        			= intval($regNum) + 1;
+    $prevNum                    = intval($regNum) - 1;
+    $nextNum                    = intval($regNum) + 1;
 }       // sequentially numbered
 
 // get information about the administrative domain
-$domainObj          			= new Domain(array('domain'     => $domain,
+$domainObj                      = new Domain(array('domain'     => $domain,
                                        'language'   => 'en'));
 if ($domainObj->isExisting())
 {
-    $cc             			= substr($domain, 0, 2);
-    $countryObj     			= new Country(array('code' => $cc));
-    $countryName    			= $countryObj->getName();
-    $domainName     			= $domainObj->get('name');
+    $cc                         = substr($domain, 0, 2);
+    $countryObj                 = new Country(array('code' => $cc));
+    $countryName                = $countryObj->getName();
+    $domainName                 = $domainObj->get('name');
 }
 else
 {

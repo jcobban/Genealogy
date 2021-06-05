@@ -34,6 +34,7 @@ use Templating\escape;
  *      2021/01/24      remove method fmtMessage                        *
  *      2021/04/02      suppress advertising for Web Crawler Bots       *
  *      2021/04/04      escape contact subject URL                      *
+ *      2021/05/31      do not access HTTP_USER_AGENT if not present    *
  *                                                                      *
  *  Copyright &copy; 2021 James A. Cobban All Rights Reserved           *
  ************************************************************************/
@@ -467,8 +468,14 @@ class FtTemplate extends Template
         }
 
         // pick an advertisement to display
-        $useragent              = $_SERVER['HTTP_USER_AGENT'];
-        if (!preg_match('/compatible; \w+Bot\//', $useragent))
+        if (isset($_SERVER['HTTP_USER_AGENT']))
+        {
+            $useragent              = $_SERVER['HTTP_USER_AGENT'];
+            $isbot      = preg_match('/compatible; \w+Bot\//', $useragent);
+        }
+        else
+            $isbot                  = true;
+        if (!$isbot)
         {
 	        $getparms               = array('adname' => '!');
 	        $advertisers            = new RecordSet('Advertisers',
@@ -502,7 +509,7 @@ class FtTemplate extends Template
 	            if (strlen($month) == 1)
 	                $month          = '0' . $month;
 	            $advertiser->set("Count$month", 0);
-	            $advertiser->save(false);
+	            $advertiser->save();
 	        }                   // move to cron job
 	
 	        $this->set('ADURL',         $adurl);

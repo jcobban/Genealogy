@@ -8,6 +8,37 @@ use \Iterator;
 /************************************************************************
  *  CountyMarriage.inc                                                  *
  *                                                                      *
+ *  CREATE TABLE `CountyMarriages` (                                    *
+ *      `M_RegDomain`   VARCHAR(6) NOT NULL DEFAULT 'CAON',             *
+ *      `M_Volume`      INT(11) NOT NULL,                               *
+ *      `M_ReportNo`    DECIMAL(9,1) NOT NULL,                          *
+ *      `M_ItemNo`      INT(11) NOT NULL,                               *
+ *      `M_Role`        CHAR(1) NOT NULL DEFAULT '',                    *
+ *      `M_GivenNames`  VARCHAR(64) DEFAULT NULL,                       *
+ *      `M_Surname`     VARCHAR(64) DEFAULT NULL,                       *
+ *      `M_SurnameSoundex` CHAR(4) DEFAULT NULL,                        *
+ *      `M_Residence`   VARCHAR(64) DEFAULT '',                         *
+ *      `M_Date`        VARCHAR(16) DEFAULT '',                         *
+ *      `M_LicenseType` CHAR(1) DEFAULT 'L',                            *
+ *      `M_WitnessName` VARCHAR(48) DEFAULT '',                         *
+ *      `M_IDIR`        INT(11) DEFAULT NULL,                           *
+ *      `M_Remarks`     TEXT,                                           *
+ *      `M_Age`         VARCHAR(16) DEFAULT NULL,                       *
+ *      `M_BirthPlace`  VARCHAR(64) DEFAULT '',                         *
+ *      `M_FatherName`  VARCHAR(64) DEFAULT '',                         *
+ *      `M_MotherName`  VARCHAR(64) DEFAULT '',                         *
+ *      PRIMARY KEY (`M_RegDomain`,                                     *
+ *          `M_Volume`,                                                 *
+ *          `M_ReportNo`,                                               *
+ *          `M_ItemNo`,                                                 *
+ *          `M_Role`),                                                  *
+ *      KEY `M_GivenNames` (`M_GivenNames`),                            *
+ *      KEY `M_Surname` (`M_Surname`),                                  *
+ *      KEY `M_SurnameSoundex` (`M_SurnameSoundex`),                    *
+ *      KEY `M_Residence` (`M_Residence`),                              *
+ *      KEY `M_IDIR` (`M_IDIR`) )                                       *
+ *      ENGINE=InnoDB DEFAULT CHARSET=utf8                              *
+ *                                                                      *
  *  Definition of a class representing a record about a spouse in       *
  *  a marriage registered in pre-confederation Ontario  It represents   *
  *  the information in a row of the table CountyMarriages.              *
@@ -23,8 +54,11 @@ use \Iterator;
  *      2017/12/18      add support for temporary fields                *
  *      2019/04/18      support method getLastSqlCmd                    *
  *      2019/05/18      add $info                                       *
+ *      2021/05/19      validate parameters to constructor              *
+ *                      update $this->msg instead of throwing Exception *
+ *                      correct handling of reports '..5'               *
  *                                                                      *
- *  Copyright &copy; 2017 James A. Cobban                               *
+ *  Copyright &copy; 2021 James A. Cobban                               *
  ************************************************************************/
 require_once __NAMESPACE__ . '/Record.inc';
 
@@ -139,7 +173,7 @@ class CountyMarriage extends Record
 
         $needInsert = false;
         $this->table    = 'CountyMarriages';
-        $msg        = '';
+        $this->msg        = '';
 
         // validate parameters
         if (is_array($parms))
@@ -149,10 +183,10 @@ class CountyMarriage extends Record
                 foreach($parms as $field => $value)
                 {   // validate all field names
                     if (!array_key_exists($field, self::$initRow))
-                        $msg    .= "Invalid field name `$field` in supplied record. ";
+                        $this->msg    .= "Invalid field name `$field` in supplied record. ";
                 }   // field names
 
-                if (strlen($msg) == 0)
+                if (strlen($this->msg) == 0)
                 {
                     $dbrow      = $parms;
                     $needInsert     = false;
@@ -173,65 +207,119 @@ class CountyMarriage extends Record
                         case 'm_domain':
                         case 'm_regdomain':
                         {
-                            $where      .= $and . 'M_RegDomain=?';
-                            $sqlParms[]     = $value;
-                            $and        = ' AND ';
+                            if ($value instanceof Domain)
+                            {
+                                $where          .= $and . 'M_RegDomain=?';
+                                $sqlParms[]     = $value['domain'];
+                                $and            = ' AND ';
+                                break;
+                            }
+
+                            if (preg_match('/^[a-zA-Z]{4,5}$/', $value))
+                            {
+                                $where          .= $and . 'M_RegDomain=?';
+                                $sqlParms[]     = $value;
+                                $and            = ' AND ';
+                            }
+                            else
+                                $this->msg      .=
+                        "CountyMarriage: invalid Domain='$value'. ";
                             break;
                         }   // domain name
 
                         case 'm_volume':
                         {
-                            $where      .= $and . 'M_Volume=?';
-                            $sqlParms[]     = $value;
-                            $and        = ' AND ';
+                            if (ctype_digit($value))
+                            {
+                                $where          .= $and . 'M_Volume=?';
+                                $sqlParms[]     = $value;
+                                $and            = ' AND ';
+                            }
+                            else
+                                $this->msg      .=
+                        "CountyMarriage: invalid Volume='$value'. ";
                             break;
                         }   // volume number
 
                         case 'm_reportno':
                         {
+                            if ($value instanceof CountyMarriageReport)
+                            {
+                                $report         = $value;
+                                $where          .= $and .
+                        'M_RegDomain=? AND M_Volume=? AND M_ReportNo=?';
+                                $sqlParms[]     = $report['regdomain'];
+                                $sqlParms[]     = $report['volume'];
+                                $sqlParms[]     = $report['reportno'];
+                                $and            = ' AND ';
+                                break;
+                            }
+
                             if (is_string($value))
                             {
                                 // some idiot put in fractional values for
                                 // report numbers!
                                 $value      = trim($value);
                                 $matches    = array();
-                                $rxr        = preg_match('#(\d+)(\x{00BD}|.5|1/2)#u',
-                                                         $value, $matches);
+                                $rxr        = preg_match('#(\d+)(\x{00BD}|\.5|1/2)#u',
+                                    $value, $matches);
                                 if ($rxr)
                                     $value  = intval($matches[0]) + 0.5;
                             }
-                            $where          .= $and . 'M_ReportNo=?';
-                            $sqlParms[]     = $value;
-                            $and            = ' AND ';
+                            if (is_numeric($value))
+                            {
+                                $where          .= $and . 'M_ReportNo=?';
+                                $sqlParms[]     = $value;
+                                $and            = ' AND ';
+                            }
+                            else
+                                $this->msg      .=
+                        "CountyMarriage: invalid ReportNo='$value'. ";
                             break;
                         }   // report number
 
                         case 'm_itemno':
                         {
-                            $where      .= $and . 'M_ItemNo=?';
-                            $sqlParms[]     = $value;
-                            $and        = ' AND ';
+                            if (is_int($value) || ctype_digit($value))
+                            {
+                                $where          .= $and . 'M_ItemNo=?';
+                                $sqlParms[]     = $value;
+                                $and            = ' AND ';
+                            }
+                            else
+                                $this->msg      .= 
+                        "CountyMarriage: invalid ItemNo='$value'. ";
                             break;
                         }   // report number
 
                         case 'm_role':
                         {
-                            $where      .= $and . 'M_Role=?';
-                            $sqlParms[]     = $value;
-                            $and        = ' AND ';
+                            if ($value == 'b' ||
+                                $value == 'B' ||
+                                $value == 'g' ||
+                                $value == 'G')
+                            {
+                                $where          .= $and . 'M_Role=?';
+                                $sqlParms[]     = $value;
+                                $and            = ' AND ';
+                            }
+                            else
+                                $this->msg      .=
+                        "CountyMarriage: invalid Role='$value'. ";
                             break;
                         }   // report number
 
                         default:
                         {
                             if (!array_key_exists($fieldLc, self::$initRow))
-                            $msg    .= "Invalid field name `$field`. ";
+                                $this->msg    .=
+                                            "Invalid field name `$field`. ";
                             break;
                         }   // unrecognized
                     }   // act on specific parameter names
                 }   // loop through all supplied search parms
 
-                if (strlen($msg) == 0)
+                if (strlen($this->msg) == 0)
                 {           // no errors so far
                     $query              = "SELECT * FROM CountyMarriages " .
                                           $where;
@@ -265,7 +353,7 @@ class CountyMarriage extends Record
                     }       // successful select
                     else
                     {       // execute failed
-                        $msg    .= "execute '$queryText' failed, errorInfo=" .
+                        $this->msg    .= "execute '$queryText' failed, errorInfo=" .
                                print_r($stmt->errorInfo(), true);
                     }       // execute failed
                 }       // no errors so far
@@ -273,11 +361,8 @@ class CountyMarriage extends Record
         }           // parameter is an array
         else
         {           // invalid parameter
-             $msg   .= "called with parms=" . print_r($parms, true);
+             $this->msg   .= "called with parms=" . print_r($parms, true);
         }           // invalid parameter
-
-        if (strlen($msg) > 0)
-            throw new Exception("CountyMarriage::__construct: " . $msg);
 
         // invoke constructor of base class
         parent::__construct($dbrow,

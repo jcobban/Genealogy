@@ -568,7 +568,8 @@ try {
                     {	            // have an event
                         if ($idir > 0 && !is_null($event))
                         {
-                            $event->save(true);
+                            $event->save();
+                            print "    <cmd>" . $event->getLastSqlCmd() . "</cmd>\n";
                             $event->toXml('event');
                             if ($clearEvent != '')
                             {	    // clear event information in tblIR
@@ -781,7 +782,8 @@ try {
     error_log("<p>updateIndividXml.php " . __LINE__ . "</p>\n",
               3,
               $document_root . "/logs/updateIndivid.log");
-        $person->save(true);
+        $person->save();
+        print "    <cmd>" . $person->getLastSqlCmd() . "</cmd>\n";
         $idir	= $person->getIdir();	// in case its a new individual
 
         // save any pending instances of Event
@@ -794,9 +796,11 @@ try {
                     $event->get('idet') == Event::ET_BIRTH)
                 {
                     $person->set('birthsd', $event->get('eventsd'));
-                    $person->save(true);
+                    $person->save();
+                    print "    <cmd>" . $person->getLastSqlCmd() . "</cmd>\n";
                 }
-                $event->save(true);
+                $event->save();
+                print "    <cmd>" . $event->getLastSqlCmd() . "</cmd>\n";
                 $event->toXml('event');
             }
         }		// create or update events
@@ -809,7 +813,8 @@ try {
         // check for updates to the child relationship record
         if ($idcr > 0 && !is_null($childr))
         {		// individual updated as child in a family
-            $childr->save(true);
+            $childr->save();
+            print "    <cmd>" . $childr->getLastSqlCmd() . "</cmd>\n";
             $childr->toXml('child');
         }		// individual updated as child in a family
         else
@@ -817,7 +822,8 @@ try {
         {		// individual added to family
             try {
                 $childr		= $family->addChild($idir);
-                $childr->save(true);
+                $childr->save();
+                print "    <cmd>" . $childr->getLastSqlCmd() . "</cmd>\n";
                 $childr->toXml('child');
             }
             catch(Exception $e)

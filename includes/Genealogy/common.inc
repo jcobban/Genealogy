@@ -1070,7 +1070,7 @@ function pageBot($pageName  = null,
             if (strlen($month) == 1)
                 $month  = '0' . $month;
             $advertiser->set("Count$month", 0);
-            $advertiser->save(false);
+            $advertiser->save();
         }               // this should be moved to a cron job
     }           // found advertisements directory
     else

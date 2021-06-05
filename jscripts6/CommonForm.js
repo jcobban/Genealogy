@@ -314,7 +314,7 @@ export const  BpAbbrs = {
                 "U"         : "United States of America",
                 "Uc"        : "Upper Canada",
                 "Us"        : "United States of America",
-                "Usa"       : "United States of America",
+                "Usa"       : "USA",
                 "U.s."      : "United States of America",
                 "W"         : "Wales",
                 "Wi"        : "West Indies",
@@ -404,7 +404,7 @@ export const  LocAbbrs = {
                 "Uc"        : "Upper Canada",
                 "U"         : "United States of America",
                 "Us"        : "United States of America",
-                "Usa"       : "United States of America",
+                "Usa"       : "USA",
                 "["         : "[blank]"
                 };
 

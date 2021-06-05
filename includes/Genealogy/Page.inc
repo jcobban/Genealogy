@@ -409,7 +409,7 @@ class Page extends Record
      *                  format                                          *
      *                  if a string use it as tag name                  *
      ********************************************************************/
-    function save($xml)
+    function save($xml = false)
     {
         global  $debug;
         global  $warn;

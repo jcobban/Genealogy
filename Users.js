@@ -18,6 +18,7 @@
  *      2019/02/10      no longer need to call pageInit                 *
  *      2019/04/11      use common table pagination                     *
  *      2021/01/16      use XMLSerializer for diagnostic output         *
+ *      2021/05/24      change implementation of confirmUserXml.php     *
  *                                                                      *
  *  Copyright &copy; 2021 James A. Cobban                               *
  ************************************************************************/
@@ -253,8 +254,8 @@ function confirmUserid()
 {
     var iu  = this.id.substring("confirm".length);
     var userid  = document.getElementById('User' + iu).value;
-    var parms       = { "userid" : userid };
-    // get the subdistrict information file
+    var parms       = { "clientid" : userid };
+    // update the database
     HTTP.post("confirmUserXml.php",
               parms,
               gotConfirm,
@@ -272,11 +273,23 @@ function confirmUserid()
  ************************************************************************/
 function gotConfirm(xmlDoc)
 {
-    var evtForm = document.evtForm;
-    var root    = xmlDoc.documentElement;
+    var evtForm         = document.evtForm;
+    var root            = xmlDoc.documentElement;
     if (root && root.nodeName && root.nodeName == 'confirmed')
     {
-        window.location = window.location;  // refresh 
+        let children    = root.childNodes;
+        let id          = '';
+        for (let i = 0; i < children.length; i++)
+        {
+            let child   = children[i];
+            if (child.nodeName == 'id')
+            {
+                id = child.textContent;
+            }
+        }
+        let tableRow    = document.getElementById('Row' + id);
+        let tableBody   = tableRow.parentNode;
+        tableBody.removeChild(tableRow);
     }
     else
     {       // error

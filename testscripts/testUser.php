@@ -38,7 +38,8 @@ showTrace();
 $user['auth']       = 'pending';
 $user->dump('after setting auth=pending');
 showTrace();
-$user->save(false);
-print "<p>$msg</p>\n";
+$user->save();
+if (strlen($msg) > 0)
+    print "<p class=\"error\">$msg</p>\n";
 $user->dump('after save');
 showTrace();

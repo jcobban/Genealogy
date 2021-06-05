@@ -32,8 +32,9 @@ use \Exception;
  *						display error messages							*
  *		2017/09/12		use get( and set(								*
  *		2020/03/08      use template                                    *
+ *		2021/05/30      correct error if no sub-domains                 *
  *																		*
- *  Copyright &copy; 2020 James A. Cobban								*
+ *  Copyright &copy; 2021 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/Census.inc';
 require_once __NAMESPACE__ . '/CensusSet.inc';
@@ -197,17 +198,20 @@ $rtemplate->set('select',               $select);
 $rtemplate->set('name',                 $t['All Provinces']);
 $data               .= $rtemplate->compile();
 $domains            = $censusRec->getDomains($lang);
-foreach($domains as $code => $domain)
-{
-    $rtemplate          = new \Templating\Template($optionText);
-    $rtemplate->set('pc',                   $domain['prov']);
-    $rtemplate->set('name',                 $domain['name']);
-    if ($domain['prov']  == $province)
-        $rtemplate->set('selected',         'selected="selected"');
-    else
-        $rtemplate->set('selected',         '');
-    $data               .= $rtemplate->compile();
-}
+if ($domains)
+{                       // have DomainSet
+    foreach($domains as $code => $domain)
+    {                   // loop through DomainSet
+        $rtemplate          = new \Templating\Template($optionText);
+        $rtemplate->set('pc',                   $domain['prov']);
+        $rtemplate->set('name',                 $domain['name']);
+        if ($domain['prov']  == $province)
+            $rtemplate->set('selected',         'selected="selected"');
+        else
+            $rtemplate->set('selected',         '');
+        $data               .= $rtemplate->compile();
+    }                   // loop through DomainSet
+}                       // have DomainSet
 $optionElt->update($data);
 
 $template->display();

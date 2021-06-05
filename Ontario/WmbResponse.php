@@ -5,52 +5,53 @@ use \Exception;
 use \Templating\Template;
 
 /************************************************************************
- *  WmbResponse.php														*
- *																		*
- *  Display a report of individuals whose Wesleyan Methodist Baptism	*
- *  matches the requested pattern.  This is invoked by method="get"		*
- *  from WmbQuery.html.													*
- *																		*
- *  Parameters:															*
- *		Count															*
- *		Offset															*
- *		Surname															*
- *		GivenName														*
- *		SurnameSoundex													*
- *		District														*
- *		Area															*
- *		Father															*
- *		Mother															*
- *		etc.															*
- *																		*
- *  History:															*
- *		2013/06/28		created											*
- *		2013/11/27		handle database server failure gracefully		*
- *		2013/12/07		$msg and $debug initialized by common.inc		*
- *		2014/01/03		interpret numeric dates							*
- *						replace tables with CSS							*
- *		2015/05/01		PHP print statements were corrupted				*
- *			            validate date before interpreting month		    *	
- *		2015/07/02		access PHP includes using include_path			*
- *		2015/07/28		force minimum width of columns					*
- *		2015/09/28		migrate from MDB2 to PDO						*
- *		2016/03/26		make given name a hyperlink						*
- *		2016/04/25		replace ereg with preg_match					*
- *		2016/08/19		change default number of lines to 25			*
- *						always display full page if page requested		*
- *						forward and back links are by page if page		*
- *						requested										*
- *						order by internal order for display of page		*
- *		2016/11/28		handle invalid month 00							*
- *		2018/01/24		use new URLs									*
- *						use prepared SQL statements						*
- *						do not fail if asked to show entire table		*
- *		2018/12/20      change xxxxHelp.html to xxxxHelpen.html         *
- *		2019/04/29      change name to WmbResponse.php                  *
- *		                use Template                                    *
- *		2020/03/13      use FtTemplate::validateLang                    *
- *																		*
- *  Copyright &copy; 2020 James A. Cobban								*
+ *  WmbResponse.php                                                     *
+ *                                                                      *
+ *  Display a report of individuals whose Wesleyan Methodist Baptism    *
+ *  matches the requested pattern.  This is invoked by method="get"     *
+ *  from WmbQuery.html.                                                 *
+ *                                                                      *
+ *  Parameters:                                                         *
+ *      Count                                                           *
+ *      Offset                                                          *
+ *      Surname                                                         *
+ *      GivenName                                                       *
+ *      SurnameSoundex                                                  *
+ *      District                                                        *
+ *      Area                                                            *
+ *      Father                                                          *
+ *      Mother                                                          *
+ *      etc.                                                            *
+ *                                                                      *
+ *  History:                                                            *
+ *      2013/06/28      created                                         *
+ *      2013/11/27      handle database server failure gracefully       *
+ *      2013/12/07      $msg and $debug initialized by common.inc       *
+ *      2014/01/03      interpret numeric dates                         *
+ *                      replace tables with CSS                         *
+ *      2015/05/01      PHP print statements were corrupted             *
+ *                      validate date before interpreting month         *   
+ *      2015/07/02      access PHP includes using include_path          *
+ *      2015/07/28      force minimum width of columns                  *
+ *      2015/09/28      migrate from MDB2 to PDO                        *
+ *      2016/03/26      make given name a hyperlink                     *
+ *      2016/04/25      replace ereg with preg_match                    *
+ *      2016/08/19      change default number of lines to 25            *
+ *                      always display full page if page requested      *
+ *                      forward and back links are by page if page      *
+ *                      requested                                       *
+ *                      order by internal order for display of page     *
+ *      2016/11/28      handle invalid month 00                         *
+ *      2018/01/24      use new URLs                                    *
+ *                      use prepared SQL statements                     *
+ *                      do not fail if asked to show entire table       *
+ *      2018/12/20      change xxxxHelp.html to xxxxHelpen.html         *
+ *      2019/04/29      change name to WmbResponse.php                  *
+ *                      use Template                                    *
+ *      2020/03/13      use FtTemplate::validateLang                    *
+ *      2021/05/29      improve parameter checking                      *
+ *                                                                      *
+ *  Copyright &copy; 2021 James A. Cobban                               *
  ************************************************************************/
 require_once __NAMESPACE__ . "/MethodistBaptism.inc";
 require_once __NAMESPACE__ . "/MethodistBaptismSet.inc";
@@ -58,28 +59,28 @@ require_once __NAMESPACE__ . "/FtTemplate.inc";
 require_once __NAMESPACE__ . "/common.inc";
 
 /************************************************************************
- *  dateToString														*
- *																		*
- *  Expand numeric dates to a human readable string.					*
- *																		*
- *  Input:																*
- *		$date		date from database field							*
- *																		*
- *  Returns:															*
- *		Human readable date as a string.								*
+ *  dateToString                                                        *
+ *                                                                      *
+ *  Expand numeric dates to a human readable string.                    *
+ *                                                                      *
+ *  Input:                                                              *
+ *      $date       date from database field                            *
+ *                                                                      *
+ *  Returns:                                                            *
+ *      Human readable date as a string.                                *
  ************************************************************************/
 function dateToString($date)
 {
-    global	$monthName;
-    $matches	= array();
-    $presult	= preg_match('/^(\d\d\d\d)-(\d+)-(\d+)$/',
+    global  $monthName;
+    $matches    = array();
+    $presult    = preg_match('/^(\d\d\d\d)-(\d+)-(\d+)$/',
                              $date,
                              $matches);
     if ($presult === 1)
-    {			// pattern matched
-        $year	= $matches[1];
-        $month	= $matches[2] - 0;
-        $day	= $matches[3] - 0;
+    {           // pattern matched
+        $year   = $matches[1];
+        $month  = $matches[2] - 0;
+        $day    = $matches[3] - 0;
         if ($month == 0)
             return $day . '&nbsp;XXX&nbsp;' .  $year;
         if ($month <= 12)
@@ -90,22 +91,23 @@ function dateToString($date)
                         $year;
         else
             return $date;
-    }			// pattern matched
+    }           // pattern matched
     else
         return $date;
-}			// dateToString
+}           // dateToString
 
-$getParms				= array();
-$npuri					= 'WmbResponse.php';// for next and previous links
-$npand					= '?';		        // adding parms to $npuri
-$limit					= 20;
-$offset					= 0;
-$orderby				= 'IDMB';
-$volume					= '';
-$page					= '';
-$lang           		= 'en';
-$surname		        = null;
-$surnameSoundex		    = false;
+$getParms               = array();
+$npuri                  = 'WmbResponse.php';// for next and previous links
+$npand                  = '?';              // adding parms to $npuri
+$limit                  = 20;
+$offset                 = 0;
+$orderby                = 'IDMB';
+$volume                 = '';
+$page                   = null;
+$pagetext               = null;
+$lang                   = 'en';
+$surname                = null;
+$surnameSoundex         = false;
 
 // validate all parameters passed to the server and construct the
 // various portions of the SQL SELECT statement
@@ -115,58 +117,66 @@ $parmsText      = "<p class=\"label\">\$_GET</p>\n" .
                         "<tr><th class=\"colhead\">key</th>" .
                         "<th class=\"colhead\">value</th></tr>\n";
 foreach ($_GET as $key => $value)
-{			    // loop through all parameters
+{               // loop through all parameters
+    $safeValue  = htmlspecialchars($value);
     $parmsText  .= "<tr><th class=\"detlabel\">$key</th>" .
-                         "<td class=\"white left\">$value</td></tr>\n"; 
+                         "<td class=\"white left\">$safeValue</td></tr>\n"; 
     switch(strtolower($key))
-    {		    // switch on parameter name
+    {           // switch on parameter name
         case 'count':
         case 'limit':
-        {		// limit number of rows returned
+        {       // limit number of rows returned
             if (preg_match("/^([0-9]{1,2})$/", $value))
-                $limit	            = $value;
+                $limit              = $value;
             break;
-        }		// limit number of rows returned
+        }       // limit number of rows returned
 
         case 'offset':
-        {		// starting offset
+        {       // starting offset
             if (preg_match("/^([0-9]{1,6})$/", $value))
-                $offset	            = $value;
+                $offset             = $value;
             break;
-        }		// starting offset
+        }       // starting offset
 
         case 'volume':
         {
-            $npuri		            .= "{$npand}{$key}=" . urlencode($value);
-            $npand		            = '&amp;'; 
-            $volume		            = $value;
+            $npuri                  .= "{$npand}{$key}=" . urlencode($value);
+            $npand                  = '&amp;'; 
+            $volume                 = $value;
             $getParms['volume']     = $value;
             break;
         }
 
         case 'page':
         {
-            $npuri		            .= "{$npand}{$key}=" . urlencode($value);
-            $npand		            = '&amp;'; 
-            $page		            = $value;
-            $getParms['page']       = $value;
+            if (preg_match('/\d+/', $value))
+            {
+                $npuri              .= "{$npand}{$key}=" .urlencode($value);
+                $npand              = '&amp;'; 
+                $page               = $value;
+                $getParms['page']   = $value;
+            }
+            else
+            {
+                $pagetext           = $safeValue;
+            }
             break;
         }
 
         case 'lang':
-        {		// language requested
-            $npuri		            .= "{$npand}{$key}=" . urlencode($value);
-            $npand		            = '&amp;'; 
-	            $lang       = FtTemplate::validateLang($value);
+        {       // language requested
+            $npuri                  .= "{$npand}{$key}=" . urlencode($value);
+            $npand                  = '&amp;'; 
+                $lang       = FtTemplate::validateLang($value);
             break;
-        }		// language requested
+        }       // language requested
 
         case 'surname':
         {
-            $surname	            = $value;
-            $npuri		            .= "{$npand}{$key}=" . urlencode($value);
-            $npand		            = '&amp;'; 
-            $orderby	            = 'Surname, GivenName';
+            $surname                = $value;
+            $npuri                  .= "{$npand}{$key}=" . urlencode($value);
+            $npand                  = '&amp;'; 
+            $orderby                = 'Surname, GivenName';
             break;
         }
 
@@ -181,42 +191,42 @@ foreach ($_GET as $key => $value)
         case 'district':
         case 'area':
         case 'residence':
-        {		// match anywhere in string
+        {       // match anywhere in string
             $value                  = str_replace('&','.',$value);
-            $npuri		            .= "{$npand}{$key}=" . urlencode($value);
-            $npand		            = '&amp;'; 
-            $orderby	            = 'Surname, GivenName';
+            $npuri                  .= "{$npand}{$key}=" . urlencode($value);
+            $npand                  = '&amp;'; 
+            $orderby                = 'Surname, GivenName';
             $getParms[$key]         = urldecode($value);
             break;
-        }		// match in string
+        }       // match in string
 
         case 'surnamesoundex':
-        {		// handled under Surname
-            $npuri	                .= "{$npand}{$key}=" . urlencode($value);
-            $npand		            = '&amp;'; 
+        {       // handled under Surname
+            $npuri                  .= "{$npand}{$key}=" . urlencode($value);
+            $npand                  = '&amp;'; 
             if (strtolower($value[0]) != 'n')
-                $surnameSoundex	    = true;
-            $orderby	            = 'Surname, GivenName';
+                $surnameSoundex     = true;
+            $orderby                = 'Surname, GivenName';
             break;
-        }		// handled under Surname
+        }       // handled under Surname
 
         default:
-        {		// exact match on field in table
-            $npuri		            .= "{$npand}{$key}=" . urlencode($value);
-            $npand		            = '&amp;'; 
-            $orderby	            = 'Surname, GivenName';
+        {       // exact match on field in table
+            $npuri                  .= "{$npand}{$key}=" . urlencode($value);
+            $npand                  = '&amp;'; 
+            $orderby                = 'Surname, GivenName';
             $getParms[$key]         = $value;
             break;
-        }		// exact match on field in table
+        }       // exact match on field in table
 
         case 'debug':
-        {		// handled by common.inc
-            $npuri		            .= "{$npand}{$key}=" . urlencode($value);
-            $npand		            = '&amp;'; 
+        {       // handled by common.inc
+            $npuri                  .= "{$npand}{$key}=" . urlencode($value);
+            $npand                  = '&amp;'; 
             break;
-        }		// debug
-    }		    // switch on parameter name
-}			    // loop through all parameters
+        }       // debug
+    }           // switch on parameter name
+}               // loop through all parameters
 if ($debug)
     $warn               .= $parmsText . "</table>\n";
 
@@ -231,13 +241,22 @@ else
     $template['volumeLink']->update(null);
 $template->set('LANG',          $lang);
 
+if (is_string($pagetext))
+{
+    $msg                .= "Invalid page='$pagetext' ignored. ";
+    $page               = 0;
+}
+else
+if (is_null($page))
+    $msg                .= "Page parameter omitted. ";
+
 if ($surname)
-{			    // surname search specified
+{               // surname search specified
     if ($surnameSoundex)
         $getParms['surnamesoundex'] = $surname;
     else
         $getParms['surname']        = $surname;
-}			    // surname search specified
+}               // surname search specified
 
 $getParms['offset']                 = $offset;
 if ($orderby == 'IDMB' && strlen($page) > 0)
@@ -256,32 +275,32 @@ else
 if ($orderby == 'IDMB' && 
     strlen($page) > 0)
 {
-    $prevpage	    = $page - 1;
-    $nextpage	    = $page + 1;
+    $prevpage       = $page - 1;
+    $nextpage       = $page + 1;
     if ($prevpage > 0)
-        $npprev		= "Volume=$volume&Page=$prevpage&Count=$limit";
+        $npprev     = "Volume=$volume&Page=$prevpage&Count=$limit";
     else
         $npprev     = '';
-    $npnext		    = "Volume=$volume&Page=$nextpage&Count=$limit";
+    $npnext         = "Volume=$volume&Page=$nextpage&Count=$limit";
 }
 else
 if ($offset > 0)
-{		    // starting offset
-    $tmp	        = $offset - $limit;
+{           // starting offset
+    $tmp            = $offset - $limit;
     if ($tmp < 0)
-        $npprev	    = "";	// no previous link
+        $npprev     = "";   // no previous link
     else
-        $npprev	    = "Count=$limit&Offset=$tmp";
-    $tmp		    = $offset + $limit;
+        $npprev     = "Count=$limit&Offset=$tmp";
+    $tmp            = $offset + $limit;
     if ($tmp > $total)
-        $npnext		= "";
+        $npnext     = "";
     else
-        $npnext		= "Count=$limit&Offset=$tmp";
-}		    // starting offset
+        $npnext     = "Count=$limit&Offset=$tmp";
+}           // starting offset
 else
 {           // at beginning
-    $npprev		    = "";
-    $npnext		    = "Count=$limit&Offset=$limit";
+    $npprev         = "";
+    $npnext         = "Count=$limit&Offset=$limit";
 }           // at beginning
 
 $template->set('NPURI',         $npuri);

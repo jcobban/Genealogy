@@ -339,7 +339,7 @@ class Surname extends Record
         // if necessary insert the record into the
         // database to associate the object with a database record
         if ($this->needInsert)
-            $this->save(false);
+            $this->save();
 
         return $this->row['idnr'];
     }       // function Surname::getIdnr
@@ -386,7 +386,7 @@ class Surname extends Record
      *      $xml        if true diagnostic output is emitted in XML     *
      *                  format, if a string use it as tag name          *
      ********************************************************************/
-    function save($xml)
+    function save($xml = false)
     {
         global  $debug;
         global  $warn;

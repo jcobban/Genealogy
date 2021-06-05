@@ -1703,14 +1703,14 @@ class Event extends RecordPic
         if (is_string($value))
         {       // location text
             $loc        = new Location(array('location' => $value));
-            $loc->save(false);      // in case its a new location
+            $loc->save();      // in case its a new location
             $idlr       = $loc->getIdlr();
         }       // location text
         else
         if ($value instanceof Location)
         {       // location object
             $loc        = $value;
-            $loc->save(false);      // in case its a new location
+            $loc->save();      // in case its a new location
             $idlr       = $loc->getIdlr();
         }       // location text
         else
@@ -2623,7 +2623,7 @@ class Event extends RecordPic
      *      0           if the record did not need to be updated        *
      *      false       if the record could not be updated              *
      ********************************************************************/
-    function save($output)
+    function save($output = false)
     {
         global  $connection;
         global  $debug;
@@ -3020,22 +3020,42 @@ class Event extends RecordPic
             }           // act on specific event types
 
             // get the old style citations associated with this event
-            $parms      = array('idime'     => $idir,
-                                'type'      => $stype);
+            $parms          = array('idime'     => $idir,
+                                    'type'      => $stype);
             // set of citations to be moved
             $mcitations     = new RecordSet('Citations', $parms);
+            $mcount         = $mcitations->count();
+            if ($mcount > 0)
+                $getmsg     = "Event::getCitations: " . __LINE__ .
+                " got $mcount old citations for idime=$idir, type=$stype";
+            else
+                $getmsg     = null;
 
             // migrate
             if ($ider > 0)
-            {           // have a real event, move the citations
+            {               // have a real event, move the citations
                 foreach($mcitations as $idsx => $citation)
                 {           // loop through all citations
+                    $oldidime   = $citation->get('idime');
+                    $oldstype   = $citation->get('stype');
+                    if ($oldstype != $newstype)
+                    {
+                        if (is_string($getmsg))
+                            error_log($getmsg);
+                        ob_start();
+                        debug_print_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
+                        error_log("Event::getCitations: " . __LINE__ . 
+                            "set Citation($idsx) oldidime=$oldidime, oldtype=$oldstype, idime=$ider, type=$newstype\n" . ob_get_clean());
+                    }
+                    else
+                    {
                     $citation->set('idime', $ider);
-                    $citation->set('type', $newstype);
+                    $citation->set('type',  $newstype);
+                    }
                 }           // loop through all citations
-            }           // have a real event, move the citations
+            }               // have a real event, move the citations
 
-        }           // preferred events
+        }                   // preferred events
 
         if ($ider > 0)
         {           // have an actual record in tblER
@@ -3080,7 +3100,7 @@ class Event extends RecordPic
                 foreach($citations as $idsx => $citation)
                 {
                     $citation->set('order', $nextOrder);
-                    $citation->save(false);
+                    $citation->save();
                     ++$nextOrder;
                 }
             }           // have citations
@@ -3103,7 +3123,7 @@ class Event extends RecordPic
     /********************************************************************
      *  function Event::addCitations                                    *
      *                                                                  *
-     *  Add a set of citations to this event.                           *
+     *  Move a set of citations from another event to this event.       *
      *                                                                  *
      *  Input:                                                          *
      *      $newCitations       instance of Citation or                 *
@@ -3123,9 +3143,10 @@ class Event extends RecordPic
 
         if ($newCitations instanceof RecordSet || is_array($newCitations))
         {
+            $ider           = $this->getIder();
             foreach($newCitations as $idsx => $citation)
             {       // loop through citations
-                $citation->set('idime', $this->getIder());
+                $citation->set('idime', $ider);
                 $stype      = $citation->get('type');
                 switch($stype)
                 {
@@ -3160,7 +3181,7 @@ class Event extends RecordPic
             $citation           = $newCitations;
             $citation->set('idime', $this->getIder());
             $citation->set('order', $order);
-            $citation->save(false);
+            $citation->save();
             $idsx               = $citation->getIdsx();
             $this->citations[$idsx] = $citation;
         }       // single citation

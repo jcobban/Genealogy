@@ -66,8 +66,9 @@
  *      2020/07/03      add button to select Ontario Marriage License   *
  *      2020/11/21      move showImage to common utilities script       *
  *      2021/05/09      expand regdate                                  *
+ *      2021/05/28      add a button to select default form layout      *
  *                                                                      *
- *  Copyright &copy; 2019 James A. Cobban.                              *
+ *  Copyright &copy; 2021 James A. Cobban.                              *
  ************************************************************************/
 
 window.onload   = onLoadMarriage;
@@ -194,6 +195,12 @@ function onLoadMarriage()
             case 'reset':
             {       // Reset button
                 element.onclick = resetForm;
+                break;
+            }       // Reset button
+
+            case 'baselayout':
+            {       // button to choose Ontario Marriage Licence layout
+                element.onclick     = chooseBaseLayout;
                 break;
             }       // Reset button
 
@@ -594,6 +601,28 @@ function showNext(ev)
     location        = nextUrl;
     return false;
 }       // function showNext
+
+/************************************************************************
+ *  function chooseBaseLayout                                           *
+ *                                                                      *
+ *  This function is called when the user selects the default layout    *
+ *  button with the mouse.                                              *
+ *                                                                      *
+ *  Input:                                                              *
+ *      this            <button id='baseLayout'>                        *
+ ************************************************************************/
+function chooseBaseLayout(ev)
+{
+    ev.stopPropagation();
+    var form        = this.form;
+    const tempPatt  = /&template=\w+/;
+    var nextUrl     = location.href.replace(tempPatt, '');
+    if (typeof(args.showimage) == 'string' &&
+        args.showimage.toLowerCase() == 'yes')
+        nextUrl     += "&ShowImage=Yes";
+    location        = nextUrl;
+    return false;
+}       // function chooseBaseLayout
 
 /************************************************************************
  *  function chooseOntarioLicenceLayout                                 *

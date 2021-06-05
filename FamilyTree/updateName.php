@@ -24,7 +24,7 @@ require_once __NAMESPACE__ . '/Name.inc';
 require_once __NAMESPACE__ . '/common.inc';
 
 // emit the XML header
-print("<?xml version='1.0' encoding='UTF-8'?>\n");
+print("<?xml version='1.0' encoding='UTF-8'?".">\n");
 print "<update>\n";
 
 $idnx	= null;
@@ -44,7 +44,8 @@ if (is_int($idnx))
     $name->postUpdate(true);
 
     // save object state to server
-    $name->save(true);
+    $name->save();
+    print "    <cmd>" . $name->getLastSqlCmd() . "</cmd>\n";
 
     // include XML representation of updated record in response
     $name->toXml('name');
