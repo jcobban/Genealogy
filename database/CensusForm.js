@@ -3235,11 +3235,11 @@ function gotIdir(xmlDoc)
 
     hideLoading();
     // substitutions into the template
-    let parms      = {"sub"     : "",
-                       "surname"    : surname,
-                       "givenname"  : givennames,
-                       "birthyear"  : birthDate,
-                       "line"       : line};
+    let parms           = {"sub"        : "",
+                           "surname"    : surname,
+                           "givenname"  : givennames,
+                           "birthyear"  : birthDate,
+                           "line"       : line};
 
     let matches  = xmlDoc.getElementsByTagName("indiv");
     if (matches.length > 0)
@@ -3252,8 +3252,8 @@ function gotIdir(xmlDoc)
     }       // have some matching entries
     else
     {       // have no matching entries
-        let cmds  = xmlDoc.getElementsByTagName("cmd");
-        parms.cmd  = new XMLSerializer().serializeToString(cmds[0]).replace('<','&lt;');
+        let cmds    = xmlDoc.getElementsByTagName("cmd");
+        parms.cmd   = new XMLSerializer().serializeToString(cmds[0]).replace('<','&lt;');
         return displayDialog('idirNullForm$sub',
                              parms,
                              button,
@@ -3439,8 +3439,8 @@ function displaySelectIdir(templateId,
         // the mouse is clicked on an option
         for(var io=0; io < select.options.length; io++)
         {
-            let option  = select.options[io];
-            evt             = new Event('change',{'bubbles':true});
+            let option      = select.options[io];
+            let evt         = new Event('change',{'bubbles':true});
             option.addEventListener("click",
                                     function(event) {
                                         event.stopPropagation(); 

@@ -73,10 +73,9 @@ if (strlen($msg) == 0)
 
         if ($userid == $sender || $userid == $receiver || canUser('yes'))
         {
-            $count  = $blog->delete(true);
-
-            if (is_int($count))
-                print "    <msg>Deleted $count records.</msg>\n";
+            $count      = $blog->delete();
+            $lastCmd    = $blog->getLastSqlCmd();
+            print "<cmd count='$count'>$lastCmd</cmd>\n";
         }       // current user is either the sender or the receiver
         else
         {       // errors in parameters

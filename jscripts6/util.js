@@ -225,6 +225,7 @@
  *                      if help is requested for a hidden element       *
  *                      find its closest enclosing non-hidden parent    *
  *      2021/03/30      remove changeDiv, it was obsoleted years ago    *
+ *      2021/07/03      correct vertical position of popup dialogs      *
  *                                                                      *
  *  Copyright &copy; 2021 James A. Cobban                               *
  ************************************************************************/
@@ -703,17 +704,21 @@ export function getOffsetTop(elt)
 {
     // note that "top" is a reserved word
     let y           = 0;
+    let main        = document.getElementsByTagName('main');
+    if (main.length > 0)
+        main        = main[0];
     while(elt)
     {
         y           += elt.offsetTop;
+        if (elt.scrollTop > 0)
+        {
+            main    = elt;
+            break;
+        }
         elt         = elt.offsetParent;
     }       // increment up to top element
-    let main        = document.getElementsByTagName('main');
-    if (main.length > 0)
-    {
-        main        = main[0];
+    if (main)
         y           -= main.scrollTop;
-    }
     return y;
 }   // function getOffsetTop
 

@@ -42,7 +42,7 @@ header("Content-Type: text/xml");
 require_once __NAMESPACE__ . '/RecordSet.inc';
 
 // emit the XML header
-print("<?xml version='1.0' encoding='UTF-8'?>\n");
+print("<?xml version='1.0' encoding='UTF-8'?".">\n");
 print "<ordered>\n";
 
 // until I find out why this include generates a new line
@@ -63,15 +63,30 @@ foreach($_POST as $key => $value)
     switch(strtolower($key))
     {
         case 'idir':
-            if (ctype_digit($idir) && $idir > 0)
+            if (ctype_digit($value) && $value > 0)
                 $idir       = $value;
             else
                 $msg        .= "Invalid value IDIR=$value. ";
             break;
 
         case 'sex':
-            if (preg_match('/^[mfMF]$/', $value))
-                $sex        = $value;
+            if (preg_match('/^[mfMF01]$/', $value))
+            {
+                switch($value)
+                {
+                    case 'm':
+                    case 'M':
+                    case '0':
+                        $sex        = 0;
+                        break;
+
+                    case 'f':
+                    case 'F':
+                    case '1':
+                        $sex        = 1;
+                        break;
+                }
+            }
             else
                 $msg        .= "Invalid value Sex=$value. ";
             break;
@@ -137,7 +152,7 @@ if (strlen($msg) == 0)
         $family->set($orderFld, $order);
         $ucount             = $family->save();
         if ($ucount > 0)
-            print "    <cmd>" . $family->getLastSqlCmd() . "</cmd>\n";
+            print "    <cmd count='$ucount'>" . $family->getLastSqlCmd() . "</cmd>\n";
 
         // include results of update in XML response
         print "    <new>\n";

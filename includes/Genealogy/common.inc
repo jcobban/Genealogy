@@ -1043,14 +1043,14 @@ function pageBot($pageName  = null,
     // pick an advertisement to display
     $dh             = opendir("$document_root/Advertisements");
     if ($dh)
-    {           // found advertisements directory
+    {                   // found advertisements directory
         while (($filename = readdir($dh)) !== false)
-        {       // loop through files
+        {               // loop through files
             if (strlen($filename) > 5 &&
                 $filename != "index.html" &&
                 substr($filename, strlen($filename) - 5) == '.html')
             $ads[]      = $filename;
-        }       // loop through files
+        }               // loop through files
         include_once  __NAMESPACE__ . '/Advertiser.inc';
         $counterRec     = new Advertiser(array('adname' == ''));
         $counterRec->increment('01');
@@ -1072,7 +1072,7 @@ function pageBot($pageName  = null,
             $advertiser->set("Count$month", 0);
             $advertiser->save();
         }               // this should be moved to a cron job
-    }           // found advertisements directory
+    }                   // found advertisements directory
     else
         $adname         = 'AddForRent.html';
     $adurl              = "/Advertisements/$adname";

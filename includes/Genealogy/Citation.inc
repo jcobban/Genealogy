@@ -1742,9 +1742,15 @@ class Citation extends RecordPic
         global  $warn;
         global  $msg;
 
-        if (!array_key_exists('idsx', $this->row))
+        $count                  = 0;
+        if (is_null($this->row) ||
+            !array_key_exists('idsx', $this->row))
+        {
             $warn   .= "<p>Citation::save: " . __LINE__ .
-                            $this->dump("not initialized");
+                $this->dump("not initialized");
+            return 0;
+        }
+
         if ($this->row['idsx'] == 0)
         {       // creating new record, ensure not a duplicate
             // construct a query for duplicate citations
@@ -2020,7 +2026,7 @@ class Citation extends RecordPic
 
         // close off the JSON document
         if (strlen($retval) > 0)
-            $retval     .= "\n}\n";
+            $retval     .= "\n    }\n";
 
         if ($print)
         {

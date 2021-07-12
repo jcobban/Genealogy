@@ -1,0 +1,37 @@
+<!--*********************************************************************
+ *  Correspondenceen.html                                               *
+ *                                                                      *
+ *  This script displays a list of correspondence regarding the         *
+ *  family tree.                                                        *
+ *                                                                      *
+ *  History:                                                            *
+ *      2021/06/24      created                                         *
+ *                                                                      *
+ *  Copyright &copy; 2021 James A. Cobban                               *
+ **********************************************************************-->
+      <div id="breadcrumbs" class="hidden">
+        <a href="/index.html">Home</a>:
+        <a href="/genealogy.php?lang=$LANG">
+        Genealogy
+        </a>:
+      </div> <!-- id="breadcrumbs" -->
+      <div class="body">
+        <h1>Correspondence
+          <span class="right">
+            <a href="/CorrespondenceHelpen.html" target="help">?&nbsp;Help</a>
+          </span>
+        </h1>
+        $TRACE
+        $MSG
+      <p>
+      Correspondence regarding the family tree.
+      </p>
+
+      <p class="label" id="correspondence$i">
+        <a href="/Correspondence/$filename$type" target="correspondence">
+            $filename
+        </a>
+      </p>
+    </div> <!-- class=body -->
+    <script src="/genealogy.js" type="module">
+    </script>

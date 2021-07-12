@@ -59,29 +59,38 @@ require_once __NAMESPACE__ . "/common.inc";
  ***********************************************************************/
 $cc             = 'CA';
 $countryName    = 'Canada';
-if (isset($_SERVER['HTTP_ACCEPT_LANGUAGE']))
-    $lang       = substr($_SERVER['HTTP_ACCEPT_LANGUAGE'], 0, 2);
-else
-    $lang       = 'en';
 
 // process parameters passed by caller
-foreach ($_GET as $key => $value)
-{           // loop through all parameters
-    switch(strtolower($key))
-    {
-        case 'lang':
-        {       // requested language
-            if (strlen($value) >= 2)
-                $lang   = strtolower(substr($value, 0, 2));
-            break;
-        }       // requested language
+if (isset($_GET) && count($_GET) > 0)
+{                   // invoked by URL to display current status of account
+    $parmsText              = "<p class='label'>\$_GET</p>\n" .
+                               "<table class='summary'>\n" .
+                                  "<tr><th class='colhead'>key</th>" .
+                                    "<th class='colhead'>value</th></tr>\n";
+    foreach ($_GET as $key => $value)
+    {               // loop through all parameters
+        $safevalue          = htmlspecialchars($value);
+        $parmsText          .= "<tr><th class='detlabel'>$key</th>" .
+                                "<td class='white left'>" .
+                                "$safevalue</td></tr>\n"; 
+        switch(strtolower($key))
+        {           // switch on parameter name
+            case 'lang':
+            {       // requested language
+                $lang       = FtTemplate::validateLang($value);
+                break;
+            }       // requested language
+    
+            case 'debug':
+            {       // requested debug
+                break;
+            }       // requested debug
+        }           // switch on parameter name
+    }               // foreach parameter
+    if ($debug)
+        $warn               .= $parmsText . "</table>\n";
+}                   // invoked by URL to display current status of account
 
-        case 'debug':
-        {       // requested debug
-            break;
-        }       // requested debug
-    }       // switch on parameter name
-}           // foreach parameter
 $update             = canUser('edit');
 
 $template           = new FtTemplate("genealogy$lang.html");

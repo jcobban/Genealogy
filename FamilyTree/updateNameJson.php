@@ -43,7 +43,7 @@ if (is_int($idnx))
     // update object from $_POST parameters
     $name->postUpdate();
     $command                    = $name->getLastSqlCmd();
-    print ",\n\"update\": " . json_encode($command);
+    print "\n\"update\": " . json_encode($command);
 
     // save object state to server
     $name->save();

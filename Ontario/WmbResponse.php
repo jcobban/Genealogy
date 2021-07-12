@@ -157,6 +157,7 @@ foreach ($_GET as $key => $value)
                 $getParms['page']   = $value;
             }
             else
+            if (strlen($value) > 0)
             {
                 $pagetext           = $safeValue;
             }
@@ -246,9 +247,6 @@ if (is_string($pagetext))
     $msg                .= "Invalid page='$pagetext' ignored. ";
     $page               = 0;
 }
-else
-if (is_null($page))
-    $msg                .= "Page parameter omitted. ";
 
 if ($surname)
 {               // surname search specified

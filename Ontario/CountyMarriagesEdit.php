@@ -223,6 +223,8 @@ if (count($_POST) > 0)
 
     // ensure reports still sorted by keys before displaying them
     usort($reports,'Genealogy\compareReports');
+
+    $itemNo         = null;
 }                       // perform update
 else
 {                       // initial query
@@ -560,6 +562,7 @@ $template->set('REPORTNOTEXT',      $reportNotext);
 if (is_null($itemNo))
 {
     $template['itemTitle']->update(null);
+    $template['itemNo']->update(null);
     $template->set('ITEMNO',            'null');
 }
 else
@@ -584,8 +587,8 @@ if (strlen($msg) == 0)
 
     if (strlen($image) == 0)
         $template['imageButton']->update(null);
-    
-    
+
+
     // notify the invoker if they are not authorized to update the form
     if (canUser('edit'))
     {       // authorized to update database
@@ -623,7 +626,7 @@ if (strlen($msg) == 0)
                             $reportNotext . "&ItemNo=" . ($itemNo - 1);
             $prevText   = $reportNotext . '-' . ($itemNo - 1);
         }
-        if (is_null($itemNo))
+        if (is_null($itemNo) || $itemNo == 1)
         {
             if ($reportNo == floor($reportNo))
                 $nextText   = $reportNo + 1;
@@ -680,7 +683,7 @@ if (strlen($msg) == 0)
                 $reportNotext       = floor($reportNo) . '½';
             $itemNo                 = $record->get('itemno'); 
             $role                   = $record->get('role');
-    
+
             // get values in a form suitable for presenting in HTML
             $givennames             = $record->get('givennames');
             $givennames             = str_replace("'","&#39;",$givennames);
@@ -702,7 +705,7 @@ if (strlen($msg) == 0)
             $date                   = $record->get('date');
             $licenseType            = $record->get('licensetype');
             $idir                   = $record->get('idir');
-    
+
             if ($role == 'G')
             {       // groom record
                 $sexclass               = 'male';
@@ -744,7 +747,7 @@ if (strlen($msg) == 0)
             }
             else
                 $rtemplate['Find$row']->update(null);
-    
+
             $data           .= $rtemplate->compile();
         }                       // process all rows
         $template['norecords']->update(null);

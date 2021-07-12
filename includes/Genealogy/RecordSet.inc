@@ -293,7 +293,7 @@ class RecordSet implements Iterator, Countable, ArrayAccess
      *          IS NOT  testing against boolean or null                 *
      ********************************************************************/
     protected static $pat   =
-                '/^(<=|<|=|!=|<=>|<>|>|>=|&|:|IS|IS NOT)?(.*)$/';
+                '/^(<=|<|=|!=|<=>|<>|>=|>|&|:|IS|IS NOT)?(.*)$/';
 
     /********************************************************************
      *  function __construct                                            *
@@ -2181,6 +2181,7 @@ require_once __NAMESPACE__ . '/Surname.inc';
         $indent             = '';
         $xmlparms           = '';
         $xml                = $output === Record::XML;
+        $json               = false;
         if ($output === Record::JSON)
         {
             $json           = true;

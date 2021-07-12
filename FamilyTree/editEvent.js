@@ -303,8 +303,7 @@ function loadEdit()
                     break;
                 }       // event temple
 
-                case 'templeReady':
-                case 'templeReady':
+                case 'templeready':
                 case 'cremated':
                 case 'title':
                 {       // templeReady checkbox
@@ -590,7 +589,7 @@ function changeOccupation(editor)
         else
             text            = tagArray[0];
         let words           = text.split(" ");
-    
+
         for(var iw = 0; iw < words.length; iw++)
         {               // loop through all words
             let key         = words[iw];
@@ -616,7 +615,7 @@ function changeOccupation(editor)
             {           // key does not start with special char
                 firstChar   = "";
             }           // key does not start with special char
-    
+
             // if word ends with a punctuation mark, do not include it
             let lastChar    = key.charAt(key.length - 1);
             if (key.substring(key.length - 2) == "'s")
@@ -634,7 +633,7 @@ function changeOccupation(editor)
             {           // key does not end with special char
                 lastChar    = "";
             }           // key does not end with special char
-    
+
             // do a table lookup in the table of abbreviations
             let exp = abbrTbl[key];
             if (exp)
@@ -1415,6 +1414,7 @@ function addCitation(ev)
     {           // not assigned yet, update record in tblER
         pendingElement  = this;
         let updEvent    = document.getElementById('updEvent');
+
         if (updEvent == null)
             form.submit();
         else
@@ -1808,48 +1808,48 @@ function createCitation()
  *                                                                      *
  *  This method is called when the JSON file representing               *
  *  the addition of a Citation is retrieved.                            *
- *						                                                *
- *  {						                                            *
- *    "parms" : {						                                *
- *      "idime" : "1063353",						                    *
- *      "type" : "10",						                            *
- *      "idsr" : "97",						                            *
- *      "source" : "Birth Register, CA, Ontario",						*
- *      "page" : "1896-07769",						                    *
- *      "row" : "0",						                            *
- *      "formname" : "nameForm"  },						                *
- *      "sqlcmd1051" : "INSERT INTO tblSX (`idsr`, `idime`, `type`, `srcdetail`, `srcprintdetail`, `srcdettext`, `srcprinttext`, `srcdetnote`, `srcprintnote`, `srcprint`, `srcsurety`, `enteredsd`, `enteredd`, `filingref`, `order`, `used`, `verified`, `content`, `override`, `overridefootnote`, `overridesubsequent`, `overridebibliography`) VALUES(97, 1063353, 10, '1896-07769', 1, '', 1, '', 1, 1, 3, 20210315, 001503202100000000, '', 0, 0, 0, '', '', 1, 1, 1)",
- *      "citation" : {				                                    *
- *      	"idsx":	"449426",				                            *
- *      	"idsr":	97,				                                    *
- *      	"source":	"Birth Register, CA, Ontario",				    *
- *      	"idime":	1063353,				                        *
- *      	"type":	10,				                                    *
- *      	"typemeans":	"Alternate Name",				            *
- *      	"reckey":	"IDNX",				                            *
- *      	"srcdetail":	"1896-07769",				                *
- *      	"srcprintdetail":	1,				                        *
- *      	"srcdettext":	"",				                            *
- *      	"srcprinttext":	1,				                            *
- *      	"srcdetnote":	"",				                            *
- *      	"srcprintnote":	1,				                            *
- *      	"srcprint":	1,				                                *
- *      	"srcsurety":	3,				                            *
- *      	"enteredsd":	20210315,				                    *
- *      	"entereddc":	"001503202100000000",				        *
- *      	"enteredd":	"15 Mar 2021",				                    *
- *      	"filingref":	"",				                            *
- *      	"order":	"0",				                            *
- *      	"used":	0,				                                    *
- *      	"verified":	0,				                                *
- *      	"content":	"",				                                *
- *      	"override":	"",				                                *
- *      	"overridefootnote":	1,				                        *
- *      	"overridesubsequent":	1,				                    *
- *      	"overridebibliography":	1				                    *
- *      },				                                                *
- *      "type" : 10				                                        *
- *  }				                                                    *
+ *                                                                      *
+ *  {                                                                   *
+ *    "parms" : {                                                       *
+ *      "idime" : "1063353",                                            *
+ *      "type" : "10",                                                  *
+ *      "idsr" : "97",                                                  *
+ *      "source" : "Birth Register, CA, Ontario",                       *
+ *      "page" : "1896-07769",                                          *
+ *      "row" : "0",                                                    *
+ *      "formname" : "nameForm"  },                                     *
+ *      "sqlcmd1051" : "INSERT INTO tblSX (`idsr`, ... , `overridebibliography`) VALUES(97, 1063353, 10, '1896-07769', 1, '', 1, '', 1, 1, 3, 20210315, 001503202100000000, '', 0, 0, 0, '', '', 1, 1, 1)",
+ *      "citation" : {                                                  *
+ *          "idsx": "449426",                                           *
+ *          "idsr": 97,                                                 *
+ *          "source":   "Birth Register, CA, Ontario",                  *
+ *          "idime":    1063353,                                        *
+ *          "type": 10,                                                 *
+ *          "typemeans":    "Alternate Name",                           *
+ *          "reckey":   "IDNX",                                         *
+ *          "srcdetail":    "1896-07769",                               *
+ *          "srcprintdetail":   1,                                      *
+ *          "srcdettext":   "",                                         *
+ *          "srcprinttext": 1,                                          *
+ *          "srcdetnote":   "",                                         *
+ *          "srcprintnote": 1,                                          *
+ *          "srcprint": 1,                                              *
+ *          "srcsurety":    3,                                          *
+ *          "enteredsd":    20210315,                                   *
+ *          "entereddc":    "001503202100000000",                       *
+ *          "enteredd": "15 Mar 2021",                                  *
+ *          "filingref":    "",                                         *
+ *          "order":    "0",                                            *
+ *          "used": 0,                                                  *
+ *          "verified": 0,                                              *
+ *          "content":  "",                                             *
+ *          "override": "",                                             *
+ *          "overridefootnote": 1,                                      *
+ *          "overridesubsequent":   1,                                  *
+ *          "overridebibliography": 1                                   *
+ *      },                                                              *
+ *      "type" : 10                                                     *
+ *  }                                                                   *
  *                                                                      *
  *  Parameters:                                                         *
  *      jsonDoc  information about the added citation                   *
@@ -1866,11 +1866,11 @@ function gotAddCit(jsonDoc)
         let parms                   = jsonDoc.parms;
         if (parms.formname)
         {
-		    let rowNum              = parms.row;
-		    let idsr                = parms.idsr;
-		    let sourcename          = parms.source;
-		    let formname            = parms.formname;
-		    let form                = document.forms[formname];
+            let rowNum              = parms.row;
+            let idsr                = parms.idsr;
+            let sourcename          = parms.source;
+            let formname            = parms.formname;
+            let form                = document.forms[formname];
             let citation            = jsonDoc.citation;
 
             // locate elements in web page to be updated

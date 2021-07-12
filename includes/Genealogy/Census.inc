@@ -835,7 +835,7 @@ class Census extends Record
         }                   // subdomains of census
 
         if (strlen($retval) > 0)
-            $retval             .= "\n}\n";
+            $retval             .= "\n    }\n";
         if ($print)
             print $retval;
         return $retval;

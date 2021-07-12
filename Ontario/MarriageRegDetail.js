@@ -154,13 +154,13 @@ function onLoadMarriage()
             }       // place of marriage
 
             case 'date':
+                element.focus();
             case 'regdate':
             {       // date of the marriage or registration
                 element.abbrTbl     = MonthAbbrs;
                 element.onchange    = dateChanged;
                 element.checkfunc   = checkDate;
                 element.checkfunc();
-                element.focus();
                 break;
             }       // date of the marriage or registration
 

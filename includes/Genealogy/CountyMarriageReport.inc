@@ -399,9 +399,9 @@ class CountyMarriageReport extends Record
                                    json_encode($value);
             $comma      = ",\n";
         }
-        if (strlen($retval) > 0)
-            $retval     .= "\n}\n";
 
+        if (strlen($retval) > 0)
+            $retval     .= "\n    }\n";
         if ($print)
             print $retval;
         return $retval;

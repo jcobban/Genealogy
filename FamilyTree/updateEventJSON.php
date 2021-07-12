@@ -7,7 +7,7 @@ use \Exception;
  *                                                                      *
  *  Handle a request to update an individual event in                   *
  *  the Legacy family tree database.  This file generates an            *
- *  JSON file, so it can be invoked from Javascript.                    *
+ *  XML file, so it can be invoked from Javascript.                     *
  *                                                                      *
  *  Parameters (passed by method='POST'):                               *
  *    One of the following record keys:                                 *
@@ -117,10 +117,11 @@ use \Exception;
  *      2017/09/28      change class LegacyEvent to class Event         *
  *      2017/10/13      class LegacyIndiv renamed to class Person       *
  *      2017/11/29      use RecordSet to get default event Order        *
+ *      2021/06/06      switch to using JSON                            *
  *                                                                      *
- *  Copyright &copy; 2017 James A. Cobban                               *
+ *  Copyright &copy; 2021 James A. Cobban                               *
  ************************************************************************/
-header("Content-Type:  application/json");
+header("Content-Type: application/json");
 require_once __NAMESPACE__ . '/Person.inc';
 require_once __NAMESPACE__ . '/Location.inc';
 require_once __NAMESPACE__ . '/Temple.inc';
@@ -130,7 +131,7 @@ require_once __NAMESPACE__ . '/Name.inc';
 require_once __NAMESPACE__ . '/LegacyDate.inc';
 require_once __NAMESPACE__ . '/common.inc';
 
-// emit the JSON header
+// print the root node of the JSON object
 print "{\n";
 
 // get the updated values of the fields in the record
@@ -165,87 +166,51 @@ $altGivenName               = null;
 $idlr                       = 1;            // default location blank
 $citParms                   = array();
 $citations                  = array();      // list of citations
-$comma                      = '';
 
-print "    \"parms\": {";
+print "    \"parms\" : {\n";
+$comma                      = '';
 foreach($_POST as $key => $value)
-{                   // loop through all parameters
-    print "$comma\t\t\"$key\":\t". json_encode($value);
+{       // loop through all parameters
+    print "$comma\t\"$key\" : " . json_encode($value);
+    $comma                  = ",\n";
 
     switch($key)
-    {               // act on specific keys
+    {   // act on specific keys
         case 'idir':
-        {           // idir of individual to be updated
+        {       // idir of individual to be updated
             $idir                       = $value;
-            if (is_numeric($idir))
-            {
+            if (strlen($idir) > 0)
                 $person                 = new Person(array('idir' => $idir));
-                if ($person->isExisting())
-                {
-                    if (!$person->isOwner())
-                        $msg    .= "User not authorized to update individual $idir. ";
-                }
-                else
-                    $msg    .= "No Person for IDIR=$idir. ";
-            }
+            if (!$person->isOwner())
+                $msg    .= "User not authorized to update individual $idir. ";
             break;
-        }           // idir of individual to be updated
+        }       // idir of individual to be updated
 
         case 'idmr':
-        {           // idmr of family to be updated
+        {       // idmr of family to be updated
             $idmr                       = $value;
-            if (is_numeric($idmr))
-            {
+            if (strlen($idmr) > 0)
                 $family                 = new Family(array('idmr' => $idmr));
-                if (!$family->isExisting())
-                    $msg    .= "No Family for IDMR=$idmr. ";
-            }
             break;
-        }           // idmr of family to be updated
+        }       // idmr of family to be updated
 
         case 'ider':
-        {           // ider to be updated
+        {       // ider to be updated
             $ider                       = $value;
-            if (is_numeric($ider))
+            if (strlen($ider) > 0)
             {
                 $event                  = new Event(array('ider' => $ider));
-                if ($event->isExisting())
-                {
-                    $type               = $event->getCitType();
-                    $idtype             = $event['idtype'];
-                    switch ($idtype)
-                    {
-                        case Event::IDTYPE_INDIV:
-                            $idir           = $event['idir'];
-                            break;
-
-                        case Event::IDTYPE_MAR:
-                            $idmr           = $event['idir'];
-                            break;
-
-                        case Event::IDTYPE_CHILD:
-                            $idcr           = $event['idir'];
-                            break;
-
-                    }
-                    $date               = $event->getDate();
-                    $location           = $event->getLocation();
-                    $etype              = $event['idet'];
-                }
-                else
-                    $msg    .= "No Event for IDER=$ider. ";
             }
             break;
-        }           // ider to be updated
+        }       // ider to be updated
 
         case 'idcr':
-        {           // idcr to be updated
+        {       // idcr to be updated
             $idcr                       = $value;
-            if (is_numeric($idcr))
+            if (strlen($idcr) > 0)
             {
                 $child                  = new Child(array('idcr' => $idcr));
-                if ($child->isExisting())
-                {
+                try {
                     $idir               = $child->getIdir();
                     $person             = new Person(array('idir' => $idir));
                     if (!$person->isOwner())
@@ -254,18 +219,17 @@ foreach($_POST as $key => $value)
                     $idmr               = $child->getIdmr();
                     $family             = new Family(array('idmr' => $idmr));
                 }
-                else
+                catch (Exception $e)
                 {
                     $person             = null;
                     $family             = null;
-                    $msg                .= "No Child for IDCR=$idcr. ";
                 }
             }
             break;
-        }           // idcr to be updated
+        }       // idcr to be updated
 
         case 'type':
-        {           // type to be updated
+        {       // type to be updated
             $type                       = $value;
             if (strlen($type) > 0)
             {
@@ -280,29 +244,29 @@ foreach($_POST as $key => $value)
                     $kind               = 0;    // location is a location
             }
             break;
-        }           // type to be updated
+        }       // type to be updated
 
         case 'etype':
-        {           // etype to be updated
+        {       // etype to be updated
             $etype                      = $value;
             break;
-        }           // etype to be updated
+        }       // etype to be updated
 
         case 'date':
-        {           // date to be updated
+        {       // date to be updated
             $date                       = trim($value);
             break;
-        }           // date to be updated
+        }       // date to be updated
 
         case 'kind':
-        {           // location kind to be updated
+        {       // location kind to be updated
             $kind                       = $value;
             break;
-        }           // location kind to be updated
+        }       // location kind to be updated
 
         case 'location':
         case 'temple':
-        {           // location to be updated
+        {       // location to be updated
             if (strlen($value) > 0)
             {       // find/create location by name
                 if ($kind == 1)
@@ -329,121 +293,121 @@ foreach($_POST as $key => $value)
                 $idlr                   = 1;
             }       // empty location
             break;
-        }           // location to be updated
+        }       // location to be updated
 
         case 'note':
-        {           // note to be updated
+        {       // note to be updated
             $note                       = $value;
             break;
-        }           // note to be updated
+        }       // note to be updated
 
         case 'deathCause':
-        {           // deathCause to be updated
+        {       // deathCause to be updated
             $deathCause                 = $value;
             break;
-        }           // deathCause to be updated
+        }       // deathCause to be updated
 
         case 'desc':
-        {           // note to be updated
+        {               // note to be updated
             $note                       = $value;
             break;
-        }           // note to be updated
+        }               // note to be updated
 
         case 'description':
         case 'occupation':
-        {           // description of event
+        {               // description of event
             $description                = $value;
             break;
-        }           // descriptions of event
+        }               // descriptions of event
 
         case 'order':
-        {           // order to be updated
+        {               // order to be updated
             $order                      = $value;
             break;
-        }           // order to be updated
+        }               // order to be updated
 
         case 'prefix':
-        {           // prefix to be updated
+        {               // prefix to be updated
             $prefix                     = $value;
             break;
-        }           // prefix to be updated
+        }               // prefix to be updated
 
         case 'title':
-        {           // title to be updated
+        {               // title to be updated
             $title                      = $value;
             break;
-        }           // title to be updated
+        }               // title to be updated
 
         case 'notmarried':
-        {           // value of not married indicator
+        {               // value of not married indicator
             $notmar                     = $value;
             break;
-        }           // value of not married indicator
+        }               // value of not married indicator
 
         case 'nochildren':
-        {           // value of no children indicator
+        {               // value of no children indicator
             $nokids                     = $value;
             break;
-        }           // value of no children indicator
+        }               // value of no children indicator
 
         case 'templeReady':
-        {           // value of temple ready submission indicator
+        {               // value of temple ready submission indicator
             $templeReady                = $value;
             break;
-        }           // value of temple ready submission indicator
+        }               // value of temple ready submission indicator
 
         case 'cremated':
-        {           // value of cremated indicator
+        {               // value of cremated indicator
             $cremated                   = $value;
             break;
-        }           // value of cremated indicator
+        }               // value of cremated indicator
 
         case 'givenName':
-        {           // value of primary given name
+        {               // value of primary given name
             $givenName                  = $value;
             break;
-        }           // value of primary given name
+        }               // value of primary given name
 
         case 'surname':
-        {           // value of primary surname
+        {               // value of primary surname
             $surname                    = $value;
             break;
-        }           // value of primary surname
+        }               // value of primary surname
 
         case 'newAltGivenName':
-        {           // value of given name portion of alternate name
+        {               // value of given name portion of alternate name
             $altGivenName               = $value;
             break;
-        }           // value of temple ready submission indicator
+        }               // value of temple ready submission indicator
 
         case 'newAltSurname':
-        {           // value of temple ready submission indicator
+        {               // value of temple ready submission indicator
             $altSurname                 = $value;
             break;
-        }           // value of temple ready submission indicator
+        }               // value of temple ready submission indicator
 
         case 'idime':
-        {           // citation IDIME
+        {               // citation IDIME
             $citParms['idime']          = $value;
             break;
-        }           // citation IDIME
+        }               // citation IDIME
 
         case 'citType':
-        {           // citation type
+        {               // citation type
             $citParms['type']           = $value;
             break;
-        }           // citation type
+        }               // citation type
 
         default:
-        {           // other fields
+        {               // other fields
             if (substr($key, 0, 6) == 'Source')
-            {       // IDSR of source
+            {           // IDSR of source
                 $idsx                   = intval(substr($key, 6));
                 $citParms['idsr']       = $value;
-            }       // IDSR of source
+            }           // IDSR of source
             else
             if (substr($key, 0, 6) == 'IDSR')
-            {       // IDSR of source
+            {           // IDSR of source
                 $idsx                   = intval(substr($key, 4));
                 $citParms['idsr']       = $value;
             }           // IDSR of source
@@ -465,44 +429,42 @@ foreach($_POST as $key => $value)
             }
         }               // other fields
     }                   // act on specific keys
-    $comma                  = ',';
 }                       // loop through all parameters
-
-print "\n\t},";         // close parameters
+print "\n    }";            // close object
 
 if (!canUser('edit'))
 {
-    $msg            .= 'User not authorized to update the database. ';
+    $msg    .= 'User not authorized to update the database. ';
 }
 
 $rtype  = null;
 
 switch($type)
-{                       // act on the event citation type
+{       // act on the event citation type
     case null:
     {
-        $msg        .= 'type= parameter missing. ';
-        $record     = null;
+        $msg                .= 'type= parameter missing. ';
+        $record             = null;
         break;
-    }                   // null
+    }       // null
 
     case Citation::STYPE_UNSPECIFIED:   // 0
     {
-        $msg    .= "Unsupported type=$type. ";
-        $record = null;
+        $msg                .= "Unsupported type=$type. ";
+        $record             = null;
         break;
-    }                   // STYPE_UNSPECIFIED
+    }       // STYPE_UNSPECIFIED
 
     case Citation::STYPE_NAME:      // 1
     {
         if (is_null($idir))
         {
-            $msg    .= "idir value not specified. ";
+            $msg            .= "idir value not specified. ";
         }
 
         if (strlen($msg) == 0)
-        {               // OK to update
-            $record     = $person;
+        {       // OK to update
+            $record         = $person;
             if ($person->isExisting())
                 $priName    = $person->getPriName();
             if (!is_null($note))
@@ -523,20 +485,22 @@ switch($type)
             // check for request to add a new alternate name
             if (($altSurname !== null && strlen($altSurname) > 0) ||
                 ($altGivenName !== null && strlen($altGivenName) > 0))
-            {           // add a new alternate name
-                $idir           = $person->getIdir();
+            {       // add a new alternate name
+                $idir               = $person->getIdir();
                 $evBirth            = $person->getBirthEvent(false);
                 if ($evBirth)
                     $birthsd        = $evBirth->get('eventsd');
                 else
                     $birthsd        = -99999999;
-                $nameSet        = new RecordSet('tblNX',
-                                    array('idir' => $idir));
-                $order          = 0;
+                $nameSet            = new RecordSet('tblNX',
+                                                array('idir' => $idir));
+                $order              = 0;
                 foreach($nameSet as $idnx => $name)
                     if ($name->get('order') > $order)
                         $order      = $name->get('order');
                 $order++;       // one more than highest
+                print ",\n    \"order" . __LINE__ . "\" : " .
+                            json_encode($order);
                 $altParms   = array(
                         'idir'      => $idir,
                         'surname'   => $surname,
@@ -550,12 +514,14 @@ switch($type)
                     $altParms['givenname']  = $altGivenName;
                 $altName            = new Name($altParms);
                 $altName->save();
-                print "\n\"cmd\" : " .
-                        json_encode($altName->getLastSqlCmd());
-            }           // add a new alternate name
-        }               // OK to update
+                print ",    \"altnamecmd\" : " . 
+                                json_encode($altName->getLastSqlCmd());
+                print ",    \"altname\" : " .
+                                $altName->toJson(false);
+            }       // add a new alternate name
+        }       // OK to update
         break;
-    }                   // STYPE_NAME
+    }       // STYPE_NAME
 
     case Citation::STYPE_BIRTH:     // 2
     {
@@ -573,15 +539,15 @@ switch($type)
         }
 
         if (strlen($msg) == 0)
-        {               // OK to update
+        {       // OK to update
             $record     = $person->getBirthEvent(true);
             $record->setDate($date);
             $record->set('idlrevent', $idlr);
             if (!is_null($note))
                 $record->set('description', $note);
-        }               // OK to update
+        }       // OK to update
         break;
-    }                   // STYPE_BIRTH
+    }       // STYPE_BIRTH
 
     case Citation::STYPE_CHRISTEN:      // 3
     {
@@ -599,15 +565,15 @@ switch($type)
         }
 
         if (strlen($msg) == 0)
-        {               // OK to update
+        {       // OK to update
             $record     = $person->getChristeningEvent(true);
             $record->setDate($date);
             $record->set('idlrevent', $idlr);
             if (!is_null($note))
                 $record->set('description', $note);
-        }               // OK to update
+        }       // OK to update
         break;
-    }                   // STYPE_CHRISTEN
+    }       // STYPE_CHRISTEN
 
     case Citation::STYPE_DEATH:     // 4;
     {
@@ -626,17 +592,16 @@ error_log("updateEvent.php: " . __LINE__ . "\n",3,$document_root . "/logs/update
         }
 
         if (strlen($msg) == 0)
-        {               // OK to update
+        {       // OK to update
             $record     = $person->getDeathEvent(true);
             $record->setDate($date);
             $record->set('idlrevent', $idlr);
             if (!is_null($note))
                 $record->set('description', $note);
             $person->set('deathcause', $deathCause);
-        }               // OK to update
+        }       // OK to update
         break;
-    }                   // STYPE_DEATH
-
+    }       // STYPE_DEATH
     case Citation::STYPE_BURIED:        // 5;
     {
         if (is_null($idir))
@@ -653,15 +618,15 @@ error_log("updateEvent.php: " . __LINE__ . "\n",3,$document_root . "/logs/update
         }
 
         if (strlen($msg) == 0)
-        {               // OK to update
+        {       // OK to update
             $record     = $person->getBuriedEvent(true);
             $record->setDate($date);
             $record->set('idlrevent', $idlr);
             if (!is_null($note))
                 $record->set('description', $note);
-        }               // OK to update
+        }       // OK to update
         break;
-    }                   // STYPE_BURIED
+    }       // STYPE_BURIED
 
     case Citation::STYPE_NOTESGENERAL:  // 6;
     {
@@ -675,12 +640,12 @@ error_log("updateEvent.php: " . __LINE__ . "\n",3,$document_root . "/logs/update
         }
 
         if (strlen($msg) == 0)
-        {               // OK to update
+        {       // OK to update
             $record     = $person;
             $record->set('Notes', $note);
-        }               // OK to update
+        }       // OK to update
         break;
-    }                   // STYPE_NOTESGENERAL
+    }       // STYPE_NOTESGENERAL
 
     case Citation::STYPE_NOTESRESEARCH: // 7;
     {
@@ -694,10 +659,10 @@ error_log("updateEvent.php: " . __LINE__ . "\n",3,$document_root . "/logs/update
         }
 
         if (strlen($msg) == 0)
-        {               // OK to update
+        {       // OK to update
             $record     = $person;
             $record->set('References', $note);
-        }               // OK to update
+        }       // OK to update
         break;
     }
 
@@ -713,15 +678,16 @@ error_log("updateEvent.php: " . __LINE__ . "\n",3,$document_root . "/logs/update
         }
 
         if (strlen($msg) == 0)
-        {               // OK to update
+        {       // OK to update
             $record     = $person;
             $record->set('Medical', $note);
-        }               // OK to update
+        }       // OK to update
         break;
     }
 
     case Citation::STYPE_DEATHCAUSE:        // 9;
     {
+error_log("updateEvent.php: " . __LINE__ . "\n",3,$document_root . "/logs/updateEvent.txt");
         if (is_null($idir))
         {
             $msg    .= "idir value not specified. ";
@@ -732,10 +698,10 @@ error_log("updateEvent.php: " . __LINE__ . "\n",3,$document_root . "/logs/update
         }
 
         if (strlen($msg) == 0)
-        {               // OK to update
+        {       // OK to update
             $record = $person;
             $record->set('DeathCause', $note);
-        }               // OK to update
+        }       // OK to update
         break;
     }
 
@@ -755,7 +721,7 @@ error_log("updateEvent.php: " . __LINE__ . "\n",3,$document_root . "/logs/update
         }
 
         if (strlen($msg) == 0)
-        {               // OK to update
+        {       // OK to update
             $record     = $person;
             $record->set('BaptismD', $date);
             $record->set('IDTRBaptism', $idlr);
@@ -765,7 +731,7 @@ error_log("updateEvent.php: " . __LINE__ . "\n",3,$document_root . "/logs/update
             else
                 $record->set('BaptismNote', $note);
             $record->set('LDSB', $templeReady);
-        }               // OK to update
+        }       // OK to update
         break;
     }
 
@@ -789,13 +755,13 @@ error_log("updateEvent.php: " . __LINE__ . "\n",3,$document_root . "/logs/update
         }
 
         if (strlen($msg) == 0)
-        {               // OK to update
+        {       // OK to update
             $record     = $person;
             $record->set('EndowD', $date);
             $record->set('IDTREndow', $idlr);
             $record->set('EndowNote', $note);
             $record->set('LDSE', $templeReady);
-        }               // OK to update
+        }       // OK to update
         break;
     }
 
@@ -819,15 +785,15 @@ error_log("updateEvent.php: " . __LINE__ . "\n",3,$document_root . "/logs/update
         }
 
         if (strlen($msg) == 0)
-        {               // OK to update
+        {       // OK to update
             $record     = new Child(array('idcr' => $idcr));
             $record->set('ParSealD', $date);
             $record->set('IDTRParSeal', $idlr);
             $record->set('ParSealNote', $note);
             $record->set('LDSP', $templeReady);
-        }               // OK to update
+        }       // OK to update
         break;
-    }                   // case Citation::STYPE_LDSP: 17
+    }       // case Citation::STYPE_LDSP: 17
 
     case Citation::STYPE_LDSS:  // 18 Sealed to Spouse
     {
@@ -836,47 +802,47 @@ error_log("updateEvent.php: " . __LINE__ . "\n",3,$document_root . "/logs/update
             $msg    .= "idmr value not specified. ";
         }
         else
-        {               // OK to update
+        {       // OK to update
             $record     = $family;
             $record->set('SealD', $date);
             $record->set('IDTRSeal', $idlr);
             $record->set('LDSS', $templeReady);
-        }               // OK to update
+        }       // OK to update
         break;
-    }                   // LDS Sealed to Spouse
+    }       // LDS Sealed to Spouse
 
     case Citation::STYPE_MAR:       // 20 Marriage  
-    {                   // Marriage event recorded in Family
+    {           // Marriage event recorded in Family
         if (is_null($idmr))
         {
             $msg                    .= "idmr value not specified. ";
         }
         else
-        {               // OK to update
+        {       // OK to update
             $record                 = $family;
             $record->set('MarD',    $date);
             $record->set('IDLRMar', $idlr);
-        }               // OK to update
+        }       // OK to update
         break;
-    }                   // Citation::STYPE_MAR: 20
+    }           // Citation::STYPE_MAR: 20
 
     case Citation::STYPE_MARNOTE:   // 21 Marriage Note
-    {                   // Marriage Note
+    {           // Marriage Note
         if (is_null($idmr))
         {
             $msg    .= "idmr value not specified. ";
         }
         else
-        {               // OK to update
+        {       // OK to update
             $record     = $family;
             $record->set('Notes', $note);
-        }               // OK to update
+        }       // OK to update
         break;
-    }                   // Citation::STYPE_MARNOTE: 21
+    }           // Citation::STYPE_MARNOTE: 21
 
     case Citation::STYPE_NEVERMARRIED:// 19 never married 
     case Citation::STYPE_MARNEVER:  // 22 Never Married      
-    {                   // not married indicator
+    {           // not married indicator
         if (is_null($idmr))
         {
             $msg    .= "idmr value not specified. ";
@@ -887,18 +853,18 @@ error_log("updateEvent.php: " . __LINE__ . "\n",3,$document_root . "/logs/update
         }
 
         if (strlen($msg) == 0)
-        {               // OK to update
+        {       // OK to update
             $record = $family;
             if ($notmar == '1')
                 $record->set('notmarried', 1);
             else
                 $record->set('notmarried', 0);
-        }               // OK to update
+        }       // OK to update
         break;
-    }                   // Citation::STYPE_MARNEVER: 22
+    }           // Citation::STYPE_MARNEVER: 22
 
     case Citation::STYPE_MARNOKIDS: // 23 no children
-    {                   // marriage events that contain no subfields
+    {           // marriage events that contain no subfields
         if (is_null($idmr))
         {
             $msg    .= "idmr value not specified. ";
@@ -909,29 +875,29 @@ error_log("updateEvent.php: " . __LINE__ . "\n",3,$document_root . "/logs/update
         }
 
         if (strlen($msg) == 0)
-        {               // OK to update
+        {       // OK to update
             $record     = $family;
             if ($nokids == '1')
                 $record->set('nochildren', 1);
             else
                 $record->set('nochildren', 0);
-        }               // OK to update
+        }       // OK to update
         break;
-    }                   // Citation::STYPE_MARNOKIDS:   23
+    }           // Citation::STYPE_MARNOKIDS:   23
 
     case Citation::STYPE_MAREND:    // 24 marriage ended
-    {                   // marriage events that contain no subfields
+    {           // marriage events that contain no subfields
         if (is_null($idmr))
         {
             $msg    .= "idmr value not specified. ";
         }
         else
-        {               // OK to update
+        {       // OK to update
             $record     = $family;
             $record->set('MarEndD', $date);
-        }               // OK to update
+        }       // OK to update
         break;
-    }                   // Citation::STYPE_MAREND:  24
+    }           // Citation::STYPE_MAREND:  24
 
 
     case Citation::STYPE_LDSC:      // 26;
@@ -954,16 +920,16 @@ error_log("updateEvent.php: " . __LINE__ . "\n",3,$document_root . "/logs/update
         }
 
         if (strlen($msg) == 0)
-        {               // OK to update
+        {       // OK to update
             $record     = $person;
             $record->set('ConfirmationD', $date);
             $record->set('IDTRConfirmation', $idlr);
             $record->set('ConfirmationKind', $kind);
             $record->set('ConfirmationNote', $note);
             $record->set('LDSC', $templeReady);
-        }               // OK to update
+        }       // OK to update
         break;
-    }                   // Citation::STYPE_LDSC:    26;
+    }           // Citation::STYPE_LDSC:    26;
 
     case Citation::STYPE_LDSI:      // 27
     {
@@ -985,21 +951,25 @@ error_log("updateEvent.php: " . __LINE__ . "\n",3,$document_root . "/logs/update
         }
 
         if (strlen($msg) == 0)
-        {               // OK to update
+        {       // OK to update
             $record     = $person;
             $record->set('InitiatoryD', $date);
             $record->set('IDTRInitiatory', $idlr);
             $record->set('InitiatoryNote', $note);
             $record->set('LDSI', $templeReady);
-        }               // OK to update
+        }       // OK to update
         break;
-    }                   // STYPE_LDSI
+    }           // STYPE_LDSI
 
     case Citation::STYPE_EVENT:     // 30
     {
         if (is_null($idir))
         {
             $msg    .= "idir value not specified. ";
+        }
+        if (is_null($ider))
+        {
+            $msg    .= "ider value not specified. ";
         }
         if (is_null($date))
         {
@@ -1022,17 +992,15 @@ error_log("updateEvent.php: " . __LINE__ . "\n",3,$document_root . "/logs/update
             $msg    .= "etype value not specified. ";
         }
         if (is_null($order) || strlen($order) == 0) 
-        {               // event order not set
+        {       // event order not set
             $eventSet   = new RecordSet('tblER',
                                         array('idir'    => $idir,
                                               'idtype'  => Event::IDTYPE_INDIV));
             $order      = $eventSet->count();
-        }               // order not set
+        }       // order not set
 
         if (strlen($msg) == 0)
-        {               // OK to update
-            if (is_null($event))
-                $event          = new Event();
+        {       // OK to update
             $record     = $event;
             $record->set('IDER',        $ider);
             $record->set('IDIR',        $idir);
@@ -1047,16 +1015,19 @@ error_log("updateEvent.php: " . __LINE__ . "\n",3,$document_root . "/logs/update
             {
                 $person->set('deathcause', $deathCause);
             }
-        }               // OK to update
-
+        }       // OK to update
         break;
-    }                   // STYPE_EVENT
+    }           // STYPE_EVENT
 
     case Citation::STYPE_MAREVENT:      // 31;
     {
         if (is_null($idmr))
         {
             $msg    .= "idmr value not specified. ";
+        }
+        if (is_null($ider))
+        {
+            $msg    .= "ider value not specified. ";
         }
         if (is_null($date))
         {
@@ -1079,17 +1050,15 @@ error_log("updateEvent.php: " . __LINE__ . "\n",3,$document_root . "/logs/update
             $msg    .= "etype value not specified. ";
         }
         if (is_null($order) || strlen($order) == 0) 
-        {               // order not set
+        {       // order not set
             $eventSet   = new RecordSet('tblER',
                             array('idir'    => $idmr,
                                   'idtype'  => Event::IDTYPE_MAR));
             $order      = $eventSet->count();
-        }               // order not set
+        }       // order not set
 
         if (strlen($msg) == 0)
-        {               // OK to update
-            if (is_null($event))
-                $event          = new Event();
+        {       // OK to update
             $record     = $event;
             $record->set('IDIR',        $idmr);
             $record->set('EventD',      $date);
@@ -1100,47 +1069,54 @@ error_log("updateEvent.php: " . __LINE__ . "\n",3,$document_root . "/logs/update
             $record->set('Order',       $order);
             $record->set('Description', $description);
             $record->set('idir',        $idmr);
-        }               // OK to update
+        }       // OK to update
         break;
-    }                   // STYPE_MAREVENT
+    }           // STYPE_MAREVENT
 
     default:
-    {                   // unsupported event type
+    {           // unsupported event type
         $msg            .= "Unsupported type=$type. ";
         $record         = null;
         break;
-    }                   // unsupported event type
+    }           // unsupported event type
 
-}                       // act on the event citation type
+}               // act on the event citation type
 
 if (strlen($msg) == 0)
-{                       // no errors detected
+{               // no errors detected
     // update the database to record the new information
     if (isset($record))
     {               // need to update record
+        $classname                  = get_class($record);
+        if (preg_match('/\w+$/', $classname, $matches))
+            $classname              = $matches[0];
         $needIdime                  = !$record->isExisting();
         $count                      = $record->save();
-        if ($count == 0)
-            print "\n\"save\" : \"save failed\""; 
-        if ($record instanceof Event)
-            print "\n\"event\" :\n";
-        else
-        if ($record instanceof Person)
-            print "\n\"person\" :\n";
-        else
-        if ($record instanceof Family)
-            print "\n\"family\" :\n";
-        else
-            print "\n\"record\" :\n";
-        $record->toJson();
+        $idime                      = $record->getId();
+        $lastCmd                    = $record->getLastSqlCmd();
+        if (strlen($lastCmd) > 0)
+        {
+            print ",\n    \"cmd\" : " . json_encode($lastCmd);
+            print ",\n    \"cmdcount\" : $count,\n    \"idime\" : $idime";
+        }
+        print ",\n    \"$classname\" : " . $record->toJson(false);
         foreach($citations as $citation)
         {
             if ($needIdime ||
                 $citation['idime'] == 0)
-                $citation->set('idime', $record->getId());
-            $citation->save();
-            print ",\n\"citation\" :\n";
-            $citation->toJson();
+                $citation->set('idime', $idime);
+            $count                  = $citation->save();
+            $lastCmd                = $record->getLastSqlCmd();
+            $idsx                   = $record->getId();
+            if (strlen($lastCmd) > 0)
+            {
+                print ",\n    \"citcmd\" : " . json_encode($lastCmd);
+                print ",\n    \"citcount\" : $count";
+                print ",\n    \"idsx\" : $idsx";
+            }
+            $errors         = $citation->getErrors();
+            if (strlen($errors) > 0)
+                print ",\n    \"errors\" : " . json_encode($errors);
         }
     }               // need to update record
 
@@ -1149,15 +1125,18 @@ if (strlen($msg) == 0)
     // the associated instance of Person
     if (isset($person))
     {
-        $person->save();
-        print ",\n\"person\" :\n";
-        $person->toJson();
+        $count      = $person->save();
+        if ($count > 0)
+        {
+            print ",\n    \"personcmd\" : " .
+                json_encode($person->getLastSqlCmd());
+            print ",\n    \"Person\" : " . $person->toJson(false);
+        }
     }
 }                   // no errors detected
 else
 {                   // errors in parameters
-    print "    \"msg\" :\t" . json_encode($msg);
+    print ",\n    \"msg\" : " . json_encode($msg);
 }                   // errors in parameters
-
-// close root node of JSON output
-print "\n}";
+// close object
+print "}\n";

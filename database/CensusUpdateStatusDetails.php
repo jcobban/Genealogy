@@ -443,13 +443,23 @@ if (strlen($msg) == 0)
         }       // no lines in page, should be deleted
 
         // display a row with values from database
-        $pctdone                = ($namecount + $agecount)*50/$population; 
-        $formatter->setAttribute(NumberFormatter::FRACTION_DIGITS, 2);
-        $row['pctdone']         = $formatter->format($pctdone);
-        $row['pctclassdone']    = pctClass($pctdone, false);
-        $pctlinked              = $idircount*100/$population;
-        $row['pctlinked']       = $formatter->format($pctlinked);
-        $row['pctclasslinked']  = pctClass($pctlinked, false);
+        if ($population > 0)
+        {
+            $pctdone            = ($namecount + $agecount)*50/$population; 
+            $formatter->setAttribute(NumberFormatter::FRACTION_DIGITS, 2);
+            $row['pctdone']     = $formatter->format($pctdone);
+            $row['pctclassdone']= pctClass($pctdone, false);
+            $pctlinked          = $idircount*100/$population;
+            $row['pctlinked']   = $formatter->format($pctlinked);
+            $row['pctclasslinked']  = pctClass($pctlinked, false);
+        }
+        else
+        {
+            $row['pctdone']     = '';
+            $row['pctclassdone']= pctClass(0, false);
+            $row['pctlinked']   = '';
+            $row['pctclasslinked']  = pctClass(0, false);
+        }
         if ($page == $highlightpage)
             $row['pageclass']   = 'even right bold';
         else

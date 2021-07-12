@@ -148,6 +148,7 @@ use \Exception;
  *		2019/12/19      replace xmlentities with htmlentities           *
  *	History as addCitJSON.php:                                          *
  *	    2021/03/07      converted to return JSON                        *
+ *	    2021/06/03      fix formatting errors                           *
  *																		*
  *  Copyright &copy; 2021 James A. Cobban								*
  ************************************************************************/
@@ -746,7 +747,7 @@ function countyMarriageCitation($page, $idmr, $type)
  *  Open Code															*
  ************************************************************************/
 
-// print the root node of the XML tree
+// print the root node of the JSON object
 print "{\n";
 
 // include feedback parameters as attributes
@@ -855,7 +856,7 @@ foreach ($_POST as $key => $value)
 			    $personid	= new Person(array('idir' => $idime));
 			    if ($personid->isExisting())
                 {
-                    print "    \"person\" : ";
+                    print ",\n    \"person\" : ";
 					$personid->toJson();
 			    }
 			    else
@@ -1031,7 +1032,7 @@ if (strlen($warn) > 0)
 // terminate the request and return the error message
 if (strlen($msg) > 0)
 {		// return the message text in XML
-	print "    \"msg\" : " . json_encode($msg) . "\n";
+	print ",\n    \"msg\" : " . json_encode($msg) . "\n";
 }		// return the message text in XML
 else
 {		// add the citation

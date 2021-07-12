@@ -865,7 +865,7 @@ function tableKeyDown(e)
                     }           // loop through <td>
                 }               // not the last row
                 else
-                {
+                {               // last row, add new row
                     let itemNo      = 0;
                     for(var itd = 0; itd < row.cells.length; itd++)
                     {           // loop through <td>s
@@ -885,15 +885,16 @@ function tableKeyDown(e)
                             }   // first <input type='text'>
                         }       // loop through children of cell
                     }           // loop through <td>
-                    let rowa    = rownum + 2;
-                    if (rowa.length == 1)
-                        rowa    = '0' + rowa;
-                    let rowb    = rownum + 3;
-                    if (rowb.length == 1)
-                    rowb        = '0' + rowb;
-                    let parms   = {'rowa'   : rowa,
-                                   'rowb'   : rowb,
-                                   'itemNo' : (itemNo-0) + 1};
+                    let rowa        = rownum + 2;
+                    if (rowa < 10)
+                        rowa        = '0' + rowa.toString();
+                    let rowb        = rownum + 3;
+                    if (rowb < 10)
+                        rowb        = '0' + rowb.toString();
+                    itemNo          = (itemNo-0) + 1;
+                    let parms       = {'rowa'   : rowa,
+                                       'rowb'   : rowb,
+                                       'itemNo' : itemNo};
 
                     // add new row for groom
                     let template    = document.getElementById('Row$rowa');
@@ -909,86 +910,86 @@ function tableKeyDown(e)
                     }
 
                     // add new row for bride
-                    template    = document.getElementById('Row$rowb');
-                    newRow      = createFromTemplate(template,
-                                                     parms,
-                                                     null);
-                    newRow      = body.appendChild(newRow);
-                    inputs      = newRow.getElementsByTagName('input');
+                    template        = document.getElementById('Row$rowb');
+                    newRow          = createFromTemplate(template,
+                                                         parms,
+                                                         null);
+                    newRow          = body.appendChild(newRow);
+                    inputs          = newRow.getElementsByTagName('input');
                     for (var ii = 0; ii < inputs.length; ii++)
                     {
                         let element = inputs[ii];
                         initElement(element);
                     }
-                }
+                }               // last row, add new row
+            }                   // have element
+            else
+                alert("commonMarriage.js: tableKeyDown: element is null.");
+            return false;       // suppress default action
+        }                       // enter key
+
+        case "ArrowUp":
+        {                       // arrow up key
+            if (element)
+            {
+                let cell            = element.parentNode;
+                let row             = cell.parentNode;
+                let body            = row.parentNode;
+                let rownum          = row.sectionRowIndex;
+                if (rownum > 0)
+                {               // not the first row
+                    rownum--;
+                    row             = body.rows[rownum];
+                    cell            = row.cells[cell.cellIndex];
+                    let children= cell.children;
+                    for(var ic = 0; ic < children.length; ic++)
+                    {           // loop through children of cell
+                        let child   = children[ic];
+                        if (child.nodeName.toLowerCase() == 'input' &&
+                            child.type == 'text')
+                        {       // first <input type='text'>
+                            child.focus();
+                            break;
+                        }       // first <input type='text'>
+                    }           // loop through children of cell
+                }               // not the first row
             }
             else
                 alert("commonMarriage.js: tableKeyDown: element is null.");
             return false;       // suppress default action
-        }               // enter key
-
-        case "ArrowUp":
-        {               // arrow up key
-            if (element)
-            {
-                let cell    = element.parentNode;
-                let row     = cell.parentNode;
-                let body    = row.parentNode;
-                let rownum  = row.sectionRowIndex;
-                if (rownum > 0)
-                {           // not the first row
-                    rownum--;
-                    row     = body.rows[rownum];
-                    cell    = row.cells[cell.cellIndex];
-                    let children= cell.children;
-                    for(var ic = 0; ic < children.length; ic++)
-                    {       // loop through children of cell
-                        let child   = children[ic];
-                        if (child.nodeName.toLowerCase() == 'input' &&
-                            child.type == 'text')
-                        {   // first <input type='text'>
-                            child.focus();
-                            break;
-                        }   // first <input type='text'>
-                    }       // loop through children of cell
-                }           // not the first row
-            }
-            else
-                alert("commonMarriage.js: tableKeyDown: element is null.");
-            return false;   // suppress default action
-        }                   // arrow up key
+        }                       // arrow up key
 
         case "ArrowDown":
-        {                   // arrow down key
+        {                       // arrow down key
             if (element)
             {
-                let cell    = element.parentNode;
-                let row     = cell.parentNode;
-                let body    = row.parentNode;
-                let rownum  = row.sectionRowIndex;
+                let cell            = element.parentNode;
+                let row             = cell.parentNode;
+                let body            = row.parentNode;
+                let rownum          = row.sectionRowIndex;
                 if (rownum < (body.rows.length - 1))
-                {           // not the last row
+                {               // not the last row
                     rownum++;
-                    row     = body.rows[rownum];
-                    cell    = row.cells[cell.cellIndex];
+                    row             = body.rows[rownum];
+                    cell            = row.cells[cell.cellIndex];
                     let children= cell.children;
                     for(var ic = 0; ic < children.length; ic++)
-                    {       // loop through children of cell
+                    {           // loop through children of cell
                         let child   = children[ic];
                         if (child.nodeName.toLowerCase() == 'input' &&
                             child.type == 'text')
-                        {   // first <input type='text'>
+                        {       // first <input type='text'>
                             child.focus();
                             break;
-                        }   // first <input type='text'>
-                    }       // loop through children of cell
-                }           // not the last row
+                        }       // first <input type='text'>
+                    }           // loop through children of cell
+                }               // not the last row
             }
             else
                 alert("commonMarriage.js: tableKeyDown: element is null.");
-            return false;   // suppress default action
-        }                   // arrow down key
-    }                       // switch on key code
+            return false;       // suppress default action
+        }                       // arrow down key
+    }                           // switch on key code
 
     return;
 }       // function tableKeyDown

@@ -206,6 +206,7 @@ class Template implements ArrayAccess
 
     protected   $page;          // the contents of the template
                                 // use $template->getRawTemplate()
+    protected   $isCompiled = false; // do not call compile twice
     private     $cursor;        // position within page during parse
     private     $inTemplate;    // between <template> and </template>
     private     $tagStack;      // stack of tags.  $tagStack[0] == $dom
@@ -795,6 +796,9 @@ class Template implements ArrayAccess
         global  $warn;
         global  $msg;
 
+        if ($this->isCompiled)
+            return $this->page;     // already called
+
         // load the template text into the object and set $this->page
         $this->page     = $this->loadPage();
         if ($this->debug)
@@ -959,14 +963,14 @@ class Template implements ArrayAccess
                         {       // leave substitution point in place
                             $page   .= self::OPEN_BRACE . $split[0] . self::CLOSE_BRACE;
                         }       // leave substitution point in place
-                    }       // {{name}} style insertions
+                    }           // {{name}} style insertions
                     $page       .= $rawtext;
-                }       // insert value of fields[$name]
+                }               // insert value of fields[$name]
                 else
                     $page       .= $rawtext;
-            }       // loop through all substitutions
+            }                   // loop through all substitutions
             $this->page     = $page;
-        }       // there are substitutions to process
+        }                       // there are substitutions to process
 
         /****************************************************************
          *  Invoke the customization in a derived class.                *
@@ -976,6 +980,7 @@ class Template implements ArrayAccess
         /****************************************************************
          *   Return Page                                                *
          ****************************************************************/
+        $this->isCompiled       = true;
         return($this->page);
     }       // method Template::compile
 

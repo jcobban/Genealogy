@@ -219,6 +219,8 @@ use \Iterator;
  *      2020/12/02      add method isValid                              *
  *                      add XSS protection                              *
  *      2021/02/19      add protected method debugBacktrace             *
+ *      2021/06/10      method save updated $msg rather than $this->msg *
+ *      2021/06/14      set SoundsLike when Surname set in method save  *
  *                                                                      *
  *  Copyright &copy; 2021 James A. Cobban                               *
  ************************************************************************/
@@ -1313,7 +1315,6 @@ class Record implements Iterator, ArrayAccess
     {
         global  $debug;
         global  $warn;
-        global  $msg;
         global  $connection;
 
         // get current date and time for added and updated fields in record
@@ -1355,13 +1356,13 @@ class Record implements Iterator, ArrayAccess
         }               // boolean true
 
         // get information about table
+        $count              = 0;
         $table              = $this->table;
         if ($table != 'Blogs' && $table != 'Users' && !canUser('edit'))
         {
-            if ($debug)
-                $warn       .= "<p>Record::save: " +
-                "current user is not authorized to update table '$table'</p>\n";
-            return 0;
+            $this->msg       .= "Record::save: " .
+        "current user is not authorized to update table '$table'. ";
+            return false;
         }
 
         // to simplify expressions
@@ -1374,7 +1375,7 @@ class Record implements Iterator, ArrayAccess
             $srvmg          = false;
             debug_print_backtrace();
             $this->msg      .= "Record::save: " . __LINE__ .
-                               " no description of table `$table` not defined";
+                    " no description of table `$table` defined";
         }
 
         // report errors detected by constructor and suppress update
@@ -1383,8 +1384,9 @@ class Record implements Iterator, ArrayAccess
             $warn   .= "<p>Record::save: " . __LINE__ .
                         " Request to update the " .
                         get_class($this). 
-                        " record ignored because of errors detected when the record was created. '" . $this->msg .
-                "' length=" . strlen($this->msg) . "</p>\n";
+                        " record ignored because of errors detected when the record was created. '" .
+                        $this->msg .
+                        "' length=" . strlen($this->msg) . "</p>\n";
             return 0;
         }                       // errors detected by constructor
 
@@ -1399,62 +1401,76 @@ class Record implements Iterator, ArrayAccess
             $comma      = '';
             if (is_null($this->row))
             {
-                $msg    .= "Record::save: insert with \$this->row null. ";
+                $this->msg    .= "Record::save: insert with \$this->row null. ";
                 return false;
             }
             foreach($this->row as $fld => $value)
             {
                 if ($fld == 'added')
-                {   // date added
+                {               // date added
                     $fldnames       .= "$comma`$fld`";
                     $values         .= "$comma:$fld";
                     $parms[$fld]    = $today;
                     $comma          = ', ';
-                }   // date added
+                }               // date added
                 else
                 if ($fld == 'addedtime')
-                {   // time added
+                {               // time added
                     $fldnames       .= "$comma`$fld`";
                     $values         .= "$comma:$fld";
                     $parms[$fld]    = $currtime;
                     $comma          = ', ';
-                }   // time added
+                }               // time added
                 else
                 if ($fld == 'updated')
-                {   // date updated
+                {               // date updated
                     $fldnames       .= "$comma`$fld`";
                     $values         .= "$comma:$fld";
                     $parms[$fld]    = $today;
                     $comma          = ', ';
-                }   // date updated
+                }               // date updated
                 else
                 if ($fld == 'updatedtime')
-                {   // time updated
+                {               // time updated
                     $fldnames       .= "$comma`$fld`";
                     $values         .= "$comma:$fld";
                     $parms[$fld]    = $currtime;
                     $comma          = ', ';
-                }   // time updated
+                }               // time updated
+                else
+                if ($fld == 'surname' &&
+                    array_key_exists('soundslike', $this->row))
+                {
+                    $fldnames       .= ", `surname`, `soundslike`";
+                    $values         .= ", :surname" .
+                                       ", LEFT(SOUNDEX(:surname),4)";
+                    $parms['surname']   = $value;
+                }
+                else
+                if ($fld == 'soundslike' &&
+                    array_key_exists('surname', $this->row))
+                {               // done under surname
+                }               // done under surname
                 else
                 if (substr($fld,-7) == 'soundex')
-                {   // soundex updated
+                {               // calculate soundex
                     $fldnames       .= "$comma`$fld`";
                     $values         .= $comma .  "LEFT(SOUNDEX(:" .
                                        substr($fld,0,strlen($fld)-7) . "),4)";
                     $comma          = ', ';
-                }   // soundex updated
+                }               // calculate soundex
                 else
                 if (is_string($prime) && $fld == $prime && $srvmg)
-                {   // let SQL server manage field value
-                }   // let SQL server manage field value
+                {               // let SQL server manage field value
+                }               // let SQL server manage field value
                 else
-                {   // other fields
+                {               // other fields
                     $fldnames       .= "$comma`$fld`";
                     $values         .= "$comma:$fld";
                     $parms[$fld]    = $value;
                     $comma          = ', ';
-                }   // other fields
-            }       // loop through all fields in record
+                }               // other fields
+            }                   // loop through all fields in record
 
             $insert                 = "INSERT INTO $table ($fldnames) " .
                                         "VALUES($values)";
@@ -1500,8 +1516,8 @@ class Record implements Iterator, ArrayAccess
             }       // successful
             else
             {       // error inserting record
-                $msg    .= htmlspecialchars($insertText) . ": " .
-                           print_r($stmt->errorInfo(), true);
+                $this->msg    .= htmlspecialchars($insertText) . ": " .
+                                   print_r($stmt->errorInfo(), true);
                 return false;
             }       // error inserting record
         }       // create new record
@@ -1613,7 +1629,7 @@ class Record implements Iterator, ArrayAccess
                 }       // successful update
                 else
                 {       // error updating record
-                    $msg    .= htmlspecialchars($updateText) . ": error=" .
+                    $this->msg    .= htmlspecialchars($updateText) . ": error=" .
                                print_r($stmt->errorInfo(),true) . ". ";
                     return false;
                 }       // error updating record
@@ -1765,11 +1781,11 @@ class Record implements Iterator, ArrayAccess
             }       // successful query
             else
             {       // error updating record
-                $msg    .= htmlspecialchars("$delete: ") .
+                $this->msg    .= htmlspecialchars("$delete: ") .
                            htmlentities(print_r($connection->errorInfo(),true)) . ". ";
                 return false;
             }       // error updating record
-        }       // have key value
+        }           // have key value
 
         // record never written to database
         return 0;   // nothing to delete
@@ -1867,7 +1883,7 @@ class Record implements Iterator, ArrayAccess
      *                  if Record::JSON diagnostic output is emitted    *
      *                  in JSON format                                  *
      ********************************************************************/
-    function postUpdate($output)
+    function postUpdate($output = false)
     {
         global  $debug;
         global  $warn;
@@ -2058,7 +2074,7 @@ class Record implements Iterator, ArrayAccess
             $comma      = ",\n";
         }
         if (strlen($retval) > 0)
-            $retval     .= "\n}\n";
+            $retval     .= "\n    }\n";
         if ($print)
             print $retval;
         return $retval;

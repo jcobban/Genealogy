@@ -13,23 +13,23 @@ use \Iterator;
  *  Canada,  This class provides access to the information in a row     *
  *  of the table Census1901S2.                                          *
  *                                                                      *
- *  CREATE TABLE `Census1901S2` (					                    *
- *      `ID`            INT(11) NOT NULL AUTO_INCREMENT,				*
- *      `DistrictName`  VARCHAR(100),					                *
- *      `DistrictNumber` DECIMAL(17,1),					                *
- *      `SubDistName`   VARCHAR(100),					                *
- *      `SubDistId`     VARCHAR(10) DEFAULT NULL,					    *
- *      `Division`      VARCHAR(10),					                *
- *      `PageNum`       VARCHAR(100),					                *
- *      `ImageURL`      VARCHAR(255),					                *
- *      `Reel`          VARCHAR(10),					                *
- *      `Province`      CHAR(2),					                    *
- *      PRIMARY KEY (`ID`),					                            *
- *      KEY `index1` (`DistrictNumber`,					                *
- *      				`SubDistId`,					                *
- *      				`Division`,					                    *
- *      				`PageNum`) )					                *
- *      ENGINE=InnoDB CHARSET=utf8mb4					                *
+ *  CREATE TABLE `Census1901S2` (                                       *
+ *      `ID`            INT(11) NOT NULL AUTO_INCREMENT,                *
+ *      `DistrictName`  VARCHAR(100),                                   *
+ *      `DistrictNumber` DECIMAL(17,1),                                 *
+ *      `SubDistName`   VARCHAR(100),                                   *
+ *      `SubDistId`     VARCHAR(10) DEFAULT NULL,                       *
+ *      `Division`      VARCHAR(10),                                    *
+ *      `PageNum`       VARCHAR(100),                                   *
+ *      `ImageURL`      VARCHAR(255),                                   *
+ *      `Reel`          VARCHAR(10),                                    *
+ *      `Province`      CHAR(2),                                        *
+ *      PRIMARY KEY (`ID`),                                             *
+ *      KEY `index1` (`DistrictNumber`,                                 *
+ *                      `SubDistId`,                                    *
+ *                      `Division`,                                     *
+ *                      `PageNum`) )                                    *
+ *      ENGINE=InnoDB CHARSET=utf8mb4                                   *
  *                                                                      *
  *  History:                                                            *
  *      2021/03/23      created                                         *
@@ -56,15 +56,15 @@ class Census1901Sched2 extends Record
      ********************************************************************/
     protected static $initRow   = array(
                 'id'                    => 0,
-				'districtname' 			=> '',
-				'districtnumber'        => 0,
-				'subdistname' 			=> '',
-				'subdistid' 			=> '',
-				'division' 			    => '',
-				'pagenum' 			    => '',
-				'imageurl' 			    => '',
-				'reel' 			        => '',
-				'province'              => '');
+                'districtname'          => '',
+                'districtnumber'        => 0,
+                'subdistname'           => '',
+                'subdistid'             => '',
+                'division'              => '',
+                'pagenum'               => '',
+                'imageurl'              => '',
+                'reel'                  => '',
+                'province'              => '');
 
     /********************************************************************
      *  Census1901Sched2::$info                                         *
@@ -147,28 +147,28 @@ class Census1901Sched2 extends Record
                         $id         = $value;
                     break;
 
-				case 'districtnumber':
+                case 'districtnumber':
                     if (preg_match('/^\d+(.5|)$/', $value))
                         $distID     = $value;
                     break;
 
-				case 'subdistid':
+                case 'subdistid':
                     $subDistId      = $value;
                     break;
 
-				case 'division':
+                case 'division':
                     $div            = $value;
                     break;
 
-				case 'pagenum':
+                case 'pagenum':
                     if (ctype_digit($value))
                         $page       = $value;
                     break;
 
-				case 'districtname':
-				case 'subdistname':
-				case 'imageurl':
-				case 'reel':
+                case 'districtname':
+                case 'subdistname':
+                case 'imageurl':
+                case 'reel':
                 case 'province':
                     break;
 
@@ -241,36 +241,36 @@ class Census1901Sched2 extends Record
                                             'subdistid'     => $subDistId,
                                             'div'           => $div,
                                             'page'          => $page);
-	            $stmt               = $connection->prepare($query);
-	            $queryText          = debugPrepQuery($query, $sqlParms);
-	            $this->lastSqlCmd   = $queryText;
-	            if ($stmt->execute($sqlParms))
-	            {               // successful query
-	                if ($debug)
-	                    $warn .= "<p>$queryText</p>\n";
-	
-	                $result         = $stmt->fetchAll(PDO::FETCH_ASSOC);
-	                if (count($result) > 0)
-	                {           // existing record
-	                    $dbrow                  = $result[0];
-	                    $needInsert             = false;
-	                }           // existing record
-	                else
-	                {           // create a new record
-	                    $dbrow                  = self::$initRow;
+                $stmt               = $connection->prepare($query);
+                $queryText          = debugPrepQuery($query, $sqlParms);
+                $this->lastSqlCmd   = $queryText;
+                if ($stmt->execute($sqlParms))
+                {               // successful query
+                    if ($debug)
+                        $warn .= "<p>$queryText</p>\n";
+    
+                    $result         = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                    if (count($result) > 0)
+                    {           // existing record
+                        $dbrow                  = $result[0];
+                        $needInsert             = false;
+                    }           // existing record
+                    else
+                    {           // create a new record
+                        $dbrow                  = self::$initRow;
                         $dbrow['districtnumber']= $distId;
                         $dbrow['subdistid']     = $subDistId;
                         $dbrow['division']      = $div;
                         $dbrow['page']          = $page;
-	                    $needInsert             = true;
-	                }           // create a new record
-	            }               // successful query
-	            else
-	            {               // error performing query
-	                $this->msg      .= "Census1901Sched2::__construct: '$queryText' " .
-	                                    print_r($stmt->errorInfo(),true) . '. ';
-	            }               // error performing query
-	        }               // good subdistrict
+                        $needInsert             = true;
+                    }           // create a new record
+                }               // successful query
+                else
+                {               // error performing query
+                    $this->msg      .= "Census1901Sched2::__construct: '$queryText' " .
+                                        print_r($stmt->errorInfo(),true) . '. ';
+                }               // error performing query
+            }               // good subdistrict
             else
                 $this->msg      .= "Invalid SubDistrict identifiers. ";
         }                   // request by enumeration division and page   

@@ -487,9 +487,11 @@ const  RlgnAbbrs = {
  *  Table for expanding abbreviations for occupations                   *
  ************************************************************************/
 const  OccAbbrs = {
-                "At"        : "at",
                 "And"       : "and",
                 "App"       : "Apprentice",
+                "At"        : "at",
+                "Asst"      : "assistant",
+                "Att"       : "attendant",
                 "B"         : "Blacksmith",
                 "Bk"        : "Bookkeeper",
                 "Brother"   : "brother",
@@ -1768,7 +1770,27 @@ function checkPositiveNumber()
         setErrorFlag(element, true);
     else
         setErrorFlag(element, re.test(number) && (number != '0'));
-}       // function checkPositiveNumber
+}       //
+
+/************************************************************************
+ *  function checkCurrency                                              *
+ *                                                                      *
+ *  Validate the current value of a field containing a currency amount. *
+ *  This is assigned to the checkfunc method of an element.             *
+ *                                                                      *
+ *  Input:                                                              *
+ *      this            an instance of an HTML input element.           *
+ ************************************************************************/
+function checkCurrency()
+{
+    let element     = this;
+    let re          = /^[$]?[0-9]+(\.[0-9]{2}|)$/;
+    let number      = element.value.trim();
+    if (number == '')
+        setErrorFlag(element, true);
+    else
+        setErrorFlag(element, re.test(number) && (number != '0'));
+}       // function checkCurrency
 
 /************************************************************************
  *  function checkFamily                                                *

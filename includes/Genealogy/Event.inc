@@ -259,6 +259,7 @@ use \Exception;
  *      2021/02/19      replace throws with error_logs                  *
  *                      use Record::constDebug and                      * 
  *                      Record::debugBacktrace                          *
+ *      2021/06/05      save did not return count                       *
  *                                                                      *
  *  Copyright &copy; 2021 James A. Cobban                               *
  ************************************************************************/
@@ -2353,8 +2354,7 @@ class Event extends RecordPic
 
         // close off the JSON document
         if (strlen($retval) > 0)
-            $retval     .= "\n}\n";
-
+            $retval     .= "\n    }\n";
         if ($print)
             print $retval;
         return $retval;
@@ -2631,6 +2631,7 @@ class Event extends RecordPic
         global  $document_root;
 
         // determine style for diagnostic output
+        $count              = 0;
         $indent             = '';
         $xmlparms           = '';
         $xml                = $output === Record::XML;
@@ -2834,7 +2835,7 @@ class Event extends RecordPic
                 error_log("Event::save: " . $this->debugBacktrace());
                 return false;
             }       // error performing query
-        }       // new preferred event
+        }           // new preferred event
 
         // for some events information is also stored in the
         // associated record and in tblNX to save a JOIN
@@ -2859,7 +2860,7 @@ class Event extends RecordPic
 
         // invoke parent's implementation to complete update
         $oldider        = intval($this->row['ider']);
-        parent::save($output);
+        $count          = parent::save($output);
         if ($debug && $oldider == 0)
             $warn       .= "<p>Event::save: new event IDER=" .
                                     $this->row['ider'] . "</p>\n";
@@ -2875,7 +2876,7 @@ class Event extends RecordPic
             $citation->set('idime', $ider);
             $citation->save($output);
         }           // loop through all citations
-
+        return $count;
     }       // Event::save
 
     /********************************************************************
@@ -3045,13 +3046,10 @@ class Event extends RecordPic
                         ob_start();
                         debug_print_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
                         error_log("Event::getCitations: " . __LINE__ . 
-                            "set Citation($idsx) oldidime=$oldidime, oldtype=$oldstype, idime=$ider, type=$newstype\n" . ob_get_clean());
+                            " set Citation($idsx) oldidime=$oldidime, oldtype=$oldstype, idime=$ider, type=$newstype\n" . ob_get_clean());
                     }
-                    else
-                    {
                     $citation->set('idime', $ider);
                     $citation->set('type',  $newstype);
-                    }
                 }           // loop through all citations
             }               // have a real event, move the citations
 

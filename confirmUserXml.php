@@ -10,7 +10,7 @@ use \Exception;
  *  XML file, so it can be invoked from Javascript.                     *
  *                                                                      *
  *  Parameters:                                                         *
- *      userid      unique name of a registered user                    *
+ *      clientid        unique name of a registered user                *
  *                                                                      *
  *  History:                                                            *
  *      2011/11/28      Created                                         *
@@ -26,6 +26,7 @@ use \Exception;
  *      2017/09/13      use class User to update database               *
  *      2021/05/24      correct errors because it was run under the     *
  *                      client's authorization, not the administrator   *
+ *      2021/06/08      method save no longer has a parameter           *
  *                                                                      *
  *  Copyright &copy; 2021 James A. Cobban                               *
  ************************************************************************/
@@ -82,7 +83,7 @@ if (strlen($msg) == 0)
         }
         else
         {           // send e-mail to the new user to validate the address
-            print "<cmd>" . $client->getLastSqlCmd() . "</cmd>\n";
+            print "<cmd count='$count'>" . $client->getLastSqlCmd() . "</cmd>\n";
             $email      = $client['email'];
             $sent       = mail($email,
              "[JamesCobban.net] Thank You for Registering as User $clientid",

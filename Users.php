@@ -263,11 +263,9 @@ if (canUser('all'))
                     {       // have instance of User
                         if ($value == '')
                         {   // request to delete record
-                            $count  = $user->delete(false);
-                            if ($count == 0)
-                                $warn   .= $user->dump('delete failed');
+                            $count      = $user->delete();
                             $lastCmd    = $user->getLastSqlCmd();
-                            if (strlen($lastCmd) > 0)
+                            if (strlen($lastCmd) > 0 && $count > 0)
                                 $warn   .= "<p>Command '$lastCmd' returned $count</p>\n";
                             $user   = null;
                         }   // request to delete record

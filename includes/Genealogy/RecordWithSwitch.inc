@@ -1903,7 +1903,7 @@ class Record implements Iterator, ArrayAccess
      *                  if Record::JSON diagnostic output is emitted    *
      *                  in JSON format                                  *
      ********************************************************************/
-    function postUpdate($output)
+    function postUpdate($output = false)
     {
         global  $debug;
         global  $warn;
@@ -2094,7 +2094,7 @@ class Record implements Iterator, ArrayAccess
             $comma      = ",\n";
         }
         if (strlen($retval) > 0)
-            $retval     .= "\n}\n";
+            $retval     .= "\n    }\n";
         if ($print)
             print $retval;
         return $retval;

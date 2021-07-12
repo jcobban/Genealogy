@@ -50,8 +50,9 @@ use \Iterator;
  *                      initial frame number for the SubDistrict        *
  *      2020/10/10      remove prefix from field names                  *
  *      2020/12/02      add method getLine                              *
+ *      2021/06/23      do not throw exception in constructor or save   *
  *                                                                      *
- *  Copyright &copy; 2020 James A. Cobban                               *
+ *  Copyright &copy; 2021 James A. Cobban                               *
  ************************************************************************/
 require_once __NAMESPACE__ . '/Record.inc';
 require_once __NAMESPACE__ . '/Census.inc';
@@ -151,8 +152,6 @@ class Page extends Record
      *      $sched              schedule identifier                     *
      *                                                                  *
      *  Returns object containing a description of a page               *
-     *                                                                  *
-     *  Throws Exception if unable to complete function                 *
      ********************************************************************/
     function __construct($parms,
                          $page  = null,
@@ -346,9 +345,10 @@ class Page extends Record
         }       // successful execute of prepared statement
         else
         {       // error on execute
-            throw new Exception("Page::__construct: '$queryText' " .
+            $this->msg  .= "Page::__construct: '$queryText' " .
                                 print_r($sqlParms, true) .
-                                print_r($stmt->errorInfo(),true));
+                                print_r($stmt->errorInfo(),true) . '. ';
+            $this->valid        = false;
         }       // error on execute
     }       // function Page::__construct
 
@@ -408,6 +408,12 @@ class Page extends Record
      *      $xml        if true diagnostic output is emitted in XML     *
      *                  format                                          *
      *                  if a string use it as tag name                  *
+     *                                                                  *
+     *  Returns:                                                        *
+     *      0           if the database record did not need to be       *
+     *                  updated                                         *
+     *      1           if the database records was inserted or updated *
+     *      false       if an error occurred                            *
      ********************************************************************/
     function save($xml = false)
     {
@@ -418,27 +424,27 @@ class Page extends Record
 
         if (is_string($xml))
         {               // string tag name
-            $tagname    = $xml;
-            $xml    = true;
+            $tagname            = $xml;
+            $xml                = true;
         }               // string tag name
         else
         if ($xml)
         {               // boolean true
-            $tagname    = 'cmd';
+            $tagname            = 'cmd';
         }               // true
 
         if ($this->needInsert)
         {               // create new record
-            $fldnames       = '';
-            $comma          = '';
-            $values         = '';
-            $sqlParms       = array();
+            $fldnames           = '';
+            $comma              = '';
+            $values             = '';
+            $sqlParms           = array();
             foreach($this->row as $fld => $value)
             {           // loop through all fields in record
-                $fldnames   .= $comma . "`$fld`";
-                $values     .= $comma . ":$fld";
+                $fldnames       .= $comma . "`$fld`";
+                $values         .= $comma . ":$fld";
                 $sqlParms[$fld] = $value;
-                $comma      = ", ";
+                $comma          = ", ";
             }           // loop through all fields in record
 
             // construct the SQL INSERT command
@@ -469,9 +475,10 @@ class Page extends Record
             }           // success
             else
             {           // error inserting record
-                throw new Exception("Page::save:
-                                    '$insertText', " .
-                                    print_r($stmt->errorInfo(),true));
+                $this->msg  .= "Page::save: '$insertText', " .
+                                print_r($stmt->errorInfo(),true) .
+                                '. ';
+                $count      = false;
             }           // error inserting record
         }               // create new record
         else
@@ -527,12 +534,15 @@ class Page extends Record
                 }       // success
                 else
                 {       // error updating record
-                    throw new Exception("Page::save:
+                    $this->msg  .= "Page::save:
                                     '$updateTextt', " .
-                                    print_r($stmt->errorInfo(),true));
+                                    print_r($stmt->errorInfo(),true) .
+                                    '. ';
+                    $count      = false;
                 }       // error updating record
             }           // changes made
         }               // update existing record
+        return $count;
     }       // function Page::save
 
     /********************************************************************

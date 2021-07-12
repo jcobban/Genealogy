@@ -550,6 +550,7 @@ use \Exception;
  *      2020/03/20      log more information on failed insert           *
  *      2021/02/18      do not create instance of Event                 *
  *                      in getBirthEvent if no information in Person    *
+ *      2021/06/18      fix getNames(1)                                 *
  *                                                                      *
  *  Copyright &copy; 2021 James A. Cobban                               *
  ************************************************************************/
@@ -3427,7 +3428,7 @@ class Person extends RecordPic
                                  array($priName));
         }
 
-        if (!is_array($this->altNames))
+        if (is_null($this->altNames))
         {       // need to load from database
             $altParms       = array('IDIR'      => $this->row['idir']);
             $this->altNames = new RecordSet('Names', $altParms);
@@ -3456,7 +3457,7 @@ class Person extends RecordPic
             {           // alternate names
                 return new RecordSet('Names',
                                      array('idir'   => $this->row['idir'],
-                                           '`order`'    => '>=0'));
+                                           '`order`'    => '>0'));
             }           // alternate names
             else
             if (is_array($order) && count($order) >= 2 &&
@@ -4026,7 +4027,8 @@ class Person extends RecordPic
                         if (is_null($value))
                             $retval .= ",\n\t\"$field\":\tnull";
                         else
-                            $retval .= ",\n\t\"$field\":\t$value";
+                            $retval .= ",\n\t\"$field\":\t" . 
+                                        json_encode($value);
                     }
                     break;
                 }       // flags suppressed for child
@@ -4052,7 +4054,8 @@ class Person extends RecordPic
                 {       // numeric fields suppressed for child
                     if (!$child)
                     {
-                        $retval .= ",\n\t\"$field\":\t$value";
+                        $retval .= ",\n\t\"$field\":\t" . 
+                                        json_encode($value);
                     }
                     break;
                 }       // numeric fields suppressed for child
@@ -4079,7 +4082,8 @@ class Person extends RecordPic
 
                 case 'id':
                 {       // first field
-                    $retval     .= "$comma\"$field\":\t$value";
+                    $retval     .= "$comma\"$field\":\t" . 
+                                        json_encode($value);
                     $comma      = ",\n\t";
                     break;
                 }       // first field
@@ -4090,7 +4094,8 @@ class Person extends RecordPic
                 case 'idmrparents':
                 case 'idar':
                 {       // numeric fields passed back with no interpretation
-                    $retval     .= ",\n\t\"$field\":\t$value";
+                    $retval     .= ",\n\t\"$field\":\t" . 
+                                        json_encode($value);
                     break;
                 }       // numeric fields passed back with no interpretation
 
@@ -4183,7 +4188,7 @@ class Person extends RecordPic
         }               // include family information
 
         // close off response
-        $retval         .= "}\n";
+        $retval         .= "\n    }\n";
 
         if ($print)
             print $retval;

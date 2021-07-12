@@ -929,6 +929,7 @@ function marrReorder()
 				"sex"		: sex};
 
     // invoke script to update Event and return XML result
+	console.log('commonMarriage.js: marrReorder: /FamilyTree/orderMarriagesByDateXml.php',parms);
     popupLoading(this);	// display loading indicator
     HTTP.post('/FamilyTree/orderMarriagesByDateXml.php',
 		      parms,
@@ -948,6 +949,8 @@ function marrReorder()
  ************************************************************************/
 function gotReorderMarr(xmlDoc)
 {
+	//alert('commonMarriage.js: gotReorderMarr: ' +
+    //            new XMLSerializer().serializeToString(xmlDoc));
     window.location.reload();
 }		// function gotReorderMarr
 

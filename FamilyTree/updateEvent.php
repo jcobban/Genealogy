@@ -131,7 +131,7 @@ require_once __NAMESPACE__ . '/LegacyDate.inc';
 require_once __NAMESPACE__ . '/common.inc';
 
 // emit the XML header
-print("<?xml version='1.0' encoding='UTF-8'?>\n");
+print("<?xml version='1.0' encoding='UTF-8'?".">\n");
 print "<event>\n";
 
 // get the updated values of the fields in the record
@@ -971,7 +971,8 @@ error_log("updateEvent.php: " . __LINE__ . "\n",3,$document_root . "/logs/update
 
     case Citation::STYPE_EVENT:     // 30
     {
-print "<trace>updateEvent.php: " . __LINE__ . " Citation::STYPE_EVENT: idir=$idir, ider=$ider, date=$date, location=" . htmlspecialchars($location->getName(),ENT_XML1) . "</trace>\n";
+        if ($location)
+            print "<trace>updateEvent.php: " . __LINE__ . " Citation::STYPE_EVENT: idir=$idir, ider=$ider, date=$date, location=" . htmlspecialchars($location->getName(),ENT_XML1) . "</trace>\n";
         if (is_null($idir))
         {
             $msg    .= "idir value not specified. ";
@@ -1100,14 +1101,24 @@ if (strlen($msg) == 0)
     if (isset($record))
     {               // need to update record
         $needIdime                  = !$record->isExisting();
-        $record->save();
-        print "<cmd>" . $record->getLastSqlCmd() . "</cmd>\n";
+        $count                      = $record->save();
+        $idime                      = $record->getId();
+        $lastCmd                    = $record->getLastSqlCmd();
+        if (strlen($lastCmd) > 0)
+            print "<cmd count='$count' result='$idime'>$lastCmd</cmd>\n";
         foreach($citations as $citation)
         {
             if ($needIdime ||
                 $citation['idime'] == 0)
-                $citation->set('idime', $record->getId());
-            $citation->save('cmd');
+                $citation->set('idime', $idime);
+            $count                  = $citation->save();
+            $lastCmd                = $record->getLastSqlCmd();
+            $idsx                   = $record->getId();
+            if (strlen($lastCmd) > 0)
+                print "<cmd count='$count' idsx='$idsx'>$lastCmd</cmd>\n";
+            $errors         = $citation->getErrors();
+            if (strlen($errors) > 0)
+                print "<errors>$errors</errors>\n";
         }
     }               // need to update record
 
@@ -1116,8 +1127,9 @@ if (strlen($msg) == 0)
     // the associated instance of Person
     if (isset($person))
     {
-        $person->save();
-        print "<cmd>" . $person->getLastSqlCmd() . "</cmd>\n";
+        $count      = $person->save();
+        if ($count > 0)
+            print "<cmd>" . $person->getLastSqlCmd() . "</cmd>\n";
     }
 }                   // no errors detected
 else

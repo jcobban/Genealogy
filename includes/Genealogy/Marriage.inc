@@ -770,11 +770,10 @@ class Marriage extends Record
         }       // loop through participants
 
         if (strlen($retval) > 0)
-            $retval     .= "\n}\n";
+            $retval     .= "\n    }\n";
         if ($print)
             print $retval;
         return $retval;
-
     }       // Marriage::toJson
 
     /********************************************************************

@@ -223,6 +223,7 @@
  *      2021/01/12      drop support for IE 9 & 10                      *
  *      2021/03/30      remove changeDiv                                *
  *      2021/04/20      do not scroll menu popup                        *
+ *      2021/07/03      correct vertical position of popup dialogs      *
  *                                                                      *
  *  Copyright &copy; 2021 James A. Cobban                               *
  ************************************************************************/
@@ -721,11 +722,23 @@ function getOffsetTop(elt)
 {
     // note that "top" is a reserved word
     let y           = 0;
+    let main        = document.getElementsByTagName('main');
+    if (main.length > 0)
+        main        = main[0];
     while(elt)
     {
         y           += elt.offsetTop;
+        if (elt.scrollTop > 0)
+        {
+            main    = elt;
+            break;
+        }
         elt         = elt.offsetParent;
     }       // increment up to top element
+    if (main)
+    {
+        y           -= main.scrollTop;
+    }
     return y;
 }   // function getOffsetTop
 

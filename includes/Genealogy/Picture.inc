@@ -1519,7 +1519,7 @@ print "<p>Picture.inc: " . __LINE__ . "path='$path', filename='$filename'</p>\n"
      *      $xml        if true diagnostic output is emitted in XML     *
      *                  format                                          *
      ********************************************************************/
-    function postUpdate($xml)
+    function postUpdate($xml = false)
     {
         global  $debug;
 

@@ -83,6 +83,8 @@ use \Iterator;
  *                      object is initialized                           *
  *      2021/02/24      fixup for divisions with bad pagination         *
  *      2021/05/17      get Pages returned a maximum of 50 pages        *
+ *      2021/06/22      getStatistics did not return values from Pages  *
+ *                      table for pages which were not in Census        *
  *                                                                      *
  *  Copyright &copy; 2021 James A. Cobban                               *
  ************************************************************************/
@@ -1082,6 +1084,11 @@ class SubDistrict extends Record
                                 substr('000000000', 0, 9 - strlen($frm)) .
                                 $frm .
                               '.jpg';
+                $website    = "https://central.bac-lac.gc.ca/";
+                $image  = $website .
+                            '.item/?app=Census1901&op=&img&id=z' .
+                            substr('000000000', 0, 9 - strlen($frm)) .
+                            $frm;
                 break;
             }   // 1901 census
 
@@ -1556,7 +1563,7 @@ class SubDistrict extends Record
                                     'district'      => $this->row['sd_distid'],
                                     'subdistrict'   => $this->row['sd_id'],
                                     'division'      => $this->row['sd_div']);
-        $where              = 'WHERE District=:district AND SubDistrict=:subdistrict AND Division=:division';
+        $where              = 'WHERE Pages.Census=:censusid AND Pages.DistId=:district AND Pages.SdId=:subdistrict AND Pages.`Div`=:division AND Pages.Sched=1';
         $province           = $census['province'];
         if (strlen($province) > 0)
         {
@@ -1564,33 +1571,30 @@ class SubDistrict extends Record
             $sqlParms['province']   = $province;
         }
 
-        $query  = "SELECT Page, SUM(GivenNames != '') AS namecount," .
+        $query  = "SELECT Pages.PageNum AS page," .
+                            "SUM(GivenNames != '') AS namecount," .
                             "SUM(Age != '') AS agecount," .
                             "SUM(IDIR != 0) AS idircount," .
                             "Pages.Population, Pages.Transcriber," .
                             "Pages.Proofreader" .
-                        " FROM Census$censusYear" .
-                        " JOIN Pages ON Pages.Census=:censusid AND " .
-                            "Pages.DistId=District AND Pages.SdId=SubDistrict " .
-                            "AND Pages.`Div`=Division AND Pages.Sched='1' " .
-                            "AND Pages.PageNum=Page " .
+                        " FROM Pages " .
+                        " LEFT JOIN Census$censusYear" .
+                        " ON District=Pages.DistId AND " .
+                            "SubDistrict=Pages.SdId AND " .
+                            "Division=Pages.`Div` AND " .
+                            "Page=Pages.PageNum " .
                         $where .
-                        " GROUP BY Page," .
+                        " GROUP BY Pages.PageNum," .
                             "Pages.Population, Pages.Transcriber," .
                             "Pages.Proofreader " .
-                        "ORDER BY Page";
+                        "ORDER BY Pages.PageNum";
 
         $stmt               = $connection->prepare( $query );
         $queryText          = debugPrepQuery($query, $sqlParms);
         if ($stmt->execute($sqlParms))
         {       // successful query
             $result         = $stmt->fetchAll(PDO::FETCH_ASSOC);
-            if ($debug)
-                $warn       .= "<p>SubDistrict::getStatistics: " . __LINE__ .
-                                " $queryText</p>";
             $pagesize       = $this->census['linesperpage'];
-            if ($debug)
-                $warn       .= "<p>SubDistrict::getStatistics: " . __LINE__ . " \$this->getSubDistrict()</p>\n";
             $sdpage1        = $this->row['sd_page1'];
             $nextpage       = $sdpage1;
             $bypage         = $this->row['sd_bypage'];
@@ -1612,6 +1616,12 @@ class SubDistrict extends Record
                 }
                 else
                 {
+                    if (is_null($row['namecount']))
+                        $row['namecount']   = 0;
+                    if (is_null($row['agecount']))
+                        $row['agecount']    = 0;
+                    if (is_null($row['idircount']))
+                        $row['idircount']   = 0;
                     $retval[]       = $row;
                     $row            = next($result);
                 }

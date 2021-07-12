@@ -228,9 +228,12 @@ if (strlen($msg) == 0)
 	        }           // successful match
 	        else
 	        {           // not a simple file
-	            $result = preg_match("#(.*e)(\d+)#",
-	                                 $imageName,
-	                                 $matches);
+	            $result             = preg_match("#(.*e)(\d+)#",
+	                                             $imageName,
+	                                             $matches);
+	            $result2            = preg_match("#(.*=z)(\d+)$#",
+	                                             $imageName,
+	                                             $matches2);
 	            if ($result == 1)
 	            {
 	                $urldirname     = $dirname;
@@ -248,7 +251,25 @@ if (strlen($msg) == 0)
 	                                  substr('0000000000', 0,
 	                                         $lnum - strlen($nextimg)) .
 	                                  $nextimg . $suffix;
-	            }
+                }
+                else
+	            if ($result2 == 1)
+	            {
+	                $urldirname     = $dirname;
+	                $prefix         = urlencode($matches2[1]);
+	                $seqnum         = $matches2[2];
+	                $lnum           = strlen($seqnum);
+	                $previmg        = $seqnum - 1;
+	                $previmg        = $prefix .
+	                                    substr('0000000000', 0,
+	                                           $lnum - strlen($previmg)) .
+	                                    $previmg;
+	                $nextimg        = $seqnum + 1;
+	                $nextimg        = $prefix .
+	                                  substr('0000000000', 0,
+	                                         $lnum - strlen($nextimg)) .
+	                                  $nextimg;
+                }
 	            else
 	                $warn   .= "<p>imageName='" . 
 	                            htmlspecialchars($imageName) . "'</p>\n";

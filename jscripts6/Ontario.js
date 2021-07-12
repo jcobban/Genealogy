@@ -49,8 +49,7 @@
  *  Copyright &copy; 2021 James A. Cobban                               *
  ************************************************************************/
 import {HTTP} from "../jscripts6/js20/http.js";
-import {debug, hideLoading, popupLoading,
-        eltMouseOver, eltMouseOut, addOption} 
+import {debug, hideLoading, popupLoading, addOption} 
         from "../jscripts6/util.js";
 
 // table for expanding county abbreviations to full names
@@ -350,7 +349,7 @@ function gotTownship(xmlDoc)
     }
 
     let regTownship     = document.getElementById("RegTownship");
-    let regCounty       = document.getElementById("RegCounty");
+    //let regCounty     = document.getElementById("RegCounty");
     let form            = regTownship.form;
     let parentNode      = regTownship.parentNode;
     let townshipSelect  = regTownship;

@@ -366,8 +366,8 @@ class FamilyTree implements Iterator
             $retval .= $comma . "\t\"$key\":\t" . json_encode($value);
             $comma  = ",\n";
         }
-        $retval .= "\n}\n";
 
+        $retval .= "\n    }\n";
         if ($print)
             print $retval;
         return $retval;

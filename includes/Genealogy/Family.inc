@@ -2441,8 +2441,7 @@ catch(Exception $e)
 
         // close off the JSON document
         if (strlen($retval) > 0)
-            $retval     .= "\n}\n";
-
+            $retval     .= "\n    }\n";
         if ($print)
             print $retval;
         return $retval;

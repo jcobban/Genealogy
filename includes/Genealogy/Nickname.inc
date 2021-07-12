@@ -376,7 +376,7 @@ class Nickname extends Record
         }       // loop through all fields
 
         if (strlen($retval) > 0)
-            $retval     .= "\n}\n";
+            $retval     .= "\n    }\n";
         if ($print)
             print $retval;
         return $retval;

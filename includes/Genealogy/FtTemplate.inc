@@ -53,6 +53,7 @@ require_once  'Templating/Template.inc' ;
 include_once  __NAMESPACE__ . '/User.inc';
 include_once  __NAMESPACE__ . '/Language.inc';
 include_once  __NAMESPACE__ . '/Advertiser.inc';
+include_once  __NAMESPACE__ . '/UserAgent.inc';
 include_once  __NAMESPACE__ . '/LegacyDate.inc';
 
 class FtTemplate extends Template
@@ -471,7 +472,14 @@ class FtTemplate extends Template
         if (isset($_SERVER['HTTP_USER_AGENT']))
         {
             $useragent              = $_SERVER['HTTP_USER_AGENT'];
-            $isbot      = preg_match('/compatible; \w+Bot\//', $useragent);
+            $botpatt                = '#(bot|spider|crawl|semrush)#i';
+            $isbot                  = preg_match($botpatt, $useragent);
+            if (!$isbot)
+            {
+                $record             = new UserAgent($useragent);
+                $record->increment();
+                $record->save();
+            }
         }
         else
             $isbot                  = true;
@@ -624,7 +632,7 @@ class FtTemplate extends Template
                     if ($messages)
                         $messages->update(null);
                     else
-                        error_log("FtTemplate.inc " . __LINE__ .
+                        error_log("FtTemplate::displayBegin: " . __LINE__ .
                                     " no id='messages' in 'UserInfoAccount' for template '" . $this->includeSub . "' in main '" . $this->main . "'\n");
                 }
                 $breadcrumbs        .= $atemplate->compile();

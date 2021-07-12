@@ -209,6 +209,7 @@ $user               = new User(array("username" => $userid));
 
 // get existing account details
 $oldemail           = $user->get('email');  // old email
+$oldcellphone       = $user->get('cellphone');  // old cellphone
 $options            = $user->get('options');// user options
 
 $blogParms          = array('keyvalue'  => $user->get('id'),
@@ -313,7 +314,7 @@ else
 if ($options & User::OPT_USETEXT_ON)
     $chkusetext     = "checked='checked'";
 else
-    $chkustextl     = "";
+    $chkusetext     = "";
 
 // define substitution values
 $template->set('USERID',        $userid);

@@ -365,7 +365,7 @@ class Blog extends Record
      ********************************************************************/
     function getIndex()
     {
-        $retval = $this->row['bl_index'];
+        $retval         = $this->row['bl_index'];
         if ($retval === null)
             return '';
         else
@@ -450,7 +450,9 @@ class Blog extends Record
                           str_pad($now['minutes'], 2, '0', STR_PAD_LEFT) . ':' .
                           str_pad($now['seconds'], 2, '0', STR_PAD_LEFT);
         parent::set('bl_datetime', $currtime);
-        parent::save($xml);
+        if (is_null($this->row['bl_text']))
+            parent::set('bl_text', '');
+        return parent::save($xml);
     }       // Blog::save
 
 }       // class Blog 

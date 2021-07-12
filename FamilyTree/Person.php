@@ -299,6 +299,8 @@ use \Templating\TemplateTag;
  *                      translate table in template and use simple      *
  *                      text substitution.                              *
  *      2021/03/19      migrate to ES2015                               *
+ *      2021/07/07      change to behavior of $family->getEvents()      *
+ *                      required adding code for families without spouse*
  *                                                                      *
  *  Copyright &copy; 2021 James A. Cobban                               *
  ************************************************************************/
@@ -1777,7 +1779,7 @@ if (!is_null($person))
 
                     // Print the name of the spouse before the first event
 ?>
-<p><?php print $spouse->getName(); ?>
+    <p><?php print $spouse->getName(); ?>
 <?php
                     // print citations for the name
                     print showCitations(Citation::STYPE_NAME,
@@ -1799,7 +1801,7 @@ if (!is_null($person))
                         $note = $altName->get('akanote');
                         if (strlen($note) > 0)
                             print $note;
-                    }   // loop through alternate names
+                    }           // loop through alternate names
 
                     // show events in the life of the spouse
                     showEvents($spouse);
@@ -1807,28 +1809,21 @@ if (!is_null($person))
     </p>
 <?php
                     // display the user reference field if present
-                    try
-                    {       // userref field present in database
-                        $userref = $spouse->get('userref');
-                        if (strlen($userref) > 0)
-                        {       // user reference
+                    $userref = $spouse->get('userref');
+                    if (strlen($userref) > 0)
+                    {           // user reference
 ?>
     <p>User Reference: <?php print $userref; ?>
     </p>
 <?php
-                        }       // userref field present in database
-                        else
-                            $userref = '';
-                    }
-                    catch(Exception $e)
-                    {
+                    }           // userref field present in database
+                    else
                         $userref = '';
-                    }           // getField failed
 
                     // display any general notes for the spouse
-                    $notes = $spouse->get('notes');
+                    $notes      = $spouse->get('notes');
                     if (strlen($notes) > 0 && !$somePrivate)
-                    {       // notes defined
+                    {           // notes defined
 ?>
     <p class="notes"><b>Notes:</b>
 <?php
@@ -1845,9 +1840,8 @@ if (!is_null($person))
                 }       // have a spouse
                 else
                 {       // end sentence
-?>
-.
-<?php
+                    print $pronoun . ' ' . $t[$verb] .
+                         " " . $t['an unknown person'] . '.';
                 }       // end sentence
 
             // display information about children

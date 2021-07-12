@@ -964,7 +964,8 @@ class Address extends RecordPic
         // delete the now redundant address record[s]
         $addresses  = new RecordSet('Addresses',
                                     array('IDAR' => $from));
-        $addresses->delete('p');
+        $count      = $addresses->delete();
+        $lastCmd    = $addresses->getLastSqlCmd();
     }       // Address::mergeAddresses
 
 }       // class Address 
