@@ -115,6 +115,10 @@ use \Templating\Template;
  *      2021/02/01      do not pass SQL JOIN to ReflectionClass         *
  *      2021/02/21      improve performance of surname searches         *
  *      2021/05/03      add some error handling                         *
+ *      2021/08/19      optimize regular expression                     *
+ *      2021/09/17      minor improvement to surname handling           *
+ *      2021/09/30      correct determining count for query with        *
+ *                      GROUP BY clause                                 *
  *                                                                      *
  *  Copyright &copy; 2021 James A. Cobban                               *
  ************************************************************************/
@@ -696,12 +700,14 @@ class RecordSet implements Iterator, Countable, ArrayAccess
                                                 ' FROM ' . $this->table . ' ' .
                                                 $where;
             if (is_string($groupby) && strlen($groupby) > 0)
-                $countQuery     = "SELECT COUNT(*) FROM " .
-                                    $this->table .  ' ' . $where .
-                                    " GROUP BY $groupby";
+            {
+                $cfields        = preg_replace('/tbl(\w\w)\.\*/','tbl$1.ID$1', $fields);
+                $countQuery     = "SELECT COUNT(1) FROM (SELECT DISTINCT $cfields FROM " .
+                                    $this->table . ' ' . $where . ') AS Temp';
+            }
             else
-                $countQuery     = "SELECT COUNT(*) FROM " . $this->table .
-                                   ' ' . $where;
+                $countQuery     = "SELECT COUNT(*) FROM " .
+                                    $this->table . ' ' . $where;
         }
 
         // construct the GROUP BY clause
@@ -719,7 +725,7 @@ class RecordSet implements Iterator, Countable, ArrayAccess
                 {
                     $table                  = $matches[1];
                     $column                 = $matches[2];
-                    if (strlen($word) > 0)
+                    if (strlen($table) > 0)
                     {
                         $info               = Record::getInformation($table);
                         if ($info)
@@ -749,7 +755,7 @@ class RecordSet implements Iterator, Countable, ArrayAccess
                 {
                     $table                  = $matches[1];
                     $column                 = $matches[2];
-                    if (strlen($word) > 0)
+                    if (strlen($table) > 0)
                     {
                         $info               = Record::getInformation($table);
                         if ($info)
@@ -783,25 +789,22 @@ class RecordSet implements Iterator, Countable, ArrayAccess
             $queryText          = debugPrepQuery($countQuery, $this->sqlParms);
             if ($stmt->execute($this->sqlParms))
             {           // success
-                if ($debug)
-                {
-                    $warn       .= "<p>RecordSet.inc: " . __LINE__ .
-                                       " query=\"$queryText\"</p>\n";
-                }
-
                 // return count in parameter object
                 $row            = $stmt->fetch(PDO::FETCH_NUM);
                 if (is_array($row))
                     $this->information['count'] = $row[0];
                 else
                     $this->information['count'] = 0;
-                $this->lastSqlCmd   = $queryText;
+                $this->information['countquery'] = $queryText;
+                $this->lastSqlCmd               = $queryText;
             }           // success
             else
             {           // error performing query
-                $this->msg  .= "RecordSet::__construct: \"$queryText\", <br>" .
-                                print_r($stmt->errorInfo(),true) . $parmsText . "<br>" .
-                                ", parms=" . print_r($this->sqlParms,true) . "\n";
+                $this->msg  .= "<p class='error'>RecordSet::__construct: " . __LINE__ .
+                    " \"$countQuery\"" .
+                    "<br>parms=" . var_export($this->sqlParms,true) . 
+                    "<br>errors=" . var_export($stmt->errorInfo(),true);
+                $this->information['count'] = 0;
             }           // error performing query
         }           // set count to actual number of records
         if (strlen($this->msg) > 0)
@@ -966,7 +969,7 @@ class RecordSet implements Iterator, Countable, ArrayAccess
         $matches                = array();
         $where                  = '';
         if (is_array($value))
-        {       // list of values
+        {                       // list of values
             $values             = $value;
             if (count($values) == 0)
                 return '';
@@ -976,7 +979,7 @@ class RecordSet implements Iterator, Countable, ArrayAccess
             {
                 $value          = trim($values[$i]);
                 if (is_int($value))
-                {           // integer
+                {               // integer
                     if (is_string($refname))
                     {
                         $where              .= "$or$fldname=:$refname$i";
@@ -988,10 +991,10 @@ class RecordSet implements Iterator, Countable, ArrayAccess
                         $this->sqlParms[]   = $val;
                     }
                     $or         = ' OR ';
-                }           // integer
+                }               // integer
                 else
                 if (is_string($value))
-                {           // elementary value
+                {               // elementary value
                     $matches        = array();
                     if (preg_match(self::$pat,
                                    $value,
@@ -1069,9 +1072,9 @@ class RecordSet implements Iterator, Countable, ArrayAccess
                                         " Invalid $fldname"."[$i] value " .
                                         "'$value'</p>\n";
                     }           // invalid value
-                }           // elementary value
+                }               // elementary value
                 else
-                {           // invalid non-elementary
+                {               // invalid non-elementary
                     $where      .= "$fldname=$submark";
                     if ($subindex)
                         $this->sqlParms[$subindex]  = $value;
@@ -1600,6 +1603,32 @@ class RecordSet implements Iterator, Countable, ArrayAccess
                 }
             }               // array of simple string comparisons
             else
+            {               // string
+                $regpat             = '/([\^!]|)([^*+?(){}$[\]]*)(.*)/';
+                if (preg_match($regpat, $pattern, $matches))
+                {
+                    $frstch         = $matches[1];
+                    $body           = $matches[2];
+                    $rest           = $matches[3];
+                    if (strlen($rest) > 0)
+                    {
+                        $lastch     = substr($rest, -1);
+                        if ($lastch == '$')
+                            $rest   = substr($rest, 0, strlen($rest) - 1);
+                        else
+                            $lastch = '';
+                    }
+                    else
+                        $lastch     = '';
+                }
+                else
+                {
+                    $frstch         = '';
+                    $lastch         = '';
+                }
+                //print "<p>pattern='$pattern'</p>\n";
+                //print "<p>frstch='$frstch', body='$body', rest='$rest', lastch='$lastch'</p>\n";
+    
             if (strlen($pattern) > 5 &&
                 strtoupper(substr($pattern, 0, 5) == 'LIKE '))
             {               // portable pattern matching
@@ -1627,37 +1656,30 @@ class RecordSet implements Iterator, Countable, ArrayAccess
                 $this->sqlParms[]   = $value;
             }               // portable pattern matching
             else
-            if (strlen($pattern) > 1 &&
-                substr($pattern, 0 ,1) == '^' &&
-                substr($pattern, -1) == '$' &&
-                (substr($pattern, 1, 1) == '?' ||
-                 substr($pattern, 1, 1) == '+' ||
-                 substr($pattern, 1, 1) == '*' ||
-                 substr($pattern, 1, 1) == '{' ||
-                 preg_match("/[*+?(){}[\]]/", substr($pattern,1,strlen($pattern)-2)) == 0))
+            if ($frstch == '^' &&
+                $lastch == '$' &&
+                strlen($rest) == 0)
             {               // special pattern to match whole value
-                $vlen       = strlen($pattern) - 2;
-                $value      = substr($pattern, 1, $vlen);
                 if (is_string($refname))
                 {
                     $where      .= $or . "$fldname=:$refname$i";
-                                    $this->sqlParms["$refname$i"]   = $value;
+                                    $this->sqlParms["$refname$i"]   = $body;
                     $i++;
                 }
                 else
                 {
                     $where      .= $or . "$fldname=?";
-                                    $this->sqlParms[]   = $value;
+                                    $this->sqlParms[]   = $body;
                 }
             }               // match whole value
             else
-            if (strlen($pattern) > 1 &&
-                substr($pattern, 0 ,1) == '^' &&
-                preg_match("/[*+?()[\]{}]/",
-                           substr($pattern,1,strlen($pattern)-1)) == 0)
+            if ($frstch == '^' &&
+                strlen($body) > 0 &&
+                strlen($rest) == 0)
             {               // match at beginning
-                $vlen           = strlen($pattern) - 1;
-                $value          = substr($pattern, 1);
+                $vlen           = strlen($body);
+                $value          = $body;
+
                 if (is_string($refname))
                 {
                     $where      .= $or . "LEFT($fldname, $vlen)=:$refname$i";
@@ -1671,13 +1693,11 @@ class RecordSet implements Iterator, Countable, ArrayAccess
                 }
             }               // match at beginning
             else
-            if (strlen($pattern) > 1 &&
-                substr($pattern, -1) == '$' &&
-                preg_match("/[*+?()[\]{}]/",
-                           substr($pattern,0,strlen($pattern)-1)) == 0)
+            if ($lastch == '$' &&
+                strlen($rest) == 0)
             {               // match at end of string
-                $vlen           = strlen($pattern) - 1;
-                $value          = substr($pattern, 0, $vlen);
+                $vlen           = strlen($body);
+                $value          = $body;
                 if (is_string($refname))
                 {
                     $where      .= $or . "RIGHT($fldname, $vlen)=:$refname$i";
@@ -1691,33 +1711,63 @@ class RecordSet implements Iterator, Countable, ArrayAccess
                 }
             }               // match at end of string
             else
-            if (preg_match("/[*+?()[\]{}]/", $pattern) == 1)
+            if (strlen($rest) > 0)
             {               // value is a REGEXP pattern
+                $leading            = null;
+                $leadingl           = 0;
+                if ($frstch == '^')
+                {
+                    $leadingl       = strlen($body);
+                    $leading        = $body;
+                    $frest          = substr($rest, 0, 1);
+                    if ($frest == '*' || 
+                        $frest == '+' || 
+                        $frest == '?' ||
+                        $frest == '{')
+                    {
+                        $leadingl--;
+                        $leading    = substr($body, 0, $leadingl);
+                    }
+                }
+
+                $where          .= $or;
                 if (is_string($refname))
                 {
-                    $where      .= $or . "$fldname REGEXP :$refname$i";
+                    if ($leadingl)
+                    {
+                        $where      .= "(LEFT($fldname,$leadingl)=:l$refname$i AND ";
+                        $this->sqlParms["l$refname$i"]   = $leading;
+                    }
+                    $where          .= "$fldname REGEXP :$refname$i";
                     $this->sqlParms["$refname$i"]   = $pattern;
                     $i++;
                 }
                 else
                 {
-                    $where      .= $or . "$fldname REGEXP ?";
+                    if ($leadingl)
+                    {
+                        $where      .= "(LEFT($fldname,$leadingl)=? AND ";
+                        $this->sqlParms[]   = $leading;
+                    }
+                    $where          .= "$fldname REGEXP ?";
                     $this->sqlParms[]   = $pattern;
                 }
+                if ($leadingl)
+                    $where          .= ')';
             }               // value is a REGEXP pattern
             else
-            if (substr($pattern,0,1) == '!')
+            if ($frstch == '!')
             {               // value is a string to exclude from results
                 $value          = substr($pattern,1);
                 if (is_string($refname))
                 {
-                    $where      .= $or . "$fldname!=:$refname$i";
+                    $where          .= $or . "$fldname!=:$refname$i";
                     $this->sqlParms["$refname$i"]   = $value;
                     $i++;
                 }
                 else
                 {
-                    $where      .= $or . "$fldname!=?";
+                    $where          .= $or . "$fldname!=?";
                     $this->sqlParms[]   = $value;
                 }
             }               // value is a string to exclude from results
@@ -1755,12 +1805,15 @@ class RecordSet implements Iterator, Countable, ArrayAccess
                     $this->sqlParms[]   = $pattern;
                 }
             }               // value is a string to find
+            }               // string
             $or     = ' OR ';
         }                   // loop through patterns
         if (strlen($where) > 0 && count($parms) > 1)
         {
             $where      = "($where)";
         }
+        //print "<p>where='$where'</p>\n";
+        //print "<p>sqlparms=" . var_export($this->sqlParms,true) . "</p>\n";
         return $where;
     }       // function RecordSet::getWherePattern
 
@@ -1897,8 +1950,8 @@ require_once __NAMESPACE__ . '/Surname.inc';
                     $sub2               = '?';
                 }
                 $sxtable                = $table;
-                if ($table == 'tblNX')
-                    $sxtable            = 'tblNR';
+                //if ($table == 'tblNX')
+                //    $sxtable            = 'tblNR';
                 if ($soundslike)
                 {
                     $surnameCmp         = '(' . $sxtable .
@@ -1983,7 +2036,7 @@ require_once __NAMESPACE__ . '/Surname.inc';
                 $orExpression   = '';
                 foreach($value as $fld2 => $val2)
                 {
-            $warn   .= "<p>RecordSet::getWhere: " . __LINE__ .
+                    $warn       .= "<p>RecordSet::getWhere: " . __LINE__ .
                 " '$fld2' => " . var_export($val2,true) . "</p>\n";
                     $fieldLc    = $nsclass::getRealFieldName($fld2);
                     if (is_null($fieldLc))
@@ -2100,16 +2153,18 @@ require_once __NAMESPACE__ . '/Surname.inc';
 
         if (strlen($surname) > 0)
         {                   // add surname check
-            $loosetext      = 'false';
+            $loosetext              = 'false';
             if ($loose)
             {
-                $loosetext      = 'true';
-                $expression = $this->getSurnameChk($this->table,
-                                                   $surname);
+                $loosetext          = 'true';
+                $expression         = $this->getSurnameChk($this->table,
+                                                           $surname);
             }
             else
             {
-                $surnameRec     = new Surname(array('surname' => $surname));
+                if (preg_match('/\^[a-zA-Z ]*\$/', $surname))
+                    $surname        = substr($surname, 1, strlen($surname) -2);
+                $surnameRec = new Surname(array('surname' => $surname));
                 $pattern            = $surnameRec['pattern'];
                 $soundslike         = $surnameRec['soundslike'];
                 if (strlen($pattern) > 0)

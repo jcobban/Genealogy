@@ -971,7 +971,7 @@ export function openSignon()
  ************************************************************************/
 export function eltMouseOver(ev)
 {
-    console.log("util.js: eltMouseOver: this=" + this.outerHTML);
+    //console.log("util.js: eltMouseOver: this=" + this.outerHTML);
     ev.stopPropagation();
     if (popupHelpOption)
     {           // this user wants help
@@ -1001,7 +1001,7 @@ export function eltMouseOver(ev)
         if (helpElt)
         {
             helpDelayTimer  = setTimeout(popupHelp.bind(helpElt), 2000);
-            console.log("util.js: eltMouseOver: start timer " + helpDelayTimer);
+            //console.log("util.js: eltMouseOver: start timer " + helpDelayTimer);
         }
         else
             console.log("util.js: eltMouseOver: helpElt not resolved");

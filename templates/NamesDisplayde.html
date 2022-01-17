@@ -12,7 +12,7 @@
   <div id="breadcrumbs" class="hidden">
 	<a href="/index.html">Home</a>:
     <a href="/genealogy.php?lang=$LANG">
-			Genealogy
+			Stammbaumforschung
     </a>:
     <a href="/genCountry.php?cc=CA&lang=$LANG">
 			Canada
@@ -21,26 +21,26 @@
 			Ontario
     </a>:
     <a href="/FamilyTree/Services.php?lang=$LANG">
-			Services
+			Dienstleistungen
     </a>:
     <a href="/FamilyTree/nominalIndex.php?name=$NAMEURI&treename=$TREENAME&lang=$LANG">
-			Nominal Index
+			Nominalindex
     </a>:
     <a href="/FamilyTree/Surnames.php?initial=$PREFIX&lang=$LANG">
-			Surnames Starting with '$PREFIX'
+			Nachnamen, die mit '$PREFIX' beginnen
     </a>:
   </div>
   <div class="body">
     <h1>
 	  <span class="right">
-	    <a href="/FamilyTree/NamesHelpen.html" target="help">? Help</a>
+	    <a href="/FamilyTree/NamesHelpen.html" target="help">? Hilfe</a>
 	  </span>
 	  $TITLE
     </h1>
     $TRACE
 	$MSG
 
-    <h2>The $SURNAME Family Record</h2>
+    <h2>Das $SURNAME Familienbuch</h2>
       <div class="row" id="IdnrRow">
         <label class="column1" for="Idnr">
 	      IDNR:
@@ -50,28 +50,28 @@
       </div>
       <div class="row" id="SurnameRow">
         <label class="column1" for="Surname">
-	      Surname:
+	      achname:
         </label>
 	      $SURNAME
         <div style="clear: both;"></div>
       </div>
       <div class="row" id="SoundsLikeRow">
         <label class="column1" for="SoundsLike">
-	      SOUNDEX Code:
+	      SOUNDEX-Code:
         </label>
 	      $SOUNDSLIKE
         <div style="clear: both;"></div>
       </div>
       <div class="row" id="PatternRow">
         <label class="column1" for="Pattern">
-	      Regular Expr. Pattern:
+	      Muster:
         </label>
 	      $PATTERN
         <div style="clear: both;"></div>
       </div>
       <div class="row" id="NotesRow">
         <label class="column1" for="Notes">
-	      Notes:
+	      Aufzeichnungen:
         </label>
         <div style="float: left; width: 80%; white-space: normal;">
         $NOTES
@@ -86,23 +86,23 @@
         <input type="hidden" name="limit"   value="$LIMIT">
         <input type="hidden" name="lang"    value="$LANG">
         <input type="hidden" name="debug"   value="$DEBUG">
-        <button type="submit" id="Update">Update</button>
+        <button type="submit" id="Update">Aktualisieren</button>
     </form>
   
     <p class="label">
 	  <a href="/FamilyTree/Surnames.php?soundex=$SOUNDEX&lang=$LANG"
 	  		id="soundexLink">
-	      Surnames with the Same Soundex '$SOUNDEX'
+	      Nachnamen mit dem gleichen Soundex '$SOUNDEX'
 	  </a>
     </p>
     <p class="label" id="patternPara">
 	  <a href="/FamilyTree/Surnames.php?pattern=$PATTERNU&lang=$LANG"
 	  		id="patternLink">
-	      Surnames with the Same Pattern '$PATTERN'
+	      Nachnamen mit dem gleichen Muster '$PATTERN'
 	  </a>
     </p>
     <p class="label">
-	  $COUNT individuals have the surname '$SURNAME'.
+	  $COUNT Personen haben den Nachnamen '$SURNAME'.
     </p>
   <!--- Put out a line with links to previous and next section of table -->
   <div class="center" id="showActualCount" >
@@ -117,11 +117,11 @@
 	</a>
     </span>
       <span id="respdescrows">
-        Names $FIRST to $LAST of $COUNT
+        Nachnamen $FIRST bis $LAST von $COUNT
       </span>
     <div style="clear: both;"></div>
   </div> <!-- left and right arrow links -->
-    <p id="deletedUnused">Deleted unused record for surname '$SURNAME'</p>
+    <p id="deletedUnused">Nicht verwendeten Datensatz für Nachnamen '$SURNAME' gelöscht </p>
     <!--- Put out the response as a grid -->
     <div id="namesTable" class="grid$MAXCOLS">
 	  <div class="button" id="entry">
@@ -134,14 +134,14 @@
     </div>
   </div> <!-- class="body" -->
   <div class="hidden" id="templates">
-	<span id="missing">Persons List Missing Surname</span>
-	<span id="nosurname">Persons with No Surname</span>
-	<span id="surname">Persons with the Surname '$SURNAME'</span>
+	<span id="missing">Personenliste fehlender Nachname</span>
+	<span id="nosurname">Personen ohne Nachnamen</span>
+	<span id="surname">Personen mit dem Nachnamen '$SURNAME'</span>
     <div id="tranTab">
-		<span data-key="No">No</span>
-		<span data-key="female">female</span>
-		<span data-key="male">male</span>
-		<span data-key="unknown">unknown</span>
+		<span data-key="No">Keine</span>
+		<span data-key="female">weiblich</span>
+		<span data-key="male">männlich</span>
+		<span data-key="unknown">Unbekannt</span>
     </div>
   </div> <!-- id="templates" -->
   <div class="balloon" id="Helpidnr">
@@ -170,8 +170,8 @@
 
   </div>
   <div class="balloon" id="HelpNotes">
-	This field permits editing a general description of the family
-    sharing the surname.
+	This field permits editing a general description of the family sharing the
+	surname.
   </div>
   <div class="balloon" id="HelpUpdate">
 	Click on this button to enable updates to the description of the

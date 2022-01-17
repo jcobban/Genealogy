@@ -47,6 +47,7 @@ use \Exception;
  *      2020/06/30      support feedback                                *
  *      2020/12/27      get message texts from template                 *
  *                      cover XSS vulnerabilities                       *
+ *      2021/10/25      permit resetting latitude and longitude null    *
  *                                                                      *
  *  Copyright &copy; 2020 James A. Cobban                               *
  ************************************************************************/
@@ -186,10 +187,8 @@ if ($location instanceof Location)
 {
     if (is_string($locationName))
         $location->setName($locationName);
-    if (is_numeric($latitude))
-        $location->setLatitude($latitude);
-    if (is_numeric($longitude))
-        $location->setLongitude($longitude);
+    $location->setLatitude($latitude);
+    $location->setLongitude($longitude);
     foreach($updates as $field => $value)
         $location[$field]   = $value;
     $pattern                = $location->getName();
@@ -198,6 +197,8 @@ if ($location instanceof Location)
 
     if ($location->isOwner())
         $location->save();
+    else
+        $warn   .= "<p>$userid is not owner of this Location</p>\n";
 }
 else
     $pattern                = '';

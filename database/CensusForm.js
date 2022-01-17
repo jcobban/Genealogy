@@ -212,6 +212,7 @@
  *                      use addEventListener                            *
  *      2021/05/08      add "United States of America" as country       *
  *                      clear 'S' from marital status column            *
+ *      2021/08/04      add support for NotMember column                *
  *                                                                      *
  *  Copyright &copy; 2021 James A. Cobban                               *
  ************************************************************************/
@@ -333,6 +334,39 @@ var  EmpWhereAbbrs = {      "And"       		: "and",
 		                    "Or"        		: "or",
 		                    "["         		: "[blank]"
 		                };
+
+/************************************************************************
+ *  MMonthAbbrs                                                         *
+ *                                                                      *
+ *  Table for expanding abbreviations for months in columns that only   *
+ *  contain a month, not a full date
+ ************************************************************************/
+const  MMonthAbbrs = {
+                "A"         : "Apr",
+                "Ap"        : "Apr",
+                "Au"        : "Aug",
+                "D"         : "Dec",
+                "F"         : "Feb",
+                "G"         : "Aug",
+                "J"         : "Jan",
+                "Ja"        : "Jan",
+                "Jl"        : "July",
+                "Jn"        : "June",
+                "Jun"       : "June",
+                "Ju"        : "July",
+                "Jul"       : "July",
+                "L"         : "July",
+                "M"         : "Mar",
+                "Ma"        : "May",
+                "Mr"        : "Mar",
+                "My"        : "May",
+                "N"         : "Nov",
+                "O"         : "Oct",
+                "S"         : "Sept",
+                "Y"         : "May",
+                "1"         : "Y",
+                "["         : "[blank]"
+                };
 
 /************************************************************************
  *  colNames2Blank table                                                *
@@ -651,7 +685,12 @@ function changeSex()
     let member              = form.elements['Member' + row];
     if (member)
     {
-        if (member.value == 'Y' || member.value == '1')
+        if (member.value == 'Y' ||
+            member.value == '1' ||
+            member.value == '?' ||
+            member.value == ' ' ||
+            member.value == '' ||
+            member.value == null)
             member.value    = this.value;
     }
 
@@ -661,6 +700,22 @@ function changeSex()
     {
         if (absent.value == 'Y' || absent.value == '1')
             absent.value    = this.value;
+    }
+
+    // if the form includes a CanRead column
+    let canRead             = form.elements['CanRead' + row];
+    if (canRead)
+    {
+        if (canRead.value == 'Y' || canRead.value == '1')
+            canRead.value    = this.value;
+    }
+
+    // if the form includes a CanWrite column
+    let canWrite             = form.elements['CanWrite' + row];
+    if (canWrite)
+    {
+        if (canWrite.value == 'Y' || canWrite.value == '1')
+            canWrite.value    = this.value;
     }
 
     // for the 1851 and 1861 censuses if the form includes a born this year
@@ -754,6 +809,42 @@ function changeCantRead()
     if (this.checkfunc)
         this.checkfunc();
 }       // function changeCantRead
+
+/************************************************************************
+ *  function changeNotMember                                            *
+ *                                                                      *
+ *  Take action when the user changes the NotMember field.              *
+ *  This is the change event handler of the element.                    *
+ *                                                                      *
+ *  Input:                                                              *
+ *      this        <input type='text'> element                         *
+ ************************************************************************/
+function changeNotMember()
+{
+    let  form                       = this.form;
+    changeElt(this);            // fold value to upper case if required
+    if (this.value.length > 0)
+    {                           // non-empty value
+        let result                  = /([a-zA-Z_$]+)(\d*)$/.exec(this.name);
+        let colName                 = result[1].toLowerCase();
+        let rowNum                  = result[2];
+        let sexElement              = form.elements['Sex' + rowNum];
+        let memberElement           = form.elements['Member' + rowNum];
+        let value                   = this.value;
+        if (value == 'N')
+            value                   = '';
+        else
+        {
+            if (sexElement)
+                value               = sexElement.value;
+            else
+                value               = 'Y';
+            if (memberElement)
+                memberElement.value = '';
+        }
+        this.value                  = value;
+    }                           // non-empty value
+}       // function changeNotMember
 
 /************************************************************************
  *  function changeAddress                                              *
@@ -1660,11 +1751,10 @@ function changeAge()
     if (canReadElt)
     {                   // form has a CanRead field
         if (ageInYears > 4 && canReadElt.value.length == 0)
-            canReadElt.value    = '1';
-        if (ageInYears < 5 && canReadElt.value == '1')
+            canReadElt.value    = sexElt.value;
+        else
+        if (ageInYears < 5)
             canReadElt.value    = '';
-        if (ageInYears < 5 && canReadElt.value == 'Y')
-            canReadElt.value    = 'N';
     }                   // form has a CanRead field
 
     // set default value for CanWrite field if not already set
@@ -1672,11 +1762,10 @@ function changeAge()
     if (canWriteElt)
     {                   // form has a CanWrite field
         if (ageInYears > 4 && canWriteElt.value.length == 0)
-            canWriteElt.value   = '1';
-        if (ageInYears < 5 && canWriteElt.value == '1')
+            canWriteElt.value   = sexElt.value;
+        else
+        if (ageInYears < 5)
             canWriteElt.value   = '';
-        if (ageInYears < 5 && canWriteElt.value == 'Y')
-            canWriteElt.value   = 'N';
     }                   // form has a CanWrite field
 
     // validate this field to set highlighting
@@ -2162,27 +2251,6 @@ function initElement(element, clear)
             break;
         }   // capitalize flag values
 
-        case 'french':
-        case 'deaf':
-        case 'blind':
-        case 'insane':
-        case 'idiot':
-        case 'lunatics':    // used in 1851
-        case 'lunatic':     // used in 1861
-        case 'idiot':       // used in 1911
-        case 'unemployed':
-        case 'spkenglish':
-        case 'spkfrench':
-        {   // capitalize flag values
-            if (clear)
-                element.value  = "";
-            if (element.addEventListener)
-                element.addEventListener('change', changeFlag, false);
-            element.checkfunc  = checkFlag;
-            element.checkfunc();
-            break;
-        }   // capitalize flag values
-
         case 'negro':       // used in 1851
         case 'coloured':    // used in 1861
         case 'indian':
@@ -2202,7 +2270,18 @@ function initElement(element, clear)
         case 'cantwrite':
         case 'birth':
         case 'deathsex':
-        {   // capitalize flag values
+        case 'french':
+        case 'deaf':
+        case 'blind':
+        case 'insane':
+        case 'idiot':
+        case 'lunatics':    // used in 1851
+        case 'lunatic':     // used in 1861
+        case 'idiot':       // used in 1911
+        case 'unemployed':
+        case 'spkenglish':
+        case 'spkfrench':
+        {                   // display gender
             if (clear)
                 element.value  = "";
             if (element.addEventListener)
@@ -2210,10 +2289,10 @@ function initElement(element, clear)
             element.checkfunc  = checkFlagSex;
             element.checkfunc();
             break;
-        }   // capitalize flag values
+        }                   // display gender
 
         case 'canread':
-        {   // capitalize and copy to CanWrite
+        {                   // capitalize and copy to CanWrite
             numCanReadFlds++;
             if (element.value != '')
                 numCanRead++;
@@ -2222,21 +2301,30 @@ function initElement(element, clear)
             element.checkfunc  = checkFlag;
             element.checkfunc();
             break;
-        }   // capitalize and copy to CanWrite
+        }                   // capitalize and copy to CanWrite
 
         case 'cantread':
-        {   // capitalize and copy to CantWrite
+        {                   // capitalize and copy to CantWrite
             if (element.addEventListener)
                 element.addEventListener('change', changeCantRead, false);
             element.checkfunc  = checkFlag;
             element.checkfunc();
             break;
-        }   // capitalize and copy to CantWrite
+        }                   // capitalize and copy to CantWrite
+
+        case 'notmember':
+        {                   // capitalize and clear 'member'
+            if (element.addEventListener)
+                element.addEventListener('change', changeNotMember, false);
+            element.checkfunc  = checkFlag;
+            element.checkfunc();
+            break;
+        }                   // capitalize and clear 'member'
 
         case 'origin':
         case 'nationality':
         case 'language':
-        {   // Expand abbreviations
+        {                   // Expand abbreviations
             element.abbrTbl      = OrigAbbrs;
             if (element.addEventListener)
                 element.addEventListener('change', changeReplDown, false);
@@ -2246,7 +2334,7 @@ function initElement(element, clear)
             element.checkfunc       = checkName;
             element.checkfunc();
             break;
-        }   // Expand abbreviations
+        }                   // Expand abbreviations
 
         case 'causeofdeath':
         {   // Cause of Death in 1851 and 1861 population census
@@ -2271,10 +2359,21 @@ function initElement(element, clear)
         }   // Expand abbreviations
 
         case 'binyear':
-        case 'bdate':
         case 'minyear':
         case 'maryear':
-        {   // Expand abbreviations
+        {                       // Fields that only contain a month
+            if (clear)
+                element.value       = "";
+            element.abbrTbl         = MMonthAbbrs;
+            if (element.addEventListener)
+                element.addEventListener('change', dateChanged, false);
+            element.checkfunc       = checkDate;
+            element.checkfunc();
+            break;
+        }                       // fields that only contain a month
+
+        case 'bdate':
+        {                       // fields containing a date (day & month)
             if (clear)
                 element.value       = "";
             element.abbrTbl         = MonthAbbrs;
@@ -2283,7 +2382,7 @@ function initElement(element, clear)
             element.checkfunc       = checkDate;
             element.checkfunc();
             break;
-        }   // Expand abbreviations
+        }                       // fields containing a date (day & month)
 
         case 'relation':
         {   // Expand abbreviations

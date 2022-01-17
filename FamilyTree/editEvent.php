@@ -2385,17 +2385,17 @@ debug:
     // citations for the event
     if (is_null($event))
     {
-        $citParms = array('idime'           => $idime,
-                            'type'          => $stype);
-        $citations = new CitationSet($citParms);
+        $citParms   = array('idime'             => $idime,
+                            'type'              => $stype);
+        $citations  = new CitationSet($citParms);
     }
     else
     {
-        $citations = $event->getCitations();
+        $citations  = $event->getCitations();
     }
 ?>
     <table id="citTable">
-            <thead>
+        <thead>
           <tr>
             <th class="left">
             <input type="hidden" name="idime" id="idime"
@@ -2411,53 +2411,53 @@ debug:
             Details (Page)
             </th>
           </tr>
-            </thead>
-      <tbody>
+        </thead>
+        <tbody>
 <?php
     if ($citations)
     foreach($citations as $idsx => $cit)
     {       // loop through all citations to this fact
-        $idsr = $cit->getIdsr();
-        $title = str_replace('"','&quot;',$cit->getSource()->getTitle());
+        $idsr   = $cit->getIdsr();
+        $title  = str_replace('"','&quot;',$cit->getSource()->getTitle());
         $detail = str_replace('"','&quot;',$cit->getDetail());
 ?>
           <tr id="sourceRow<?php print $idsx; ?>" >
             <td id="firstButton<?php print $idsx; ?>">
-        <button type="button"
-                    id="editCitation<?php print $idsx; ?>">
-            Edit Citation
-        </button>
+              <button type="button"
+                        id="editCitation<?php print $idsx; ?>">
+                Edit Citation
+              </button>
             </td>
             <td id="sourceCell<?php print $idsx; ?>">
-        <input type="text" name="Source<?php print $idsx; ?>"
+              <input type="text" name="Source<?php print $idsx; ?>"
                     id="Source<?php print $idsx; ?>"
                     class="ina leftnc"
                     value="<?php print $title; ?>"
                     readonly="readonly"
                     size="40" style="width: 20em;">
-        <input type="hidden" name="IDSR<?php print $idsx; ?>"
+              <input type="hidden" name="IDSR<?php print $idsx; ?>"
                     id="IDSR<?php print $idsx; ?>"
                     value="<?php print $idsr; ?>">
             </td>
             <td>
-        <input type="text" name="Page<?php print $idsx; ?>"
+              <input type="text" name="Page<?php print $idsx; ?>"
                     id="Page<?php print $idsx; ?>"
                     class="white leftnc"
                     value="<?php print $detail; ?>"
                     size="37" style="width: 18em;">
             </td>
             <td>
-        <button type="button"
+              <button type="button"
                     id="delCitation<?php print $idsx; ?>">
-            Delete Citation
-        </button>
+                Delete Citation
+              </button>
             </td>
           </tr>
 <?php
     }       // loop through citations
 ?>
-      </tbody>
-      <tfoot>
+        </tbody>
+        <tfoot>
           <tr>
             <td>
               <button type="button" id="AddCitation">
@@ -2465,7 +2465,7 @@ debug:
               </button>
             </td>   
           </tr>
-      </tfoot>
+        </tfoot>
     </table>
 <?php
 
@@ -2473,9 +2473,9 @@ debug:
     // to add and delete them for the name event
     if ($stype == Citation::STYPE_NAME)
     {       // Name event, provide access to alternates
-        $altNames = $person->getNames();
+        $altNames   = $person->getNames();
         showTrace();
-        $in     = 0;
+        $in         = 0;
 ?>
     <fieldset class="other" id="altNameSet">
       <legend class="labelSmall">Alternate Names</legend>
@@ -2512,7 +2512,7 @@ debug:
       <label class="column1" for="newAltSurname">
         New Surname:
       </label>
-    <input type="text" name="newAltSurname" id="newAltSurname"
+      <input type="text" name="newAltSurname" id="newAltSurname"
             size="32" maxlength="120" class="white left">
       <div style="clear: both;"></div>
     </div>
@@ -2520,7 +2520,7 @@ debug:
       <label class="column1" for="newAltGivenName">
         New Given Name:
       </label>
-    <input type="text" name="newAltGivenName" id="newAltGivenName"
+      <input type="text" name="newAltGivenName" id="newAltGivenName"
             size="50" maxlength="120" class="white left">
       <div style="clear: both;"></div>
     </div>
@@ -2546,9 +2546,9 @@ debug:
     </div>
 <?php
         // citations for the cause of death
-        $citParms = array('idime'           => $idir,
-                        'type'          => Citation::STYPE_DEATHCAUSE);
-        $citations = new CitationSet($citParms);
+        $citParms   = array('idime'         => $idir,
+                            'type'          => Citation::STYPE_DEATHCAUSE);
+        $citations  = new CitationSet($citParms);
 ?>
       <table id="DcCitTable">
             <thead>

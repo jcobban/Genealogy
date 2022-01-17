@@ -58,6 +58,7 @@ require_once __NAMESPACE__ . "/common.inc";
  *      open code                                                       *
  ***********************************************************************/
 $cc             = 'CA';
+$lang           = 'en';
 $countryName    = 'Canada';
 
 // process parameters passed by caller

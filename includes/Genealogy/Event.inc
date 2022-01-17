@@ -260,6 +260,8 @@ use \Exception;
  *                      use Record::constDebug and                      * 
  *                      Record::debugBacktrace                          *
  *      2021/06/05      save did not return count                       *
+ *      2021/12/17      correct merge of citations from legacy event    *
+ *                      to instance of class Event                      *
  *                                                                      *
  *  Copyright &copy; 2021 James A. Cobban                               *
  ************************************************************************/
@@ -2932,9 +2934,9 @@ class Event extends RecordPic
         // migrated to tblER, and so the citations may still refer to the
         // original location
         if ($preferred)
-        {           // preferred events
+        {                   // preferred events
             switch($idet)
-            {           // act on specific event types
+            {               // act on specific event types
                 case Event::ET_BIRTH:
                 {
                     $stype      = Citation::STYPE_BIRTH;
@@ -3018,40 +3020,29 @@ class Event extends RecordPic
                     break;
                 }
 
-            }           // act on specific event types
+            }               // act on specific event types
 
-            // get the old style citations associated with this event
-            $parms          = array('idime'     => $idir,
-                                    'type'      => $stype);
-            // set of citations to be moved
-            $mcitations     = new RecordSet('Citations', $parms);
-            $mcount         = $mcitations->count();
-            if ($mcount > 0)
-                $getmsg     = "Event::getCitations: " . __LINE__ .
-                " got $mcount old citations for idime=$idir, type=$stype";
-            else
-                $getmsg     = null;
-
-            // migrate
-            if ($ider > 0)
-            {               // have a real event, move the citations
-                foreach($mcitations as $idsx => $citation)
-                {           // loop through all citations
-                    $oldidime   = $citation->get('idime');
-                    $oldstype   = $citation->get('stype');
-                    if ($oldstype != $newstype)
-                    {
-                        if (is_string($getmsg))
-                            error_log($getmsg);
-                        ob_start();
-                        debug_print_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
-                        error_log("Event::getCitations: " . __LINE__ . 
-                            " set Citation($idsx) oldidime=$oldidime, oldtype=$oldstype, idime=$ider, type=$newstype\n" . ob_get_clean());
-                    }
-                    $citation->set('idime', $ider);
-                    $citation->set('type',  $newstype);
-                }           // loop through all citations
-            }               // have a real event, move the citations
+            if ($stype != Citation::STYPE_EVENT)
+            {               // move events from old location
+	            // get the old style citations associated with this event
+	            $parms              = array('idime'     => $idir,
+	                                        'type'      => $stype);
+	            // set of citations to be moved
+	            $mcitations         = new RecordSet('Citations', $parms);
+	            $mcount             = $mcitations->count();
+	
+	            // migrate
+	            if ($ider > 0)
+	            {           // have a real event, move the citations
+	                foreach($mcitations as $idsx => $citation)
+	                {       // loop through all citations
+	                    $oldidime   = $citation->get('idime');
+	                    $oldstype   = $citation->get('stype');
+	                    $citation->set('idime', $ider);
+	                    $citation->set('type',  $newstype);
+	                }       // loop through all citations
+	            }           // have a real event, move the citations
+            }               // move events from old location
 
         }                   // preferred events
 
@@ -3081,7 +3072,13 @@ class Event extends RecordPic
             // add citations from merged event
             if (isset($mcitations))
                 foreach($mcitations as $idsx => $citation)
+                {
+                    $oldidime   = $citation->get('idime');
+                    $oldstype   = $citation->get('stype');
+                    error_log("Event::getCitations: " . __LINE__ . 
+                            " merge Citation($idsx) oldidime=$oldidime, oldtype=$oldstype");
                     $citations[$idsx]   = $citation;
+                }
         }           // have an actual record in tblER
         else
         if (isset($mcitations))

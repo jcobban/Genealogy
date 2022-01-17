@@ -159,6 +159,7 @@ require_once __NAMESPACE__ . '/Citation.inc';
 require_once __NAMESPACE__ . '/CitationSet.inc';
 require_once __NAMESPACE__ . '/common.inc';
 
+$start                          = hrtime(true);
 // set up based upon the user's level of authorization
 if (canUser('edit'))
 {		// user is authorized to edit the database
@@ -200,6 +201,7 @@ $lang       					= 'en';
 $birth		    				= null;
 $indiv		    				= null;
 $imatches						= null;
+$timing                         = false;
 
 if (isset($_GET) && count($_GET) > 0)
 {	        	    // invoked by URL to display current status of account
@@ -276,7 +278,13 @@ if (isset($_GET) && count($_GET) > 0)
 	            $lang           = FtTemplate::validateLang($value);
 				break;
 	        }
-	
+
+            case 'timing':
+            {
+                $timing         = true;
+                break;
+            }
+
 		    default:
 		    {
                 $warn	.= "Unexpected parameter $key='" . 
@@ -399,8 +407,12 @@ if ($lmonthsTag)
 // if no error messages Issue the query
 if (strlen($msg) == 0)
 {			// no errors
-	// get the birth registration object
+    // get the birth registration object
+    $before         = hrtime(true);
 	$birth			= new Birth($domain, $regYear, $regNum);
+    if ($timing)
+        $warn       .= "<p>new Birth took " . number_format(hrtime(true) - $before) .
+                        "ns</p>\n";
 
 	// copy contents into working variables
 	$surname		                = $birth->get('surname');
@@ -445,29 +457,52 @@ if (strlen($msg) == 0)
 	    $citparms   	= array('idsr'		=> 97,
     		    	    	    'type'		=> Citation::STYPE_BIRTH,
 	    		    	        'srcdetail'	=> $pattern);
+        $before         = hrtime(true);
         $citations		= new CitationSet($citparms);
+        if ($timing)
+        { 
+            $warn           .= "<p>new CitationSet(" . var_export($citparms, true) . ") took " .
+                            number_format(hrtime(true) - $before) .
+                            "ns</p>\n";
+            $info           = $citations->getInformation();
+            $query          = $info['query'];
+            $warn           .= "<p>query='$query'</p>\n";
+            //    foreach($connection->query("EXPLAIN $query") as $r)
+            //        $warn       .= "<p>" . print_r($r, true);
+        }
 
 	    if ($citations->count() > 0)
 	    {				// citation to birth in old location
-			$citrow	= $citations->rewind();
-			$idir	= $citrow->get('idime');
+			$citrow	        = $citations->rewind();
+			$idir	        = $citrow->get('idime');
 	    }				// citation to birth in old location
 	    else
 	    {				// citation to birth in event
-			$citparms	= array('idsr'		=> 97,
-				                'type'		=> Citation::STYPE_EVENT,
-				                'srcdetail'	=> $pattern); 
-            $citations	= new CitationSet($citparms);
+			$citparms	    = array('idsr'		=> 97,
+                                    'type'		=> Citation::STYPE_EVENT,
+                                    'idet'      => Event::ET_BIRTH,
+				                    'srcdetail'	=> $pattern); 
+            $before         = hrtime(true);
+            $citations	    = new CitationSet($citparms);
+            if ($timing) 
+            { 
+                $warn       .= "<p>new CitationSet(" . 
+                                var_export($citparms, true) . ") took " .
+                                number_format(hrtime(true) - $before) .
+                                "ns</p>\n";
+                $info       = $citations->getInformation();
+                $query      = $info['query'];
+                $warn       .= "<p>query='$query'</p>\n";
+                //foreach($connection->query("EXPLAIN $query") as $r)
+                //    $warn       .= "<p>" . print_r($r, true);
+            }
 
-			foreach($citations as $idsx => $citation)
-			{			// loop through citations
+			if ($citations->count() > 0)
+			{			// citations to birth at new location
+			    $citation	    = $citations->rewind();
 			    $ider       	= $citation->get('idime');
 			    $event	        = new Event($ider);
-			    if ($event->getIdet() == Event::ET_BIRTH)
-			    {			// citation for birth event
-    				$idir		= $event->getIdir();
-	    			break;
-			    }			// citation for birth event
+    			$idir		    = $event->getIdir();
 			}			// loop through citations
 	    }				// citation to birth in event
 
@@ -516,7 +551,12 @@ if (strlen($msg) == 0)
 				        		    'givenname'	=> $gnameList,
 				        		    'birthsd'	=> $birthrange);
 
+            $before     = hrtime(true);
 			$imatches	= new PersonSet($getparms);
+            if ($timing) 
+                $warn       .= "<p>new PersonSet(" . var_export($getparms, true) . ") took " .
+                            number_format(hrtime(true) - $before) .
+                            "ns</p>\n";
 	    }				// existing record
 	    else
 	    if ($idir > 0 && strlen($surname) == 0 && strlen($givennames) == 0)
@@ -782,4 +822,8 @@ if (!$update && $image == "")
     $template->updateTag('ImageRow',  null);
 
 // display template
+if ($timing)
+    $warn       .= "<p>Script took " .
+                            number_format(hrtime(true) - $start) .
+                            "ns</p>\n";
 $template->display();

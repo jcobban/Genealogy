@@ -1363,6 +1363,8 @@ function update()
 function gotUpdated(jsonObj)
 {
     let opener          = null;
+    let idir            = 0;
+
     if (window.frameElement && window.frameElement.opener)
         opener          = window.frameElement.opener;
     else
@@ -1378,121 +1380,132 @@ function gotUpdated(jsonObj)
         }
         else
         {
-        // let  msg = "";
-        // for(key in indiv)
-        //     msg      += key + "='" + indiv[key] + "',";
-        // alert("editIndivid.js: gotUpdated: indiv={" + msg + "} ");
-
-        // get the IDIR value from the response
-        let idir        = indiv.idir;
-        if (typeof(idir) === "undefined")
-        {
-            console.log("editIndivid.js: gotUpdated: 1362 idir=" + idir +
-                  " jsonObj=" + JSON.stringify(jsonObj));
-        }
-        else
-            console.log("editIndivid.js: gotUpdated: 1366 jsonObj=" + JSON.stringify(jsonObj));
-        if ((idir - 0) == 0)
-            console.log("editIndivid.js: gotUpdated: 1368: idir=" + idir + ": " +
-                        JSON.stringify(jsonObj));
-        // update IDIR value in form
-        srcform.idir.value  = idir;
-
-        // if there is a child tag present, get the IDCR value
-        let idcr            = 0;
-        let childr          = jsonObj.child;
-        if (childr)
-            idcr            = childr.idcr;
-
-        // if invoker has requested to be notified of key information about
-        // the individual to update a specific individual in the invoking page
-        if (feedbackRow !== null &&
-            typeof(feedbackRow.changePerson) == 'function')
-        {       // updating a family member
-            let gender      = srcform.Gender.value;
-            if (gender == 0)
-                genderClass = 'male';
+            // let  msg = "";
+            // for(key in indiv)
+            //     msg      += key + "='" + indiv[key] + "',";
+            // alert("editIndivid.js: gotUpdated: indiv={" + msg + "} ");
+    
+            // get the IDIR value from the response
+            idir        = indiv.idir;
+            if (typeof(idir) === "undefined")
+            {
+                console.log("editIndivid.js: gotUpdated: 1362 idir=" + idir +
+                      " jsonObj=" + JSON.stringify(jsonObj));
+            }
             else
-            if (gender == 1)
-                genderClass = 'female';
-            else
-                genderClass = 'unknown';
-
-            let birthDate           = '';
-            let deathDate           = '';
-
-            let eventBody           = document.getElementById('EventBody');
-            let eventRows           = eventBody.children;
-            for(let ir = 0; ir < eventRows.length; ir++)
-            {           // loop through all events
-                let eventRow        = eventRows[ir];
-                let children        = eventRow.getElementsByTagName('input');
-                for(let ic = 0;
-                    ic < children.length;
-                    ic++)
-                {
-                    celt            = children[ic];
-                    if (celt.name == 'BirthDate')
-                    {
-                        birthDate   = celt.value;
-                        break;
-                    }
-                    else
-                    if (celt.name == 'DeathDate')
-                    {
-                        deathDate   = celt.value;
-                        break;
-                    }
-                }
-            }           // death row present
-
-            // pass the information back to the invoker
-            let parms       = { "idir"      : idir,
-                                "givenname" : srcform.GivenName.value,
-                                "surname"   : srcform.Surname.value,
-                                "birthd"    : birthDate,
-                                "deathd"    : deathDate,
-                                "gender"    : genderClass,
-                                "sex"       : gender};
-            if (parentsIdmr !== null)
-                parms.idcr  = idcr;
-
-            feedbackRow.changePerson(parms);
-        }       // updating a family member
-        else
-        if (parmIdir == 0 && parentsIdmr !== null && idcr == 0)
-        {       // adding new child
-            // Now that the individual is updated in the database
-            // if adding a child, notify invoker to add the child to the list
-            // of children
-            let childTable  = opener.document.getElementById('children');
-            let genderSel   = srcform.Gender;
-            let index       = genderSel.selectedIndex;
-            let gender      = genderSel.options[index].value;
-            if (gender == 0)
-                indiv.gender    = 'male';
-            else
-            if (gender == 1)
-                indiv.gender    = 'female';
-            else
-                indiv.gender    = 'unknown';
-
-            // invoke the add method of the 'children' table
-            // now that the individual has been added into the database
+                console.log("editIndivid.js: gotUpdated: 1366 jsonObj=" + JSON.stringify(jsonObj));
             if ((idir - 0) == 0)
-                console.log("editIndivid.js: gotUpdated: 1467: call addChildToPage: idir=" +
-                        idir );
-            if (childTable)
-                childTable.addChildToPage(indiv,
-                                          false);
-        }       // adding new child
-        }       // person present in object
+                console.log("editIndivid.js: gotUpdated: 1368: idir=" + idir + ": " +
+                            JSON.stringify(jsonObj));
+            // update IDIR value in form
+            srcform.idir.value  = idir;
+    
+            // if there is a child tag present, get the IDCR value
+            let idcr            = 0;
+            let childr          = jsonObj.child;
+            if (childr)
+                idcr            = childr.idcr;
+    
+            // if invoker has requested to be notified of key information about
+            // the individual to update a specific individual in the invoking page
+            if (feedbackRow !== null &&
+                typeof(feedbackRow.changePerson) == 'function')
+            {       // updating a family member
+                let gender      = srcform.Gender.value;
+                if (gender == 0)
+                    genderClass = 'male';
+                else
+                if (gender == 1)
+                    genderClass = 'female';
+                else
+                    genderClass = 'unknown';
+    
+                let birthDate           = '';
+                let deathDate           = '';
+    
+                let eventBody           = document.getElementById('EventBody');
+                let eventRows           = eventBody.children;
+                for(let ir = 0; ir < eventRows.length; ir++)
+                {           // loop through all events
+                    let eventRow        = eventRows[ir];
+                    let children        = eventRow.getElementsByTagName('input');
+                    for(let ic = 0;
+                        ic < children.length;
+                        ic++)
+                    {
+                        celt            = children[ic];
+                        if (celt.name == 'BirthDate')
+                        {
+                            birthDate   = celt.value;
+                            break;
+                        }
+                        else
+                        if (celt.name == 'DeathDate')
+                        {
+                            deathDate   = celt.value;
+                            break;
+                        }
+                    }
+                }           // death row present
+    
+                // pass the information back to the invoker
+                let parms       = { "idir"      : idir,
+                                    "givenname" : srcform.GivenName.value,
+                                    "surname"   : srcform.Surname.value,
+                                    "birthd"    : birthDate,
+                                    "deathd"    : deathDate,
+                                    "gender"    : genderClass,
+                                    "sex"       : gender};
+                if (parentsIdmr !== null)
+                    parms.idcr  = idcr;
+    
+                feedbackRow.changePerson(parms);
+            }       // updating a family member
+            else
+            if (parmIdir == 0 && parentsIdmr !== null && idcr == 0)
+            {       // adding new child
+                // Now that the individual is updated in the database
+                // if adding a child, notify invoker to add the child to the list
+                // of children
+                let childTable  = opener.document.getElementById('children');
+                let genderSel   = srcform.Gender;
+                let index       = genderSel.selectedIndex;
+                let gender      = genderSel.options[index].value;
+                if (gender == 0)
+                    indiv.gender    = 'male';
+                else
+                if (gender == 1)
+                    indiv.gender    = 'female';
+                else
+                    indiv.gender    = 'unknown';
+    
+                // invoke the add method of the 'children' table
+                // now that the individual has been added into the database
+                if ((idir - 0) == 0)
+                {
+                    console.log("editIndivid.js: gotUpdated: 1483: call addChildToPage: idir=" +
+                            idir );
+                    alert("editIndivid.js: gotUpdated: 1486 IDIR not set: " +
+                    JSON.stringify(jsonObj));
+                }
+                if (childTable)
+                    childTable.addChildToPage(indiv,
+                                              false);
+            }       // adding new child
+        }           // person present in object
         // hide the frame containing this dialog
         if (window.frameElement)
             closeFrame();
         else
         {
-            location    = "Person.php?idir=" + idir;
+            if ((idir - 0) == 0)
+            {
+                console.log('editIndivid.js: gotUpdated: 1496 Person.php?idir=' + idir); 
+                alert("editIndivid.js: gotUpdated: 1501 IDIR not set: " +
+                    JSON.stringify(jsonObj));
+            }
+            else
+                location    = "Person.php?idir=" + idir;
         }
     }           // valid response
     else

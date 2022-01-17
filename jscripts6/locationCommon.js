@@ -171,7 +171,7 @@ export function locationChanged(ev)
     {
         let letters             = results[2];
         if (letters == 'RN' || letters == 'RS' || letters == 'R' ||
-            letters == 'NBTR' || letters == 'RSLR' || 
+            letters == 'NBTR' || letters == 'RSLR' || letters == 'RNLR' ||  
             letters == 'STR' || letters == 'NTR' ||
             letters == 'st' || letters == 'nd' ||
             letters == 'rd' || letters == 'th')

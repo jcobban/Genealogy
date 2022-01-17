@@ -1,5 +1,5 @@
 <!--*********************************************************************
- *  SqlCommanden.html                                                   *
+ *  SqlCommandfr.html                                                   *
  *                                                                      *
  *  Issue arbitrary SQL command against the database.                   *
  *                                                                      *
@@ -9,27 +9,27 @@
  *  Copyright &copy; 2020 James A. Cobban                               *
  **********************************************************************-->
     <div id="breadcrumbs" class="hidden">
-      <a href="/genealogy.php?lang=$LANG">Genealogy</a>:
+      <a href="/genealogy.php?lang=$LANG">Genealogie</a>:
     </div>  
     <div class="body">
       <h1>
         <span class="right">
-          <a href='SqlCommandHelpen.html' target='help'>? Help</a>
+          <a href='SqlCommandHelpen.html' target='help'>? Aide</a>
         </span>
-        Issue SQL Command
+        Ëmettre une Commande de Langage de Requête Structurée (SQL)
         <div style='clear: both;'></div>
       </h1>
       $TRACE
       $MSG
-      <p id="command"><span class="label">Command:</span> '$COMMAND'
+      <p id="command"><span class="label">Commande:</span> '$COMMAND'
       </p>
 
       <p id="table"><span class="label">Table:</span> '$TABLE'
       </p>
       <div id="badtable">
-      <p class="message">Table '$TABLE' not defined on server.
+      <p class="message">Table '$TABLE' non définie sur le serveur.
       </p>
-      <p>The $TABLECOUNT defined tables are:</p>
+      <p>Les $TABLECOUNT tables définies sont:</p>
       <p id="tableNames" style='text-align: left; margin-left: 5em;'>
         <span id="tableName$I">
             $TABLENAME,
@@ -37,50 +37,50 @@
       </p>
       </div> <!-- id="badtable" -->
       <p id="join">
-      <span class="label">Join:</span> '$JOIN'
+      <span class="label">Rejoindre:</span> '$JOIN'
       </p>
       <p id="operands">
-      <span class="label">Operands:</span> '$OPERANDS'
+      <span class="label">Opérandes:</span> '$OPERANDS'
       </p>
       <p id="where">
-      <span class="label">Where:</span> '$WHERE'
+      <span class="label">L'Ou:</span> '$WHERE'
       </p>
       <p id="groupby">
-      <span class="label">GROUP BY:</span> '$GROUPBY'
+      <span class="label">Grouper par:</span> '$GROUPBY'
       </p>
       <p id="having">
-      <span class="label">HAVING:</span> '$HAVING'
+      <span class="label">Avoir:</span> '$HAVING'
       </p>
       <p id="orderby">
-      <span class="label">ORDER BY:</span> '$ORDERBY'
+      <span class="label">Ordre par:</span> '$ORDERBY'
       </p>
       <p id="limit">
-      <span class="label">LIMIT:</span> '$LIMIT'
+      <span class="label">Limite:</span> '$LIMIT'
       </p>
       <p id="offset">
-      <span class="label">OFFSET:</span> '$OFFSET'
+      <span class="label">Décalage:</span> '$OFFSET'
       </p>
       <p id="emsg" class="message">$EMSG</p>
       <div id="fieldnames">
-        <p>The $FIELDCOUNT defined fields in the
-        <code>`$TABLENAME`</code> table are:</p>
+          <p>Les $FIELDCOUNT champs définis dans la table 
+            <code>`$TABLENAME`</code> sont:</p>
         <p style='font-weight: bold; margin-left: 15px;'>$FIELDSNAME</p>
       </div><!-- id="fieldnames" -->
       <form name='sqlform' action='SqlCommand.php' method='post'>
         <input type='hidden' id="debug" name='debug' value='$DEBUG'>
         <input type='hidden' id="lang" name='lang' value='$LANG'>
-        <p id="stats" class="warning">This command will 
-          <span id="displaystats">display $COUNT rows from</span>
-          <span id="updatestats">update $COUNT rows in</span> 
-          the database.
+        <p id="stats" class="warning">Cette commande  
+          <span id="displaystats">affichera $COUNT lignes de</span>
+          <span id="updatestats">mettra à jour $COUNT lignes dans</span> 
+          la base de données.
         </p>
         <p>
-          <button type='button' id="Submit">Issue Command</button>
+          <button type='button' id="Submit">Ëmettre la Commande</button>
           <input type='hidden' id="Confirm" name='Confirm' value=''>
         </p>
         <p>
           <label class="label" style='width: 7em;' for='SqlCommand'>
-              Command:
+              Commande:
           </label>
           <input type='text' name='SqlCommand' id="SqlCommand"
                   class='white leftnc' size='80'
@@ -143,8 +143,7 @@
       Click on this button to issue the SQL command.
     </div>
     <div id="templates" class="hidden">
-        <span id="badFieldName">`$expr` is not a field name
-            in table `$table`.
+        <span id="badFieldName">`$expr` n'est pas un nom de champ dans la table `$table`.
         </span>
     </div>
     <script src="/jscripts/util.js" type="application/javaScript">

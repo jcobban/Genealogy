@@ -35,6 +35,7 @@ use Templating\escape;
  *      2021/04/02      suppress advertising for Web Crawler Bots       *
  *      2021/04/04      escape contact subject URL                      *
  *      2021/05/31      do not access HTTP_USER_AGENT if not present    *
+ *      2021/10/25      add rel= attributes to some header tags         *
  *                                                                      *
  *  Copyright &copy; 2021 James A. Cobban All Rights Reserved           *
  ************************************************************************/
@@ -65,7 +66,7 @@ class FtTemplate extends Template
      ********************************************************************/
     private $lang               = 'en';
     private $formatter          = null;
-    private $sateFormatter      = null;
+    private $dateFormatter      = null;
     private $includeSub         = null; // filename for error messages
 
     /********************************************************************
@@ -162,6 +163,7 @@ class FtTemplate extends Template
                     $warn   .= str_replace(array('$langName','$nativeName'),
                                            array($langName, $nativeName),
                                            $sorry);
+                    $langcode   = 'en';
                 }
                 else
                 {
@@ -741,7 +743,7 @@ class FtTemplate extends Template
                         $apos       = strpos($help, '<a');
                         $apos       = strpos($help, '>', $apos + 1);
                         $help       = substr($help, 0, $apos) .
-                                             ' id="menuhelp" class="menuitem"' .
+                            ' rel="help" id="menuhelp" class="menuitem"' .
                                              substr($help, $apos);
                         $help       = str_replace('</a>',
                                                   '</a><br>',
@@ -750,6 +752,7 @@ class FtTemplate extends Template
                         $child->update(null);
                     }       // move help section to menu
                 }           // loop through children of first <h1>
+
                 if (count($h1array) > 1)
                 {
                     $heading            = $h1->innerHTML;
@@ -794,7 +797,7 @@ class FtTemplate extends Template
                     $apos       = strpos($help, '<a');
                     $apos       = strpos($help, '>', $apos + 1);
                     $help       = substr($help, 0, $apos) .
-                                  ' class="menuitem"' .
+                                  ' rel="author" class="menuitem"' .
                                   substr($help, $apos);
                     $breadcrumbs.= $help;
                     $child->update(null);

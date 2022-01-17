@@ -925,7 +925,7 @@ require_once __NAMESPACE__ . '/Marriage.inc';
             break;
         }       // Marriage
 
-        case 'CountyMarriage':
+        case 'CountyMarriages':
         {
 require_once __NAMESPACE__ . '/CountyMarriage.inc';
             if (isset($volume))

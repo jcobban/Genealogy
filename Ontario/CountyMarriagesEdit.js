@@ -130,22 +130,22 @@ function findInTree()
     let birthmax    = 1856;
     if (date.length >= 4)
     {
-        let matches     = /\d\d\d\d/.exec(date);
+        let matches         = /\d\d\d\d/.exec(date);
         if (Array.isArray(matches))
-        {   // year of marriage
-	        let year    = parseInt(matches[0]);
+        {               // year of marriage
+	        let year        = parseInt(matches[0]);
 
-	        if (age.length > 0)
-	        {
-	            birthmin    = year - (age - 0 + 5);
-	            birthmax    = year - (age - 5);
-	        }
-	        else
+	        if (age.length == 0 || isNaN(age))
 	        {
 	            birthmin    = year - 80;
 	            birthmax    = year - 16;
 	        }
-        }   // year of marriage
+	        else
+	        {
+	            birthmin    = year - (age - 0 + 5);
+	            birthmax    = year - (age - 5);
+	        }
+        }               // year of marriage
     }
 
     let sex             = 'M';
@@ -180,7 +180,7 @@ function findInTree()
  ************************************************************************/
 function gotIdir(xmlDoc)
 {
-    //alert("CensusForm.js: gotIdir: xmlDoc=" + new XMLSerializer().serializeToString(xmlDoc));
+    //alert("CountyMarriagesEdit.js: gotIdir: xmlDoc=" + new XMLSerializer().serializeToString(xmlDoc));
     let rootNode    = xmlDoc.documentElement;
     let buttonId    = rootNode.getAttribute("buttonId");
     let button      = document.getElementById(buttonId);
@@ -188,7 +188,7 @@ function gotIdir(xmlDoc)
     {
         let msgDiv  = document.getElementById('msgDiv');
         msgDiv.style.display    = 'none';
-        alert("CensusForm.js: gotIdir: unable to find element with id='" +
+        alert("CountyMarriagesEdit.js: gotIdir: unable to find element with id='" +
             buttonId + "' rootNode=" + new XMLSerializer().serializeToString(rootNode));
         return;
     }
@@ -257,7 +257,7 @@ function gotIdir(xmlDoc)
  ************************************************************************/
 function noIdir()
 {
-    alert("CensusForm.js: noIdir: " +
+    alert("CountyMarriagesEdit.js: noIdir: " +
           "unable to find getIndivNamesXml.php script on server");
 }       // function noIdir
 
@@ -374,7 +374,7 @@ function displaySelectIdir(templateId,
 
                 default:
                 {
-                    // alert("CensusForm.js:displaySelectIdir: " +
+                    // alert("CountyMarriagesEdit.js:displaySelectIdir: " +
                     //    "nodeName='" + child.nodeName + "'");
                     break;
                 }

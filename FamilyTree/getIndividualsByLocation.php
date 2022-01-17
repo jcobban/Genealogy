@@ -60,8 +60,9 @@ use \Exception;
  *		2020/01/22      internationalize numbers                        *
  *		2020/03/13      use FtTemplate::validateLang                    *
  *      2020/12/05      correct XSS vulnerabilities                     *
+ *      2021/11/20      improve parameter error handling and i18n       *
  *																		*
- *  Copyright &copy; 2020 James A. Cobban								*
+ *  Copyright &copy; 2021 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/Location.inc';
 require_once __NAMESPACE__ . '/Person.inc';
@@ -81,6 +82,7 @@ $lang		    		= 'en';
 $indcount				= 0;
 $marcount				= 0;
 $evtcount				= 0;
+$text                   = '';   // accumulate messages
 
 if (isset($_GET) && count($_GET) > 0)
 {			            // invoked by method=get
@@ -132,32 +134,40 @@ if (isset($_GET) && count($_GET) > 0)
 
 $template		    = new FtTemplate("getIndividualsByLocation$lang.html");
 $formatter          = $template->getFormatter();
+$translate          = $template->getTranslate();
+$t                  = $translate['tranTab'];          // localization table
 
 if (is_string($idlrtext))
 {
-    $text		    .= $template['invalidIdlr']->innerHTML;
-    $msg            .= str_replace('$value', $idlrtext, $text);
-	$locName	    = 'Unknown';
+    $text		        .= $template['invalidIdlr']->innerHTML;
+    $msg                .= str_replace('$value', $idlrtext, $text);
+	$locName	        = $t['Unknown'];
+	$template->set('IDLR', $idlrtext);
 }
 else
 if (is_null($idlr))
 {
-	$msg		    .= $template['missingIdlr']->innerHTML;
-	$locName	    = 'Unknown';
+	$msg		        .= $template['missingIdlr']->innerHTML;
+	$locName	        = $t['Unknown'];
+	$template->set('IDLR', 'NULL');
 }
 else
 {
-	$location	    = new Location(array('idlr' => $idlr));
+	$template->set('IDLR', $idlr);
+	$location	        = new Location(array('idlr' => $idlr));
     if (!$location->isExisting())
     {
-        $text	    .= $template['incorrectIdlr']->innerHTML;
-        $msg	    .= str_replace('$value', $idlr, $text);
-    } 
+        $text	        .= $template['incorrectIdlr']->innerHTML;
+        $msg	        .= str_replace('$value', $idlr, $text);
+	    $locName	    = $t['Unknown'];
+    }
+    else 
+	    $locName	    = $location->getName();
 }
+$template->set('LOCNAME', $locName);
 
 if (strlen($msg) == 0)
 {		                // no messages
-	$locName	    = $location->getName();
 
 	// get individuals who have the location in one of the events
 	// recorded in the individual record
@@ -192,8 +202,6 @@ if (strlen($msg) == 0)
 	$evtcount	    = $evtInfo['count'];
 	$count		    += $evtcount;
 
-	$template->set('IDLR', $idlr);
-	$template->set('LOCNAME', $locName);
 	$prefix		        = $locName;
 	if (strlen($prefix) > 4)
 		$prefix		    = substr($prefix, 0, 4);

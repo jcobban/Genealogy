@@ -73,8 +73,9 @@ if (count($_POST) > 0)
                       "<th class='colhead'>value</th></tr>\n";
     foreach($_POST as $key => $value)
     {           // loop through all parameters
+        $safevalue  = htmlspecialchars($value);
         $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
-                        "<td class='white left'>$value</td></tr>\n"; 
+                        "<td class='white left'>$safevalue</td></tr>\n"; 
         switch(strtolower($key))
         {                       // act on specific keys
             case 'regyear':
@@ -172,6 +173,7 @@ if (strlen($msg) == 0)
     // handle updated values from the input form
     foreach($_POST as $key => $value)
     {       // loop through all passed values
+        $safevalue  = htmlspecialchars($value);
         switch(strtolower($key))
         {   // act on individual keys
             case 'regdomain':

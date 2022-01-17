@@ -70,6 +70,11 @@ $itemNotext             = null;
 $roletext               = null;
 $offsettext             = null;
 $limittext              = null;
+$ministerName           = '';
+$faith                  = '';
+$residence              = '';
+$page                   = '';
+$image                  = '';
 $fixup                  = true;
 
 if (isset($_POST) && count($_POST) > 0)

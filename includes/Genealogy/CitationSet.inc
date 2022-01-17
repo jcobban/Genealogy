@@ -48,22 +48,47 @@ class CitationSet extends RecordSet
      *  Throws Exception if unable to complete function                 *
      ********************************************************************/
     function __construct($parms     = null,
-                         $order     = "`Order`")
+                         $order     = "tblSX.`Order`")
     {
         global  $warn;
 
         // second parameter is ignored if $parms['order'] present
+        $tableName                  = 'tblSX';
+        $idet                       = false;
+        $typefield                  = null;
         foreach ($parms as $field => $value)
-        {
-            if (strtolower($field) == 'order')
-                $order      = $value;
-        }
-        $parms['order']     = $order;
+        {                       // loop through parameters
+            switch (strtolower($field))
+            {
+                case 'order':
+                    $order          = $value;
+                    break;
 
-        parent::__construct('tblSX', $parms);
+                case 'idet':
+                    $tableName      = 
+                                'tblSX LEFT JOIN tblER ON `IDER`=`IDIME`';
+                    $idet           = true;
+                    break;
+                    
+                case 'type':
+                    $typefield      = $field;
+                    break;
+
+            }
+        }                       // loop through parameters
+
+        if ($idet)
+        {                       // IDET was specified
+            if (is_null($typefield))
+                $parms['type']          = Citation::EVENT_TYPE;
+        }                       // IDET was specified
+        $parms['order']             = $order;
+
+        parent::__construct($tableName, $parms, 'tblSX.*');
+
         if ($this->information['count'] > 1000 && $this->limit > 1000)
         {
-            $warn       .= '<p>CitationSet: Too many matching citations, ' . 
+            $warn       .= '<p>CitationSet: Too many matching citations, ' .
                             number_format($this->information['count']) . 
                             ' query=' . 
                             debugPrepQuery($this->query, $this->sqlParms) . 
@@ -101,13 +126,16 @@ class CitationSet extends RecordSet
 
         foreach($this->parms as $fldname => $value)
         {           // loop through all parameters
-            $fieldLc        = Citation::getRealFieldName($fldname);
+            if (strtolower($fldname) == 'idet')
+                $fieldLc        = 'idet';
+            else
+                $fieldLc        = Citation::getRealFieldName($fldname);
             switch($fieldLc)
             {
                 case 'idsx':
                 {       // primary key
                     $expression = $this->getWhereInt('IDSX',
-                                          $value);
+                                                     $value);
                     if (strlen($expression) > 0)
                     {
                         $where  .= $and . $expression;
@@ -119,7 +147,7 @@ class CitationSet extends RecordSet
                 case 'idime':
                 {       // IDIME record key
                     $expression     = $this->getWhereInt('IDIME',
-                                              $value);
+                                                         $value);
                     if (strlen($expression) > 0)
                     {
                         $where      .= $and . $expression;
@@ -131,7 +159,7 @@ class CitationSet extends RecordSet
                 case 'idir':
                 {       // IDIR pseudo-field
                     $expression     = $this->getWhereInt('IDIME',
-                                              $value);
+                                                         $value);
                     if (strlen($expression) > 0)
                     {
                         $where      .= $and . '((Type>=0 AND Type<=9) OR ' .
@@ -261,6 +289,7 @@ class CitationSet extends RecordSet
 
                 case 'idsr':
                 case 'type':
+                case 'idet':
                 case 'srcprintdetail':
                 case 'srcprinttext':
                 case 'srcprintnote':
@@ -274,7 +303,7 @@ class CitationSet extends RecordSet
                 case 'overridebibliography':
                 {       // positive integer fields
                     $expression     = $this->getWhereInt($fldname,
-                                              $value);
+                                                         $value);
                     if (strlen($expression) > 0)
                     {
                         $where      .= $and . $expression;
@@ -323,10 +352,10 @@ class CitationSet extends RecordSet
             if ($this->information['count'] > 1000 && $this->limit > 1000)
                 throw new Exception('CitationSet: Too many matching citations, ' . number_format($this->information['count']) . ' query=' . debugPrepQuery($this->query, $this->sqlParms));
             // construct a query for the specific matches
-            $query      = $this->query;
+            $query          = $this->query;
 
             // query the database for matches
-            $stmt       = $connection->prepare($query);
+            $stmt           = $connection->prepare($query);
             $queryText      = debugPrepQuery($query, $this->sqlParms);
             if ($stmt->execute($this->sqlParms))
             {       // success
@@ -351,8 +380,9 @@ class CitationSet extends RecordSet
             }       // success
             else
             {       // error performing query
-                throw new Exception("CitationSet::rewind: '$queryText', " .
-                                print_r($stmt->errorInfo(),true));
+                throw new Exception("CitationSet::rewind: '$query', " .
+                                "parms=" . var_export($this->sqlParms,true) .
+                                ", error=" . var_export($stmt->errorInfo(),true));
             }       // error performing query
         }
 

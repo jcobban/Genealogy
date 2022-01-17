@@ -422,6 +422,7 @@ class Page extends Record
         global  $userid;
         global  $connection;
 
+        $count                  = false;
         if (is_string($xml))
         {               // string tag name
             $tagname            = $xml;

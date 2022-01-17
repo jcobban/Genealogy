@@ -606,7 +606,7 @@ if (strlen($msg) == 0)
     // check for existing citations to this registration
     $citparms               = array('idsr'      => 99,
                                     'type'      => Citation::STYPE_MAR,
-                                    'srcdetail' => "^ *$regYear-0*$regNum *$");
+                                    'srcdetail' => "^$regYear-0*$regNum($|[^0-9])");
     $citations              = new CitationSet($citparms);
     if ($citations->count() > 0)
     {       // existing citation

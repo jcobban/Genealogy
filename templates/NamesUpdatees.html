@@ -109,14 +109,14 @@
 	      Apellidos con el Mismo Código Soundex '$SOUNDEX'
 	  </a>
     </p>
-    <p class="label">
+    <p class="label" id="patternPara">
 	  <a href="/FamilyTree/Surnames.php?pattern=$PATTERNU&lang=$LANG"
 	  		id="patternLink">
 	      Apellidos con el Mismo Patrón '$PATTERN'
 	  </a>
     </p>
     <hr>	<!-- start of blog section of page -->
-    <h3>Blogs</h3>
+    <h3>Comentarios</h3>
     <form name="blogForm" id="blogForm" action="blogIndiv.php" method="post"
 	        enctype="multipart/form-data">
         <div id="blogEntry">
@@ -128,10 +128,10 @@
 		    </p>
 		    <p id="blogActions">
 		      <button type="button" id="blEdit$BLID">
-			    Editar Mensaje
+			    Editar comentarios
 		      </button>
 		      <button type="button" id="blDel$BLID">
-			    Borrar Mensaje
+			    Borrar comentarios
 		      </button>
 		    </p>
         </div> <!-- id="blogEntry" -->
@@ -154,7 +154,7 @@
         </div>
         <div class="row" id="blogPostRow">
           <button type="button" id="PostBlog" accessKey="B">
-	        Publicar <u>B</u>log
+	        Publicar Comentarios
           </button>
         </div>
     </form> <!-- name="blogform" id="blogform" -->

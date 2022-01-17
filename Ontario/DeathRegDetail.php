@@ -406,7 +406,7 @@ if (strlen($msg) == 0)
         // check for existing citations to this registration
         $citparms           = array('idsr'      => 98,
                                     'type'      => Citation::STYPE_DEATH,
-                                    'srcdetail' => "^$regYear-0*$regNum");
+                                    'srcdetail' => "^$regYear-0*$regNum($|[^0-9])");
         $citations          = new CitationSet($citparms);
 
         if ($citations->count() > 0)
@@ -418,7 +418,7 @@ if (strlen($msg) == 0)
         {       // check for event citation
             $citparms       = array('idsr'      => 98,
                                     'type'      => Citation::STYPE_EVENT,
-                                    'srcdetail' => "^$regYear-0*$regNum");
+                                    'srcdetail' => "^$regYear-0*$regNum($|[^0-9])");
             $citations      = new CitationSet($citparms);
             foreach($citations as $idsx => $citation)
             {
@@ -878,7 +878,7 @@ switch(strtoupper($marStat))
                          array('selected'   => ' '));
         break;
 
-    case 'E':
+    case 'W':
         $template->updateTag('MarStatS',
                          array('selected'   => ' '));
         $template->updateTag('MarStatM',

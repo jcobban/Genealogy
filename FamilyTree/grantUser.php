@@ -327,8 +327,6 @@ else
 if (count($_POST) > 0)
 {                   // invoked by submit to update
     $parmsText  = "<p class='label'>\$_POST</p>\n" .
-
-    $parmsText  = "<p class='label'>\$_POST</p>\n" .
                       "<table class='summary'>\n" .
                       "<tr><th class='colhead'>key</th>" .
                           "<th class='colhead'>value</th></tr>\n";
@@ -362,7 +360,7 @@ if (count($_POST) > 0)
             }
         }                   // missing parameter
     }                       // loop through parameters
-    //if ($debug)
+    if ($debug)
         $warn   .= $parmsText . "</table>\n";
 }                   // invoked by submit to update account
 
@@ -462,13 +460,13 @@ if ($isOwner)
         $template->set('NAME',          $name);
         $template->set('CLASS',         $class);
         if ($done)
-        {       // access granted
-            $template['alreadyMain']->update(null);
-        }       // access granted
-        else
         {       // previously granted
-            $template['grantMain']->update(null);
+            $template['alreadyMain']->update(null);
         }       // previously granted
+        else
+        {       // new grant
+            $template['grantMain']->update(null);
+        }       // new grant
     
         // check for children and parents not previously granted
         $contents           .= grantMarriages($person, 
@@ -497,9 +495,12 @@ if ($isOwner)
         $title      = str_replace(array('$NAME', '$GRANTEENAME'),
                                   array( $name,   $granteeName),
                                   $title);
+        $title      = htmlspecialchars_decode($title);
+        $heading    = "<p>$title</p>\n" .
+                        $template['grantHeader']->outerHTML;
         if (mail($sendto,
                  $title,
-                 $contents,
+                 $heading . $contents,
                  $headers))
         {
             $template['confirmationFailed']->update(null);

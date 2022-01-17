@@ -1,116 +1,116 @@
 <!--*********************************************************************
- *  CountyMarriageEditQueryen.html									    *
- *																		*
+ *  CountyMarriageEditQueryen.html                                      *
+ *                                                                      *
  *  Template to prompt the user to enter parameters for a search of the *
- *  County Marriage Registration database.								*
- *																		*
- *  History:															*
- *		2018/11/21		created											*
+ *  County Marriage Registration database.                              *
+ *                                                                      *
+ *  History:                                                            *
+ *      2018/11/21      created                                         *
  *      2019/12/19      line things up                                  *
- *																		*
- *  Copyright &copy; 2019 James A. Cobban								*
+ *                                                                      *
+ *  Copyright &copy; 2019 James A. Cobban                               *
  **********************************************************************-->
     <div id="breadcrumbs" class="hidden">
       <a href="/genealogy.php?lang=$LANG">
         Genealogy</a>:
       <a href="/Canada/CountriesEdit.php?lang=$LANG">
-	    List of Supported Countries
+        List of Supported Countries
       </a>:
       <a href="/genCountry.php?code=$CC&lang=$LANG">
-		$COUNTRYNAME
+        $COUNTRYNAME
       </a>:
       <a href="/Canada/genProvince.php?domain=$DOMAIN&lang=$LANG" id="stateCrumb">
-		$DOMAINNAME
+        $DOMAINNAME
       </a>:
-	  <a href="/Ontario/CountyMarriageVolumeSummary.php?Domain=$DOMAIN&lang=$LANG">
+      <a href="/Ontario/CountyMarriageVolumeSummary.php?Domain=$DOMAIN&lang=$LANG">
         Volume Summary
       </a>:
     </div>
 
-	<div class="body">
-	  <h1>County Marriage Registration Query
-	    <span class="right">
-			<a href="CountyMarriageEditQueryHelpen.html" target="_blank">Help?</a>
-	    </span>
-	    <div style="clear: both;"></div>
-	  </h1>
-	$TRACE
-	$MSG
-	  <form action="CountyMarriageReportEdit.php" method="GET"
-			name="distForm" id="distForm">
-	    <input name="Offset" id="Offset" type="hidden" value="0">
-	    <input name="Debug" id="Debug" type="hidden" value="$DEBUG">
-	    <div id="formTable">
-	      <fieldset class="other">
-			<legend class="labelCol1">Identification:</legend>
-	        <div class="row">
-			  <div class="column1">
-			    <label class="labelCol1" for="RegDomain">Domain:</label>
-			    <select name="RegDomain" id="RegDomain"
-				  	class="white left" size="1">
-			      <option id="domain$code" value="$code" $selected>
-				  	$name
-			      </option>
-			    </select>
-			  </div>
-			  <div class="column2">
-			    <label class="labelCol2" for="Volume">Volume:</label>
-			    <input name="Volume" id="Volume" type="text" 
+    <div class="body">
+      <h1>County Marriage Registration Query
+        <span class="right">
+            <a href="CountyMarriageEditQueryHelpen.html" target="_blank">Help?</a>
+        </span>
+        <div style="clear: both;"></div>
+      </h1>
+    $TRACE
+    $MSG
+      <form action="CountyMarriageReportEdit.php" method="GET"
+            name="distForm" id="distForm">
+        <input name="Offset" id="Offset" type="hidden" value="0">
+        <input name="Debug" id="Debug" type="hidden" value="$DEBUG">
+        <div id="formTable">
+          <fieldset class="other">
+            <legend class="labelCol1">Identification:</legend>
+            <div class="row">
+              <div class="column1">
+                <label class="labelCol1" for="RegDomain">Domain:</label>
+                <select name="RegDomain" id="RegDomain"
+                    class="white left" size="1">
+                  <option id="domain$code" value="$code" $selected>
+                    $name
+                  </option>
+                </select>
+              </div>
+              <div class="column2">
+                <label class="labelCol2" for="Volume">Volume:</label>
+                <input name="Volume" id="Volume" type="text" 
                         style="float: left;"
-				            class="white rightnc" size="4" maxlength="4"/>
-			  </div>
-			  <div style="clear:both;"></div>
-	        </div>
-	        <div class="row">
-			  <div class="column1">
-			    <label class="labelCol1" for="ReportNo">ReportNo:</label>
-			    <input name="ReportNo" id="ReportNo" type="text"
+                            class="white rightnc" size="4" maxlength="4"/>
+              </div>
+              <div style="clear:both;"></div>
+            </div>
+            <div class="row">
+              <div class="column1">
+                <label class="labelCol1" for="ReportNo">ReportNo:</label>
+                <input name="ReportNo" id="ReportNo" type="text"
                     style="float: left;"
-				        class="white rightnc" size="4" maxlength="4"/>
-			  </div>
-			  <div class="column2">
-			    <label class="labelCol2" for="ItemNo">ItemNo:</label>
-			    <input name="ItemNo" id="ItemNo" type="text" 
+                        class="white rightnc" size="4" maxlength="4"/>
+              </div>
+              <div class="column2">
+                <label class="labelCol2" for="ItemNo">ItemNo:</label>
+                <input name="ItemNo" id="ItemNo" type="text" 
                         style="float: left;"
-				        class="white rightnc" size="4" maxlength="4"/>
-			  </div>
-			  <div style="clear:both;"></div>
-	        </div>
-	      </fieldset>
-	      <fieldset class="other">
-			<legend class="labelCol1">Individual:</legend>
-	        <div class="row">
-			  <div class="column1">
-			    <label class="labelCol1" for="GivenNames">Given Names:</label>
-			    <input name="GivenNames" id="GivenNames"
-					  type="text" style="float: left;"
-				    class="white left" size="16" maxlength="64"/>
-			  </div>
-			  <div class="column2">
-			    <label class="labelCol2" for="Surname">Surname:</label>
-			    <input name="Surname" id="Surname" type="text" style="float: left;"
-				    class="white left" size="16" maxlength="64"/>
-			  </div>
-			  <div class="column3">
-			    <label class="labelCol3" for="Soundex">Soundex:</label>
-			    <input name="Soundex" id="Soundex" type="checkbox"
-					  class="left"
-				    class="white left" value="Y"/>
-			    <div style="clear: both;"></div>
-			  </div>
-			  <div style="clear:both;"></div>
-			</div>
-	      </fieldset>
-	    </div> <!-- id="formTable" -->
-	    <p id="buttonsRow">
-	      <button type="submit" id="Query">Query</button>
-	      &nbsp;
-	      <button type="reset" id="Reset">Clear Form</button>
-	      &nbsp;
-	      <button type="button" id="Stats">Status</button>
-	    </p>
-	  </form>
-	</div> <!-- end of <div id="body"> -->
+                        class="white rightnc" size="4" maxlength="4"/>
+              </div>
+              <div style="clear:both;"></div>
+            </div>
+          </fieldset>
+          <fieldset class="other">
+            <legend class="labelCol1">Individual:</legend>
+            <div class="row">
+              <div class="column1">
+                <label class="labelCol1" for="GivenNames">Given Names:</label>
+                <input name="GivenNames" id="GivenNames"
+                        type="text" style="float: left;"
+                        class="white left" size="16" maxlength="64"/>
+              </div>
+              <div class="column2">
+                <label class="labelCol2" for="Surname">Surname:</label>
+                <input name="Surname" id="Surname" type="text" style="float: left;"
+                    class="white left" size="16" maxlength="64"/>
+              </div>
+              <div class="column3">
+                <label class="labelCol3" for="Soundex">Soundex:</label>
+                <input name="Soundex" id="Soundex" type="checkbox"
+                      class="left"
+                    class="white left" value="Y"/>
+                <div style="clear: both;"></div>
+              </div>
+              <div style="clear:both;"></div>
+            </div>
+          </fieldset>
+        </div> <!-- id="formTable" -->
+        <p id="buttonsRow">
+          <button type="submit" id="Query">Query</button>
+          &nbsp;
+          <button type="reset" id="Reset">Clear Form</button>
+          &nbsp;
+          <button type="button" id="Stats">Status</button>
+        </p>
+      </form>
+    </div> <!-- end of <div id="body"> -->
     <!--  The remainder of the web page consists of divisions containing
     context specific help.  Including this information here ensures
     that the language of the help balloons matches the language of the
@@ -166,8 +166,8 @@
     </div>
     <div class="hidden" id="templates">
       <div class="left" id="noCountyMsg">
-		      Counties summary file "CountiesListXml.php?Prov=$PROVINCE"
-		      not available from server.
+              Counties summary file "CountiesListXml.php?Prov=$PROVINCE"
+              not available from server.
       </div>
     </div>
     <script src="/jscripts/CommonForm.js" type="text/javascript"></script>

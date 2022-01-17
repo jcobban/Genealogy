@@ -148,6 +148,8 @@
     .warning   {color:              #806000; /* dark yellow */
                 }
 
+    .smaller   {font-size:          smaller;}
+
    /*********************************************************************
     *    styles for background color                                    *
     *********************************************************************/
@@ -1374,6 +1376,9 @@
     input.center {
                 font-family:        sans-serif;
                 text-align:         center;
+                display:            block;
+                margin-left:        auto;
+                margin-right:       auto;
                 float:              left;
                 text-transform:		capitalize;
                 padding:            0px;
@@ -1426,10 +1431,13 @@
                 border-bottom:      1px solid white;
                 border-right:       1px solid white;
                 }
+    input.expand {
+                min-width: 35px; 
+                max-width: 100%; 
+                width: 100%;
+                }
     input.male {
                 font-family:        sans-serif;
-                text-align:         left;
-                float:              left;
                 background-color:   white;
                 color:              blue;
                 text-transform:		capitalize;
@@ -1441,8 +1449,6 @@
                 }
     input.female {
                 font-family:        sans-serif;
-                text-align:         left;
-                float:              left;
                 background-color:   white;
                 color:              red;
                 text-transform:		capitalize;
@@ -1454,8 +1460,6 @@
                 }
     input.unknown {
                 font-family:        sans-serif;
-                text-align:         left;
-                float:              left;
                 background-color:   white;
                 color:              green;
                 text-transform:		capitalize;

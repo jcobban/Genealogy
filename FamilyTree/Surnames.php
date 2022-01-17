@@ -45,11 +45,13 @@ use \Templating\Template;
  *		2020/02/23      $surname and $idnr were not initialized if      *
  *		                there were no surname matches                   *
  *      2020/12/05      correct XSS vulnerabilities                     *
+ *      2021/09/15      automatically delete unused entries             *
  *																		*
  *  Copyright &copy; 2020 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/Surname.inc';
 require_once __NAMESPACE__ . '/Language.inc';
+require_once __NAMESPACE__ . '/PersonSet.inc';
 require_once __NAMESPACE__ . '/FtTemplate.inc';
 require_once __NAMESPACE__ . '/common.inc';
 
@@ -171,30 +173,34 @@ else
 $template->set('TITLE',     $title);
 
 // get the matches
-$surnames	            = new RecordSet('Surnames', $getParms);
-$info   	            = $surnames->getInformation();
-$count	                = $info['count'];
+$surnames	                = new RecordSet('Surnames', $getParms);
+$info   	                = $surnames->getInformation();
+$count	                    = $info['count'];
 $template->set('MAXCOLS',           $maxcols);
 
 if ($count > 0)
 {                   // display the results
-    $cell               = $template['asurname'];
-    $cellHtml           = str_replace('id="asurname"', '', $cell->outerHTML());
-    $data               = '';
+    $cell                   = $template['asurname'];
+    $cellHtml               = str_replace('id="asurname"', '', $cell->outerHTML());
+    $data                   = '';
     foreach($surnames as $idnr => $surnamerec)
     {
-        $surname	    = $surnamerec->getSurname(); 
+        $surname	        = $surnamerec->getSurname(); 
         if (substr($surname,0,6) == 'Wifeof' ||
             substr($surname,0,8) == 'Motherof')
             continue;
 
-        // link to detailed query action
-        $ctemplate      = new Template($cellHtml);
-        $usurname	    = rawurlencode($surname);
-        $ctemplate->set('SURNAME',      $surname);
-        $ctemplate->set('USURNAME',     $usurname);
-        $ctemplate->set('LANG',         $lang);
-        $data           .= $ctemplate->compile();
+        if ($surnamerec['pattern'] == '' && $surnamerec->getCount() == 0)
+            $surnamerec->delete();
+        else
+        {           // link to detailed query action
+	        $ctemplate      = new Template($cellHtml);
+	        $usurname	    = rawurlencode($surname);
+	        $ctemplate->set('SURNAME',      $surname);
+	        $ctemplate->set('USURNAME',     $usurname);
+	        $ctemplate->set('LANG',         $lang);
+	        $data           .= $ctemplate->compile();
+        }           // link to detailed query action
     }	            // loop through results
 
     $template['asurname']->update($data);

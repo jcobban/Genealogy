@@ -150,6 +150,8 @@ use \Iterator;
  *      2021/01/03      static method getLocation extended to support   *
  *                      using location as unique key                    *
  *      2021/02/18      add information to error log                    *
+ *      2021/07/22      support style prefix on boundary                *
+ *      2021/10/25      support setLatitude/setLongitude to null        *
  *                                                                      *
  *  Copyright &copy; 2021 James A. Cobban                               *
  ************************************************************************/
@@ -581,7 +583,7 @@ class Location extends RecordPic
         $part2          = '';
         $county         = '';
         //        local    county       province        country
-        $geoPattern     = "/^(.*),\s*([^,]+),\s*([^,]+),\s*(\w\w)$/";
+        $geoPattern     = "/^(.*),\s*([^,]+),\s*([^,]+),\s*(\w{2,3})$/";
         $results        = array();
         $res1           = preg_match($geoPattern, $name, $results);
         if ($res1)
@@ -708,6 +710,15 @@ class Location extends RecordPic
                 $boundary       = $this->row[$field];
                 if (strlen($boundary) > 2)
                 {
+                    if (preg_match('/^{[^}]*},/',
+                                   $boundary,
+                                   $matches))
+                    {
+                        $prefix     = $matches[0];
+                        $boundary   = substr($boundary, strlen($prefix));
+                    }
+                    else
+                        $prefix     = '';
                     if (substr($boundary,0,1) == '(' &&
                         substr($boundary,-1) == ')')
                         $boundary       = substr($boundary, 1, strlen($boundary) - 2);
@@ -722,7 +733,7 @@ class Location extends RecordPic
                             number_format(floatval($point[1]),6) . ')';
                         $comma          = ',';
                     }
-                    $boundary           = $newBoundary;
+                    $boundary           = $prefix . $newBoundary;
                 }
                 return $boundary;
             }
@@ -1077,22 +1088,27 @@ class Location extends RecordPic
      ********************************************************************/
     function setLatitude($value)
     {
+        $oldvalue   = $this->getLatitude();
+        if (is_null($value))
+        {
+            parent::set('latitude', $value);
+            return $oldvalue;
+        }
         if (!is_numeric($value))
             return $this->getLatitude();
-        $value      = (double)$value;
-        $negative   = $value < 0;
-        $value      = abs($value);
+        $value      		= (double)$value;
+        $negative   		= $value < 0;
+        $value      		= abs($value);
         if ($value > 90.0)
             throw new Exception("Location:setLatitude: " .
                             "value $value out of range");
-        $ddd        = floor($value);    // degrees
-        $value      = ($value - $ddd) * 60.0;
-        $mm     = floor($value);    // minutes
-        $ss     = ($value - $mm) * 60.0;// seconds and fraction
-        $value      = ($ddd * 10000) + ($mm * 100) + $ss;
+        $ddd        		= floor($value);    // degrees
+        $value      		= ($value - $ddd) * 60.0;
+        $mm     		    = floor($value);    // minutes
+        $ss     		    = ($value - $mm) * 60.0;// seconds and fraction
+        $value      		= ($ddd * 10000) + ($mm * 100) + $ss;
         if ($negative)
-            $value  = -$value;
-        $oldvalue   = $this->getLatitude();
+            $value  		= -$value;
         parent::set('latitude', $value);
         return $oldvalue;
     }       // Location::setLatitude
@@ -1117,6 +1133,12 @@ class Location extends RecordPic
      ********************************************************************/
     function setLongitude($value)
     {
+        $oldvalue   = $this->getLongitude();
+        if (is_null($value))
+        {
+            parent::set('longitude', $value);
+            return $oldvalue;
+        }
         if (!is_numeric($value))
             return $this->getLongitude();
         $value      = (double)$value;
@@ -1132,7 +1154,6 @@ class Location extends RecordPic
         $value      = ($ddd * 10000) + ($mm * 100) + $ss;
         if ($negative)
             $value  = -$value;
-        $oldvalue   = $this->getLongitude();
         parent::set('longitude', $value);
         return $oldvalue;
     }       // Location::setLongitude

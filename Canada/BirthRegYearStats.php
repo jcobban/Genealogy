@@ -59,6 +59,7 @@ use \Templating\Template;
  *		2020/11/28      correct XSS error                               *
  *		2021/01/15      improve parameter checking                      *
  *		                move message texts to template                  *
+ *		2021/11/22      ignore anomalous regnums in statistics          *
  *																		*
  *  Copyright &copy; 2021 James A. Cobban								*
  ************************************************************************/
@@ -134,6 +135,7 @@ if (isset($_GET) && count($_GET) > 0)
                     $cc                 = 'CA';
                 }
                 else
+                if (strlen($value) > 0)
                     $codetext           = htmlspecialchars($value);
 				break;
 		    }		// code
@@ -149,6 +151,7 @@ if (isset($_GET) && count($_GET) > 0)
 				if (preg_match('/^\w+$/', $value))
 	                $county		        = $value;
                 else
+                if (strlen($value) > 0)
                     $countytext         = htmlspecialchars($value);
 				break;
 		    }		// county
@@ -269,28 +272,28 @@ $template->set('DEBUG',		        $debug?'Y':'N');
 if (strlen($msg) == 0)
 {			// no errors
     // get the statistics
-    $births		    = new BirthSet($getParms);
+    $births		    		= new BirthSet($getParms);
 
 	if ($county)
-	    $result	    = $births->getCountyStatistics();
+	    $result	    		= $births->getCountyStatistics();
 	else
-        $result	    = $births->getStatistics();
+        $result	    		= $births->getStatistics();
 
 	if (!$showTownship)
 	    $template->updateTag('TownshipTH', null);
 	
-	$dataRow            = $template->getElementById('dataRow');
-	$yearHTML           = $dataRow->outerHTML();
+	$dataRow            	= $template->getElementById('dataRow');
+	$yearHTML           	= $dataRow->outerHTML();
 	
-	$total	        	= 0;
-	$totalLinked	    = 0;
-	$rownum		        = 0;
-	$countyObj		    = null;
-	$countyName		    = '';
-	$lowest		        = PHP_INT_MAX;
-	$highest		    = 0;
-	$data               = '';
-	$formatter          = $template->getFormatter();
+	$total	        		= 0;
+	$totalLinked	    	= 0;
+	$rownum		        	= 0;
+	$countyObj		    	= null;
+	$countyName		    	= '';
+	$lowest		        	= PHP_INT_MAX;
+	$highest		    	= 0;
+	$data               	= '';
+	$formatter          	= $template->getFormatter();
 	
 	foreach($result as $row)
 	{
@@ -324,7 +327,7 @@ if (strlen($msg) == 0)
 	
 		if ($low < $lowest)
 		    $lowest	        = $low;
-		if ($high < ($low + 400000) && $high > $highest)
+		if ($high < ($low + 5000) && $high > $highest)
 		    $highest	    = $high;
 	    $todo		        = $currhigh - $low + 1;
 	    if ($todo < $count)
@@ -350,19 +353,19 @@ if (strlen($msg) == 0)
 	    $ttemplate->set('PCTLINKEDCLASS', pctClass($pctLinked));
 	    if (!$showTownship)
 	        $ttemplate->updateTag('townshipCol', null);
-	    $data           .= $ttemplate->compile();
+	    $data               .= $ttemplate->compile();
 	}	            	// process all rows
     $dataRow->update($data);
 	    
 	if ($total == 0)
 	{
-		$pctDone	= 0;
-		$pctLinked	= 0;
+		$pctDone	        = 0;
+		$pctLinked	        = 0;
 	}
 	else
 	{
-		$pctDone	= 100 * $total / ($highest - $lowest + 1);
-		$pctLinked	= 100 * $totalLinked / $total;
+		$pctDone	        = 100 * $total / ($highest - $lowest + 1);
+		$pctLinked	        = 100 * $totalLinked / $total;
 	}
 	$formatter->setAttribute(NumberFormatter::FRACTION_DIGITS, 0);
 	$template->set('TOTAL',             $formatter->format($total));

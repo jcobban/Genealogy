@@ -51,8 +51,9 @@ use \Exception;
  *      2019/11/17      move CSS to <head>                              *
  *		2020/03/13      use FtTemplate::validateLang                    *
  *      2020/12/05      correct XSS vulnerabilities                     *
+ *      2022/01/09      add limit parameter                             *
  *																		*
- *  Copyright &copy; 2020 James A. Cobban								*
+ *  Copyright &copy; 2021 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/Person.inc';
 require_once __NAMESPACE__ . '/User.inc';
@@ -67,6 +68,8 @@ $pattern                = '';
 $lang                   = 'en';
 $treename    	        = '';
 $surname    	        = '';
+$limit                  = 20;
+$limittext              = null;
 
 if (count($_GET) > 0)
 {
@@ -95,6 +98,15 @@ if (count($_GET) > 0)
             case 'pattern':
             {
                 $pattern        = htmlspecialchars($value);
+                break;
+            }
+
+            case 'limit':
+            {
+                if (ctype_digit($value))
+                    $limit      = $value;
+                else
+                    $limittext  = htmlspecialchars($value);
                 break;
             }
 
@@ -139,6 +151,15 @@ if (count($_POST) > 0)
                 break;
             }
 
+            case 'limit':
+            {
+                if (ctype_digit($value))
+                    $limit      = $value;
+                else
+                    $limittext  = htmlspecialchars($value);
+                break;
+            }
+
 			case 'lang':
             {
                 $lang           = FtTemplate::validateLang($value);
@@ -180,10 +201,12 @@ if ($idir > 0)
 	if ($isOwner)
     {		        // OK
         if (strlen($pattern) > 0)
-            $getParms	= array('username' => array('!' . $userid,
-                                    htmlspecialchars_decode($pattern)));
+            $getParms	= array('username'  => array('!' . $userid,
+                                        htmlspecialchars_decode($pattern)),
+                                'limit'     => $limit);
         else
-	        $getParms	= array('username' => '!' . $userid);
+	        $getParms	= array('username'  => '!' . $userid,
+                                'limit'     => $limit);
         $users		= new UserSet($getParms);
         if ($users->count() > 0)
 	        $action     = 'Update';
@@ -196,6 +219,9 @@ else
     $surname    	= '';
     $users          = array();
 }		            // invalid input
+
+if (is_string($limittext))
+    $warn           .= "<p>Parameter limit='$limittext' ignored</p>\n";
 
 $template           = new FtTemplate("grantIndivid$action$lang.html");
 $template->updateTag('otherStylesheets',	
@@ -220,5 +246,6 @@ $template->set('NAMEURI',       $nameuri);
 $template->set('TREENAME',      $treename);
 $template->set('PREFIX',        $prefix);
 $template->set('PATTERN',       $pattern);
+$template->set('LIMIT',         $limit);
 
 $template->display();

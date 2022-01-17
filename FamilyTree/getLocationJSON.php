@@ -54,8 +54,10 @@ use \Exception;
  *                      or "99 " if the remainder of the location       *
  *                      identifies a street or concession that is       *
  *                      already in use but with a different lot number  *
+ *      2021/07/16      search for match on either location or shortname*
+ *      2021/08/13      correct handling of street/concession           *
  *                                                                      *
- *  Copyright &copy; 2020 James A. Cobban                               *
+ *  Copyright &copy; 2021 James A. Cobban                               *
  ************************************************************************/
 header("Content-Type: text/xml");
 require_once __NAMESPACE__ . '/Location.inc';
@@ -88,7 +90,7 @@ foreach($_GET as $fldname => $value)
         case 'name':
         {                   // search 'name' parameter
             if ($value == '')
-                $getParms['location']   = $value;
+                $getParms['location']   = '';
             else    // match either location or short name
             {
                 $value          = trim($value);
@@ -149,19 +151,21 @@ else
     $query                      = $info['query'];
     
     if (is_string($name) && $locations->count() == 0)
-    {                       // no exact match repeat with more general search
-        unset($getParms[0]);
-        $getParms['location']	= "^$search";   // starting with search
+    {                       // no exact match repeat with general search
+        // starting with search
+        $getParms[0]	        = array('location'  => "^$search",
+                                        'shortname' => "^$search");
         $locations              = new RecordSet('Locations', $getParms);
         $info                   = $locations->getInformation();
         $query                  = $info['query'];
-    }                       // no exact match repeat with more general search
+    }                       // no exact match repeat with general search
     $count                      = $locations->count();
 
     if ($count == 0)
     {                       // check for match on street or concession
         if (preg_match('/^(lot \d+|\d+)\s+/', $search, $matches))
         {                   // starts with '9999' or 'lot 9999'
+            unset($getParms[0]);
             $street                 = substr($search, strlen($matches[0]));
             $getParms['location']	= "$street$";   // ending with street/con
             $locations              = new RecordSet('Locations', $getParms);

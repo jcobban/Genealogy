@@ -54,9 +54,9 @@ require_once __NAMESPACE__ . '/Location.inc';
 require_once __NAMESPACE__ . '/RecordSet.inc';
 require_once __NAMESPACE__ . '/common.inc';
 
-$limit		= 40;		// default limit
+$limit		    = 40;		// default limit
 $getParms		= array();
-$name		= null;
+$name		    = null;
 
 foreach($_GET as $fldname => $value)
 {			// loop through all parameters
@@ -76,11 +76,11 @@ foreach($_GET as $fldname => $value)
         case 'name':
         {		// special 'name' parameter
     		if ($value == '')
-    		    $getParms['location']	= $value;
+    		    $getParms['location']	= '';
     		else	// match either location or short name
             {
-                $value          = trim($value);
-                $name		    = $value;
+                $value                  = trim($value);
+                $name		            = $value;
                 // if name is enclosed in square brackets do not include them
                 if (substr($value, 0, 1) == '[')
                     $value      = substr($value, 1);

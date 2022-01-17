@@ -1,454 +1,475 @@
 <!--*********************************************************************
- *  CensusForm1861Proofreaden.html										*
- *																		*
- *  Proofread a page from the 1861 census of Canada						*
- *																		*
- *  History:															*
- *		2018/02/06		created											*
- *		2018/02/23		pass specific censusid to CensusUpdateStatus	*
- *						and CensusUpdateStatusDist						*
- *																		*
- *  Copyright &copy; 2018 James A. Cobban								*
+ *  CensusForm1861Proofreaden.html                                      *
+ *                                                                      *
+ *  Proofread a page from the 1861 census of Canada                     *
+ *                                                                      *
+ *  History:                                                            *
+ *      2018/02/06      created                                         *
+ *      2018/02/23      pass specific censusid to CensusUpdateStatus    *
+ *                      and CensusUpdateStatusDist                      *
+ *                                                                      *
+ *  Copyright &copy; 2018 James A. Cobban                               *
  **********************************************************************-->
   <div class="hidden" id="breadcrumbs">
     <a href="/genealogy.php?lang=$LANG">Genealogy</a>:
     <a href="/genCountry.php?cc=CA&amp;lang=$LANG">Canada</a>:
     <a href="/database/genCensuses.php?lang=$LANG">Censuses</a>:
     <a href="/database/QueryDetail.php?Census=CA1861&Province=$PROVINCE&amp;District=$DISTRICT&amp;SubDistrict=$SUBDISTRICT&lang=$LANG">
-	1861 Census Search
+    1861 Census Search
     </a>: 
     <a href="/database/ReqUpdate.php?Census=CA1861$SEARCH&lang=$LANG">
-	1861 Census Select Page
+    1861 Census Select Page
     </a>:
     <a href="/database/CensusUpdateStatus.php?Census=$CENSUSID&lang=$LANG">
-	Summary
+    Summary
     </a>:
     <a href="/database/CensusUpdateStatusDist.php?Census=$CENSUSID&amp;Province=$PROVINCE&amp;District=$DISTRICT&lang=$LANG">
-	    District $DISTRICT $DISTRICTNAME Summary
+        District $DISTRICT $DISTRICTNAME Summary
     </a>:
     <a href="/database/CensusUpdateStatusDetails.php?Census=$CENSUSID&amp;Province=$PROVINCE&amp;District=$DISTRICT&amp;SubDistrict=$SUBDISTRICT&amp;Division=$DIVISION&lang=$LANG">
-	Division Details
-    </a>:	
+    Division Details
+    </a>:   
   </div>
   <div id="transcription" style="overflow: auto; overflow-x: scroll">
     <div class="body">
       <h1>
-	  1861 Census of Canada Proofread
-	<span class="right">
-	  <a href="/database/CensusForm1861Helpen.html" target="help">? Help</a>
-	</span>
-	<div style="clear: both;"></div>
+      1861 Census of Canada Proofread
+    <span class="right">
+      <a href="/database/CensusForm1861Helpen.html" target="help">? Help</a>
+    </span>
+    <div style="clear: both;"></div>
       </h1>
       $MSG
       $TRACE
       <p class="message" id="origTranscriberMessage">
-	Only the original transcriber can modify the transcription.
-	Any changes you make will be recorded as field notes.
+    Only the original transcriber can modify the transcription.
+    Any changes you make will be recorded as field notes.
       </p>
       <!--- Put out a line with links to previous and next section of table -->
       <div class="center" id="frontPager">
-	<span class="left" id="npPrevFront">
-	    <a href="/database/CensusForm.php$npPrev" id="prenpprev">
-		&lt;---
-	    </a>
-	</span>
-	<span class="right" id="npNextFront">
-	    <a href="/database/CensusForm.php$npNext" id="prenpnext">
-		---&gt;
-	    </a>
-	</span>
+    <span class="left" id="npPrevFront">
+        <a href="/database/CensusForm.php$npPrev" id="prenpprev">
+        &lt;---
+        </a>
+    </span>
+    <span class="right" id="npNextFront">
+        <a href="/database/CensusForm.php$npNext" id="prenpnext">
+        ---&gt;
+        </a>
+    </span>
     <span>
-	  <span id="frontProv">$PROVINCE,</span>
-	    dist $DISTRICT $DISTRICTNAME,
-	    subdist $SUBDISTRICT $SUBDISTRICTNAME,
-	    <span id="frontDiv">div $DIVISION </span>
-	    page $PAGE
-	</span>
+      <span id="frontProv">$PROVINCE,</span>
+        dist $DISTRICT $DISTRICTNAME,
+        subdist $SUBDISTRICT $SUBDISTRICTNAME,
+        <span id="frontDiv">div $DIVISION </span>
+        page $PAGE
+    </span>
       </div> <!-- id="frontPager"-->
     
       <!--- Put out the response as a table -->
       <form name="censusForm" id="censusForm"
-	    action="CensusProofread.php" 
-	    method="post"  
-	    autocomplete="off" 
-	    enctype="multipart/form-data">
-	<p class="label" id="TranscriberLine">
-	    Transcriber: $TRANSCRIBER 
-	</p>
-	<p class="label" id="ProofreaderLine">
-	    Proof Reader: $PROOFREADER 
-	</p>
-	<p class="label" id="imageLine">
-	    <span id="ImageButton">
-	    <button type="button" id="imageButton">
-		Display Original Census <u>I</u>mage
-	    </button>
-	    <button type="button" id="correctImage">
-		    <u>C</u>orrect Image URL
-	    </button>
-	    <input type="hidden" name="Image" id="Image"
-		value="$IMAGE">
-	    </span> <!-- id="ImageButton" -->
-	    <span id="ImagePrompt">
-		Enter URL of Census Image:
-	    <input type="text" name="Image" id="Image"
-		size="64" maxlength="128" class="white left"
-		value="$IMAGE"> 
-	    </span> <!-- id="ImagePrompt" -->
-	    <button type="button" id="treeMatch">
-		Match Family Tree Citations
-	    </button>
-	      &nbsp;
-	    <button type="button" id="showImportant">
-		Show Important
-	    </button>
-	</p>
-	
+        action="CensusProofread.php" 
+        method="post"  
+        autocomplete="off" 
+        enctype="multipart/form-data">
+    <p class="label" id="TranscriberLine">
+        Transcriber: $TRANSCRIBER 
+    </p>
+    <p class="label" id="ProofreaderLine">
+        Proof Reader: $PROOFREADER 
+    </p>
+    <p class="label" id="imageLine">
+        <span id="ImageButton">
+        <button type="button" id="imageButton">
+        Display Original Census <u>I</u>mage
+        </button>
+        <button type="button" id="correctImage">
+            <u>C</u>orrect Image URL
+        </button>
+        <input type="hidden" name="Image" id="Image"
+        value="$IMAGE">
+        </span> <!-- id="ImageButton" -->
+            <span id="NoImage" class="error">
+                No Image Available for this Page
+            </span> <!-- id="NoImage" -->
+        <span id="ImagePrompt">
+        Enter URL of Census Image:
+        <input type="text" name="Image" id="Image"
+        size="64" maxlength="128" class="white left"
+        value="$IMAGE"> 
+        </span> <!-- id="ImagePrompt" -->
+        <button type="button" id="treeMatch">
+        Match Family Tree Citations
+        </button>
+          &nbsp;
+        <button type="button" id="showImportant">
+        Show Important
+        </button>
+    </p>
+    
       <div class="hidden" id="hidden">
-	<input type="hidden" name="Census" value="$CENSUSID">
-	<input type="hidden" name="Province" value="$PROVINCE">
-	<input type="hidden" name="District" value="$DISTRICT">
-	<input type="hidden" name="SubDistrict" value="$SUBDISTRICT">
-	<input type="hidden" name="Division" value="$DIVISION">
-	<input type="hidden" name="Page" value="$PAGE">
-	<input type="hidden" name="Rows" value="$ROWS">
-	<input type="hidden" name="Debug" value="$DEBUG">
+    <input type="hidden" name="Census" value="$CENSUSID">
+    <input type="hidden" name="Province" value="$PROVINCE">
+    <input type="hidden" name="District" value="$DISTRICT">
+    <input type="hidden" name="SubDistrict" value="$SUBDISTRICT">
+    <input type="hidden" name="Division" value="$DIVISION">
+    <input type="hidden" name="Page" value="$PAGE">
+    <input type="hidden" name="Rows" value="$ROWS">
+    <input type="hidden" name="Debug" value="$DEBUG">
       </div>
     <p id="pageSize" class="warning">Page contains $NUMLINES lines</p>
       <table class="form" id="form" >
-		<thead>
-		  <!--- Put out the column headers -->
-		  <tr>
-		    <th class='colhead1st'>
-		      Line
-		    </th>
-		    <th class='colhead'>
-		      Fam
-		    </th>
-		    <th class='colhead'>
-		      Surname
-		    </th>
-		    <th class='colhead'>
-		      Given Names
-		    </th>
-		    <th class='colhead'>
-		      Occupation
-		    </th>
-		    <th class='colhead'>
-		      Birth Place
-		    </th>
-		    <th class='colhead'>
-		      MinY
-		    </th>
-		    <th class='colhead'>
-		      Religion
-		    </th>
-		    <th class='colhead'>
-		      Line
-		    </th>
-		    <th class='colhead'>
-		      Location
-		    </th>
-		    <th class='colhead'>
-		      Age
-		    </th>
-		    <th class='colhead'>
-		      Sex
-		    </th>
-		    <th class='colhead'>
-		      MSt
-		    </th>
-		    <th class='colhead'>Col'd</th>
-		    <th class='colhead'>Mem</th>
-		    <th class='colhead'>Ab't</th>
-		    <th class='colhead'>D'f</th>
-		    <th class='colhead'>Bl'd</th>
-		    <th class='colhead'>Lun.</th>
-		    <th class='colhead'>Sc'l</th>
-		    <th class='colhead'>Il.</th>
-		    <th class='colhead'>Born</th>
-		    <th class='colhead'>Died</th>
-		    <th class='colhead'>Age Death</th>
-		    <th class='colhead'>Death Cause</th>
-		    <th class='colhead'>Res Type</th>
-		    <th class='colhead'>Stories</th>
-		    <th class='colhead'>Num Fam</th>
-		    <th class='colhead'>
-		      Remarks
-		    </th>
-		    <th class='colhead'>
-		      Line
-		    </th>
-		    <th class='colhead'>
-		      FT
-		    </th>
-		  </tr>
-		</thead>
-		<tbody>
-		  <tr id="Row$line">
-		    <th class='$cellclass left'>$line</th>
-		    <td class='$cellclass left'>
-		    <input type='text' name='Family$line'
-		    	value='$family'
-		    	class='$famclass' size='3' maxlength='4'>
-		    </td>
-		    <td class='$cellclass left'>
-		    <input type='text' name='Surname$line'
-		    	value='$surname, '
-		    	class='$surclass white leftnc' size='14' maxlength='120'>
-		    </td>
-		    <td class='$cellclass left'>
-		    <input type='text' name='GivenNames$line'
-		    	value='$givennames' 
-		    	class='black white left' size='18' maxlength='120'>
-		    </td>
-		    <td class='$cellclass left'>
-		    <input type='text' name='Occupation$line'
-		    	value='$occupation' 
-		    	class='black white leftnc' size='12' maxlength='48'>
-		    </td>
-		    <td class='$cellclass left'>
-		    <input type='text' name='BPlace$line'
-		    	value='$bplace' 
-		    	class='black white leftnc' size='12' maxlength='32'>
-		    </td>
-		    <td class='$cellclass left'>
-		    <input type='text' name='MarYear$line'
-		    	value='$maryear'
-		    	class='black white leftnc' size='4' maxlength='4'>
-		    </td>
-		    <td class='$cellclass left'>
-		    <input type='text' name='Religion$line'
-		    	value='$religion'
-		    	class='$relclass white leftnc' size='16' maxlength='32'>
-		    </td>
-		    <th class='$cellclass left'>$line</th>
-		    <td class='$cellclass left'>
-		    <input type='text' name='Location$line'
-		    	value='$location' 
-		    	class='black white leftnc' size='20' maxlength='32'>
-		    </td>
-		    <td class='$cellclass left'>
-		    <input type='text' name='Age$line'
-		    	value='$age'
-		    	class='black white rightnc' size='3' maxlength='8'>
-		    </td>
-		    <td class='$cellclass left'>
-		    <input type='text' name='Sex$line'
-		    	value='$sex' 
-		    	class='black white center' size='1' maxlength='1'>
-		    </td>
-		    <td class='$cellclass center'>
-		    <input type='text' name='MStat$line'
-		    	value='$mstat'
-		    	class='black white center' size='1' maxlength='1'>
-		    </td>
-		    <td class='$cellclass center'>
-		    <input type='text' name='Coloured$line'
-		    	value='$coloured'
-		    	class='black white center' size='1' maxlength='1'>
-		    </td>
-		    <td class='$cellclass center'>
-		    <input type='text' name='Member$line'
-		    	value='$member'
-		    	class='black white center' size='1' maxlength='1'>
-		    </td>
-		    <td class='$cellclass center'>
-		    <input type='text' name='Absent$line'
-		    	value='$absent'
-		    	class='black white center' size='1' maxlength='1'>
-		    </td>
-		    <td class='$cellclass center'>
-		    <input type='text' name='Deaf$line'
-		    	value='$deaf'
-		    	class='black white center' size='1' maxlength='1'>
-		    </td>
-		    <td class='$cellclass center'>
-		    <input type='text' name='Blind$line'
-		    	value='$blind'
-		    	class='black white center' size='1' maxlength='1'>
-		    </td>
-		    <td class='$cellclass center'>
-		    <input type='text' name='Lunatic$line'
-		    	value='$lunatic'
-		    	class='black white center' size='1' maxlength='1'>
-		    </td>
-		    <td class='$cellclass center'>
-		    <input type='text' name='School$line'
-		    	value='$school'
-		    	class='black white center' size='1' maxlength='1'>
-		    </td>
-		    <td class='$cellclass center'>
-		    <input type='text' name='Illiterate$line'
-		    	value='$illiterate'
-		    	class='black white center' size='1' maxlength='1'>
-		    </td>
-		    <td class='$cellclass center'>
-		    <input type='text' name='Birth$line'
-		    	value='$birth'
-		    	class='black white center' size='1' maxlength='1'>
-		    </td>
-		    <td class='$cellclass center'>
-		    <input type='text' name='DeathSex$line'
-		    	value='$deathsex'
-		    	class='black white center' size='1' maxlength='1'>
-		    </td>
-		    <td class='$cellclass right'>
-		    <input type='text' name='AgeAtDeath$line'
-		    	value='$ageatdeath'
-		    	class='black white rightnc' size='3' maxlength='4'>
-		    </td>
-		    <td class='$cellclass left'>
-		    <input type='text' name='CauseOfDeath$line'
-		    	value='$causeofdeath' 
-		    	class='black white leftnc' size='10' maxlength='32'>
-		    </td>
-		    <td class='$cellclass left'>
-		    <input type='text' name='ResType$line'
-		    	value='$restype'
-		    	class='black white left' size='3' maxlength='16'>
-		    </td>
-		    <td class='$cellclass right'>
-		    <input type='text' name='Stories$line'
-		    	value='$stories'
-		    	class='black white rightnc' size='3' maxlength='8'>
-		    </td>
-		    <td class='$cellclass left'>
-		    <input type='text' name='NumFamilies$line'
-		    	value='$numfamilies'
-		    	class='black white rightnc' size='2' maxlength='2'>
-		    </td>
-		    <td class='$cellclass left'>
-		    <input type='text' name='Remarks$line'
-		    	value='$remarks'
-		    	class='black white leftnc' size='20' maxlength='255'>
-		    </td>
-		    <th class='$cellclass left'>$line</th>
-		    <td class='$cellclass left' style='white-space: nowrap;'>
-		        <input type='hidden' name='IDIR$line'
-		    	value='$idir'>
-		        <button type='button' id='doIdir$line'
-		    		class='button'>
-		    	$idirtext 
-		        </button>
-			&nbsp;
-		        <button type='button' id='clearIdir$line'
-		    		class='button'>
-		    	Clear
-		        </button>
-		    </td>
-		  </tr>
-		</tbody>
-		<tfoot>
-		  <!--- Put out the column footers -->
-		  <tr>
-		    <th class='colhead1st'>
-		      Line
-		    </th>
-		    <th class='colhead'>
-		      Fam
-		    </th>
-		    <th class='colhead'>
-		      Surname
-		    </th>
-		    <th class='colhead'>
-		      Given Names
-		    </th>
-		    <th class='colhead'>
-		      Occupation
-		    </th>
-		    <th class='colhead'>
-		      Birth Place
-		    </th>
-		    <th class='colhead'>
-		      MinY
-		    </th>
-		    <th class='colhead'>
-		      Religion
-		    </th>
-		    <th class='colhead'>
-		      Line
-		    </th>
-		    <th class='colhead'>
-		      Location
-		    </th>
-		    <th class='colhead'>
-		      Age
-		    </th>
-		    <th class='colhead'>
-		      Sex
-		    </th>
-		    <th class='colhead'>
-		      MSt
-		    </th>
-		    <th class='colhead'>Col'd</th>
-		    <th class='colhead'>Mem</th>
-		    <th class='colhead'>Ab't</th>
-		    <th class='colhead'>D'f</th>
-		    <th class='colhead'>Bl'd</th>
-		    <th class='colhead'>Lun.</th>
-		    <th class='colhead'>Sc'l</th>
-		    <th class='colhead'>Il.</th>
-		    <th class='colhead'>Born</th>
-		    <th class='colhead'>Died</th>
-		    <th class='colhead'>Age Death</th>
-		    <th class='colhead'>Death Cause</th>
-		    <th class='colhead'>Res Type</th>
-		    <th class='colhead'>Stories</th>
-		    <th class='colhead'>Num Fam</th>
-		    <th class='colhead'>
-		      Remarks
-		    </th>
-		    <th class='colhead'>
-		      Line
-		    </th>
-		    <th class='colhead'>
-		      FT
-		    </th>
-		  </tr>
-		</tfoot>
+        <thead>
+          <!--- Put out the column headers -->
+          <tr>
+            <th class='colhead1st'>
+              Line
+            </th>
+            <th class='colhead'>
+              Fam
+            </th>
+            <th class='colhead'>
+              Surname
+            </th>
+            <th class='colhead'>
+              Given Names
+            </th>
+            <th class='colhead'>
+              Occupation
+            </th>
+            <th class='colhead'>
+              Birth Place
+            </th>
+            <th class='colhead'>
+              MinY
+            </th>
+            <th class='colhead'>
+              Religion
+            </th>
+            <th class='colhead'>
+              Line
+            </th>
+            <th class='colhead'>
+              Location
+            </th>
+            <th class='colhead'>
+              Age
+            </th>
+            <th class='colhead smaller'>
+              Sex
+            </th>
+            <th class='colhead smaller'>
+              MSt
+            </th>
+            <th class='colhead smaller'>Col'd</th>
+            <th class='colhead smaller'>Mem</th>
+            <th class='colhead smaller'>NotM</th>
+            <th class='colhead smaller'>Ab't</th>
+            <th class='colhead smaller'>D'f</th>
+            <th class='colhead smaller'>Bl'd</th>
+            <th class='colhead smaller'>Lun.</th>
+            <th class='colhead smaller'>Sc'l</th>
+            <th class='colhead smaller'>Il.</th>
+            <th class='colhead smaller'>Born</th>
+            <th class='colhead smaller'>Died</th>
+            <th class='colhead smaller'>Age Death</th>
+            <th class='colhead'>Death Cause</th>
+            <th class='colhead'>Res Type</th>
+            <th class='colhead smaller'>Stories</th>
+            <th class='colhead smaller'>Num Fam</th>
+            <th class='colhead'>
+              Remarks
+            </th>
+            <th class='colhead'>
+              Line
+            </th>
+            <th class='colhead'>
+              FT
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr id="Row$line">
+            <th class='$cellclass left'>$line</th>
+            <td class='$cellclass left'>
+              <input type='text' name='Family$line'
+                    value='$family'
+                    class='$famclass' size='3' maxlength='4'>
+            </td>
+            <td class='$cellclass left'>
+              <input type='text' name='Surname$line'
+                    value='$surname, '
+                    class='$surclass white leftnc' size='14' maxlength='120'>
+            </td>
+            <td class='$cellclass left'>
+              <input type='text' name='GivenNames$line'
+                    value='$givennames' 
+                    class='black white left' size='18' maxlength='120'>
+            </td>
+            <td class='$cellclass left'>
+              <input type='text' name='Occupation$line'
+                    value='$occupation' 
+                    class='black white leftnc' size='12' maxlength='48'>
+            </td>
+            <td class='$cellclass left'>
+              <input type='text' name='BPlace$line'
+                    value='$bplace' 
+                    class='black white leftnc' size='12' maxlength='32'>
+            </td>
+            <td class='$cellclass left'>
+              <input type='text' name='MarYear$line'
+                    value='$maryear'
+                    class='black white leftnc' size='4' maxlength='4'>
+            </td>
+            <td class='$cellclass left'>
+              <input type='text' name='Religion$line'
+                    value='$religion'
+                    class='$relclass white leftnc' size='16' maxlength='32'>
+            </td>
+            <th class='$cellclass left'>$line</th>
+            <td class='$cellclass left'>
+              <input type='text' name='Location$line'
+                    value='$location' 
+                    class='black white leftnc' size='20' maxlength='32'>
+            </td>
+            <td class='$cellclass left'>
+              <input type='text' name='Age$line'
+                    value='$age'
+                    class='black white rightnc' size='3' maxlength='8'>
+            </td>
+            <td class='$cellclass left'>
+              <input type='text' name='Sex$line'
+                    value='$sex' 
+                    class='black white center' size='1' maxlength='1'>
+            </td>
+            <td class='$cellclass center'>
+              <input type='text' name='MStat$line'
+                    value='$mstat'
+                    class='black white center' size='1' maxlength='1'>
+            </td>
+            <td class='$cellclass center'>
+              <input type='text' name='Coloured$line'
+                    value='$coloured'
+                    class='black white center expand'
+				    maxlength='1'>
+            </td>
+            <td class='$cellclass center'>
+              <input type='text' name='Member$line'
+                    value='$member'
+                    class='black white center expand'
+				    maxlength='1'>
+            </td>
+            <td class='$cellclass center'>
+              <input type='text' name='NotMember$line'
+                    value='$notmember'
+                    class='black white center expand'
+				    maxlength='1'>
+            </td>
+            <td class='$cellclass center'>
+              <input type='text' name='Absent$line'
+                    value='$absent'
+                    class='black white center expand'
+				    maxlength='1'>
+            </td>
+            <td class='$cellclass center'>
+              <input type='text' name='Deaf$line'
+                    value='$deaf'
+                    class='black white center expand'
+				    maxlength='1'>
+            </td>
+            <td class='$cellclass center'>
+              <input type='text' name='Blind$line'
+                    value='$blind'
+                    class='black white center expand'
+				    maxlength='1'>
+            </td>
+            <td class='$cellclass center'>
+              <input type='text' name='Lunatic$line'
+                    value='$lunatic'
+                    class='black white center expand'
+				    maxlength='1'>
+            </td>
+            <td class='$cellclass center'>
+              <input type='text' name='School$line'
+                    value='$school'
+                    class='black white center expand'
+				maxlength='1'>
+            </td>
+            <td class='$cellclass center'>
+              <input type='text' name='Illiterate$line'
+                    value='$illiterate'
+                    class='black white center expand'
+				    maxlength='1'>
+            </td>
+            <td class='$cellclass center'>
+              <input type='text' name='Birth$line'
+                    value='$birth'
+                    class='black white center expand'
+				    maxlength='1'>
+            </td>
+            <td class='$cellclass center'>
+              <input type='text' name='DeathSex$line'
+                    value='$deathsex'
+                    class='black white center expand'
+				    maxlength='1'>
+            </td>
+            <td class='$cellclass right'>
+              <input type='text' name='AgeAtDeath$line'
+                    value='$ageatdeath'
+                    class='black white rightnc' size='3' maxlength='4'>
+            </td>
+            <td class='$cellclass left'>
+              <input type='text' name='CauseOfDeath$line'
+                    value='$causeofdeath' 
+                    class='black white leftnc' size='10' maxlength='32'>
+            </td>
+            <td class='$cellclass left'>
+              <input type='text' name='ResType$line'
+                    value='$restype'
+                    class='black white left' size='3' maxlength='16'>
+            </td>
+            <td class='$cellclass right'>
+              <input type='text' name='Stories$line'
+                    value='$stories'
+                    class='black white rightnc' size='3' maxlength='8'>
+            </td>
+            <td class='$cellclass left'>
+              <input type='text' name='NumFamilies$line'
+                    value='$numfamilies'
+                    class='black white rightnc' size='2' maxlength='2'>
+            </td>
+            <td class='$cellclass left'>
+              <input type='text' name='Remarks$line'
+                    value='$remarks'
+                    class='black white leftnc' size='20' maxlength='255'>
+            </td>
+            <th class='$cellclass left'>$line</th>
+            <td class='$cellclass left' style='white-space: nowrap;'>
+              <input type='hidden' name='IDIR$line'
+                    value='$idir'>
+              <button type='button' id='doIdir$line'
+                    class='button'>
+                $idirtext 
+              </button>
+            &nbsp;
+              <button type='button' id='clearIdir$line'
+                    class='button'>
+                Clear
+              </button>
+            </td>
+          </tr>
+        </tbody>
+        <tfoot>
+          <!--- Put out the column footers -->
+          <tr>
+            <th class='colhead1st'>
+              Line
+            </th>
+            <th class='colhead'>
+              Fam
+            </th>
+            <th class='colhead'>
+              Surname
+            </th>
+            <th class='colhead'>
+              Given Names
+            </th>
+            <th class='colhead'>
+              Occupation
+            </th>
+            <th class='colhead'>
+              Birth Place
+            </th>
+            <th class='colhead'>
+              MinY
+            </th>
+            <th class='colhead'>
+              Religion
+            </th>
+            <th class='colhead'>
+              Line
+            </th>
+            <th class='colhead'>
+              Location
+            </th>
+            <th class='colhead'>
+              Age
+            </th>
+            <th class='colhead smaller'>
+              Sex
+            </th>
+            <th class='colhead smaller'>
+              MSt
+            </th>
+            <th class='colhead smaller'>Col'd</th>
+            <th class='colhead smaller'>Mem</th>
+            <th class='colhead smaller'>NotM</th>
+            <th class='colhead smaller'>Ab't</th>
+            <th class='colhead smaller'>D'f</th>
+            <th class='colhead smaller'>Bl'd</th>
+            <th class='colhead smaller'>Lun.</th>
+            <th class='colhead smaller'>Sc'l</th>
+            <th class='colhead smaller'>Il.</th>
+            <th class='colhead smaller'>Born</th>
+            <th class='colhead smaller'>Died</th>
+            <th class='colhead smaller'>Age Death</th>
+            <th class='colhead'>Death Cause</th>
+            <th class='colhead'>Res Type</th>
+            <th class='colhead smaller'>Stories</th>
+            <th class='colhead smaller'>Num Fam</th>
+            <th class='colhead'>
+              Remarks
+            </th>
+            <th class='colhead'>
+              Line
+            </th>
+            <th class='colhead'>
+              FT
+            </th>
+          </tr>
+        </tfoot>
       </table>
-	  <p>
-	    <button type="submit" id="Submit">
-	      <u>U</u>pdate Database 
-	    </button>
-	    <button type="reset" id="reset">
-	      Reset to Defaults 
-	    </button>
-	    <button type="button" id="addRow">
-	      Add a Row 
-	    </button>
-	  </p>
+      <p>
+        <button type="submit" id="Submit">
+          <u>U</u>pdate Database 
+        </button>
+        <button type="reset" id="reset">
+          Reset to Defaults 
+        </button>
+        <button type="button" id="addRow">
+          Add a Row 
+        </button>
+      </p>
       </form>
       <!--- Put out a line with links to previous and next section of table -->
       <div class="center" id="backPager">
-	<span class="left" id="npPrevBack">
-	    <a href="/database/CensusForm.php$npPrev" id="prenpprev">
-		&lt;---
-	    </a>
-	</span>
-	<span class="right" id="npNextBack">
-	    <a href="/database/CensusForm.php$npNext" id="prenpnext">
-		---&gt;
-	    </a>
-    	</span>
+    <span class="left" id="npPrevBack">
+        <a href="/database/CensusForm.php$npPrev" id="prenpprev">
+        &lt;---
+        </a>
+    </span>
+    <span class="right" id="npNextBack">
+        <a href="/database/CensusForm.php$npNext" id="prenpnext">
+        ---&gt;
+        </a>
+        </span>
         <span>
-	  <span id="backProv">$PROVINCE,</span>
-    	    dist $DISTRICT $DISTRICTNAME,
-    	    subdist $SUBDISTRICT $SUBDISTRICTNAME,
-    	    <span id="backDiv">div $DIVISION </span>
-    	    page $PAGE
-    	</span>
+      <span id="backProv">$PROVINCE,</span>
+            dist $DISTRICT $DISTRICTNAME,
+            subdist $SUBDISTRICT $SUBDISTRICTNAME,
+            <span id="backDiv">div $DIVISION </span>
+            page $PAGE
+        </span>
       </div> <!-- id="backPager" -->
 
       <div id="comments">
         <h2>User Comments on the Transcription</h2>
           <p id="comment$index">
-	    On line $line field $fldName 
-	    changed from '$oldValue'
-	    to '$newValue'
-	    by $userid
-	    <span id="commentDesc$index">because $Comment</span>
+        On line $line field $fldName 
+        changed from '$oldValue'
+        to '$newValue'
+        by $userid
+        <span id="commentDesc$index">because $Comment</span>
           </p>
       </div> <!-- id="comments" -->
     </div> <!-- class="body" -->

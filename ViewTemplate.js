@@ -9,6 +9,8 @@
  *                                                                      *
  *  Copyright &copy; 2020 James A. Cobban                               *
  ************************************************************************/
+import {hideRightColumn}
+            from "../jscripts6/util.js";
 
 window.onload   = onLoad;
 
@@ -20,19 +22,19 @@ window.onload   = onLoad;
  ************************************************************************/
 function onLoad()
 {
-    var listOfPopups    = document.getElementsByClassName('balloon');
-    for (var vi = 0; vi < listOfPopups.length; vi++)
+    let listOfPopups    = document.getElementsByClassName('balloon');
+    for (let vi = 0; vi < listOfPopups.length; vi++)
     {           // loop through popups
-        var popup                   = listOfPopups[vi];
+        let popup                   = listOfPopups[vi];
         popup.style.position        = 'static';
         popup.style.marginTop       = '5px';
         popup.style.display         = 'block';
     }           // loop through popups
 
-    var listOfHidden    = document.getElementsByClassName('hidden');
-    for (var vi = 0; vi < listOfHidden.length; vi++)
+    let listOfHidden    = document.getElementsByClassName('hidden');
+    for (let vi = 0; vi < listOfHidden.length; vi++)
     {           // loop through popups
-        var hidden                  = listOfHidden[vi];
+        let hidden                  = listOfHidden[vi];
         if (hidden.id != "hideMsgTemplate")
             continue;
         hidden.style.position       = 'static';

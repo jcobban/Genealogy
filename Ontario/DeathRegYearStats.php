@@ -47,6 +47,7 @@ use \NumberFormatter;
  *      2021/02/12      internationalize parameter validation messages  *
  *                      DeathSet::getStatistics now returns county name *
  *      2021/05/29      $highest, $totcount, $totlinked undefined       *
+ *      2021/10/18      display linked relative to transcribed          *
  *                                                                      *
  *  Copyright &copy; 2021 James A. Cobban                               *
  ************************************************************************/
@@ -272,7 +273,10 @@ if (strlen($msg) == 0)
         $pctdoneclass                   = pctClass($pctdone);
         $linkcount                      = $row['linkcount'];
         $totlinked                      += $linkcount;
-        $pctlinked                      = ($linkcount * 100.0)/ $count;
+        if ($surnamecount > 0)
+            $pctlinked                  = ($linkcount * 100.0)/ $surnamecount;
+        else
+            $pctlinked                  = 100.0;
         if ($pctlinked > 100.0)
             $pctlinked                  = 100.0;
         $pctlinkedclass                 = pctClass($pctlinked);
@@ -305,7 +309,7 @@ $template->set('HIGHEST',           $highest);
 $formatter->setAttribute(NumberFormatter::FRACTION_DIGITS, 2);
 $template->set('PCTDONE',           $formatter->format(($totcount * 100.0) / $total));
 $template->set('PCTDONECLASS',      pctClass(($totcount * 100.0) / $total));
-$template->set('PCTLINKED',         $formatter->format(($totlinked* 100.0) / $total));
-$template->set('PCTLINKEDCLASS',    pctClass(($totlinked * 100.0) / $total));
+$template->set('PCTLINKED',         $formatter->format(($totlinked* 100.0) / $totcount));
+$template->set('PCTLINKEDCLASS',    pctClass(($totlinked * 100.0) / $totcount));
 
 $template->display();

@@ -102,7 +102,8 @@ if (strlen($userid) > 0)
 
 	$blogParms	= array('keyvalue'	=> $user->get('id'),
                         'table'		=> 'Users',
-                        'order'     => 'BL_Index DESC');
+                        'order'     => 'BL_Index DESC',
+                        'limit'     => 100);
 	$bloglist	= new RecordSet('Blogs', $blogParms);
 	$blogCount	= $bloglist->count();
 }

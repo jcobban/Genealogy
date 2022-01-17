@@ -115,8 +115,10 @@ use \NumberFormatter;
  *		2020/02/14      add loose check for "name, .*, county..."       *
  *		2020/06/30      add feedback parameter                          *
  *		2020/12/05      correct XSS vulnerabilities                     *
+ *		2021/07/21      use htmlspecialchars to escape values inserted  *
+ *		                into quoted values in template                  *
  *																	    *
- *  Copyright &copy; 2020 James A. Cobban								*
+ *  Copyright &copy; 2021 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/Location.inc';
 require_once __NAMESPACE__ . '/Picture.inc';
@@ -194,6 +196,7 @@ foreach($_GET as $key => $value)
 
 	    case 'debug':
 	    case 'text':
+	    case 'userid':
 	    {		    // handled by common code
 			break;
 	    }		    // handled by common code
@@ -266,15 +269,16 @@ $template->set('TITLE',             $title);
 $template->set('IDLR',	            $idlr);
 $template->set('FEEDBACK',	        $feedback);
 $locname			= $location->get('location');
-$template->set('LOCATION',		    str_replace('"','&quote;',$locname));
+$template->set('LOCATION',		    htmlspecialchars($locname));
 $shortName			= $location->getShortName();
-$template->set('SHORTNAME',		    str_replace('"','&quote;',$shortName));
+$template->set('SHORTNAME',		    htmlspecialchars($shortName));
 $sortedLoc			= $location->get('sortedlocation');
-$template->set('SORTEDLOC',		    str_replace('"','&quote;',$sortedLoc));
+$template->set('SORTEDLOC',		    htmlspecialchars($sortedLoc));
 $fsPlaceId			= $location->get('fsplaceid'); 
-$template->set('FSPLACEID',		    str_replace('"','&quote;',$fsPlaceId));
+$template->set('FSPLACEID',		    htmlspecialchars($fsPlaceId));
 $template->set('PREPOSITION',	    $location->get('preposition'));
-$template->set('BOUNDARY',		    $location->get('boundary'));
+$boundary			= $location->get('boundary'); 
+$template->set('BOUNDARY',		    htmlspecialchars($boundary));
 $formatter->setAttribute(NumberFormatter::FRACTION_DIGITS, 6);
 $template->set('LATITUDE',		    $formatter->format($location->get('latitude')));
 $template->set('LONGITUDE',		    $formatter->format($location->get('longitude')));

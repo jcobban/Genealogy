@@ -717,9 +717,10 @@ export const  OrigAbbrs = {
                 };
 
 /************************************************************************
- *      MonthAbbrs                                                      *
+ *  MonthAbbrs                                                          *
  *                                                                      *
- *  Table for expanding abbreviations for months                        *
+ *  Table for expanding abbreviations for months in fields that contain *
+ *  a date                                                              *
  ************************************************************************/
 export const  MonthAbbrs = {
                 "A"         : "Apr",

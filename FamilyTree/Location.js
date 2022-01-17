@@ -48,8 +48,9 @@
  *		2019/05/19      call element.click to trigger button click      *
  *		2020/02/17      hide right column                               *
  *		2020/05/28      correct setting of sortedLocation               *
+ *		2021/07/22      support explicit styling of polyline/polygon    *
  *																		*
- *  Copyright &copy; 2020 James A. Cobban								*
+ *  Copyright &copy; 2021 James A. Cobban								*
  ************************************************************************/
 
 /************************************************************************
@@ -151,17 +152,18 @@ var	map		        = null;
 var	path		    = [];
 
 // instance of google.maps.PolyOptions for editing boundary
-var	polyOptionsEdit	= {strokeColor: "red", 
-					   strokeOpacity: 0.5,
-					   strokeWeight: 2,
-					   editable: true};
+var	polyOptionsEdit	= {strokeColor:     "red", 
+					   strokeOpacity:   0.5,
+					   strokeWeight:    2,
+					   editable:        true};
 
 // instance of google.maps.PolygonOptions for displaying boundary
-var	polyOptionsShow	= {strokeColor: "red", 
-					   strokeOpacity: 0.5,
-					   strokeWeight: 2,
-					   fillColor: "black",
-					   fillOpacity: 0.10};
+var	polyOptionsShow	= {strokeColor:     "red", 
+					   strokeOpacity:   0.5,
+					   strokeWeight:    2,
+					   fillColor:       "black",
+					   fillOpacity:     0.10};
+var mapStyle        = polyOptionsShow;  // copy defaults
 
 // instance of google.maps.Polyline for displaying boundary
 var	boundary	    = null;
@@ -187,26 +189,26 @@ function onLoadLocation()
 
     // scan through all forms and set dynamic functionality
     // for specific elements
-    for(var i = 0; i < document.forms.length; i++)
+    for(let i = 0; i < document.forms.length; i++)
     {
-		var form	= document.forms[i];
+		let form	                    = document.forms[i];
 
 		if (form.name == 'locForm')
 		{	// set action methods for form
-		    form.onsubmit		 	= validateForm;
-		    form.onreset 			= resetForm;
+		    form.onsubmit		 	    = validateForm;
+		    form.onreset 			    = resetForm;
 		}	// set action methods for form
 
-		for(var j = 0; j < form.elements.length; j++)
+		for(let j = 0; j < form.elements.length; j++)
 		{
-		    var element	                = form.elements[j];
+		    let element	                = form.elements[j];
 
 		    // take action specific to element
-		    var	name;
+		    let	name;
 		    if (element.name && element.name.length > 0)
-			name	                    = element.name;
+			    name	                = element.name;
 		    else
-			name	                    = element.id;
+			    name	                = element.id;
 
 		    switch(name)
 		    {		// act on field name
@@ -244,28 +246,66 @@ function onLoadLocation()
 	
 				case 'Boundary':
 				{
-				    var	latPatt	        = /\(([0-9.\-]+)/;
-				    var	lngPatt	        = /([0-9.\-]+)\)/;
-				    var	boundStr	    = element.value;
-				    var	readonly	    = form.Zoom.readOnly;
+				    let	latPatt	        = /\(([0-9.\-]+)/;
+				    let	lngPatt	        = /([0-9.\-]+)\)/;
+				    let	boundStr	    = element.value;
+				    let	readonly	    = form.Zoom.readOnly;
 	
 				    if (boundStr.length > 0)
-				    {		// have a boundary to display
-						var	bounds	    = boundStr.split(',');
-						for (var ib=0; ib < bounds.length; ib++)
-						{		// loop through each element
-						    var	bound	= bounds[ib];
-						    var rxRes	= latPatt.exec(bound);
+				    {		        // have a boundary to display
+                        if (boundStr.charAt(0) == '{')
+                        {           // JSON style prefix
+                            let prefEng = boundStr.indexOf('},');
+                            let prefix  = boundStr.substring(0, prefEng + 1);
+                            mapStyle    = JSON.parse(prefix);
+                            for (let prop in mapStyle)
+                            {       // loop through properties
+                                let value       = mapStyle[prop];
+                                switch (prop)
+                                {   // act on specific option
+									case 'strokeColor':
+                                        polyOptionsEdit[prop]   = value;
+                                        polyOptionsShow[prop]   = value;
+                                        break;
+
+									case 'strokeOpacity':
+                                        polyOptionsEdit[prop]   = value;
+                                        polyOptionsShow[prop]   = value;
+                                        break;
+
+									case 'strokeWeight':
+                                        polyOptionsEdit[prop]   = value;
+                                        polyOptionsShow[prop]   = value;
+                                        break;
+
+									case 'fillColor':
+                                        polyOptionsShow[prop]   = value;
+                                        break;
+
+									case 'fillOpacity':
+                                        polyOptionsShow[prop]   = value;
+                                        break;
+
+                                }   // act on specific option
+                            }       // loop through properties
+                            boundStr    = boundStr.substring(prefEng + 2);
+                        }           // JSON style prefix
+
+						let	bounds	    = boundStr.split(',');
+						for (let ib=0; ib < bounds.length; ib++)
+						{		    // loop through each element
+						    let	bound	= bounds[ib];
+						    let rxRes	= latPatt.exec(bound);
 						    if (rxRes != null)
 						    {		// latitude 
-								var lat	= rxRes[1];
+								let lat	= rxRes[1];
 								ib++;
 								bound	= bounds[ib];
 								rxRes	= lngPatt.exec(bound);
 								if (rxRes != null)
 								{		// longitude)
-								    var lng		= rxRes[1];
-								    var latLng	= new google.maps.LatLng(lat,
+								    let lng		= rxRes[1];
+								    let latLng	= new google.maps.LatLng(lat,
 													 lng);
 								    path.push(latLng);
 								}		// longitude
@@ -282,7 +322,12 @@ function onLoadLocation()
 							            bound + " ignored");
 						}		// loop through each element
 						if (readonly)
-						    boundary = new google.maps.Polygon(polyOptionsShow);
+                        {
+                            if (polyOptionsShow.strokeColor == 'red')
+						        boundary = new google.maps.Polygon(polyOptionsShow);
+                            else    
+						        boundary = new google.maps.Polyline(polyOptionsShow);
+                        }
 						else
 						    boundary = new google.maps.Polyline(polyOptionsEdit);
 						boundary.setPath(path);
@@ -741,21 +786,27 @@ function hideMap()
 function getMap()
 {
     if (map === null)
-    {			// user forgot to do show map first
-		var	form	= this.form;
+    {			            // user forgot to do show map first
+		let	form	            = this.form;
 		form.showMap.click();
 		return;
-    }			// user forgot to do show map first
+    }			            // user forgot to do show map first
 
     if (map !== null && map.getMapTypeId() !== null)
     {
-		var form	= this.form;
-		var center	= map.getCenter();
-		var zoom	= map.getZoom();
-		var min;
-		var sec;
-		var deg;
-		var neg;
+		let form	            = this.form;
+		let oldvalue            = form.Boundary.value;
+        let repref              = /^{[^}]*},/;
+        let results             = repref.exec(oldvalue);
+        let prefix              = '';
+        if (results)
+            prefix              = results[0];
+		let center	            = map.getCenter();
+		let zoom	            = map.getZoom();
+		let min;
+		let sec;
+		let deg;
+		let neg;
 
 		form.Latitude.value	    = center.lat().toFixed(6);
 		form.Longitude.value	= center.lng().toFixed(6);
@@ -766,18 +817,18 @@ function getMap()
 		// copy the boundary path
 		if (boundary)
 		{
-		    var path		    = boundary.getPath().getArray();
-		    var pathStr		    = '';
-		    var comma		    = '';
-		    for(var pi = 0; pi < path.length; pi++)
+		    let path		    = boundary.getPath().getArray();
+		    let pathStr		    = '';
+		    let comma		    = '';
+		    for(let pi = 0; pi < path.length; pi++)
 		    {
-	    		var point	    = path[pi];
+	    		let point	    = path[pi];
 	    		pathStr		    += comma +
 	    				  '(' + point.lat().toFixed(6) + ',' +
 	    					point.lng().toFixed(6) + ')';
 	    		comma		    = ',';
 		    }
-		    form.Boundary.value	= pathStr;
+		    form.Boundary.value	= prefix + pathStr;
 		}
 		else
 		    form.Boundary.value	= '';

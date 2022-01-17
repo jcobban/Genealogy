@@ -88,8 +88,9 @@ use \Exception;
  *		                fix display for deleted object                  *
  *      2019/11/17      move CSS to <head>                              *
  *      2020/12/05      correct XSS vulnerabilities                     *
+ *      2021/10/17      minor cleanup in parameter processing           *
  *																		*
- *  Copyright &copy; 2020 James A. Cobban								*
+ *  Copyright &copy; 2021 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/Address.inc';
 require_once __NAMESPACE__ . '/RecordSet.inc';
@@ -127,9 +128,9 @@ if (isset($_GET) && count($_GET) > 0)
                       "<th class='colhead'>value</th></tr>\n";
     foreach($_GET as $key => $value)
     {		                    // loop through all parameters
+        $safevalue          = htmlspecialchars($value);
         $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
-                        "<td class='white left'>" .
-                        htmlspecialchars($value) . "</td></tr>\n"; 
+                        "<td class='white left'>$safevalue</td></tr>\n"; 
 		switch(strtolower($key))
 		{	                    // act on specific key
 		    case 'formname':
@@ -137,9 +138,7 @@ if (isset($_GET) && count($_GET) > 0)
                 if (preg_match('/^[a-zA-Z_][a-zA-Z0-9_.-]*$/', $value))
                     $formname	= $value;
                 else
-                    $msg        .= "Formname value '" .
-                                    htmlspecialchars($value) .
-                                    "' invalid. ";
+                    $msg        .= "Formname value '$safevalue' invalid. ";
 				break;
 		    }	                // formname
 
@@ -211,14 +210,11 @@ if (isset($_POST) && count($_POST) > 0)
     foreach($_POST as $key => $value)
     {		                    // loop through all parameters
 		if (is_array($value))
-            $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
-                            "<td class='white left'>" .
-                            htmlspecialchars(print_r($value, true)) .
-                            "</td></tr>\n"; 
-		else
-            $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
-                            "<td class='white left'>" .
-                            htmlspecialchars($value) . "</td></tr>\n"; 
+            $safevalue  = htmlspecialchars(var_export($value, true));
+        else
+            $safevalue  = htmlspecialchars($value);
+        $parmsText      .= "<tr><th class='detlabel'>$key</th>" .
+                            "<td class='white left'>$safevalue</td></tr>\n"; 
 		switch(strtolower($key))
 		{	                    // act on specific key
 		    case 'formname':
@@ -226,9 +222,7 @@ if (isset($_POST) && count($_POST) > 0)
                 if (preg_match('/^[a-zA-Z_][a-zA-Z0-9_.-]*$/', $value))
                     $formname	= $value;
                 else
-                    $msg        .= "Formname value '" .
-                                    htmlspecialchars($value) .
-                                    "' invalid. ";
+                    $msg        .= "Formname value '$safevalue' invalid. ";
 				break;
 		    }	                // formname
 
@@ -237,9 +231,7 @@ if (isset($_POST) && count($_POST) > 0)
                 if (preg_match('/^[a-zA-Z]+$/', $value))
 				    $action		= strtolower($value);
                 else
-                    $msg        .= "Action value '" .
-                                    htmlspecialchars($value) .
-                                    "' invalid. ";
+                    $msg        .= "Action value '$safevalue' invalid. ";
 				break;
 		    }	                // action
 
@@ -250,9 +242,7 @@ if (isset($_POST) && count($_POST) > 0)
 				    $idar	= intval($value);
 				else
 				{	            // invalid format
-				    $name	= "IDAR value '" .
-                                    htmlspecialchars($value) .
-                                    "' invalid";
+				    $name	= "IDAR value '$safevalue' invalid";
 				    $msg	.= $name . '. ';
 				}	            // invalid format
 				break;
@@ -264,9 +254,7 @@ if (isset($_POST) && count($_POST) > 0)
 				    $kind	= intval($value);
 				else
 				{	            // invalid format
-				    $name	= "Kind value '" .
-                                    htmlspecialchars($value) .
-                                    "' invalid";
+				    $name	= "Kind value '$safevalue' invalid";
 				    $msg	.= $name . '. ';
 				}	            // invalid format
 				break;
@@ -288,10 +276,10 @@ if (isset($_POST) && count($_POST) > 0)
 if ($kind == 0 &&			// mailing address
 	$name == 'new' &&
 	(strlen($given) > 0 || strlen($surname) > 0))
-	$name	= $given . ' ' . $surname;
+	$name	            = "$given $surname";
 if ($kind == 2 &&			// repository
 	$name == 'new')
-	$name	= 'New Repository';
+	$name	            = 'New Repository';
 
 // allocate an instance of Address based upon the parameters
 // passed to the script

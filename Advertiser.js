@@ -79,7 +79,6 @@ function onLoad()
             }           // act on a field
         }               // loop through all elements in the form
     }                   // loop through all forms
-    console.log("Advertiser.js: onLoad: " + trace);
 
 }       // function onLoad
 

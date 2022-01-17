@@ -10,7 +10,7 @@
  *                                                                      *
  *  Copyright &copy; 2020 James A. Cobban                               *
  ************************************************************************/
-import {eltMouseOver, eltMouseOut, keyDown, createFromTemplate}
+import {keyDown, createFromTemplate}
         from "../jscripts6/util.js";
 import {changeElt} from "../jscripts6/CommonForm.js";
 

@@ -66,8 +66,9 @@ use \Exception;
  *      2019/01/03      replace static method getNextSurname with       *
  *                      new Surname(array('surname' => ">=$surname")    *
  *      2019/05/17      add Surname::$info                              *
+ *      2021/09/15      add method getCount                             *
  *                                                                      *
- *  Copyright &copy; 2019 James A. Cobban                               *
+ *  Copyright &copy; 2021 James A. Cobban                               *
  ************************************************************************/
 require_once __NAMESPACE__ . '/Record.inc';
 
@@ -377,6 +378,23 @@ class Surname extends Record
     }       // function Surname::getName
 
     /********************************************************************
+     *  function Surname::getCount                                      *
+     *                                                                  *
+     *  Get the the number of instances of class Person that have this  *
+     *  surname.                                                        *
+     *                                                                  *
+     *  Returns:                                                        *
+     *      integer count                                               *
+     ********************************************************************/
+    function getCount()
+    {
+        $getParms['surname']        = $this->row['surname'];
+        $personList                 = new PersonSet($getParms);
+        $info                       = $personList->getInformation();
+        return $info['count'];
+    }       // function Surname::getCount
+
+    /********************************************************************
      *  function Surname::save                                          *
      *                                                                  *
      *  Save changes made to the Surname record into the                *
@@ -404,6 +422,9 @@ class Surname extends Record
         {       // true
             $tagname    = 'cmd';
         }       // true
+        if ($xml)
+            error_log("Surname::save called with deprecated parameter\n" .
+                        $this->debugBacktrace());
 
         if (strlen($this->msg) > 0)
         {

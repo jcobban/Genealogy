@@ -21,8 +21,9 @@ use \Iterator;
  *      2019/06/15      add column to getCountyStatistics               *
  *      2019/12/13      remove B_ prefix from file names                *
  *      2020/04/24      support ANSI standard use of "                  *
+ *      2021/11/22      ignore regnums that are out of range            *
  *                                                                      *
- *  Copyright &copy; 2020 James A. Cobban                               *
+ *  Copyright &copy; 2021 James A. Cobban                               *
  ************************************************************************/
 require_once __NAMESPACE__ . '/RecordSet.inc';
 require_once __NAMESPACE__ . '/Birth.inc';
@@ -507,12 +508,28 @@ class BirthSet extends RecordSet
         global  $connection;
 
         // execute the query
+        $query  = 'SELECT MIN(RegNum) as low FROM Births ' .
+                    $this->where;
+        $stmt           = $connection->prepare($query);
+        $queryText      = debugPrepQuery($query, $this->sqlParms);
+        if ($stmt->execute($this->sqlParms))
+        {
+            $result     = $stmt->fetch(PDO::FETCH_ASSOC);
+            $low        = $result['low'];
+        }
+        else
+        {
+            $msg        .= "query '$queryText' failed: " .
+                               print_r($stmt->errorInfo(), true);
+            return null;
+        }           // query failed
+        $stmt           = $connection->prepare($query);
         $query  = 'SELECT RegCounty AS County, RegTownship AS Township, ' .
                                 "SUM(Surname != '') AS `Count`,  " .
                                 'SUM(Idir != 0) AS LinkCount, ' .
                                 'MIN(RegNum) as low, ' .
                                 'MAX(RegNum) as high,  ' .
-                                '(SELECT MAX(RegNum) FROM Births  WHERE RegYear=:regyear and RegCounty=:regcounty AND RegTownship=Township AND RegNum<500000) AS `currhigh` ' .
+                                "(SELECT MAX(RegNum) FROM Births  WHERE RegYear=:regyear and RegCounty=:regcounty AND RegTownship=Township AND RegNum<($low + 5000)) AS `currhigh` " .
                         'FROM Births ' .
                         $this->where .
                         ' GROUP BY RegCounty, RegTownship ' .

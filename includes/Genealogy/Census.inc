@@ -74,6 +74,8 @@ use \Iterator;
  *      2020/03/08      add method getDomains                           *
  *      2020/09/28      add field EnumMonth                             *
  *      2020/12/02      protect against XSS                             *
+ *      2021/09/19      method getDomains returned null for single      *
+ *                      domain census instead of DomainSet              *
  *                                                                      *
  *  Copyright &copy; 2020 James A. Cobban                               *
  ************************************************************************/
@@ -464,9 +466,6 @@ class Census extends Record
         if ($this->domains)
             return $this->domains;
 
-        $province           = $this['province'];
-        if (is_string($province) && strlen($province) > 0)
-            return null;        // census of single domain
         $cc                 = $this['countrycode'];
         $provinces          = $this['provinces'];
         if ($cc == 'CA' || $cc == 'US')

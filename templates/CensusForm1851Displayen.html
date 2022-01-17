@@ -145,26 +145,27 @@
 		    <th class='colhead'>
 		      Age
 		    </th>
-		    <th class='colhead'>
+		    <th class='colhead smaller'>
 		      Sex
 		    </th>
-		    <th class='colhead'>
+		    <th class='colhead smaller'>
 		      MSt
 		    </th>
-		    <th class='colhead'>Neg</th>
-		    <th class='colhead'>Ind</th>
-		    <th class='colhead'>Mem</th>
-		    <th class='colhead'>Ab't</th>
-		    <th class='colhead'>D'f</th>
-		    <th class='colhead'>Bl'd</th>
-		    <th class='colhead'>Lun.</th>
-		    <th class='colhead'>Sc'l</th>
-		    <th class='colhead'>Born</th>
-		    <th class='colhead'>Died</th>
-		    <th class='colhead'>Age Death</th>
+		    <th class='colhead smaller'>Neg</th>
+		    <th class='colhead smaller'>Ind</th>
+		    <th class='colhead smaller'>Mem</th>
+		    <th class='colhead smaller'>Not M</th>
+		    <th class='colhead smaller'>Ab't</th>
+		    <th class='colhead smaller'>D'f</th>
+		    <th class='colhead smaller'>Bl'd</th>
+		    <th class='colhead smaller'>Lun.</th>
+		    <th class='colhead smaller'>Sc'l</th>
+		    <th class='colhead smaller'>Born</th>
+		    <th class='colhead smaller'>Died</th>
+		    <th class='colhead smaller'>Age Death</th>
 		    <th class='colhead'>Death Cause</th>
 		    <th class='colhead'>Res Type</th>
-		    <th class='colhead'>Stories</th>
+		    <th class='colhead smaller'>Stories</th>
 		    <th class='colhead'>Num Fam</th>
 		    <th class='colhead'>
 		      Remarks
@@ -232,110 +233,116 @@
 			    class='black white rightnc' 
 			    size='3' maxlength='8'>
 		    </td>
-		    <td class='$cellclass center'>
+		    <td class='$cellclass'>
 		        <input type='text' name='Sex$line'
 			    value='$sex'  readonly='readonly'
-			    class='black white center'
+			    class='black white center expand'
 			    size='1' maxlength='1'>
 		    </td>
-		    <td class='$cellclass center'>
+		    <td class='$cellclass'>
 		        <input type='text' name='MStat$line'
 			    value='$mstat' readonly='readonly'
-			    class='black white center' 
+			    class='black white center expand' 
 			    size='1' maxlength='1'>
 		    </td>
-		    <td class='$cellclass center'>
+		    <td class='$cellclass'>
 		        <input type='text' name='Negro$line'
 			    value='$negro' readonly='readonly'
-			    class='black white center' 
+			    class='black white center expand' 
 			    size='1' maxlength='1'>
 		    </td>
-		    <td class='$cellclass center'>
+		    <td class='$cellclass'>
 		        <input type='text' name='Indian$line'
 			    value='$indian' readonly='readonly'
-			    class='black white center' 
+			    class='black white center expand' 
 			    size='1' maxlength='1'>
 		    </td>
-		    <td class='$cellclass center'>
+		    <td class='$cellclass'>
 		        <input type='text' name='Member$line'
 			    value='$member' readonly='readonly'
-			    class='black white center' 
+			    class='black white center expand' 
 			    size='1' maxlength='1'>
 		    </td>
-		    <td class='$cellclass center'>
+            <td class='$cellclass center'>
+              <input type='text' name='NotMember$line'
+                    value='$notmember'
+                    class='black white center expand'
+					maxlength='1'>
+            </td>
+		    <td class='$cellclass'>
 		        <input type='text' name='Absent$line'
 			    value='$absent' readonly='readonly'
-			    class='black white center' 
+			    class='black white center expand' 
 			    size='1' maxlength='1'>
 		    </td>
-		    <td class='$cellclass center'>
+		    <td class='$cellclass'>
 		        <input type='text' name='Deaf$line'
 			    value='$deaf' readonly='readonly'
-			    class='black white center' 
+			    class='black white center expand' 
 			    size='1' maxlength='1'>
 		    </td>
-		    <td class='$cellclass center'>
+		    <td class='$cellclass'>
 		        <input type='text' name='Blind$line'
 			    value='$blind' readonly='readonly'
-			    class='black white center' 
+			    class='black white center expand' 
 			    size='1' maxlength='1'>
 		    </td>
-		    <td class='$cellclass center'>
+		    <td class='$cellclass'>
 		        <input type='text' name='Lunatics$line'
 			    value='$lunatics' readonly='readonly'
-			    class='black white center' 
+			    class='black white center expand' 
 			    size='1' maxlength='1'>
 		    </td>
-		    <td class='$cellclass center'>
+		    <td class='$cellclass'>
 		        <input type='text' name='School$line'
 			    value='$school' readonly='readonly'
-			    class='black white center' 
+			    class='black white center expand' 
 			    size='1' maxlength='1'>
 		    </td>
-		    <td class='$cellclass center'>
+		    <td class='$cellclass'>
 		        <input type='text' name='Birth$line'
 			    value='$birth' readonly='readonly'
-			    class='black white center' 
+			    class='black white center expand' 
 			    size='1' maxlength='1'>
 		    </td>
-		    <td class='$cellclass center'>
-		        <input type='text' name='DeathSex$line'
+		    <td class='$cellclass'>
+		      <input type='text' name='DeathSex$line'
 			    value='$deathsex' readonly='readonly'
-			    class='black white center' 
+			    class='black white center expand' 
 			    size='1' maxlength='1'>
 		    </td>
 		    <td class='$cellclass right'>
-		        <input type='text' name='AgeAtDeath$line'
+		      <input type='text' name='AgeAtDeath$line'
 			    value='$ageatdeath' readonly='readonly'
 			    class='black white rightnc' 
 			    size='3' maxlength='4'>
 		    </td>
 		    <td class='$cellclass left'>
-		        <input type='text' name='CauseOfDeath$line'
+		      <input type='text' name='CauseOfDeath$line'
 			    value='$causeofdeath' readonly='readonly'
 			    class='black white leftnc' 
 			    size='10' maxlength='32'>
 		    </td>
-		    <td class='$cellclass center'>
-		        <input type='text' name='ResType$line'
+		    <td class='$cellclass'>
+		      <input type='text' name='ResType$line'
 			    value='$restype' readonly='readonly'
 			    class='black white left' 
 			    size='7' maxlength='16'>
 		    </td>
 		    <td class='$cellclass right'>
-		        <input type='text' name='Stories$line'
+		      <input type='text' name='Stories$line'
 			    value='$stories' readonly='readonly'
-			    class='black white rightnc' 
+			    class='black white rightnc expand' 
 			    size='3' maxlength='8'>
 		    </td>
 		    <td class='$cellclass right'>
-		        <input type='text' name='NumFamilies$line'
+		      <input type='text' name='NumFamilies$line'
 			    value='$numfamilies' readonly='readonly'
-			    class='black white rightnc' 
+			    class='black white rightnc expand' 
 			    size='2' maxlength='2'>
 		    </td>
 		    <td class='$cellclass left'>
-		        <input type='text' name='Remarks$line'
+		      <input type='text' name='Remarks$line'
 			    value='$remarks' readonly='readonly'
 			    class='black white leftnc' 
 			    size='20' maxlength='255'>
@@ -386,26 +393,27 @@
 		    <th class='colhead'>
 		      Age
 		    </th>
-		    <th class='colhead'>
+		    <th class='colhead smaller'>
 		      Sex
 		    </th>
-		    <th class='colhead'>
+		    <th class='colhead smaller'>
 		      MSt
 		    </th>
-		    <th class='colhead'>Neg</th>
-		    <th class='colhead'>Ind</th>
-		    <th class='colhead'>Mem</th>
-		    <th class='colhead'>Ab't</th>
-		    <th class='colhead'>D'f</th>
-		    <th class='colhead'>Bl'd</th>
-		    <th class='colhead'>Lun.</th>
-		    <th class='colhead'>Sc'l</th>
-		    <th class='colhead'>Born</th>
-		    <th class='colhead'>Died</th>
-		    <th class='colhead'>Age Death</th>
+		    <th class='colhead smaller'>Neg</th>
+		    <th class='colhead smaller'>Ind</th>
+		    <th class='colhead smaller'>Mem</th>
+		    <th class='colhead smaller'>Not M</th>
+		    <th class='colhead smaller'>Ab't</th>
+		    <th class='colhead smaller'>D'f</th>
+		    <th class='colhead smaller'>Bl'd</th>
+		    <th class='colhead smaller'>Lun.</th>
+		    <th class='colhead smaller'>Sc'l</th>
+		    <th class='colhead smaller'>Born</th>
+		    <th class='colhead smaller'>Died</th>
+		    <th class='colhead smaller'>Age Death</th>
 		    <th class='colhead'>Death Cause</th>
 		    <th class='colhead'>Res Type</th>
-		    <th class='colhead'>Stories</th>
+		    <th class='colhead smaller'>Stories</th>
 		    <th class='colhead'>Num Fam</th>
 		    <th class='colhead'>
 		      Remarks

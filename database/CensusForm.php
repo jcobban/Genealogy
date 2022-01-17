@@ -86,6 +86,7 @@ use \Templating\Template;
  *      2020/12/01      eliminate XSS vulnerabilities                   *
  *      2021/04/16      handle subdistrict id with colon better         *
  *      2021/04/25      add autofill parameter                          *
+ *      2021/07/26      support displaying message if no image for page *
  *                                                                      *
  *  Copyright &copy; 2021 James A. Cobban                               *
  ************************************************************************/
@@ -151,8 +152,27 @@ if (isset($_GET) && count($_GET) > 0)
                                     "<th class='colhead'>value</th></tr>\n";
     foreach ($_GET as $key => $value)
     {                   // loop through all parameters
-        $value              = trim($value);
-        $safevalue          = htmlspecialchars($value);
+        if (is_array($value))
+        {
+            if (count($value) == 0)
+            {
+                $value      = '';
+                $safevalue  = '';
+            }
+            else
+            if (count($value) == 1)
+            {
+                $value      = $value[0];
+                $safevalue  = htmlspecialchars($value);
+            }
+            else
+                $safevalue  = htmlspecialchars(var_export($value, true));
+        }
+        else
+        {
+            $value          = trim($value);
+            $safevalue      = htmlspecialchars($value);
+        }
         $parmsText          .= "<tr><th class='detlabel'>$key</th>" .
                                 "<td class='white left'>" .
                                 $safevalue . "</td></tr>\n";
@@ -499,12 +519,17 @@ if (strlen($division) == 0)
     $template['frontDiv']->update(null);
     $template['backDiv']->update(null);
 }
-$promptTag  = $template->getElementById('ImagePrompt');
+$promptTag              = $template->getElementById('ImagePrompt');
+$noneTag                = $template->getElementById('NoImage');
 if (strlen($image) == 0)
     $template['ImageButton']->update(null); // hide
 else
-if ($promptTag)
-    $promptTag->update(null); // hide
+{
+    if ($promptTag)
+        $promptTag->update(null); // hide
+    if ($noneTag)
+        $noneTag->update(null); // hide
+}
 
 if (strlen($msg) > 0)
 {

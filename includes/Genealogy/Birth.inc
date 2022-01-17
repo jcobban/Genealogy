@@ -643,45 +643,99 @@ class Birth extends Record
                     return parent::set($fieldLc, 'Y');
             }
 
-            case 'regcounty':
-            case 'regtownship':
-            case 'surname':
-            case 'givennames':
             case 'sex':
-            case 'birthplace':
+            {
+                if (strlen($value) > 1)
+                {
+                    $warn       .= "<p>Birth::set: `$fieldLc` value '$value' truncated</p>\n";
+                    $value      = substr($value, 0, 1);
+                }
+                return parent::set($fieldLc, $value);
+            }
+
+            case 'regcounty':
+            {
+                if (strlen($value) > 3)
+                {
+                    $warn       .= "<p>Birth::set: `$fieldLc` value '$value' truncated</p>\n";
+                    $value      = substr($value, 0, 3);
+                }
+                return parent::set($fieldLc, $value);
+            }
+
             case 'birthdate':
-            case 'fathername':
-            case 'fatheroccupation':
-            case 'fatheroccplace':
-            case 'mothername':
-            case 'motheroccupation':
-            case 'motheroccplace':
-            case 'formerhusband':
-            case 'marriageplace':
             case 'marriagedate':
-            case 'accoucheur':
-            case 'informant':
-            case 'informantres':
             case 'informantrel':
             case 'regdate':
+            {
+                if (strlen($value) > 16)
+                {
+                    $warn       .= "<p>Birth::set: `$fieldLc` value '$value' truncated</p>\n";
+                    $value      = substr($value, 0, 16);
+                }
+                return parent::set($fieldLc, $value);
+            }
+
+            case 'surname':
+            case 'fatheroccupation':
+            case 'motheroccupation':
+            {
+                if (strlen($value) > 32)
+                {
+                    $warn       .= "<p>Birth::set: `$fieldLc` value '$value' truncated</p>\n";
+                    $value      = substr($value, 0, 32);
+                }
+                return parent::set($fieldLc, $value);
+            }
+
+            case 'givennames':
+            case 'fathername':
+            case 'mothername':
+            case 'formerhusband':
+            case 'accoucheur':
+            case 'informant':
+            {
+                if (strlen($value) > 48)
+                {
+                    $warn       .= "<p>Birth::set: `$fieldLc` value '$value' truncated</p>\n";
+                    $value      = substr($value, 0, 48);
+                }
+                return parent::set($fieldLc, $value);
+            }
+
+            case 'regtownship':
+            {
+                if (strlen($value) > 64)
+                {
+                    $warn       .= "<p>Birth::set: `$fieldLc` value '$value' truncated</p>\n";
+                    $value      = substr($value, 0, 64);
+                }
+                return parent::set($fieldLc, $value);
+            }
+
+            case 'birthplace':
+            case 'fatheroccplace':
+            case 'motheroccplace':
+            case 'marriageplace':
+            case 'informantres':
             case 'registrar':
             case 'remarks':
             case 'image':
-            {
+            {               // at least 128 characters long
                 return parent::set($fieldLc, $value);
-            }
+            }               // at least 128 characters long
 
             case 'msvol':
             case 'idir':
             case 'originalvolume':
             case 'originalpage':
             case 'originalitem':
-            {
+            {               // integer values
                 if (is_null($value) ||
                     (is_string($value) && strlen($value) == 0))
                     $value      = 0;
                 return parent::set($fieldLc, $value);
-            }
+            }               // integer values
 
             default:
             {

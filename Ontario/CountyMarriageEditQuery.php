@@ -15,12 +15,12 @@ use \Exception;
  *		2018/02/03		change breadcrumbs to new standard				*
  *		2018/03/10		do not complain about lang parameter			*
  *		2018/11/20      change xxxxHelp.html to xxxxHelpen.html         *
+ *		2019/11/20      use FtTemplate                                  *
  *																		*
- *  Copyright &copy; 2018 James A. Cobban								*
+ *  Copyright &copy; 2019 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/Domain.inc';
 require_once __NAMESPACE__ . '/DomainSet.inc';
-require_once __NAMESPACE__ . '/Language.inc';
 require_once __NAMESPACE__ . '/FtTemplate.inc';
 require_once __NAMESPACE__ . '/common.inc';
 
@@ -29,6 +29,7 @@ $cc             = 'CA';
 $countryName    = 'Canada';
 $domain		    = 'CACW';	// default domain
 $domainName	    = 'Canada West (Ontario)';
+$domainError    = null;
 $lang		    = 'en';
 
 $parmsText      = "<p class='label'>\$_GET</p>\n" .
@@ -37,7 +38,10 @@ $parmsText      = "<p class='label'>\$_GET</p>\n" .
                       "<th class='colhead'>value</th></tr>\n";
 foreach($_GET as $key => $value)
 {			// loop through all input parameters
-    $valueText      = debugParm($value);
+    if (is_string($value))
+        $valueText      = htmlspecialchars($value);
+    else
+        $valueText      = htmlspecialchars(var_export($value));
     $parmsText      .= "<tr><th class='detlabel'>$key</th>" .
                             "<td class='white left'>$valueText</td>" .
                         "</tr>\n"; 
@@ -50,8 +54,10 @@ foreach($_GET as $key => $value)
             {
                 $value          = $value[0];
             }
-            if (is_string($value))
+            if (is_string($value) && strlen($value) >= 4)
                 $domain	        = $value;
+            else
+                $domainError    = $valueText;
 		    break;
 		}		// RegDomain
 
@@ -80,7 +86,7 @@ foreach($_GET as $key => $value)
 
 		default:
 		{
-		    $warn	        .= "Unexpected parameter $key='$value'. ";
+		    $warn	        .= "Unexpected parameter $key='$valueText'. ";
 		    break;
 		}		// any other paramters
     }		// process specific named parameters
@@ -94,11 +100,10 @@ $template['otherStylesheets']->update(
 
 $domainObj	    = new Domain(array('domain'	    => $domain,
 								   'language'	=> $lang));
-if ($domainObj->isExisting())
-	$domainName	= $domainObj->get('name');
-else
+$domainName	    = $domainObj->get('name');
+$cc	            = $domainObj->get('cc');
+if (!$domainObj->isExisting())
 {
-	$domainName	= "Domain" . $domain;
 	$msg	    .= "Domain '$domain' must be a supported two character country code followed by a two character state or province code. ";
 }
 
@@ -110,14 +115,12 @@ $template->set('CC',		    $cc);
 $template->set('COUNTRYNAME',	$countryName);
 $template->set('LANG',		    $lang);
 
-if ($debug)
-	$template->set('DEBUG', 'Y');
-else
-	$template->set('DEBUG', 'N');
+$template->set('DEBUG',         $debug ? 'Y' : 'N');
 
 // get a list of domains for the selection list
-$getParms	= array('language'	=> 'en');
-$domains	= new DomainSet($getParms);
+$getParms	    = array('cc'        => $cc,
+                        'language'	=> 'en');
+$domains	    = new DomainSet($getParms);
 foreach($domains as $code => $domainObj)
 {
     if ($code == $domain)

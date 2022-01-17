@@ -93,19 +93,19 @@
           <button type="button" id="showImportant">
               Show Important
           </button>
-      </p>
+        </p>
       
-      <div class="hidden" id="hidden">
-        <input type="hidden" name="Census" value="$CENSUSID">
-        <input type="hidden" name="Province" value="$PROVINCE">
-        <input type="hidden" name="District" value="$DISTRICT">
-        <input type="hidden" name="SubDistrict" value="$SUBDISTRICT">
-        <input type="hidden" name="Division" value="$DIVISION">
-        <input type="hidden" name="Page" value="$PAGE">
-        <input type="hidden" name="Rows" value="$ROWS">
-        <input type="hidden" name="Debug" value="$DEBUG">
-      </div>
-    <p id="pageSize" class="warning">Page contains $NUMLINES lines</p>
+        <div class="hidden" id="hidden">
+          <input type="hidden" name="Census" value="$CENSUSID">
+          <input type="hidden" name="Province" value="$PROVINCE">
+          <input type="hidden" name="District" value="$DISTRICT">
+          <input type="hidden" name="SubDistrict" value="$SUBDISTRICT">
+          <input type="hidden" name="Division" value="$DIVISION">
+          <input type="hidden" name="Page" value="$PAGE">
+          <input type="hidden" name="Rows" value="$ROWS">
+          <input type="hidden" name="Debug" value="$DEBUG">
+        </div>
+        <p id="pageSize" class="warning">Page contains $NUMLINES lines</p>
         <table class="form" id="form" >
           <thead>
             <!--- Put out the column headers -->
@@ -131,7 +131,7 @@
               <th class='colhead'>
                 Relation
               </th>
-              <th class='colhead'>
+              <th class='colhead smaller'>
                 MSt
               </th>
               <th class='colhead'>
@@ -196,14 +196,14 @@
               <th class='colhead'>
                 Hourly Rate    <!-- col 29 -->
               </th>
-              <th class='colhead'>
-                Life Insurance    <!-- col 30 -->
+              <th class='colhead smaller'>
+                Life Ins'ance    <!-- col 30 -->
               </th>
-              <th class='colhead'>
-                Acc Insurance    <!-- col 31 -->
+              <th class='colhead smaller'>
+                Acc Ins'nce    <!-- col 31 -->
               </th>
-              <th class='colhead'>
-                Cost Insurance    <!-- col 32 -->
+              <th class='colhead smaller'>
+                Cost Ins'nce    <!-- col 32 -->
               </th>
               <th class='colhead'>
                 Line
@@ -211,28 +211,28 @@
               <th class='colhead'>
                 School Mons    <!-- col 33  -->
               </th>
-              <th class='colhead'>
+              <th class='colhead smaller'>
                 Can Read    <!-- col 34 -->
               </th>
-              <th class='colhead'>
+              <th class='colhead smaller'>
                 Can Write    <!-- col 35 -->
               </th>
-              <th class='colhead'>
+              <th class='colhead smaller'>
                 Language    <!-- col 36 -->
               </th>
-              <th class='colhead'>
+              <th class='colhead smaller'>
                 Cost Education    <!-- col 37 -->
               </th>
-              <th class='colhead'>
+              <th class='colhead smaller'>
                 Blind        <!-- col 38  -->
               </th>
-              <th class='colhead'>
+              <th class='colhead smaller'>
                 Deaf        <!-- col 39 -->
               </th>
-              <th class='colhead'>
+              <th class='colhead smaller'>
                 Insane        <!-- col 40 -->
               </th>
-              <th class='colhead'>
+              <th class='colhead smaller'>
                 Idiot        <!-- col 41 -->
               </th>
               <th class='colhead'>
@@ -275,10 +275,10 @@
                       class='black white leftnc'
                       size='16' maxlength='48'>
               </td>
-              <td class='$cellclass center'>
+              <td class='$cellclass'>
                   <input type='text' name='Sex$line'
                       value='$sex' 
-                      class='black white center'
+                      class='black white center expand'
                       size='1' maxlength='1'>
               </td>
               <td class='$cellclass left'>
@@ -287,10 +287,10 @@
                       class='black white left'
                       size='10' maxlength='32'>
               </td>
-              <td class='$cellclass center'>
+              <td class='$cellclass'>
                   <input type='text' name='MStat$line'
                       value='$mstat' 
-                      class='black white center'
+                      class='black white center expand'
                       size='1' maxlength='1'>
               </td>
               <th class='$cellclass left'>$line</th>
@@ -363,22 +363,22 @@
                       class='black white leftnc'
                       size='10' maxlength='24'>
               </td>
-              <td class='$cellclass center'>
+              <td class='$cellclass'>
                   <input type='text' name='Employer$line'
                       value='$employer'
-                      class='black white center'
+                      class='black white center expand'
                       size='1' maxlength='1'>
               </td>
-              <td class='$cellclass center'>
+              <td class='$cellclass'>
                   <input type='text' name='Employee$line'
                       value='$employee'
-                      class='black white center'
+                      class='black white center expand'
                       size='1' maxlength='1'>
               </td>
-              <td class='$cellclass center'>
+              <td class='$cellclass'>
                   <input type='text' name='OwnAcct$line'
                       value='$ownacct'
-                      class='black white center'
+                      class='black white center expand'
                       size='1' maxlength='1'>
               </td>
               <td class='$cellclass left'>
@@ -461,59 +461,59 @@
                       size='5' maxlength='8'>
                       <!--  col 33  -->
               </td>
-              <td class='$cellclass center'>
+              <td class='$cellclass'>
                   <input type='text' name='CanRead$line'
                       value='$canread'
-                      class='black white center'
+                      class='black white center expand'
                       size='1' maxlength='1'>
                       <!--  col 34 -->
               </td>
-              <td class='$cellclass center'>
+              <td class='$cellclass'>
                   <input type='text' name='CanWrite$line'
                       value='$canwrite'
-                      class='black white center'
+                      class='black white center expand'
                       size='1' maxlength='1'>
                       <!--  col 35 -->
               </td>
               <td class='$cellclass left'>
                   <input type='text' name='Language$line'
                       value='$language'
-                      class='black white left'
+                      class='black white left expand'
                       size='5' maxlength='8'>
                       <!--  col 36 -->
               </td>
               <td class='$cellclass right'>
                   <input type='text' name='CostEducation$line'
                       value='$costeducation'
-                      class='black white rightnc'
+                      class='black white rightnc expand'
                       size='5' maxlength='8'>
                       <!--  col 37 -->
               </td>
-              <td class='$cellclass center'>
+              <td class='$cellclass'>
                   <input type='text' name='Blind$line'
                       value='$blind'
-                      class='black white center'
+                      class='black white center expand'
                       size='1' maxlength='1'>
                       <!--  col 38  -->
               </td>
-              <td class='$cellclass center'>
+              <td class='$cellclass'>
                   <input type='text' name='Deaf$line'
                       value='$deaf'
-                      class='black white center'
+                      class='black white center expand'
                       size='1' maxlength='1'>
                       <!--  col 39 -->
               </td>
-              <td class='$cellclass center'>
+              <td class='$cellclass'>
                   <input type='text' name='Insane$line'
                       value='$insane'
-                      class='black white center'
+                      class='black white center expand'
                       size='1' maxlength='1'>
                       <!--  col 40 -->
               </td>
-              <td class='$cellclass center'>
+              <td class='$cellclass'>
                   <input type='text' name='Idiot$line'
                       value='$idiot'
-                      class='black white center'
+                      class='black white center expand'
                       size='1' maxlength='1'>
                       <!--  col 41 -->
               </td>
@@ -565,7 +565,7 @@
               <th class='colhead'>
                 Relation
               </th>
-              <th class='colhead'>
+              <th class='colhead smaller'>
                 MSt
               </th>
               <th class='colhead'>
@@ -630,14 +630,14 @@
               <th class='colhead'>
                 Hourly Rate      <!-- col 29 -->
               </th>
-              <th class='colhead'>
-                Life Insurance      <!-- col 30 -->
+              <th class='colhead smaller'>
+                Life Ins'nce      <!-- col 30 -->
               </th>
-              <th class='colhead'>
-                Acc Insurance      <!-- col 31 -->
+              <th class='colhead smaller'>
+                Acc Ins'nce      <!-- col 31 -->
               </th>
-              <th class='colhead'>
-                Cost Insurance      <!-- col 32 -->
+              <th class='colhead smaller'>
+                Cost Ins'nce      <!-- col 32 -->
               </th>
               <th class='colhead'>
                 Line
@@ -645,28 +645,28 @@
               <th class='colhead'>
                 School Mons      <!-- col 33  -->
               </th>
-              <th class='colhead'>
+              <th class='colhead smaller'>
                 Can Read      <!-- col 34 -->
               </th>
-              <th class='colhead'>
+              <th class='colhead smaller'>
                 Can Write      <!-- col 35 -->
               </th>
-              <th class='colhead'>
+              <th class='colhead smaller'>
                 Language      <!-- col 36 -->
               </th>
-              <th class='colhead'>
+              <th class='colhead smaller'>
                 Cost Education      <!-- col 37 -->
               </th>
-              <th class='colhead'>
+              <th class='colhead smaller'>
                 Blind          <!-- col 38  -->
               </th>
-              <th class='colhead'>
+              <th class='colhead smaller'>
                 Deaf          <!-- col 39 -->
               </th>
-              <th class='colhead'>
+              <th class='colhead smaller'>
                 Insane      <!-- col 40 -->
               </th>
-              <th class='colhead'>
+              <th class='colhead smaller'>
                 Idiot          <!-- col 41 -->
               </th>
               <th class='colhead'>

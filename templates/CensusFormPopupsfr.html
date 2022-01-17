@@ -123,52 +123,51 @@
       </table>
     </div>
     <div class="balloon" id="HelpMStat"> 
-      <p>
-        Indicate the marital status de l'individu.  
-        Expected values are: 
-      </p>
+      Si le recenseur etait un anglophone, les valeurs de statut 
+      marital sont:
     <table>
       <tr>
-        <th>M</th><td>for Married</td>
+        <th>M</th><td>pour Married</td>
       </tr>
       <tr>
-        <th>W</th><td>for Widow/Widower</td>
+        <th>W</th><td>pour Widow/Widower</td>
       </tr>
       <tr>
-        <th>D</th><td>for Divorced</td>
+        <th>D</th><td>pour Divorced</td>
       </tr>
       <tr>
-        <th>S</th><td>for Single</td>
+        <th>S</th><td>pour Single</td>
       </tr>
       <tr>
-        <th>blank</th><td>for Single</td>
+        <th>blank</th><td>pour Single</td>
       </tr>
     </table>
-      <p>If the enumerator was a francophone, the marital status values are:
-      </p>
+      Si le recenseur etait un francophone, les valeurs de statut 
+      marital sont:
     <table>
       <tr>
-        <th>M</th><td>for <i>Mari&eacute;[e]</i></td>
+        <th>M</th><td>pour <i>Mari&eacute;[e]</i></td>
       </tr>
       <tr>
-        <th>V</th><td>for <i>Veuve/Veuf</i></td>
+        <th>V</th><td>pour <i>Veuve/Veuf</i></td>
       </tr>
       <tr>
-        <th>D</th><td>for <i>Divorc&eacute;[e]</i></td>
+        <th>D</th><td>pour <i>Divorc&eacute;[e]</i></td>
       </tr>
       <tr>
-        <th>C</th><td>for <i>C&eacute;libatair[e]</i></td>
+        <th>C</th><td>pour <i>C&eacute;libatair[e]</i></td>
       </tr>
       <tr>
-        <th>blank</th><td>for <i>C&eacute;libatair[e]</i></td>
+        <th>blank</th><td>pour <i>C&eacute;libatair[e]</i></td>
       </tr>
     </table>
     </div>
     <div class="balloon" id="HelpFrench">
       Indicate whether the individual is a French-Canadian.  
-      Any non-blank value indicates true.  The enumerator generally entered
+      Le recenseur generally entered
       a stroke which can be entered as '1'.
-      Anything other than 0 or the letter 'N' is converted to 'Y'.
+      The application replaces 0 or the letter 'N' with a space.  Any other
+      character is replaced by the gender.
     </div>
     <div class="balloon" id="HelpOrigin">
       Specify the ethnic origin de l'individu.
@@ -180,41 +179,55 @@
     </div>
     <div class="balloon" id="HelpColoured">
       Indicate whether the individual is a Negro (African descent).
-      Any non-blank value indicates true.  The enumerator generally entered
+      Le recenseur generally entered
       a stroke which can be entered as '1'.
-      Anything other than 0 or the letter 'N' is converted to 'Y'.
+      The application replaces 0 or the letter 'N' with a space.  Any other
+      character is replaced by the gender.
     </div>
     <div class="balloon" id="HelpNegro">
       Indicates whether the individual is a Negro (African descent).
-      Any non-blank value indicates true.  The enumerator generally entered
+      Le recenseur generally entered
       a stroke which can be entered as '1'.
-      Anything other than 0 or the letter 'N' is converted to 'Y'.
+      The application replaces 0 or the letter 'N' with a space.  Any other
+      character is replaced by the gender.
     </div>
     <div class="balloon" id="HelpIndian">
       Indicate whether the individual is a Indian (Native).
-      Any non-blank value indicates true.  The enumerator generally entered
+      Le recenseur generally entered
       a stroke which can be entered as '1'.
-      Anything other than 0 or the letter 'N' is converted to 'Y'.
+      The application replaces 0 or the letter 'N' with a space.  Any other
+      character is replaced by the gender.
     </div>
     <div class="balloon" id="HelpMember">
-      Indicate whether the individual is a member of the primary famille in this
-      household.
-      The enumerator generally entered a stroke which can be entered as '1'.
-      Anything other than 0 or the letter 'N' is converted to 'Y'.
+      Indicate whether the individual is a member of the primary family
+      in this household.
+      Le recenseur generally entered a stroke which can be entered as '1'.
+      The application replaces 0 or the letter 'N' with a space.  Any other
+      character is replaced by the gender.
+    </div>
+    <div class="balloon" id="HelpNotMember">
+      Explicit indication that the individual is <b>not</b> a member of
+      the primary family in this household.
+      Le recenseur generally entered a stroke which can be entered as '1'.
+      The application replaces 0 or the letter 'N' with a space.  Any other
+      character causes the 'Member' column to be cleared and this column
+      is replaced by the gender.
     </div>
     <div class="balloon" id="HelpAbsent">
       Indicate whether the individual was absent at the time of the enumeration.
-      The enumerator generally entered a stroke which can be entered as '1'.
-      Anything other than 0 or the letter 'N' is converted to 'Y'.
+      Le recenseur generally entered a stroke which can be entered as '1'.
+      The application replaces 0 or the letter 'N' with a space.  Any other
+      character is replaced by the gender.
     </div>
     <div class="balloon" id="HelpNationality">
       Specify the nationality (citizenship) de l'individu.
     </div>
     <div class="balloon" id="HelpBYearTxt">
-      The 4 digit year of birth.  If only 2 digits are entered the century is
-      filled in on the assumption the year falls in the century up to and
-      including the census year. If not entered by the enumerator enter '[' to
-      fill the field with '[Blank]'.
+      The 4 digit year of birth.  If only 2 digits are entered the
+      application fills in the century 
+      on the assumption the year falls in the century up to and
+      including the census year. If not entered by the enumerator
+      enter '[' to fill the field with '[Blank]'.
     </div>
     <div class="balloon" id="HelpBInYear">
       Indicator that the individual was born in the 12 months preceding the census.
@@ -285,7 +298,7 @@
     <div class="balloon" id="HelpUnemployed">
       If this field is non-blank then the individual was unemployed during
       the week preceding the enumeration.
-      The enumerator generally wrote a stroke so enter something that looks
+      Le recenseur generally wrote a stroke so enter something that looks
       like a stroke, for example the digit '1'.
       Anything other than 0 or the letter 'N' is converted to 'Y'.
     </div>
@@ -410,13 +423,13 @@
     </div>
     <div class="balloon" id="HelpSpkEnglish">
       Indicate whether the individual can speak English.
-      Any non-blank value indicates true.  The enumerator generally entered
+      Le recenseur generally entered
       a stroke which can be entered as '1'.
       Anything other than 0 or the letter 'N' is converted to 'Y'.
     </div>
     <div class="balloon" id="HelpSpkFrench">
       Indicate whether the individual can speak French.
-      Any non-blank value indicates true.  The enumerator generally entered
+      Le recenseur generally entered
       a stroke which can be entered as '1'.
       Anything other than 0 or the letter 'N' is converted to 'Y'.
     </div>
@@ -443,13 +456,13 @@
     </div>
     <div class="balloon" id="HelpCanRead">
       Indicate whether the individual can read.
-      Any non-blank value indicates true.  The enumerator generally entered
+      Le recenseur generally entered
       a stroke which can be entered as '1'.
       Anything other than 0 or the letter 'N' is converted to 'Y'.
     </div>
     <div class="balloon" id="HelpCanWrite">
       Indicate whether the individual can write.
-      Any non-blank value indicates true.  The enumerator generally entered
+      Le recenseur generally entered
       a stroke which can be entered as '1'.
       Anything other than 0 or the letter 'N' is converted to 'Y'.
     </div>
@@ -467,7 +480,7 @@
     </div>
     <div class="balloon" id="HelpIlliterate">
       Indicates whether the individual was illiterate.
-      Any non-blank value indicates true.  The enumerator generally entered
+      Le recenseur generally entered
       a stroke which can be entered as '1'.
     </div>
     <div class="balloon" id="HelpBirth">
@@ -503,62 +516,72 @@
       Indicates the number of families sharing this residence.
     </div>
     <div class="balloon" id="HelpLanguage">
-      In this column the enumerator was requested to enter the primary language
-      spoken.
+      In this column the enumerator was requested to enter the primary
+      language spoken.
     </div>
     <div class="balloon" id="HelpSpkOther">
       If the individual can speak a language other than French or English
-      this column identifies the language.  If the enumerator filled this column
-      in with 'English', 'French', 'Anglais', or 'Français', leave the column blank
+      this column identifies the language.  If the enumerator filled
+      this column in with 'English', 'French', 'Anglais', or 'Français',
+      leave the column blank
       because there are separate columns for that information.
     </div>
     <div class="balloon" id="HelpSchool"> 
       Indicate whether the individual is attending school.
-      Any non-blank value indicates true.  The enumerator generally entered
-      a stroke which can be entered as '1'.
-      Anything other than 0 or the letter 'N' is converted to 'Y'.
+      Le recenseur a généralement saisi un trait qui peut être
+      saisi comme «1».
+      L'application remplace le chiffre 0 ou la lettre 'N' avec un espace. 
+      Tout autre caractère est remplacé par le genre.
     </div>
     <div class="balloon" id="HelpDeaf">
       If this field is non-blank then the individual is deaf.
-      The enumerator generally wrote a stroke so enter something that looks
-      like a stroke, for example the digit '1'.
-      Anything other than 0 or the letter 'N' is converted to 'Y'.
+      Le recenseur a généralement saisi un trait qui peut être
+      saisi comme «1».
+      L'application remplace le chiffre 0 ou la lettre 'N' avec un espace. 
+      Tout autre caractère est remplacé par le genre.
     </div>
     <div class="balloon" id="HelpBlind">
       If this field is non-blank then the individual is blind.
-      The enumerator generally wrote a stroke so enter something that looks
-      like a stroke, for example the digit '1'.
-      Anything other than 0 or the letter 'N' is converted to 'Y'.
+      Le recenseur a généralement saisi un trait qui peut être
+      saisi comme «1».
+      L'application remplace le chiffre 0 ou la lettre 'N' avec un espace. 
+      Tout autre caractère est remplacé par le genre.
     </div>
     <div class="balloon" id="HelpInsane">
       If this field is non-blank then the individual is of unsound mind.
-      The enumerator generally wrote a stroke so enter something that looks
-      like a stroke, for example the digit '1'.
-      Anything other than 0 or the letter 'N' is converted to 'Y'.
+      Le recenseur a généralement saisi un trait qui peut être
+      saisi comme «1».
+      L'application remplace le chiffre 0 ou la lettre 'N' avec un espace. 
+      Tout autre caractère est remplacé par le genre.
     </div>
     <div class="balloon" id="HelpIdiot">
       If this field is non-blank then the individual is "an idiot or silly."
       In modern parlance developmentally delayed.
-      The enumerator generally wrote a stroke so enter something that looks
-      like a stroke, for example the digit '1'.
-      Anything other than 0 or the letter 'N' is converted to 'Y'.
+      Le recenseur a généralement saisi un trait qui peut être
+      saisi comme «1».
+      L'application remplace le chiffre 0 ou la lettre 'N' avec un espace. 
+      Tout autre caractère est remplacé par le genre.
     </div>
     <div class="balloon" id="HelpLunatic">
       Indicates whether the individual was mentally incapacitated.
-      Any non-blank value indicates true.  The enumerator generally entered
-      a stroke which can be entered as '1'.
-      Anything other than 0 or the letter 'N' is converted to 'Y'.
+      Le recenseur a généralement saisi un trait qui peut être
+      saisi comme «1».
+      L'application remplace le chiffre 0 ou la lettre 'N' avec un espace. 
+      Tout autre caractère est remplacé par le genre.
     </div>
     <div class="balloon" id="HelpLunatics">
       Indicates whether the individual was mentally incapacitated.
-      Any non-blank value indicates true.  The enumerator generally entered
-      a stroke which can be entered as '1'.
-      Anything other than 0 or the letter 'N' is converted to 'Y'.
+      Le recenseur a généralement saisi un trait qui peut être
+      saisi comme «1».
+      L'application remplace le chiffre 0 ou la lettre 'N' avec un espace. 
+      Tout autre caractère est remplacé par le genre.
     </div>
     <div class="balloon" id="HelpOwnerTenant">
-      Entrez 'O' if the householder owns the property, or 'R' or 'T' if the householder
-      is a tenant.  If the householder is resident in a house that is supplied
-      as part of the job, for example a Manse supplied for a Minister, or a house
+      Entrez la lettre 'O' if the householder owns the property, or 
+      'R' or 'T' if the householder
+      is a tenant.  If the householder is resident in a house that is
+      supplied as part of the job, for example a Manse supplied for
+      a Minister, or a house
       supplied by the Railroad to a Station Agent, then specify 'F'.
       This is specified only on the head of household.
     </div>

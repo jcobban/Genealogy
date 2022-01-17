@@ -63,9 +63,12 @@ use \Templating\Template;
  *      2020/04/25      correct search for matching records in Names    *
  *                      add link to surnames with same pattern          *
  *      2020/12/05      correct XSS vulnerabilities                     *
- *      2020/12/14      blog section removed from display only template * 
+ *      2020/12/14      blog section removed from display only template *
+ *      2021/07/17      deprecate IDNR parameter                        *
+ *      2021/09/30      hide line to display surnames with same pattern *
+ *                      if no pattern is defined for this surname       * 
  *                                                                      *
- *  Copyright &copy; 2020 James A. Cobban                               *
+ *  Copyright &copy; 2021 James A. Cobban                               *
  ************************************************************************/
 require_once __NAMESPACE__ . '/LegacyDate.inc';
 require_once __NAMESPACE__ . '/Person.inc';
@@ -295,6 +298,7 @@ if (is_string($idnrtext))
 else
 if ($idnr)
 {
+    $warn                   .= "<p>Deprecated parameter IDNR.</p>";
     $surnameRec             = new Surname(array('idnr' => $idnr));
     if ($surnameRec->isExisting())
         $surname            = $surnameRec['surname'];
@@ -303,10 +307,10 @@ if ($idnr)
 }
 if (is_null($surname))
 {                   // missing mandatory parameter
-    $msg                    .= 'Missing mandatory parameter Surname or IDNR';
+    $msg                    .= 'Missing mandatory parameter Surname. ';
     $surname                = '';
     $idnr                   = 1;
-    $surnameRec             = new Surname(array('idnr' => 1));
+    $surnameRec             = new Surname(array('surname' => ''));
     $title                  = $template['missing']->innerHTML();
 }                   // missing mandatory parameter
 else
@@ -315,7 +319,7 @@ if (strlen($surname) == 0)
     $prefix                 = '';
     $title                  = $template['nosurname']->innerHTML();
     $idnr                   = 1;
-    $surnameRec             = new Surname(array('idnr' => 1));
+    $surnameRec             = new Surname(array('surname' => ''));
 }                   // empty surname
 else
 {                   // surname provided
@@ -396,6 +400,8 @@ if (strlen($msg) == 0)
     $getParms['limit']          = $limit;
     $personList                 = new PersonSet($getParms);
     $info                       = $personList->getInformation();
+    $countQuery                 = $info['countquery'];
+    $showQuery                  = $info['query'];
     $count                      = $info['count'];
     $actualCount                = $personList->count();
     if ($count > 0)
@@ -526,5 +532,7 @@ if ($blogElement)
     else
         $blogElement->update(null);
 }
+if ($pattern == '')
+    $template['patternPara']->update(null);
 
 $template->display();

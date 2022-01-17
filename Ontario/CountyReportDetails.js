@@ -78,9 +78,9 @@ function onLoad()
 
 				case 'Residence':
 				{
-				    element.abbrTbl	= LocAbbrs;
+				    element.abbrTbl	    = LocAbbrs;
 				    element.onkeydown	= keyDown;	// special key handling
-				    element.onchange	= change;	// default handler
+				    element.onchange	= locationChanged;
 				    element.checkfunc	= checkAddress;
 				    element.checkfunc(); 
 				    break;

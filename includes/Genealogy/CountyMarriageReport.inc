@@ -58,6 +58,7 @@ class CountyMarriageReport extends Record
                         'm_regdomain'           => 'CAON',
                         'm_volume'              => 1,
                         'm_reportno'            => 1,
+                        'm_year'                => 1869,
                         'm_page'                => 1,
                         'm_givennames'          => '',
                         'm_surname'             => '',
@@ -92,6 +93,7 @@ class CountyMarriageReport extends Record
                         'domain'                => 'm_regdomain',
                         'volume'                => 'm_volume',
                         'reportno'              => 'm_reportno',
+                        'year'                  => 'm_year',
                         'page'                  => 'm_page',
                         'givennames'            => 'm_givennames',
                         'surname'               => 'm_surname',
@@ -143,37 +145,37 @@ class CountyMarriageReport extends Record
         global $warn;
         global $connection;
 
-        $needInsert = false;
+        $needInsert     = false;
         $this->table    = 'CountyMarriageReports';
-        $msg        = '';
+        $msg            = '';
 
         // validate parameters
         if (is_array($parms))
-        {       // associative parms or row returned from database query
+        {                               // associative parms
             if (count($parms) >= count(self::$initRow))
-            {       // row returned from database query
+            {                           // row returned from database query
                 $dbrow      = $parms;
                 $needInsert = false;
-            }       // row returned from database query
+            }                           // row returned from database query
             else
-            {       // associative array of search parms
-                $where      = '';
-                $and        = 'WHERE ';
-                $sqlParms   = array();
+            {                           // associative array of search parms
+                $where              = '';
+                $and                = 'WHERE ';
+                $sqlParms           = array();
                 foreach($parms as $fldname => $value)
-                {   // loop through all supplied search parms
-                    $fieldLc    = strtolower($fldname);
+                {                       // loop through all search parms
+                    $fieldLc        = strtolower($fldname);
                     if (array_key_exists($fieldLc, self::$translate))
                         $fieldLc    = self::$translate[$fieldLc];
                     switch($fieldLc)
-                    {   // act on specific parameter names
+                    {                   // act on specific parameter names
                         case 'm_regdomain':
                         {
                             $where  .= $and . 'M_RegDomain=?';
                             $sqlParms[] = $value;
                             $and    = ' AND ';
                             break;
-                        }   // domain name
+                        }               // domain name
 
                         case 'm_volume':
                         {
@@ -181,7 +183,7 @@ class CountyMarriageReport extends Record
                             $sqlParms[] = $value;
                             $and    = ' AND ';
                             break;
-                        }   // volume number
+                        }               // volume number
 
                         case 'm_reportno':
                         {
@@ -224,93 +226,94 @@ class CountyMarriageReport extends Record
                             $sqlParms[] = $reportNo;
                             $and    = ' AND ';
                             break;
-                        }   // report number
+                        }               // report number
 
                         default:
                         {
                             $msg    .= "Unrecognized search parm `$field`. ";
                             break;
-                        }   // unrecognized
-                    }   // act on specific parameter names
-                }   // loop through all supplied search parms
+                        }               // unrecognized
+                    }                   // act on specific parameter names
+                }                       // loop through all search parms
 
                 if (strlen($msg) == 0)
-                {           // no errors so far
+                {                       // no errors so far
                     $query  = "SELECT * FROM CountyMarriageReports $where";
                     $stmt   = $connection->prepare($query);
                     $queryText  = debugPrepQuery($query, $sqlParms);
                     if ($stmt->execute($sqlParms))
-                    {       // successful select
+                    {                   // successful select
                         if ($debug)
                             $warn   .= "<p>CountyMarriageReport.inc: " .
                                        __LINE__ .
                                        " query='$queryText'</p>\n";
                         $row    = $stmt->fetch(PDO::FETCH_ASSOC);
                         if (is_array($row))
-                        {       // match existing row in table
+                        {               // match existing row in table
                             $dbrow      = $row;
                             $needInsert     = false;
-                        }       // match existing row in table
+                        }               // match existing row in table
                         else
-                        {       // no match, create new row
+                        {               // no match, create new row
                             $dbrow      = self::$initRow;
                             foreach($parms as $field => $value)
-                            {   // loop through all search parms
+                            {           // loop through all search parms
                                 switch(strtolower($field))
-                                {   // act on specific parameter names
+                                {       // act on specific parameter names
                                     case 'domain':
                                     case 'm_regdomain':
                                     {
-                                    $dbrow['m_regdomain']   = $value;
-                                    $domain         = $value;
+                                        $dbrow['m_regdomain']   = $value;
+                                        $domain                 = $value;
                                     break;
                                     }   // domain name
                 
                                     case 'volume':
                                     case 'm_volume':
                                     {
-                                    $dbrow['m_volume']  = $value;
-                                    $volume         = $value;
+                                        $dbrow['m_volume']      = $value;
+                                        $volume                 = $value;
                                     break;
                                     }   // volume number
                 
                                     case 'reportno':
                                     case 'm_reportno':
                                     {
-                                    $dbrow['m_reportno']    = $value;
-                                    $reportNo       = $value;
+                                        $dbrow['m_reportno']    = $value;
+                                        $reportNo               = $value;
                                     break;
                                     }   // report number
                 
-                                }   // act on specific parameter names
-                            }   // loop through all search parms
+                                }       // act on specific parameter names
+                            }           // loop through all search parms
 
                             $getParms   = array(
                                     'M_RegDomain'   => $domain,
-                                    'M_Volume'  => $volume,
+                                    'M_Volume'      => $volume,
                                     'M_ReportNo'    => '<' . $reportNo,
-                                    'order'     => 'M_ReportNo DESC',
-                                    'limit'     => 1);
+                                    'order'         => 'M_ReportNo DESC',
+                                    'limit'         => 1);
                             $reports    = new RecordSet('CountyMarriageReports',
                                             $getParms); 
                             if ($reports->count() > 0)
-                            {       // copy values from previous report
-                                $report         = $reports->rewind();
+                            {           // copy values from previous report
+                                $report             = $reports->rewind();
+                                $dbrow['m_year']    = $report->get('year');
                                 $dbrow['m_page']    = $report->get('page');
                                 $dbrow['m_image']   = $report->get('image');
-                            }       // copy values from previous report
+                            }           // copy values from previous report
                             $needInsert = true;
-                        }       // no match, create new row
-                    }           // successful select
+                        }               // no match, create new row
+                    }                   // successful select
                     else
-                    {       // execute failed
+                    {                   // execute failed
                         $msg    .= "execute '$queryText' failed<br/>" .
                                        ":<br/>errorInfo=" .
                                        print_r($connection->errorInfo(), true);
-                    }       // execute failed
-                }       // no errors so far
-            }       // associative array of search parms
-        }       // parameter is an array
+                    }                   // execute failed
+                }                       // no errors so far
+            }                           // associative array of search parms
+        }                               // parameter is an array
         else
         {
              $msg   .= "called with " .

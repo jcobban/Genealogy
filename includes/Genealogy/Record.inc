@@ -221,6 +221,8 @@ use \Iterator;
  *      2021/02/19      add protected method debugBacktrace             *
  *      2021/06/10      method save updated $msg rather than $this->msg *
  *      2021/06/14      set SoundsLike when Surname set in method save  *
+ *      2021/12/11      insert spaces into some SqlLog fields so they   *
+ *                      display more compactly in a query               *
  *                                                                      *
  *  Copyright &copy; 2021 James A. Cobban                               *
  ************************************************************************/
@@ -3149,21 +3151,21 @@ class Record implements Iterator, ArrayAccess
         $id             = $this->getId();
 
         if ($this->former)
-            $oldJson    = json_encode($this->former);
+            $oldJson    = str_replace(',',', ',json_encode($this->former));
         else
             $oldJson    = '';
 
         if (strtoupper(substr($command, 0, 6)) == 'DELETE')
             $newJson    = '';
         else
-            $newJson    = json_encode($this->row);
+            $newJson    = str_replace(',',', ',json_encode($this->row));
 
         // prepare the insert
         $logCmd = 'INSERT INTO SqlLog ' .
                             '(SL_DateTime, SL_Command, SL_Parms, SL_ID, SL_UserName, SL_OldJson, SL_NewJson) ' .
                             'VALUES (NOW(), ?, ?, ?, ?, ?, ?)';
         $parms  = array($command,
-                        json_encode($parms),
+                        str_replace(',',', ',json_encode($parms)),
                         $id,
                         $userid,
                         $oldJson,

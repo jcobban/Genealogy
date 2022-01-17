@@ -105,6 +105,10 @@ $subdistId				= null;
 $subdisttext			= null;		// invalid subdistrict identifier
 $division				= '';
 $divisiontext			= null;		// invalid division number
+$imageBase              = null;
+$imageBasetext          = null;
+$relFrame               = null;
+$relFrametext           = null;
 $offset                 = 0;
 $limit                  = 20;
 $lang		    	    = 'en';
@@ -179,6 +183,24 @@ if (isset($_GET) && count($_GET) > 0)
 	    		break;
 	        }		// enumeration division
 
+	        case 'imagebase':
+            {		            // image base at LAC
+                if (ctype_digit($value))
+                    $imageBase      = $value;
+                else
+                    $imageBasetext  = htmlspecialchars($value);
+	    		break;
+	        }		            // image base at LAC
+
+	        case 'relframe':
+            {		            // relative frame start at LAC
+                if (ctype_digit($value))
+                    $relFrame       = $value;
+                else
+                    $relFrametext   = htmlspecialchars($value);
+	    		break;
+	        }		            // relative frame start at LAC
+
 	        case 'offset':
             {		// offset in page set
                 if (ctype_digit($value))
@@ -211,14 +233,14 @@ if ($update)
 	$action                 = 'Update';
 else
 	$action                 = 'Display';
-$template		= new FtTemplate("PageForm$action$lang.html");
+$template		            = new FtTemplate("PageForm$action$lang.html");
 $template->updateTag('otherStylesheets',	
     		         array('filename'   => 'PageForm'));
 
 // validate census identifier
 if (is_string($censustext))
-    $msg                .= $template['censusUndefined']->
-                                    replace('$CENSUSID', $censustext);
+    $msg                    .= $template['censusUndefined']->
+                                        replace('$CENSUSID', $censustext);
 else
 if ($censusId)
 {                       // census identifier specified
@@ -352,9 +374,15 @@ if ($censusId && $distId && $subdistId)
 		$subdistName		= $subDistrict->get('sd_name');
 		$pageCount		    = $subDistrict->get('sd_pages');
         $page1		    	= $subDistrict->get('sd_page1');
-		$bypage		    	= $subDistrict->get('sd_bypage');
-		$imageBase			= $subDistrict->get('sd_imagebase');
-		$relFrame			= $subDistrict->get('sd_relframe');
+        $bypage		    	= $subDistrict->get('sd_bypage');
+        if (is_null($imageBase))
+            $imageBase		= $subDistrict->get('sd_imagebase');
+        else
+            $subDistrict->set('sd_imagebase', $imageBase);
+        if (is_null($relFrame))
+            $relFrame		= $subDistrict->get('sd_relframe');
+        else
+		    $subDistrict->set('sd_relframe', $relFrame);
         // the page number past the end of the division
         $dlmpage			= $page1 + ($pageCount * $bypage);
 

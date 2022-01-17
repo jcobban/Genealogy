@@ -18,8 +18,9 @@ use \Iterator;
  *  History:                                                            *
  *      2018/02/13      created                                         *
  *      2020/10/10      remove prefix from field names                  *
+ *      2021/09/19      only pass SubDistrict object to new Page        *
  *                                                                      *
- *  Copyright &copy; 2020 James A. Cobban                               *
+ *  Copyright &copy; 2021 James A. Cobban                               *
  ************************************************************************/
 require_once __NAMESPACE__ . '/RecordSet.inc';
 require_once __NAMESPACE__ . '/Page.inc';
@@ -459,11 +460,7 @@ class PageSet extends RecordSet
                     if ($pageNum < $currPageNum)
                     {       // not already defined
                         $image      = $subD->getDefaultImage($pageNum);
-                        $pageParms  = array('census'    => $subD['sd_census'],
-                                            'distid'    => $subD['sd_distid'],
-                                            'sdid'      => $subD['sd_id'],
-                                            'division'  => $subD['sd_div'],
-                                            'sched'     => '1',
+                        $pageParms  = array('sdid'      => $subD,
                                             'pagenum'   => $pageNum);
                         $page       = new Page($pageParms);
                         $page->set('image', $image);

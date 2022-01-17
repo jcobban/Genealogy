@@ -29,11 +29,6 @@
     <a href="/FamilyTree/Surnames.php?initial=$PREFIX&lang=$LANG">
 			Apellidos que comienzan con prefijo '$PREFIX'
     </a>:
-    <span id="allNamesInSurname">
-    <a href="/FamilyTree/Names.php?Surname=$SURNAME&lang=$LANG">
-            Todas las personas con apellido '$SURNAME'
-    </a>:
-    </span>
   </div>
   <div class="body">
     <h1>
@@ -46,15 +41,6 @@
 	$MSG
 
     <h2>Editar el Registro Familiar de  $SURNAME</h2>
-    <form name="surnameForm" id="surnameForm"
-	      action="/FamilyTree/Names.php" method="post">
-        <input type="hidden" name="idnr"    value="$IDNR">
-        <input type="hidden" name="Surname" value="$SURNAME">
-        <input type="hidden" name="Edit"    value="Y">
-      <input type="hidden" name="lang"      value="$LANG">
-      <input type="hidden" name="debug"     value="$DEBUG">
-      <input type="hidden" name="offset"    value="$OFFSET">
-      <input type="hidden" name="limit"     value="$LIMIT">
 
       <div class="row" id="IdnrRow">
         <label class="column1" for="Idnr" style="width: 17em;">
@@ -93,6 +79,15 @@
         </div>
         <div style="clear: both;"></div>
       </div>
+    <form name="surnameForm" id="surnameForm"
+	      action="/FamilyTree/Names.php" method="post">
+        <input type="hidden" name="Surname" value="$SURNAME">
+        <input type="hidden" name="Edit"    value="Y">
+        <input type="hidden" name="lang"    value="$LANG">
+        <input type="hidden" name="debug"   value="$DEBUG">
+        <input type="hidden" name="offset"  value="$OFFSET">
+        <input type="hidden" name="limit"   value="$LIMIT">
+        <button type="submit" id="Update">Actualizar</button>
     </form>
   
     <p class="label">
@@ -101,7 +96,7 @@
 	      Apellidos con el Mismo Código Soundex '$SOUNDEX'
 	  </a>
     </p>
-    <p class="label">
+    <p class="label" id="patternPara">
 	  <a href="/FamilyTree/Surnames.php?pattern=$PATTERNU&lang=$LANG"
 	  		id="patternLink">
 	      Apellidos con el Mismo Patrón '$PATTERN'
@@ -187,6 +182,10 @@
 	  Este campo permite editar una descripción general de la familia
       que comparte el apellido.
     </div>
+  <div class="balloon" id="HelpUpdate">
+	Click on this button to enable updates to the description of the
+    family.
+  </div>
     <div class="balloon" id="HelpUpdateRecordButton">
 	  Click on this button to apply changes to the record for this family.
     </div>

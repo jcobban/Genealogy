@@ -232,10 +232,6 @@ foreach($duplicates as $name)
 // if not the administrator do nothing
 if ($administrator)
 {       // only the administrator can use this dialog
-    $warn                       .= "<table>\n    <tbody>\n";
-    foreach(FtTemplate::$userAgents as $agent => $count)
-        $warn   .= "        <tr><td>$agent</td><td>$count</td></tr>\n";
-    $warn                       .= "    </tbody>\n</table>\n";
     $mainParms['limit']         = $limit;
     $mainParms['offset']        = $offset;
     $mainParms['adname']        = $pattern;

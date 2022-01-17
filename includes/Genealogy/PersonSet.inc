@@ -62,11 +62,11 @@ class PersonSet extends RecordSet
         $strposNX   = false;
 
         foreach($parms  as $name => $value)
-        {
-            $split  = explode('.', str_replace('`','',$name));
+        {                   // loop through all parameters
+            $split              = explode('.', str_replace('`','',$name));
             if (count($split) >= 2)
-            {           // table-qualified field name
-                $table  = $split[0];
+            {               // table-qualified field name
+                $table              = $split[0];
                 switch($table)
                 {
                     case 'EBirth':
@@ -94,9 +94,9 @@ class PersonSet extends RecordSet
                     }
 
                 }
-            }           // table-qualified field name
+            }               // table-qualified field name
             else
-            {           // unqualified field name
+            {               // unqualified field name
                 $fieldLc    = strtolower($name);
                 switch($fieldLc)
                 {
@@ -123,9 +123,9 @@ class PersonSet extends RecordSet
                         break;
                     }
 
-                }       // switch on parameters
-            }           // unqualified field name
-        }       // loop through parameters
+                }           // switch on parameters
+            }               // unqualified field name
+        }                   // loop through parameters
         if (!$orderSet)
             $parms['order'] = 'tblIR.Surname,' .
                                   'tblIR.GivenName,' .
@@ -159,6 +159,7 @@ class PersonSet extends RecordSet
                                 "tblNX.Surname AS indexsurname, " .
                                 "tblNX.GivenName AS indexgivenname, " .
                                 "tblNX.`Order` AS indextype");
+
         if ($this->information['count'] > 1000 && $this->limit > 1000)
         {
             $this->limit    = 0;    // suppress loading records

@@ -386,8 +386,9 @@ for ($i = 1; $i <= count($deathcause); $i++)
                 if ($prevword == 'senile')
                 {
 ?>
-            Senile dementia is severe mental deterioration in old age, 
-            characterized by loss of memory and control of bodily functions.
+            Senile dementia is mental deterioration in old age, 
+            characterized by loss of memory and control of bodily
+            functions.
 <?php
                 }
                 else
@@ -588,6 +589,15 @@ for ($i = 1; $i <= count($deathcause); $i++)
 ?>
             "Erysipelas" is an acute streptococcus bacterial infection of the 
             upper dermis and superficial lymphatics.
+<?php
+                break;
+            }
+
+            case 'erythema':
+            {
+?>
+            "Erythema" is a type of skin rash caused by injured or
+            inflamed blood capillaries.
 <?php
                 break;
             }
@@ -1000,8 +1010,17 @@ for ($i = 1; $i <= count($deathcause); $i++)
             case 'meningitis':
             {
 ?>
-            "meningitis": inflammation of the protective membranes covering the
-            brain and spinal cord.
+            "meningitis": inflammation of the protective membranes
+            covering the brain and spinal cord.
+<?php
+                break;
+            }
+
+            case 'miliary':
+            {
+?>
+            "miliary": a disease accompanied by a rash with lesions 
+            resembling millet seed.
 <?php
                 break;
             }
@@ -1011,7 +1030,7 @@ for ($i = 1; $i <= count($deathcause); $i++)
 ?>
             "mitral valve": the valve in the heart that lies between the
             left atrium and the left ventricle.  The name comes from the
-            similarity in appearance to a mitre.
+            similarity in appearance to a bishop's mitre.
 <?php
                 break;
             }
@@ -1106,6 +1125,15 @@ for ($i = 1; $i <= count($deathcause); $i++)
 ?>
             "Paresis": a condition typified by a weakness of voluntary
             movement.
+<?php
+                break;
+            }
+
+            case 'parotid':
+            {
+?>
+            "Parotid glands": salivary glands that sit just in front
+            of the ears on each side of the face.
 <?php
                 break;
             }
@@ -1349,7 +1377,15 @@ for ($i = 1; $i <= count($deathcause); $i++)
                 break;
             }
 
-            case 'sepsis':
+            case 'senility':
+            {
+?>
+            "senility": an obsolete term for a cognitive decline
+            particularly characterized by memory loss at a time
+            when the causes of such a decline were not understood.
+<?php
+                break;
+            }
 
             case 'sepsis':
             case 'septicaemia':

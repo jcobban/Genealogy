@@ -138,8 +138,9 @@ use \Genealogy\RecordSet;
  *                  functions                                           *
  *      2020/05/03  fix interaction of set with third parameter         *
  *      2020/11/16  add list of includes to warning messages            *
+ *      2921/12/28  handle failure of get_file_contents                 *
  *                                                                      *
- *  Copyright &copy; 2020 James A. Cobban All Rights Reserved           *
+ *  Copyright &copy; 2021 James A. Cobban All Rights Reserved           *
  ************************************************************************/
 require_once __NAMESPACE__ . '/TemplateTag.inc' ;
 
@@ -1052,8 +1053,19 @@ class Template implements ArrayAccess
 
         if ($this->main != "" &&
             (substr($this->main, 0, 4) == 'http' ||
-            file_exists($this->main)))
-            $page   = file_get_contents($this->main);
+             file_exists($this->main)))
+        {
+            $page   = @file_get_contents($this->main);
+            if ($page === false)
+            {               // unexpected failure
+                $error          = error_get_last();
+                $page   = '<p><strong>Request for document name=\'' .
+                            $this->main . "' failed</strong>, error=" .
+                            '<span class="error">' .
+                            var_export($error, true) .
+                            "</span></p>";
+            }               // unexpected failure
+        }
         else
             $page   = '<p><strong>File not found name=\'' .
                           $this->main . "'</strong></p>";

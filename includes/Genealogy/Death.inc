@@ -661,13 +661,22 @@ class Death extends Record
                 return parent::set($fieldLc, $value);
             }
 
-            case 'place':
-            case 'regdomain':
             case 'regyear':
             case 'regnum':
+            case 'msvol':
+            case 'idir':
+            case 'originalitem':
+            {
+                if (is_int($value) || ctype_digit($value))
+                    return parent::set($fieldLc, $value);
+                else
+                    return $this->row[$fieldLc];
+            }
+
+            case 'place':
+            case 'regdomain':
             case 'regcounty':
             case 'regtownship':
-            case 'msvol':
             case 'surname':
             case 'givennames':
             case 'sex':
@@ -701,10 +710,8 @@ class Death extends Record
             case 'registrar':
             case 'recordedby':
             case 'image':
-            case 'idir':
             case 'originalvolume':
             case 'originalpage':
-            case 'originalitem':
             {
                 return parent::set($fieldLc, $value);
             }

@@ -70,383 +70,386 @@
 	    method="post"  
 	    autocomplete="off" 
 	    enctype="multipart/form-data">
-	<p class="label" id="TranscriberLine">
-	    Transcriber: $TRANSCRIBER 
-	</p>
-	<p class="label" id="ProofreaderLine">
-	    Proof Reader: $PROOFREADER 
-	</p>
-	<p class="label" id="imageLine">
-	    <span id="ImageButton">
-	    <button type="button" id="imageButton">
-		Display Original Census <u>I</u>mage
-	    </button>
-	    <input type="hidden" name="Image" id="Image"
-		value="$IMAGE">
-	    </span> <!-- id="ImageButton" -->
-	    <span id="ImagePrompt">
-		Enter URL of Census Image:
-	    <input type="text" name="Image" id="Image"
-		size="64" maxlength="128" class="black white left"
-		value="$IMAGE"> 
-	    </span> <!-- id="ImagePrompt" -->
-	    <button type="button" id="treeMatch">
-		Match Family Tree Citations
-	    </button>
-	      &nbsp;
-	    <button type="button" id="showImportant">
-		Show Important
-	    </button>
-	</p>
-	
-      <div class="hidden" id="hidden">
-	<input type="hidden" name="Census" value="$CENSUSID">
-	<input type="hidden" name="Province" value="$PROVINCE">
-	<input type="hidden" name="District" value="$DISTRICT">
-	<input type="hidden" name="SubDistrict" value="$SUBDISTRICT">
-	<input type="hidden" name="Division" value="$DIVISION">
-	<input type="hidden" name="Page" value="$PAGE">
-	<input type="hidden" name="Rows" value="$ROWS">
-	<input type="hidden" name="Debug" value="$DEBUG">
-    </div>
-    <p id="pageSize" class="warning">Page contains $NUMLINES lines</p>
-    <table class="form" id="form" >
-	<thead>
-	  <!--- Put out the column headers -->
-	  <tr>
-	    <th class="colhead1st">
-	      Line
-	    </th>
-	    <th class="colhead">
-	      Fam
-	    </th>
-	    <th class="colhead">
-	      Surname
-	    </th>
-	    <th class="colhead">
-	      Given Names
-	    </th>
-	    <th class="colhead">
-	      Sex
-	    </th>
-	    <th class="colhead">
-	      Age
-	    </th>
-	    <th class="colhead">
-	      MSt
-	    </th>
-	    <th class="colhead">
-	      Relation
-	    </th>
-	    <th class="colhead">
-	      Birth Place
-	    </th>
-	    <th class="colhead">
-	      FC
-	    </th>
-	    <th class="colhead">
-	      Father's BPlace
-	    </th>
-	    <th class="colhead">
-	      Mother's BPlace
-	    </th>
-	    <th class="colhead">
-	      Religion
-	    </th>
-	    <th class="colhead">
-	      Occupation
-	    </th>
-	    <th class="colhead">
-	      Line
-	    </th>
-	    <th class="colhead">
-	      E'r
-	    </th>
-	    <th class="colhead">
-	      E'ee
-	    </th>
-	    <th class="colhead">
-	      Un emp
-	    </th>
-	    <th class="colhead">
-	      Num E'es
-	    </th>
-	    <th class="colhead">
-	      Can Read
-	    </th>
-	    <th class="colhead">
-	      Can Write
-	    </th>
-	    <th class="colhead">
-	      Deaf
-	    </th>
-	    <th class="colhead">
-	      Blind
-	    </th>
-	    <th class="colhead">
-	      In sane
-	    </th>
-	    <th class="colhead">
-	      Remarks
-	    </th>
-	    <th class="colhead">
-	      Line
-	    </th>
-	    <th class="colhead">
-	      FT
-	    </th>
-	  </tr>
-	</thead>
-	<tbody>
-	  <tr id="Row$line">
-	<th class="$cellclass left">
-	    $line 
-	</th>
-	<td class="$cellclass left">
-	    <input type="text" name="Family$line" 
-		value="$family"
-		class="$famclass white right"
-		size="3" maxlength="6" >
-	</td>
-	<td class="$cellclass left">
-	    <input type="text" name="Surname$line"
-		value="$surname"
-		class="$surclass white left"
-		size="12" maxlength="120" >
-	</td>
-	<td class="$cellclass left">
-	    <input type="text" name="GivenNames$line"
-		value="$givennames"
-		class="black white left" 
-		size="16" maxlength="120" >
-	</td>
-	<td class="$cellclass left">
-	    <input type="text" name="Sex$line"
-		value="$sex" 
-		class="black white center"
-		size="1" maxlength="1" >
-	</td>
-	<td class="$cellclass right">
-	    <input type="text" name="Age$line"
-		value="$age"
-		class="black white rightnc" 
-		size="3" maxlength="8" >
-	</td>
-	<td class="$cellclass left">
-	    <input type="text" name="MStat$line"
-		value="$mstat"
-		class="black white center" 
-		size="1" maxlength="1" >
-	</td>
-	<td class="$cellclass left">
-	    <input type="text" name="Relation$line"
-		value="$relation"
-		class="black white left" 
-		size="10" maxlength="32" >
-	</td>
-	<td class="$cellclass left">
-	    <input type="text" name="BPlace$line"
-		value="$bplace"
-		class="black white left" 
-		size="10" maxlength="32" >
-	</td>
-	<td class="$cellclass left">
-	    <input type="text" name="French$line"
-		value="$french"
-		class="black white center" 
-		size="1" maxlength="1" >
-	</td>
-	<td class="$cellclass left">
-	    <input type="text" name="FathersBPlace$line"
-		value="$fathersbplace"
-		class="black white left" 
-		size="10" maxlength="32" >
-	</td>
-	<td class="$cellclass left">
-	    <input type="text" name="MothersBPlace$line"
-		value="$mothersbplace"
-		class="$mbpclass white left" 
-		size="10" maxlength="32" >
-	</td>
-	<td class="$cellclass left">
-	    <input type="text" name="Religion$line"
-		value="$religion"
-		class="$relclass white leftnc"
-		size="12" maxlength="32" >
-	</td>
-	<td class="$cellclass left">
-	    <input type="text" name="Occupation$line"
-		value="$occupation"
-		class="black white leftnc" 
-		size="18" maxlength="48" >
-	</td>
-	<th class="$cellclass left">
-	    $line 
-	</th>
-	<td class="$cellclass center">
-	    <input type="text" name="Employer$line"
-		value="$employer"
-		class="black white center" 
-		size="1" maxlength="1" >
-	</td>
-	<td class="$cellclass center">
-	    <input type="text" name="Employee$line"
-		value="$employee"
-		class="black white center" 
-		size="1" maxlength="1" >
-	</td>
-	<td class="$cellclass center">
-	    <input type="text" name="Unemployed$line"
-		value="$unemployed"
-		class="black white center" 
-		size="1" maxlength="1" >
-	</td>
-	<td class="$cellclass right">
-	    <input type="text" name="NumHands$line"
-		value="$numhands"
-		class="black white rightnc" 
-		size="3" maxlength="5" >
-	</td>
-	<td class="$cellclass center">
-	    <input type="text" name="CanRead$line"
-		value="$canread"
-		class="black white center" 
-		size="1" maxlength="1" >
-	</td>
-	<td class="$cellclass center">
-	    <input type="text" name="CanWrite$line"
-		value="$canwrite"
-		class="black white center" 
-		size="1" maxlength="1" >
-	</td>
-	<td class="$cellclass center">
-	    <input type="text" name="Deaf$line"
-		value="$deaf"
-		class="black white center" 
-		size="1" maxlength="1" >
-	</td>
-	<td class="$cellclass center">
-	    <input type="text" name="Blind$line"
-		value="$blind"
-		class="black white center" 
-		size="1" maxlength="1" >
-	</td>
-	<td class="$cellclass center">
-	    <input type="text" name="Insane$line"
-		value="$insane"
-		class="black white center" 
-		size="1" maxlength="1" >
-	</td>
-	<td class="$cellclass left">
-	    <input type="text" name="Remarks$line"
-		value="$remarks"
-		class="black white leftnc" 
-		size="20" maxlength="255" >
-	</td>
-	<th class="$cellclass left">
-	    $line 
-	</th>
-	<td class="$cellclass left" style="white-space: nowrap;">
-	    <input type="hidden" name="IDIR$line"
-		value="$idir">
-	    <button type="button" id="doIdir$line"
-			class="button">
-		$idirtext 
-	    </button>
-	    &nbsp;
-		<button type="button" id="clearIdir$line"
-			    class="button">
-		    Clear
-		</button>
-	</td>
-    </tr>
-	</tbody>
-	<tfoot>
-	  <!--- Put out the column footers -->
-	  <tr>
-	    <th class="colhead1st">
-	      Line
-	    </th>
-	    <th class="colhead">
-	      Fam
-	    </th>
-	    <th class="colhead">
-	      Surname
-	    </th>
-	    <th class="colhead">
-	      Given Names
-	    </th>
-	    <th class="colhead">
-	      Sex
-	    </th>
-	    <th class="colhead">
-	      Age
-	    </th>
-	    <th class="colhead">
-	      MSt
-	    </th>
-	    <th class="colhead">
-	      Relation
-	    </th>
-	    <th class="colhead">
-	      Birth Place
-	    </th>
-	    <th class="colhead">
-	      FC
-	    </th>
-	    <th class="colhead">
-	      Father's BPlace
-	    </th>
-	    <th class="colhead">
-	      Mother's BPlace
-	    </th>
-	    <th class="colhead">
-	      Religion
-	    </th>
-	    <th class="colhead">
-	      Occupation
-	    </th>
-	    <th class="colhead">
-	      Line
-	    </th>
-	    <th class="colhead">
-	      E'r
-	    </th>
-	    <th class="colhead">
-	      E'ee
-	    </th>
-	    <th class="colhead">
-	      Un emp
-	    </th>
-	    <th class="colhead">
-	      Num E'es
-	    </th>
-	    <th class="colhead">
-	      Can Read
-	    </th>
-	    <th class="colhead">
-	      Can Write
-	    </th>
-	    <th class="colhead">
-	      Deaf
-	    </th>
-	    <th class="colhead">
-	      Blind
-	    </th>
-	    <th class="colhead">
-	      In sane
-	    </th>
-	    <th class="colhead">
-	      Remarks
-	    </th>
-	    <th class="colhead">
-	      Line
-	    </th>
-	    <th class="colhead">
-	      FT
-	    </th>
-	  </tr>
-	</tfoot>
+    	<p class="label" id="TranscriberLine">
+    	    Transcriber: $TRANSCRIBER 
+    	</p>
+    	<p class="label" id="ProofreaderLine">
+    	    Proof Reader: $PROOFREADER 
+    	</p>
+    	<p class="label" id="imageLine">
+    	  <span id="ImageButton">
+    	    <button type="button" id="imageButton">
+    		Display Original Census <u>I</u>mage
+    	    </button>
+    	    <input type="hidden" name="Image" id="Image"
+    		value="$IMAGE">
+    	  </span> <!-- id="ImageButton" -->
+          <span id="NoImage" class="error">
+              No Image Available for this Page
+          </span> <!-- id="NoImage" -->
+    	  <span id="ImagePrompt">
+    		Enter URL of Census Image:
+    	    <input type="text" name="Image" id="Image"
+    		size="64" maxlength="128" class="black white left"
+    		value="$IMAGE"> 
+    	  </span> <!-- id="ImagePrompt" -->
+    	    <button type="button" id="treeMatch">
+    		Match Family Tree Citations
+    	    </button>
+    	      &nbsp;
+    	    <button type="button" id="showImportant">
+    		Show Important
+    	    </button>
+    	</p>
+    	
+          <div class="hidden" id="hidden">
+    	<input type="hidden" name="Census" value="$CENSUSID">
+    	<input type="hidden" name="Province" value="$PROVINCE">
+    	<input type="hidden" name="District" value="$DISTRICT">
+    	<input type="hidden" name="SubDistrict" value="$SUBDISTRICT">
+    	<input type="hidden" name="Division" value="$DIVISION">
+    	<input type="hidden" name="Page" value="$PAGE">
+    	<input type="hidden" name="Rows" value="$ROWS">
+    	<input type="hidden" name="Debug" value="$DEBUG">
+        </div>
+        <p id="pageSize" class="warning">Page contains $NUMLINES lines</p>
+        <table class="form" id="form" >
+    	<thead>
+    	  <!--- Put out the column headers -->
+    	  <tr>
+    	    <th class="colhead1st">
+    	      Line
+    	    </th>
+    	    <th class="colhead">
+    	      Fam
+    	    </th>
+    	    <th class="colhead">
+    	      Surname
+    	    </th>
+    	    <th class="colhead">
+    	      Given Names
+    	    </th>
+    	    <th class="colhead">
+    	      Sex
+    	    </th>
+    	    <th class="colhead">
+    	      Age
+    	    </th>
+    	    <th class="colhead">
+    	      MSt
+    	    </th>
+    	    <th class="colhead">
+    	      Relation
+    	    </th>
+    	    <th class="colhead">
+    	      Birth Place
+    	    </th>
+    	    <th class="colhead">
+    	      FC
+    	    </th>
+    	    <th class="colhead">
+    	      Father's BPlace
+    	    </th>
+    	    <th class="colhead">
+    	      Mother's BPlace
+    	    </th>
+    	    <th class="colhead">
+    	      Religion
+    	    </th>
+    	    <th class="colhead">
+    	      Occupation
+    	    </th>
+    	    <th class="colhead">
+    	      Line
+    	    </th>
+    	    <th class="colhead smaller">
+    	      E'r
+    	    </th>
+    	    <th class="colhead smaller">
+    	      E'ee
+    	    </th>
+    	    <th class="colhead smaller">
+    	      Un emp
+    	    </th>
+    	    <th class="colhead smaller">
+    	      Num E'es
+    	    </th>
+    	    <th class="colhead smaller">
+    	      Can Read
+    	    </th>
+    	    <th class="colhead smaller">
+    	      Can Write
+    	    </th>
+    	    <th class="colhead smaller">
+    	      Deaf
+    	    </th>
+    	    <th class="colhead smaller">
+    	      Blind
+    	    </th>
+    	    <th class="colhead smaller">
+    	      In sane
+    	    </th>
+    	    <th class="colhead">
+    	      Remarks
+    	    </th>
+    	    <th class="colhead">
+    	      Line
+    	    </th>
+    	    <th class="colhead">
+    	      FT
+    	    </th>
+    	  </tr>
+    	</thead>
+    	<tbody>
+    	  <tr id="Row$line">
+    	<th class="$cellclass left">
+    	    $line 
+    	</th>
+    	<td class="$cellclass left">
+    	    <input type="text" name="Family$line" 
+    		value="$family"
+    		class="$famclass white right"
+    		size="3" maxlength="6" >
+    	</td>
+    	<td class="$cellclass left">
+    	    <input type="text" name="Surname$line"
+    		value="$surname"
+    		class="$surclass white left"
+    		size="12" maxlength="120" >
+    	</td>
+    	<td class="$cellclass left">
+    	    <input type="text" name="GivenNames$line"
+    		value="$givennames"
+    		class="black white left" 
+    		size="16" maxlength="120" >
+    	</td>
+    	<td class="$cellclass left">
+    	    <input type="text" name="Sex$line"
+    		value="$sex" 
+    		class="black white center expand"
+    		size="1" maxlength="1" >
+    	</td>
+    	<td class="$cellclass right">
+    	    <input type="text" name="Age$line"
+    		value="$age"
+    		class="black white rightnc" 
+    		size="3" maxlength="8" >
+    	</td>
+    	<td class="$cellclass left">
+    	    <input type="text" name="MStat$line"
+    		value="$mstat"
+    		class="black white center" 
+    		size="1" maxlength="1" >
+    	</td>
+    	<td class="$cellclass left">
+    	    <input type="text" name="Relation$line"
+    		value="$relation"
+    		class="black white left" 
+    		size="10" maxlength="32" >
+    	</td>
+    	<td class="$cellclass left">
+    	    <input type="text" name="BPlace$line"
+    		value="$bplace"
+    		class="black white left" 
+    		size="10" maxlength="32" >
+    	</td>
+    	<td class="$cellclass left">
+    	    <input type="text" name="French$line"
+    		value="$french"
+    		class="black white center" 
+    		size="1" maxlength="1" >
+    	</td>
+    	<td class="$cellclass left">
+    	    <input type="text" name="FathersBPlace$line"
+    		value="$fathersbplace"
+    		class="black white left" 
+    		size="10" maxlength="32" >
+    	</td>
+    	<td class="$cellclass left">
+    	    <input type="text" name="MothersBPlace$line"
+    		value="$mothersbplace"
+    		class="$mbpclass white left" 
+    		size="10" maxlength="32" >
+    	</td>
+    	<td class="$cellclass left">
+    	    <input type="text" name="Religion$line"
+    		value="$religion"
+    		class="$relclass white leftnc"
+    		size="12" maxlength="32" >
+    	</td>
+    	<td class="$cellclass left">
+    	    <input type="text" name="Occupation$line"
+    		value="$occupation"
+    		class="black white leftnc" 
+    		size="18" maxlength="48" >
+    	</td>
+    	<th class="$cellclass left">
+    	    $line 
+    	</th>
+    	<td class="$cellclass">
+    	    <input type="text" name="Employer$line"
+    		value="$employer"
+    		class="black white center expand" 
+    		size="1" maxlength="1" >
+    	</td>
+    	<td class="$cellclass">
+    	    <input type="text" name="Employee$line"
+    		value="$employee"
+    		class="black white center expand" 
+    		size="1" maxlength="1" >
+    	</td>
+    	<td class="$cellclass">
+    	    <input type="text" name="Unemployed$line"
+    		value="$unemployed"
+    		class="black white center expand" 
+    		size="1" maxlength="1" >
+    	</td>
+    	<td class="$cellclass right">
+    	    <input type="text" name="NumHands$line"
+    		value="$numhands"
+    		class="black white rightnc" 
+    		size="3" maxlength="5" >
+    	</td>
+    	<td class="$cellclass">
+    	    <input type="text" name="CanRead$line"
+    		value="$canread"
+    		class="black white center expand" 
+    		size="1" maxlength="1" >
+    	</td>
+    	<td class="$cellclass">
+    	    <input type="text" name="CanWrite$line"
+    		value="$canwrite"
+    		class="black white center expand" 
+    		size="1" maxlength="1" >
+    	</td>
+    	<td class="$cellclass">
+    	    <input type="text" name="Deaf$line"
+    		value="$deaf"
+    		class="black white center expand" 
+    		size="1" maxlength="1" >
+    	</td>
+    	<td class="$cellclass">
+    	    <input type="text" name="Blind$line"
+    		value="$blind"
+    		class="black white center expand" 
+    		size="1" maxlength="1" >
+    	</td>
+    	<td class="$cellclass">
+    	    <input type="text" name="Insane$line"
+    		value="$insane"
+    		class="black white center expand" 
+    		size="1" maxlength="1" >
+    	</td>
+    	<td class="$cellclass left">
+    	    <input type="text" name="Remarks$line"
+    		value="$remarks"
+    		class="black white leftnc" 
+    		size="20" maxlength="255" >
+    	</td>
+    	<th class="$cellclass left">
+    	    $line 
+    	</th>
+    	<td class="$cellclass left" style="white-space: nowrap;">
+    	    <input type="hidden" name="IDIR$line"
+    		value="$idir">
+    	    <button type="button" id="doIdir$line"
+    			class="button">
+    		$idirtext 
+    	    </button>
+    	    &nbsp;
+    		<button type="button" id="clearIdir$line"
+    			    class="button">
+    		    Clear
+    		</button>
+    	</td>
+        </tr>
+    	</tbody>
+    	<tfoot>
+    	  <!--- Put out the column footers -->
+    	  <tr>
+    	    <th class="colhead1st">
+    	      Line
+    	    </th>
+    	    <th class="colhead">
+    	      Fam
+    	    </th>
+    	    <th class="colhead">
+    	      Surname
+    	    </th>
+    	    <th class="colhead">
+    	      Given Names
+    	    </th>
+    	    <th class="colhead">
+    	      Sex
+    	    </th>
+    	    <th class="colhead">
+    	      Age
+    	    </th>
+    	    <th class="colhead">
+    	      MSt
+    	    </th>
+    	    <th class="colhead">
+    	      Relation
+    	    </th>
+    	    <th class="colhead">
+    	      Birth Place
+    	    </th>
+    	    <th class="colhead">
+    	      FC
+    	    </th>
+    	    <th class="colhead">
+    	      Father's BPlace
+    	    </th>
+    	    <th class="colhead">
+    	      Mother's BPlace
+    	    </th>
+    	    <th class="colhead">
+    	      Religion
+    	    </th>
+    	    <th class="colhead">
+    	      Occupation
+    	    </th>
+    	    <th class="colhead">
+    	      Line
+    	    </th>
+    	    <th class="colhead smaller">
+    	      E'r
+    	    </th>
+    	    <th class="colhead smaller">
+    	      E'ee
+    	    </th>
+    	    <th class="colhead smaller">
+    	      Un emp
+    	    </th>
+    	    <th class="colhead smaller">
+    	      Num E'es
+    	    </th>
+    	    <th class="colhead smaller">
+    	      Can Read
+    	    </th>
+    	    <th class="colhead smaller">
+    	      Can Write
+    	    </th>
+    	    <th class="colhead smaller">
+    	      Deaf
+    	    </th>
+    	    <th class="colhead smaller">
+    	      Blind
+    	    </th>
+    	    <th class="colhead smaller">
+    	      In sane
+    	    </th>
+    	    <th class="colhead">
+    	      Remarks
+    	    </th>
+    	    <th class="colhead">
+    	      Line
+    	    </th>
+    	    <th class="colhead">
+    	      FT
+    	    </th>
+    	  </tr>
+    	</tfoot>
       </table>
 	  <p>
 	    <button type="submit" id="Submit">

@@ -89,13 +89,16 @@ define ('MISS_NUMBER',  32);
 $cc                     = 'CA';
 $countryName            = 'Canada';
 $domain                 = 'CAON';
+$domaintext             = null;
 $code                   = 'ON';
 $domainName             = 'Ontario';
 $county                 = null;
 $countyName             = null;
 $township               = null;
 $regYear                = null;
+$regyeartext            = null;
 $regNum                 = null;
+$regnumtext             = null;
 $idirChanged            = false;
 $lang                   = 'en';
 $errors                 = 0;
@@ -109,37 +112,37 @@ if (count($_POST) > 0)
                       "<th class='colhead'>value</th></tr>\n";
     foreach($_POST as $key => $value)
     {
+        $safevalue  = htmlspecialchars($value);
         $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
-                            "<td class='white left'>$value</td></tr>\n"; 
+                            "<td class='white left'>$safevalue</td></tr>\n"; 
         switch(strtolower($key))
         {
             case 'domain':
             {
-                $domain     = $value;
+                if (preg_match('/^[A-Za-z]{4,5}$/', $value))
+                    $domain         = strtoupper($value);
+                else
+                    $domaintext     = $safevalue;
                 break;
             }
     
             case 'regyear':
             {
-                if (ctype_digit($value))
-                {
-                    $regYear    = intval($value);
-                    if ($regYear < 1850 or $regYear > 2100)
-                        $msg    .= "RegYear='$value' is out of range. ";
-                }
+                if (ctype_digit($value) &&
+                    $value >= 1850 && 
+                    $value < 2100)
+                    $regYear        = intval($value);
                 else
-                    $msg    .= "RegYear='$value' is not numeric. ";
+                    $regyeartext    = $safevalue;
                 break;
             }
     
             case 'regnum':
             {
                 if (ctype_digit($value))
-                {
-                    $regNum = intval($value);
-                }
+                    $regNum         = intval($value);
                 else
-                    $msg    .= "RegNum='$value' is not numeric. ";
+                    $regnumtext     = $safevalue;
                 break;
             }
 
@@ -157,24 +160,24 @@ if (count($_POST) > 0)
     
             case 'lang':
             {
-                $lang       = FtTemplate::validateLang($value);
+                $lang               = FtTemplate::validateLang($value);
                 break;
             }           // lang
         }               // act on specific parameters
     }                   // loop through all parameters
     if ($debug)
-        $warn       .= $parmsText . "</table>\n";
+        $warn           .= $parmsText . "</table>\n";
 }                       // invoked by URL to update the record
 
 // get name of domain in requested language
-$domainObj          = new Domain(array('domain'     => $domain,
-                                       'language'   => $lang));
-$domainName         = $domainObj->get('name');
+$domainObj              = new Domain(array('domain'     => $domain,
+                                           'language'   => $lang));
+$domainName             = $domainObj->get('name');
 $country                = $domainObj->getCountry();
 $countryName            = $country->getName($lang);
 if (!$domainObj->isExisting())
 {                       // undefined
-    $msg            .= "Domain='$domain' is invalid. ";
+    $msg                .= "Domain='$domain' is invalid. ";
 }                       // undefined
 
 if (is_string($county))
@@ -186,10 +189,16 @@ if (is_string($county))
 $nextNum                = intval($regNum) + 1;
 $paddedRegNum           = str_pad($regNum, 5, '0', STR_PAD_LEFT);
 
+if ($domaintext)
+    $msg    .= "Domain='$domaintext' is invalid. ";
 if (is_null($regYear))
     $msg    .= 'Year of registration not specified. ';
+if ($regyeartext)
+    $msg    .= "RegYear='$regyeartext' is invalid. ";
 if (is_null($regNum))
     $msg    .= 'Registration number not specified. ';
+if ($regnumtext)
+    $msg    .= "RegNum='$regnumtext' is not numeric. ";
 
 // expand only if authorized
 if (!canUser('edit'))
@@ -246,6 +255,8 @@ if (strlen($msg) == 0)
 
             default:
             {
+                if ($debug)
+                    $warn   .= "<p>\$death->set('$key', $value)</p>\n";
                 $death->set($key, $value);
                 break;
             }

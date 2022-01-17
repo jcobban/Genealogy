@@ -133,7 +133,7 @@ use Templating\Template;
  *      2014/09/04      use common routine to build where for static    *
  *                      methods                                         *
  *                      $parms['enteredsd'] may be a range of dates     *
- *      2014/09/08      add method toHtml                               *
+ *      2014/09/08      add method toHTML                               *
  *      2014/09/23      do not enclose order parameter in back-quotes   *
  *                      in static method getCitations to permit         *
  *                      more than one field                             *
@@ -228,6 +228,7 @@ use Templating\Template;
  *      2021/03/15      correct toJson output                           *
  *      2021/05/19      add support for 'page' as a county marriage     *
  *                      identifier                                      *  
+ *      2021/11/20      undefined variable $id                          *
  *                                                                      *
  *  Copyright &copy; 2021 James A. Cobban                               *
  ************************************************************************/  
@@ -2507,6 +2508,26 @@ class Citation extends RecordPic
                 break;
             }       // Find a Grave Website
 
+            case 'Canadian Military Records':
+            {       // Canadian Military Records
+                $count          = preg_match('/([0-9]+)/',
+                                             $detail,
+                                             $matches);
+                if ($count == 1)
+                {   // detail matches pattern
+                    $id         = 'sourceCanMilRegtNum$IDSX';
+                    $item       = $matches[1];
+                    $updates    = array('ITEM'      => $item,
+                                        'LANG'      => $lang,
+                                        'DETAIL'    => $detail);
+                }   // detail matches pattern
+                else
+                {
+                    $updates    = array('DETAIL'    => $detail);
+                }
+                break;
+            }       // Canadian Military Records
+
             default:
             {   // does not match any interpreted pattern
                 $matches        = array();
@@ -2556,7 +2577,13 @@ class Citation extends RecordPic
         $subTemplate->set('TITLE',     $title);
         $html               = $subTemplate->compile();
 
-        $tag                = $template[$id];
+        if (isset($id) && is_string($id) && strlen($id) > 0)
+            $tag            = $template[$id];
+        else
+        {
+            $tag            = null;
+            $id             = "no match for source '$title' detail='$detail'";
+        }
         if ($tag)
         {
             $subTemplate    = new Template($tag->outerHTML());
@@ -2568,7 +2595,7 @@ class Citation extends RecordPic
             $html           = preg_replace('/^[ \t]*[\r\n]+/m', '', $html);
         }
         else
-            error_log("Citation::toHtml: " . __LINE__ .
+            error_log("Citation::toHTML: " . __LINE__ .
         " could not resolve tag with id='$id' for detail='$detail'");
 
         // interpret text quotation from source
@@ -2594,7 +2621,7 @@ class Citation extends RecordPic
         }
 
         return $html;
-    }       // function Citation::toHtml
+    }       // function Citation::toHTML
 
 }       // class Citation 
 

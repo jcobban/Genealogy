@@ -306,6 +306,7 @@ function onLoadMarriage()
             case 'ggivennames':
             case 'bgivennames':
             case 'mgivennames':
+            case 'registrar':
             {       // given names of a participant
                 element.abbrTbl     = GivnAbbrs;
                 element.checkfunc   = checkName;

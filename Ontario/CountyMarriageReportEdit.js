@@ -257,12 +257,15 @@ function noDeleteReport()
  ************************************************************************/
 function editReport()
 {
-    var	form	= this.form;
-    var	rownum	= this.id.substring(this.id.length - 2);
-    var	domain	= form.Domain.value;
-    var	volume	= form.elements['Volume' + rownum].value;
-    var	report	= form.elements['ReportNo' + rownum].value;
-    window.open('CountyReportDetails.php?Domain=' + domain + '&Volume=' + volume + '&ReportNo=' + report,
+    var	form	        = this.form;
+    var	rownum	        = this.id.substring(this.id.length - 2);
+    var	domain	        = form.Domain.value;
+    var	volumeElt	    = form.elements['Volume' + rownum];
+    var	volume	        = volumeElt.value;
+    var	report	        = form.elements['ReportNo' + rownum].value;
+    window.open('CountyReportDetails.php?Domain=' + domain +
+                                        '&Volume=' + volume + 
+                                        '&ReportNo=' + report,
 				'_blank');
     return false;
 }		// editReport

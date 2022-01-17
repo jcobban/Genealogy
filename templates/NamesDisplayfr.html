@@ -29,11 +29,6 @@
     <a href="/FamilyTree/Surnames.php?initial=$PREFIX&lang=fr">
 			Surnoms qui commence avec '$PREFIX'
     </a>:
-    <span id="allNamesInSurname">
-    <a href="/FamilyTree/Names.php?Surname=$SURNAME&lang=$LANG">
-            Tout Personnes avec Surnom '$SURNAME'
-    </a>:
-    </span>
   </div>
   <div class="body">
     <h1>
@@ -83,17 +78,16 @@
         </div>
         <div style="clear: both;"></div>
       </div>
-    <form name="surnameForm" id="surnameForm"
-	  action="/FamilyTree/Names.php" method="get">
-        <input type="hidden" name="idnr"    value="$IDNR">
+      <form name="surnameForm" id="surnameForm"
+	        action="/FamilyTree/Names.php" method="get">
         <input type="hidden" name="Surname" value="$SURNAME">
         <input type="hidden" name="Edit"    value="Y">
         <input type="hidden" name="offset"  value="$OFFSET">
         <input type="hidden" name="limit"   value="$LIMIT">
         <input type="hidden" name="lang"    value="$LANG">
         <input type="hidden" name="debug"   value="$DEBUG">
-
-    </form>
+        <button type="submit" id="Update">Mise à Jour</button>
+      </form>
   
     <p class="label">
 	  <a href="/FamilyTree/Surnames.php?soundex=$SOUNDEX&lang=$LANG"
@@ -101,7 +95,7 @@
 	      Noms de famille avec le même Soundex '$SOUNDEX'
 	  </a>
     </p>
-    <p class="label">
+    <p class="label" id="patternPara">
 	  <a href="/FamilyTree/Surnames.php?pattern=$PATTERNU&lang=$LANG"
 	  		id="patternLink">
 	      Noms de famille avec le même motif '$PATTERN'
@@ -179,6 +173,10 @@
 	  This field permits editing a general description of the family sharing the
 	  surname.
     </div>
+  <div class="balloon" id="HelpUpdate">
+	Click on this button to enable updates to the description of the
+    family.
+  </div>
     <div class="balloon" id="HelpUpdateRecordButton">
 	  Click on this button to apply changes to the record for this family.
     </div>

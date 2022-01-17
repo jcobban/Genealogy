@@ -85,6 +85,8 @@ use \Iterator;
  *      2021/05/17      get Pages returned a maximum of 50 pages        *
  *      2021/06/22      getStatistics did not return values from Pages  *
  *                      table for pages which were not in Census        *
+ *      2021/07/26      delete superfluous pages from end of division   *
+ *                      in method getDefaultImage                       *
  *                                                                      *
  *  Copyright &copy; 2021 James A. Cobban                               *
  ************************************************************************/
@@ -384,65 +386,62 @@ class SubDistrict extends Record
         // construct the query for an existing record
 
         if (is_string($division) && strlen($division) > 0)
-        {                   // division included in search
-            $sdQuery    = "SELECT * FROM SubDistricts " .
-                                "WHERE SD_Census=:censusId AND " .
-                                  "SD_DistId=:distId AND " .
-                                  "SD_Id=:sdId AND " .
-                                  "SD_Div=:division AND " .
-                                  "SD_Sched=:sched";
-            $sqlParms   = array('censusId'  => $censusId,
-                                'distId'    => $distId ,
-                                'sdId'      => $sdId,
-                                'division'  => $division,
-                                'sched'     => $sched);
-        }                   // division included in search
+        {               // division included in search
+            $sdQuery        = "SELECT * FROM SubDistricts " .
+                                    "WHERE SD_Census=:censusId AND " .
+                                      "SD_DistId=:distId AND " .
+                                      "SD_Id=:sdId AND " .
+                                      "SD_Div=:division AND " .
+                                      "SD_Sched=:sched";
+            $sqlParms       = array('censusId'  => $censusId,
+                                    'distId'    => $distId ,
+                                    'sdId'      => $sdId,
+                                    'division'  => $division,
+                                    'sched'     => $sched);
+        }               // division included in search
         else
-        {                   // division not included in search
-            $sdQuery    = "SELECT * FROM SubDistricts " .
-                                "WHERE SD_Census=:censusId AND " .
-                                  "SD_DistId=:distId AND " .
-                                  "SD_Id=:sdId AND " .
-                                  "SD_Sched=:sched";
-            $sqlParms   = array('censusId'  => $censusId,
-                                'distId'    => $distId ,
-                                'sdId'      => $sdId,
-                                'sched'     => $sched);
-        }                   // division not included in search
+        {               // division not included in search
+            $sdQuery        = "SELECT * FROM SubDistricts " .
+                                    "WHERE SD_Census=:censusId AND " .
+                                        "SD_DistId=:distId AND " .
+                                        "SD_Id=:sdId AND " .
+                                        "SD_Sched=:sched";
+            $sqlParms       = array('censusId'  => $censusId,
+                                    'distId'    => $distId ,
+                                    'sdId'      => $sdId,
+                                    'sched'     => $sched);
+        }               // division not included in search
 
         // query the database for sub-district information
-        $stmt       = $connection->prepare($sdQuery);
-        $queryText  = debugPrepQuery($sdQuery, $sqlParms);
+        $stmt               = $connection->prepare($sdQuery);
+        $queryText          = debugPrepQuery($sdQuery, $sqlParms);
         if ($stmt->execute($sqlParms))
-        {       // success
-            $result     = $stmt->fetchAll(PDO::FETCH_ASSOC);
-            $count      = count($result);
+        {               // success
+            $result         = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            $count          = count($result);
             if ($count != 1)
-            {
-                $warn   .= "<p>SubDistrict.inc: " . __LINE__.
-                            " query='$queryText' " .
-                            "numRows=$count</p>\n";
-                $backtrace  = debug_backtrace();
-                $warn   .= "<p>";
-                foreach($backtrace as $caller)
-                    $warn   .= $caller['file'] . ':' .
-                                $caller['line'] . ', ';
-                $warn   .= "</p>\n";
-            }
-            else
+            {           // too many records found
+                $warn       .= "<p>SubDistrict.inc: " . __LINE__.
+                                " query='$queryText' " .
+                                "numRows=$count</p>\n";
+                if (is_null($division))
+                    $warn   .= "<p>SubDistrict.inc: " . __LINE__.
+                                " missing division identifier</p>\n";
+            }           // too many records found
+            else        // one record correctly found
             if ($debug)
             {
-                $warn   .= "<p>SubDistrict.inc: " . __LINE__.
-                            " query='$queryText'</p>\n";
+                $warn       .= "<p>SubDistrict.inc: " . __LINE__.
+                                " query='$queryText'</p>\n";
             }
 
             if ($count >= 1)
-            {       // existing record
-                $dbrow          = $result[0];
-                $needInsert     = false;
-            }       // existing record
+            {           // existing record
+                $dbrow              = $result[0];
+                $needInsert         = false;
+            }           // existing record
             else
-            {       // create a new record
+            {           // create a new record
                 // set defaults
                 $dbrow              = self::$initRow;
                 $dbrow['sd_census'] = $censusId;
@@ -516,14 +515,14 @@ class SubDistrict extends Record
                     $dbrow      = self::$initRow;
                 }       // error performing query
                 $needInsert     = true;
-            }       // create new record
-        }       // success
+            }           // create new record
+        }               // success
         else
-        {       // error performing query
+        {               // error performing query
             $this->msg          .= " '$queryText' " .
                                     print_r($stmt->errorInfo(),true);
             $dbrow              = self::$initRow;
-        }       // error performing query
+        }               // error performing query
 
         // invoke constructor of base class
         parent::__construct($dbrow,
@@ -882,7 +881,7 @@ class SubDistrict extends Record
                             'sdId'      => $this->row['sd_id'],
                             'division'  => $this->row['sd_div']);
 
-            $stmt   = $connection->prepare($delete);
+            $stmt       = $connection->prepare($delete);
             $deleteText = debugPrepQuery($delete, $sqlParms);
             if ($stmt->execute($sqlParms))
             {       // success
@@ -983,6 +982,7 @@ class SubDistrict extends Record
     function getDefaultImage($page)
     {
         global $warn;
+        global $connection;
 
         $censusId       = $this->row['sd_census'];
         $distId         = $this->row['sd_distid'];
@@ -994,6 +994,7 @@ class SubDistrict extends Record
         if ($relFrame == 0)
         {
             $warn       .= "<p>SubDistrict::getDefaultImage: the initial frame number field in the SubDistrict table for Census=$censusId District=$distId Sub-District=$subdistId Division=$div has not been initialized.</p>\n";
+            $warn       .= $this->debugBacktrace();
             error_log("SubDistrict::getDefaultImage: the initial frame number field in the SubDistrict table for Census=$censusId District=$distId Sub-District=$subdistId Division=$div has not been initialized.\n");
         }
         $page1          = $this->row['sd_page1'];
@@ -1008,6 +1009,22 @@ class SubDistrict extends Record
         {
             $warn       .= "<p>SubDistrict::getDefaultImage: $page is not a valid page number within SubDistrict ($censusId,$distId,$subdistId,$div)</p>\n";
             $warn       .= "<p>\$page1=$page1, \$pages=$pages, \$bypage=$bypage, \$lastpage=$lastpage remainder=" . (($page - $page1) % $bypage) . "</p>\n";
+            $delPages       = 'DELETE FROM Pages ' .
+                                'WHERE `Census`=:censusId AND `DistId`=:distId AND `SdId`=:sdId AND `Div`=:division AND `PageNum`>:lastpage';
+            $sqlParms       = array('censusId'  => $censusId,
+                                    'distId'    => $distId,
+                                    'sdId'      => $subdistId,
+                                    'division'  => $div,
+                                    'lastpage'  => $lastpage);
+            $stmt           = $connection->prepare($delPages);
+            $delText        = debugPrepQuery($delPages, $sqlParms);
+            if ($stmt->execute($sqlParms))
+            {           // success
+                $count      = $stmt->rowCount();
+                $warn   .= "<p>SubDistrict::getDefaultImage: " .
+                    __LINE__ . " '$delText' deleted $count invalid Pages</p>\n";
+            }
+
             return '';
         }
 
@@ -1525,10 +1542,8 @@ class SubDistrict extends Record
     {
         global      $warn;
         $limit              = $this->row['sd_pages'] + 1;
-        $result             = new PageSet(array('sdid'     => $this,
-                                                'page'     => $first,
-                                                'limit'    => $limit));
-        return $result;
+        $result             = new PageSet(array('sdid'     => $this));
+        return $result;     
     }       // SubDistrict::getPages
 
     /********************************************************************
