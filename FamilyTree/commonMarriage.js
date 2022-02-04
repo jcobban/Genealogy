@@ -896,13 +896,13 @@ function noDelMarr()
 }		// function noDelMarr
 
 /************************************************************************
- *  function addFamily														*
+ *  function addFamily													*
  *																		*
- *  This method is called when the user requests to add						*
+ *  This method is called when the user requests to add					*
  *  a new family to an individual										*
  *																		*
  *  Input:																*
- *		this		<button id='Add'>										*
+ *		this		<button id='Add'>									*
  ************************************************************************/
 function addFamily()
 {
@@ -910,13 +910,13 @@ function addFamily()
 }	// function addFamily
 
 /************************************************************************
- *  function marrReorder														*
+ *  function marrReorder												*
  *																		*
  *  This method is called when the user requests to reorder				*
- *  marriages by date.														*
+ *  marriages by date.													*
  *																		*
  *  Input:																*
- *		this		<button id='Reorder'>										*
+ *		this		<button id='Reorder'>								*
  ************************************************************************/
 function marrReorder()
 {

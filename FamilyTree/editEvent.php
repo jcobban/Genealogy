@@ -1836,11 +1836,11 @@ if (strlen($msg) == 0)
             if ($event)
             {
                 getEventInfo($event);
-                $kind           = null;
+                $kind               = null;
     
                 if ($idet == Event::ET_DEATH)
                 {
-                    $deathCause = $person['deathcause'];
+                    $deathCause     = $person['deathcause'];
                     if (is_null($deathCause))
                         $deathCause = '';
                 }
@@ -1853,7 +1853,7 @@ if (strlen($msg) == 0)
             if ($event)
             {
                 getEventInfo($event);
-                $kind           = null;
+                $kind               = null;
             }       // event defined
             break;
         }   // Citation::STYPE_MAREVENT
@@ -1861,7 +1861,7 @@ if (strlen($msg) == 0)
         //    idtd parameter points to To-Do records tblTD.IDTD
          case Citation::STYPE_TODO: // 40 To-Do Item
         {
-            $notes              = '';
+            $notes                  = '';
             break;
         }
     

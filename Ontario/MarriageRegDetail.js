@@ -67,8 +67,9 @@
  *      2020/11/21      move showImage to common utilities script       *
  *      2021/05/09      expand regdate                                  *
  *      2021/05/28      add a button to select default form layout      *
+ *      2022/01/21      disable ShowImage button if image URL is empty  *
  *                                                                      *
- *  Copyright &copy; 2021 James A. Cobban.                              *
+ *  Copyright &copy; 2022 James A. Cobban.                              *
  ************************************************************************/
 
 window.onload   = onLoadMarriage;
@@ -157,16 +158,19 @@ function onLoadMarriage()
                 element.focus();
             case 'regdate':
             {       // date of the marriage or registration
-                element.abbrTbl     = MonthAbbrs;
-                element.onchange    = dateChanged;
-                element.checkfunc   = checkDate;
+                element.abbrTbl     		= MonthAbbrs;
+                element.onchange    		= dateChanged;
+                element.checkfunc   		= checkDate;
                 element.checkfunc();
                 break;
             }       // date of the marriage or registration
 
             case 'showimage':
             {   // display image button
-                element.onclick = showImage;
+                element.onclick             = showImage;
+                    if (element.form.Image.value == '')
+                        element.disabled    = true;
+                    else
                 if (typeof(args.showimage) == 'string' &&
                         args.showimage.toLowerCase() == 'yes')
                         element.click();
@@ -175,38 +179,38 @@ function onLoadMarriage()
 
             case 'next':
             {       // button to go to next marriage registration
-                element.onclick = showNext;
+                element.onclick             = showNext;
                 break;
             }       // button to go to next marriage registration
 
             case 'previous':
             {       // button to go to previous marriage registration
-                element.onclick = showPrevious;
+                element.onclick             = showPrevious;
                 break;
             }       // button to go to previous marriage registration
 
             case 'newquery':
             {       // button to issue new query
-                element.href    = theForm.newQueryHref.value;
-                element.onclick = goToLink;
+                element.href    			= theForm.newQueryHref.value;
+                element.onclick 			= goToLink;
                 break;
             }       // button to issue new query
 
             case 'reset':
             {       // Reset button
-                element.onclick = resetForm;
+                element.onclick 			= resetForm;
                 break;
             }       // Reset button
 
             case 'baselayout':
             {       // button to choose Ontario Marriage Licence layout
-                element.onclick     = chooseBaseLayout;
+                element.onclick             = chooseBaseLayout;
                 break;
             }       // Reset button
 
             case 'ontariolicense':
             {       // button to choose Ontario Marriage Licence layout
-                element.onclick     = chooseOntarioLicenceLayout;
+                element.onclick             = chooseOntarioLicenceLayout;
                 break;
             }       // Reset button
 
@@ -214,9 +218,9 @@ function onLoadMarriage()
             case 'bsurname':
             case 'msurname':
             {       // surname of a participant
-                element.abbrTbl     = SurnAbbrs;
-                element.checkfunc   = checkName;
-                element.onchange    = change;
+                element.abbrTbl     		= SurnAbbrs;
+                element.checkfunc   		= checkName;
+                element.onchange    		= change;
                 element.checkfunc();
                 break;
             }       // surname of a participant
@@ -225,9 +229,9 @@ function onLoadMarriage()
             case 'bresidence':
             case 'mresidence':
             {       // current residence of a participant
-                element.abbrTbl     = LocAbbrs;
-                element.onchange    = locationChanged;
-                element.checkfunc   = checkAddress;
+                element.abbrTbl     		= LocAbbrs;
+                element.onchange    		= locationChanged;
+                element.checkfunc   		= checkAddress;
                 element.checkfunc();
                 break;
             }       // current residence of a participant
@@ -235,18 +239,18 @@ function onLoadMarriage()
             case 'gbirthplace':
             case 'bbirthplace':
             {       // birth place of participant
-                element.abbrTbl     = BpAbbrs;
-                element.onchange    = locationChanged;
-                element.checkfunc   = checkAddress;
+                element.abbrTbl     		= BpAbbrs;
+                element.onchange    		= locationChanged;
+                element.checkfunc   		= checkAddress;
                 element.checkfunc();
                 break;
             }       // birth place of participant
 
             case 'greligion':
             {       // religious affiliation of groom
-                element.onchange    = changeGReligion;
-                element.abbrTbl     = RlgnAbbrs;
-                element.checkfunc   = checkName;
+                element.onchange    		= changeGReligion;
+                element.abbrTbl     		= RlgnAbbrs;
+                element.checkfunc   		= checkName;
                 element.checkfunc();
                 break;
             }       // religious affiliation of groom
@@ -254,9 +258,9 @@ function onLoadMarriage()
             case 'breligion':
             case 'mreligion':
             {       // religious affiliation of bride
-                element.abbrTbl     = RlgnAbbrs;
-                element.checkfunc   = checkName;
-                element.onchange    = change;
+                element.abbrTbl     		= RlgnAbbrs;
+                element.checkfunc   		= checkName;
+                element.onchange    		= change;
                 element.checkfunc();
                 break;
             }       // religious affiliation of bride
@@ -265,10 +269,10 @@ function onLoadMarriage()
             {       // occupation of groom
                 // for the groom set the default occupation as Farmer
                 if (element.value.length == 0)
-                    element.value   = 'Farmer';
-                element.abbrTbl     = OccAbbrs;
-                element.checkfunc   = checkOccupation;
-                element.onchange    = change;
+                    element.value   		= 'Farmer';
+                element.abbrTbl     		= OccAbbrs;
+                element.checkfunc   		= checkOccupation;
+                element.onchange    		= change;
                 element.checkfunc();
                 break;
             }       // occupation of groom
@@ -276,9 +280,9 @@ function onLoadMarriage()
             case 'boccupation':
             case 'moccupation':
             {       // occupation of bride
-                element.abbrTbl     = OccAbbrs;
-                element.checkfunc   = checkOccupation;
-                element.onchange    = change;
+                element.abbrTbl     		= OccAbbrs;
+                element.checkfunc   		= checkOccupation;
+                element.onchange    		= change;
                 element.checkfunc();
                 break;
             }       // occupation of bride
@@ -286,9 +290,9 @@ function onLoadMarriage()
             case 'gmarstat':
             {       // marital status of groom
                 if (element.value.length == 0)
-                    element.value      = 'B';  // Bachelor
-                element.checkfunc   = checkMStat;
-                element.onchange    = change;
+                    element.value      		= 'B';  // Bachelor
+                element.checkfunc   		= checkMStat;
+                element.onchange    		= change;
                 element.checkfunc();
                 break;
             }       // marital status of groom
@@ -296,9 +300,9 @@ function onLoadMarriage()
             case 'bmarstat':
             {       // marital status of bride
                 if (element.value.length == 0)
-                    element.value      = 'S';  // Spinster
-                element.checkfunc   = checkMStat;
-                element.onchange    = change;
+                    element.value      		= 'S';  // Spinster
+                element.checkfunc   		= checkMStat;
+                element.onchange    		= change;
                 element.checkfunc();
                 break;
             }       // marital status of bride
@@ -308,9 +312,9 @@ function onLoadMarriage()
             case 'mgivennames':
             case 'registrar':
             {       // given names of a participant
-                element.abbrTbl     = GivnAbbrs;
-                element.checkfunc   = checkName;
-                element.onchange    = change;
+                element.abbrTbl     		= GivnAbbrs;
+                element.checkfunc   		= checkName;
+                element.onchange    		= change;
                 element.checkfunc();
                 break;
             }       // given names of a participant
@@ -319,16 +323,16 @@ function onLoadMarriage()
             case 'clearb':
             case 'clearm':
             {       // clear IDIR association
-                element.onclick     = clearIdir;
+                element.onclick             = clearIdir;
                 break;
             }       // clear IDIR association
 
             case 'gfathername':
             case 'bfathername':
             {       // father's name
-                element.abbrTbl     = GivnAbbrs;
-                element.checkfunc   = checkName;
-                element.onchange    = change;
+                element.abbrTbl     		= GivnAbbrs;
+                element.checkfunc   		= checkName;
+                element.onchange    		= change;
                 element.checkfunc();
                 break;
             }       // father's name
@@ -336,9 +340,9 @@ function onLoadMarriage()
             case 'gmothername':
             case 'bmothername':
             {       // mother's name
-                element.abbrTbl     = GivnAbbrs;
-                element.checkfunc   = checkName;
-                element.onchange    = change;
+                element.abbrTbl     		= GivnAbbrs;
+                element.checkfunc   		= checkName;
+                element.onchange    		= change;
                 element.checkfunc();
                 break;
             }       // mother's name
@@ -346,9 +350,9 @@ function onLoadMarriage()
             case 'witness1':
             case 'witness2':
             {       // witness names
-                element.abbrTbl     = GivnAbbrs;
-                element.checkfunc   = checkName;
-                element.onchange    = change;
+                element.abbrTbl     		= GivnAbbrs;
+                element.checkfunc   		= checkName;
+                element.onchange    		= change;
                 element.checkfunc();
                 break;
             }       // witness names
@@ -356,9 +360,9 @@ function onLoadMarriage()
             case 'witness1res':
             case 'witness2res':
             {       // witness address
-                element.abbrTbl     = LocAbbrs;
-                element.onchange    = locationChanged;
-                element.checkfunc   = checkAddress;
+                element.abbrTbl     		= LocAbbrs;
+                element.onchange    		= locationChanged;
+                element.checkfunc   		= checkAddress;
                 element.checkfunc();
                 break;
             }       // witness address
@@ -366,18 +370,17 @@ function onLoadMarriage()
             case 'gage':
             case 'bage':
             {       // age of bride or groom
-                element.abbrTbl     = AgeAbbrs;
-                element.onchange    = changeAge;
-                element.checkfunc   = checkAge;
-                element.onchange    = change;
+                element.abbrTbl     		= AgeAbbrs;
+                element.onchange    		= changeAge;
+                element.checkfunc   		= checkAge;
                 element.checkfunc();
                 break;
             }       // age of bride or groom
 
             case 'image':
             {
-                element.checkfunc   = checkURL;
-                element.onchange    = change;
+                element.checkfunc   		= checkURL;
+                element.onchange            = changeImage;
                 element.checkfunc();
                 break;
             }       // Image URL
@@ -385,7 +388,7 @@ function onLoadMarriage()
             case 'gbirthyear':
             case 'bbirthyear':
             {       // birth year of bride or groom
-                element.onchange    = change;
+                element.onchange            = change;
                 break;
             }       // birth year of bride or groom
 
@@ -431,6 +434,24 @@ function changeAge()
     textElt.innerHTML   = birthYear
     this.checkfunc();
 }       // function changeAge
+
+/************************************************************************
+ *  function changeImage                                                *
+ *                                                                      *
+ *  Take action when the user changes the image URL.                    *
+ *                                                                      *
+ *  Input:                                                              *
+ *      this            <input name='Image'>                            *
+ ************************************************************************/
+function changeImage()
+{
+    let button          		= document.getElementById('ShowImage');
+    if (this.value == '')
+        button.disabled 		= true;
+    else
+        button.disabled 		= false;
+    this.checkfunc();   // validate
+}       // function changeImage
 
 /************************************************************************
  *  function changeGReligion                                            *

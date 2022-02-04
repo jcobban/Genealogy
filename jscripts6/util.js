@@ -2875,7 +2875,8 @@ export function showImage(ev)
             (imageUrl.substring(0,23) == "http://www.ancestry.ca/" ||
              imageUrl.substring(0,23) == "https://www.ancestry.ca" ||
              imageUrl.substring(0,23) == "http://interactive.ance" ||
-             imageUrl.substring(0,23) == "https://interactive.anc"))
+             imageUrl.substring(0,23) == "https://interactive.anc" ||
+             imageUrl.substring(0,23) == "https://www.familysearc"))
             window.open(imageUrl, "_blank");
         else
         if (imageUrl.length > 5 &&

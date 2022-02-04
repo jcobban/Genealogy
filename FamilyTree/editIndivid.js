@@ -316,8 +316,9 @@
  *      2021/01/16      use XMLSerializer for diagnostic output         *
  *                      use addEventListener                            *
  *      2021/03/04      avoid creating duplicate events                 *
+ *      2022/02/01      replace calls to onchange with dispatchEvent    *
  *                                                                      *
- *  Copyright &copy; 2021 James A. Cobban                               *
+ *  Copyright &copy; 2022 James A. Cobban                               *
  ************************************************************************/
 
 /************************************************************************
@@ -2749,7 +2750,8 @@ function gotDeleteEvent(xmlDoc)
                     else
                     {
                         dateElt.value   = '';
-                        dateElt.onchange();
+                        let evt         = new Event('change');
+                        dateElt.dispatchEvent(evt);
                     }
                     let locnElt = document.getElementById(name + "Location");
                     if (locnElt  === null)
@@ -2758,8 +2760,9 @@ function gotDeleteEvent(xmlDoc)
                     }
                     else
                     {
-                    locnElt.value   = '';
-                    locnElt.onchange();
+                        locnElt.value   = '';
+                        let evt         = new Event('change');
+                        locnElt.dispatchEvent(evt);
                     }
                     let rownum  = parms.rownum;
                     let iderElt = document.getElementById("EventIder" + rownum);

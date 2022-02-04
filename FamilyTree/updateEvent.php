@@ -152,6 +152,7 @@ $location                   = null;         // instance of Location or Temple
 $kind                       = 0;            // 1 if location is a temple
 $note                       = '';
 $deathCause                 = '';
+$deathCauseSet              = false;
 $description                = '';
 $notmar                     = 0;
 $nokids                     = 0;
@@ -308,6 +309,7 @@ foreach($_POST as $key => $value)
         case 'deathCause':
         {       // deathCause to be updated
             $deathCause                 = $value;
+            $deathCauseSet              = true;
             break;
         }       // deathCause to be updated
 
@@ -1110,10 +1112,13 @@ if (strlen($msg) == 0)
         {
             if ($needIdime ||
                 $citation['idime'] == 0)
-                $citation->set('idime', $idime);
+            {
+                if ($citation['type'] != 9)
+                    $citation->set('idime', $idime);
+            }
             $count                  = $citation->save();
-            $lastCmd                = $record->getLastSqlCmd();
-            $idsx                   = $record->getId();
+            $lastCmd                = $citation->getLastSqlCmd();
+            $idsx                   = $citation->getId();
             if (strlen($lastCmd) > 0)
                 print "<cmd count='$count' idsx='$idsx'>$lastCmd</cmd>\n";
             $errors         = $citation->getErrors();

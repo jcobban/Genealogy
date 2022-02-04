@@ -148,8 +148,10 @@
  *		2019/07/20      insert spaces into death date                   *
  *		2019/11/15      pass requested language to child dialogs        *
  *		2020/02/17      hide right column                               *
+ *		2022/01/19      ensure when displaying edit for mother that     *
+ *		                the surname is not empty                        *
  *																		*
- *  Copyright &copy; 2020 James A. Cobban								*
+ *  Copyright &copy; 2022 James A. Cobban								*
  ************************************************************************/
 
 window.onload	= loadEdit;
@@ -764,27 +766,30 @@ function chooseFather()
  ************************************************************************/
 function editMother()
 {
-    var lang    			= 'en';
+    let lang    			= 'en';
     if ('lang' in args)
         lang                = args.lang;
-    var	form	            = this.form;
-    var idir	            = form.IDIRWife.value;
+    let	form	            = this.form;
+    let idir	            = form.IDIRWife.value;
     if (idir > 0)
     {		// mother present
-		for (var ib = 0; ib < editChildButtons.length; ib++)
+		for (let ib = 0; ib < editChildButtons.length; ib++)
 		{			// disable all editChild buttons
 		    editChildButtons[ib].disabled	= true;
 		}			// disable all editChild buttons
-		var script	        = "editIndivid.php?idir=" + idir + 
+		let wifeGiven	    = form.WifeGivenName.value; 
+		let wifeSurname     = form.WifeSurname.value;
+		let treename		= form.treename.value;
+		let script	        = "editIndivid.php?idir=" + idir + 
                               "&rowid=Wife" +
 		                      "&initGivenName=" + 
-                                encodeURIComponent(form.WifeGivenName.value) + 
-		                      "&initSurname=" + 
-                                encodeURIComponent(form.WifeSurname.value) +
-		                      '&treeName=' + 
-                                encodeURIComponent(form.treename.value);
+						                encodeURIComponent(wifeGiven) + 
+							  "&initSurname=" +
+						                encodeURIComponent(wifeSurname);
+							  '&treeName=' +
+						                encodeURIComponent(treename) +
                               '&lang=' + lang;
-		var childWindow	    = openFrame("wifeFrame",
+		let childWindow	    = openFrame("wifeFrame",
 						                script,
 						                "left");
 		childWindows.push(childWindow);
@@ -804,17 +809,17 @@ function editMother()
  ************************************************************************/
 function chooseMother()
 {
-    var lang    			= 'en';
+    let lang    			= 'en';
     if ('lang' in args)
         lang                = args.lang;
     form		            = this.form;
-    var surname		        = form.WifeSurname.value;
-    var url		            = "chooseIndivid.php?id=Wife" +
+    let surname		        = form.WifeSurname.value;
+    let url		            = "chooseIndivid.php?id=Wife" +
 		                      "&name=" + encodeURIComponent(surname) +
 		                      '&treeName=' + 
                                 encodeURIComponent(form.treename.value) +
                               '&lang=' + lang;
-    var childWindow	        = openFrame("chooserFrame",
+    let childWindow	        = openFrame("chooserFrame",
 						                url,
 						                "left");
 }		// function chooseMother
@@ -866,18 +871,21 @@ function createMother()
     var lang    			= 'en';
     if ('lang' in args)
         lang                = args.lang;
+    var	form		        = this.form;
+	let wifeGiven	        = form.WifeGivenName.value; 
+	let wifeSurname         = form.WifeSurname.value;
+	let treename		    = form.treename.value;
     for (var ib = 0; ib < editChildButtons.length; ib++)
     {				// disable all editChild buttons
 		editChildButtons[ib].disabled	= true;
     }				// disable all editChild buttons
-    var	form		        = this.form;
     var script		        = "editIndivid.php?rowid=Wife&initGender=1" +
 		                      "&initGivenName=" +
-                            encodeURIComponent(form.WifeGivenName.value) + 
-		                      "&initSurname=" + 
-                            encodeURIComponent(form.WifeSurname.value) + 
-		                      '&treeName=' + 
-                            encodeURIComponent(form.treename.value);
+                                        encodeURIComponent(wifeGiven) + 
+		                      "&initSurname=" +
+                                        encodeURIComponent(wifeSurname) + 
+    	                      '&treeName=' +
+                                        encodeURIComponent(treename) +
                               '&lang=' + lang;
 
     var childWindow	        = openFrame("wifeFrame",

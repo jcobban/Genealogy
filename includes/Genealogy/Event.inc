@@ -262,8 +262,11 @@ use \Exception;
  *      2021/06/05      save did not return count                       *
  *      2021/12/17      correct merge of citations from legacy event    *
  *                      to instance of class Event                      *
+ *      2022/01/22      support HTML in extended notes                  *
+ *                      send warning about non-empty death description  *
+ *                      to error log instead of user                    *
  *                                                                      *
- *  Copyright &copy; 2021 James A. Cobban                               *
+ *  Copyright &copy; 2022 James A. Cobban                               *
  ************************************************************************/
 require_once __NAMESPACE__ . '/RecordPic.inc';
 require_once __NAMESPACE__ . '/LegacyDate.inc';
@@ -2484,6 +2487,12 @@ class Event extends RecordPic
                 return $this->row['eventsd'];
             }           // legacy internal date format
 
+            case 'notes':
+            {           // extended textual notes
+                return parent::set($field, 
+                                   htmlspecialchars_decode($value));
+            }           // extended textual notes
+
             default:
             {           // no validation implemented yet
                 return parent::set($field, $value);
@@ -2738,10 +2747,9 @@ class Event extends RecordPic
                         $indiv->clearEvent('death');
                         if ($this->row['description'] != '')
                         {
-                            $warn   .= "<p>Event::save: " .
-                            "Description='" .
-                            htmlentities($this->row['description'],ENT_XML1) .
-                            "' when saving death event</p>\n";
+                            error_log("Event::save: " .
+                            "Description='" . $this->row['description'] .
+                            "' when saving death event");
                             $this->row['description']   = '';
                         }
                         break;

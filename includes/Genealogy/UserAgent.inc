@@ -14,12 +14,13 @@ use \Exception;
  *      CREATE TABLE UserAgents (                                       *
  *      Agent       VARCHAR(255),               -- file name            *
  *      Counter     INT(10) NOT NULL DEFAULT 0, -- counter              *
- *      PRIMARY KEY (agent),                                           *
+ *      PRIMARY KEY (agent),                                            *
  *                                                                      *
  *  History:                                                            *
  *      2021/06/18      created                                         *
+ *      2022/02/01      remove non-error logging                        *
  *                                                                      *
- *  Copyright &copy; 2021 James A. Cobban                               *
+ *  Copyright &copy; 2022 James A. Cobban                               *
  ************************************************************************/
 require_once __NAMESPACE__ . '/Record.inc';
 
@@ -368,17 +369,11 @@ class UserAgent extends Record
         global  $warn;
         global  $connection;
 
-        error_log('UserAgent::increment: ' . __LINE__); 
         $increment     = 'UPDATE UserAgents SET Counter=Counter+1';
         $stmt                   = $connection->prepare($increment);
-        if ($stmt->execute())
-            error_log('UserAgent::increment: cmd=' . $increment); 
-        else
+        if (!$stmt->execute())
         {
             $errorInfo  =  print_r($stmt->errorInfo(),true);
-            error_log("UserAgent.inc: " . __LINE__ .
-                                " increment='$increment', " .
-                                "errorInfo=$errorInfo\n");
         }
     }           // function UserAgent::increment
 

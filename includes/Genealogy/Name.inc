@@ -38,31 +38,31 @@ use Templating\TemplateTag;
  *        Prefix                  VARCHAR(120)                          *
  *        Title                   VARCHAR(120)                          *
  *        UserRef                 VARCHAR(50)                           *
- *        Order                   SHORTINT(5)                           *
+ *        Type                    SHORTINT(2)                           *
  *              0  = main name                                          *
  *              -1 = married names                                      *
  *              1  = 1st Alt Name,                                      *
  *              2  = 2nd Alt Name, etc...                               *
- *        MarriedNameCreatedBy    TINYINT(3)                            *
+ *        MarriedNameCreatedBy    TINYINT(1)                            *
  *              0  = not a married name,                                *
  *              1  = rule generated married name,                       *
  *              2  = user created married name                          *
  *        BirthSD                 INTEGER(10)                           *
  *              (see Sort Date)                                         *
  *              Unused by this implementation                           *
- *        PreferredAKA            TINYINT(3)                            *
+ *        PreferredAKA            TINYINT(1)                            *
  *              0=no, 1=yes                                             *
  *        AKANote                 LONGTEXT                              *
  *        IDMR                    INTEGER(10)                           *
  *              --> tblMR.ID,  ID to Marriage Record                    *
  *              Set to NULL for all names except Married names          *
- *        SrchTag                 TINYINT(3)                            *
+ *        SrchTag                 TINYINT(1)                            *
  *              0=no, 1=yes                                             *
  *              Unused by this implementation                           *
- *        qsTag                   TINYINT(3)                            *
+ *        qsTag                   TINYINT(1)                            *
  *              temporary use, 0=no, 1=yes                              *
  *              Unused by this implementation                           *
- *        `TreeName` VARCHAR(63) NOT NULL DEFAULT '',                   *
+ *        `TreeName`              VARCHAR(63) NOT NULL DEFAULT '',      *
  *                                                                      *
  *  The design of this table in the original implementation violated    *
  *  good design for SQL databases in that the information was           *
@@ -76,6 +76,8 @@ use Templating\TemplateTag;
  *  and is hidden from external view.                                   * 
  *  The field that provided a link to the associated record in the      *
  *  Families (tblMR) table is renamed to `IDMR` to clarify its meaning. *
+ *  The field that indicated the type of the name is renamed `type`     *
+ *  because the original name `order` is an SQL reserved word.          *
  *                                                                      *
  *  History:                                                            *
  *      2011/01/03      created                                         *
@@ -106,7 +108,7 @@ use Templating\TemplateTag;
  *                      request to get what should be a unique record   *
  *      2014/04/08      rename to LegacyName                            *
  *                      initialize field 'akanote' in the record with   *
- *                      `order`=0 to match 'namenote' in individual     *
+ *                      `type`=0 to match 'namenote' in individual      *
  *                      array returned by static getNames indexed by    *
  *                      IDNX                                            *
  *      2014/04/30      fix undefined variable on record not found      *
@@ -123,7 +125,7 @@ use Templating\TemplateTag;
  *                      to provide alternative to passing instance      *
  *                      of LegacyFamily and $husb parameter to get      *
  *                      alternate married name record                   *
- *      2015/01/08      permit specifying an array of values of 'Order' *
+ *      2015/01/08      permit specifying an array of values of 'type'  *
  *                      in static methods getNames, deleteNames, and    *
  *                      updateNames                                     *
  *                      If the supplied given name and surname match    *
@@ -137,7 +139,7 @@ use Templating\TemplateTag;
  *                      easily misspelled 'marriednamemaridid' parm     *
  *      2015/03/08      do not reference deprecated name fields in      *
  *                      LegacyFamily                                    *
- *                      ensure implied `Order`=-1 for construction of   *
+ *                      ensure implied `type`=-1 for construction of    *
  *                      married name record                             *
  *      2015/04/27      escape < and > in SQL commands displayed in     *
  *                      XML or HTML                                     *
@@ -156,7 +158,7 @@ use Templating\TemplateTag;
  *      2017/12/18      add support for temporary fields                *
  *      2018/03/21      temporarily add logging to /logs/Name.log       *
  *                      to track down cause of surname reversals        *
- *      2018/11/09      add constants for `order`                       *
+ *      2018/11/09      add constants for `type`                        *
  *      2018/11/05      remove method updateFromIndiv                   *
  *                      report errors in constructor through $this->msg *
  *                      save references to Person and Family            *
@@ -173,7 +175,7 @@ use Templating\TemplateTag;
  *      2918/06/01      improve JSON output                             *
  *      2019/07/18      use Person::getPerson                           *
  *      2019/11/22      add Name::$info                                 *
- *                      defer assignment of aka order until save        *
+ *                      defer assignment of aka type until save         *
  *      2019/11/26      correct constructor which was returning the     *
  *                      an existing entry if no valid IDIR was passed   *
  *      2019/12/19      replace xmlentities with htmlentities           *
@@ -183,8 +185,10 @@ use Templating\TemplateTag;
  *      2021/02/19      replace throws with error_logs                  *
  *                      use Record::constDebug and                      * 
  *                      Record::debugBacktrace                          *
+ *      2022/01/10      change fieldname `order` to `type` to avoid     *
+ *                      conflict with SQL reserved word                 *
  *                                                                      *
- *  Copyright &copy; 2021 James A. Cobban                               *
+ *  Copyright &copy; 2022 James A. Cobban                               *
  ************************************************************************/
 require_once __NAMESPACE__ . '/Record.inc';
 require_once __NAMESPACE__ . '/Person.inc';
@@ -208,7 +212,7 @@ class Name extends Record
     /********************************************************************
      *  $this->family                                                   *
      *  This is a saved reference to the associated instance of         *
-     *  Family if order=-1                                              *
+     *  Family if field `idmr` is set                                   *
      ********************************************************************/
     protected   $family         = null;
 
@@ -225,7 +229,7 @@ class Name extends Record
      *  a new record.                                                   *
      ********************************************************************/
     protected static    $initRow    = array(
-                        'idnx'                  => 0,           // autoincrement
+                        'idnx'                  => 0,   // autoincrement
                         'idnr'                  => 0,           // ignored
                         'idir'                  => 0,
                         'surname'               => '',
@@ -234,7 +238,7 @@ class Name extends Record
                         'prefix'                => '',
                         'title'                 => '',
                         'userref'               => '',
-                        'order'                 => 0,
+                        'type'                  => 0,
                         'marriednamecreatedby'  => 0,
                         'birthsd'               => -99999999,   // ignored
                         'preferredaka'          => 0,           // not AKA
@@ -256,7 +260,7 @@ class Name extends Record
                         'prime'                 => 'idnx',
                         'srvmg'                 => true,
                         'fldcount'              => 18,
-                        'order'                 => '`order`',
+                        'order'                 => 'type',
                         'classname'             => 'Name');
 
     /********************************************************************
@@ -267,8 +271,9 @@ class Name extends Record
     protected static    $translate  = array(
                         'id'                    => 'idnx',
                         'given'                 => 'givenname',
-                        '`order`'               => 'order',
-                        'type'                  => 'order',
+                        '`order`'               => 'type',
+                        'order'                 => 'type',
+                        'gender'                => 'gender',
                         'suffix'                => 'title',
                         'createdby'             => 'marriednamecreatedby',
                         'marriednamemaridid'    => 'idmr',
@@ -277,7 +282,7 @@ class Name extends Record
                         );
 
     /********************************************************************
-     *  Constant values of `order`                                      *
+     *  Constant values of `type`                                       *
      ********************************************************************/
     const   PRIMARY             = 0;
     const   MARRIED             = -1;
@@ -321,7 +326,7 @@ class Name extends Record
         $idnx                   = null;
         $idir                   = null;
         $idmr                   = null;
-        $order                  = null;
+        $type                  = null;
         $givenname              = null;
         $surname                = null;
         $where                  = '';
@@ -379,11 +384,11 @@ class Name extends Record
                     break;
                 }                           // IDIR
 
-                case 'order':
-                {                           // Order
-                    $order                  = intval($value);
+                case 'type':
+                {                           // Type
+                    $type                  = intval($value);
                     break;
-                }                           // Order
+                }                           // Type
 
                 case 'idmr':
                 {                           // idmr of family
@@ -430,14 +435,14 @@ class Name extends Record
 
         if (is_null($idnx))
         {                                   // IDNX not specified
-            if (is_null($order))
-            {                               // order not specified
+            if (is_null($type))
+            {                               // type not specified
                 if ($idmr > 0 && $idir > 0)
-                {                           // Order must be -1
+                {                           // Type must be Name::MARRIED
                     // if IDMR is specified this
-                    // implies Order=-1
-                    $where                      .= $and . "`Order`=-1";
-                }                           // Order must be -1
+                    // implies Type=Name::MARRIED
+                    $where                      .= $and . "`type`=-1";
+                }                           // Type must be Name::MARRIED
                 else
                 if ($idir > 0)
                 {                           // IDIR specified
@@ -455,23 +460,23 @@ class Name extends Record
                             $sqlParms['surname']= $surname;
                             $and                = ' AND ';
                         }
-                        $where                  .= $and . "`Order`>0";
+                        $where                  .= $and . "`Type`>0";
                     }                       // alternate name
                     else
                     {                       // get primary name
-                        $where                  .= $and . "`Order`=0";
+                        $where                  .= $and . "`Type`=0";
                     }                       // get primary name
                 }                           // IDIR specified
-            }                               // order not specified
+            }                               // Type not specified
             else
-            {                               // order specified
+            {                               // Type specified
                 if ($idir > 0)
                 {
-                    $where                      .= $and . "`Order`=:order";
-                    $sqlParms['order']          = $order;
+                    $where                      .= $and . "`Type`=:type";
+                    $sqlParms['type']          = $type;
                     $and                        = ' AND ';
                 }
-            }                               // order specified
+            }                               // Type specified
         }                                   // IDNX not specified
 
         return $where;
@@ -494,7 +499,7 @@ class Name extends Record
      *                                                                  *
      *                      array('idir'        => $idir) or            *
      *                      array('idir'        => $idir,               *
-     *                            'order'       => Name::PRIMARY)       *
+     *                            'type'        => Name::PRIMARY)       *
      *                          creates an entry for the primary        *
      *                          name of the individual                  *
      *                                                                  *
@@ -504,7 +509,7 @@ class Name extends Record
      *                          adds an alternate name for a Person     *
      *                                                                  *
      *                      array('idir'        => $idir,               *
-     *                            'order'       => positiveInt)         *
+     *                            'type'        => positiveInt)         *
      *                          returns the specific existing           *
      *                          alternate name of a Person              *
      *                                                                  *
@@ -512,7 +517,7 @@ class Name extends Record
      *                            'idmr'        => $idmr) or            *
      *                      array('idir'        => $idir,               *
      *                            'idmr'        => $idmr,               *
-     *                            'order'       => Name::MARRIED)       *
+     *                            'type'        => Name::MARRIED)       *
      *                          returns the married name entry for the  *
      *                          particular Person as a spouse in        *
      *                          the specified family.                   *
@@ -539,7 +544,7 @@ class Name extends Record
         $idnx                   = null;
         $idir                   = null;
         $idmr                   = null;
-        $order                  = null;
+        $type                   = null;
         $surname                = '';
 
         $this->constDebug('Name', $parms);
@@ -564,7 +569,7 @@ class Name extends Record
                 $idir           = 0;
             $this->person       = $parms;
             $parms              = array('idir'  => $idir,
-                                        'order' => Name::PRIMARY);
+                                        'type'  => Name::PRIMARY);
         }                           // old way to init from individual
         else
         if ($parms instanceof Family)
@@ -592,12 +597,22 @@ class Name extends Record
             {                       // complete row from database
                 $dbrow                  = $parms;
                 foreach($parms as $field => $value)
-                {
+                {                   // loop through fields
                     $fieldLc            = strtolower($field);
                     if (array_key_exists($fieldLc, self::$translate))
                         $fieldLc        = self::$translate[$fieldLc];
-                    switch($fieldLc)
+                    else
+                    if (!array_key_exists($fieldLc, self::$initRow))
                     {
+                        $warn   .= "<p>Name::__construct: " . __LINE__ .
+                    " Invalid field name '$fieldLc' in parameters.</p>\n".
+                    print_r($parms, true) . ".\n";
+                        $warn   .= "<p>" . $this->debugBacktrace().
+                                    "</p>\n";
+                    }
+
+                    switch($fieldLc)
+                    {               // act on specific fields
                         case 'idnx':
                         {
                             $idnx                   = $value;
@@ -618,20 +633,12 @@ class Name extends Record
                         }
 
                         case 'gender':
-                        {               // pseudo field copied from Person
-                            break;      // ignore
-                        }               // pseudo field copied from Person
+                        {           // pseudo field copied from Person
+                            break;  // ignore
+                        }           // pseudo field copied from Person
 
                         default:
                         { 
-                            if (!array_key_exists($fieldLc, self::$initRow))
-                            {
-                                $warn   .= "<p>Name::__construct: " . __LINE__ .
-                    " Invalid field name '$fieldLc' in parameters.</p>\n".
-                    print_r($parms, true) . ".\n";
-                                $warn   .= "<p>" . $this->debugBacktrace().
-                                            "</p>\n";
-                            }
                             break;
                         }
                     }               // act on specific fields
@@ -695,17 +702,17 @@ class Name extends Record
                                 $person             = $this->person;
                                 $idir               = $person['idir'];
                                 $dbrow['idir']      = $idir;
-                                if (array_key_exists('order', $sqlParms))
+                                if (array_key_exists('type', $sqlParms))
                                 {
-                                    $order          = $sqlParms['order'];
-                                    $dbrow['order'] = $order;
+                                    $type          = $sqlParms['type'];
+                                    $dbrow['type'] = $type;
                                 }
                             }       // person passed as parameter
 
                             if ($this->family)
                             {       // family passed as parameter
                                 $dbrow['idmr']      = $this->family['idmr'];
-                                $dbrow['order']     = Name::MARRIED;
+                                $dbrow['type']      = Name::MARRIED;
                             }       // family passed as parameter
 
                             if ($debug)
@@ -759,9 +766,9 @@ class Name extends Record
                                         break;
                                     }
                     
-                                    case 'order':
+                                    case 'type':
                                     {
-                                        $dbrow['order']     = $value;
+                                        $dbrow['type']      = $value;
                                         break;
                                     }
                                 }
@@ -812,10 +819,10 @@ class Name extends Record
 
         // ensure that all married names match the prime givenname,
         // prefix, title, and userref
-        if ($this['order'] == 0 && $idir > 0 && !$needInsert)
+        if ($this['type'] == 0 && $idir > 0 && !$needInsert)
         {                   // primary name record
             $updParms   = array('idir'      => $idir,
-                                'type'      => -1,
+                                'type'      => Name::MARRIED,
                                 'orderby'   => 'idnx');
             $setParms   = array('givenname' => $this['givenname'],
                                 'prefix'    => $this['prefix'],
@@ -825,7 +832,7 @@ class Name extends Record
             $count      = $names->update($setParms);
         }
     
-        if ($this['order'] == -1 && is_null($this->row['idmr']))
+        if ($this['type'] == Name::MARRIED && is_null($this->row['idmr']))
             $this->msg      = "Name::__construct: attempt to create married name record without IDMR"; 
     
         // diagnostic output if debug is set
@@ -1055,7 +1062,7 @@ class Name extends Record
             case 'idnx':
             case 'idir':
             case 'soundslike':
-            case 'order':
+            case 'type':
             case 'marriednamecreatedby':
             case 'preferredaka':
             case 'srchtag':
@@ -1157,12 +1164,12 @@ class Name extends Record
 
             $this->surnameRec       = new Surname(array('surname' => $newname));
             $this->surnameRec->save();
-            if ($this['order'] == Name::PRIMARY)
+            if ($this['type'] == Name::PRIMARY)
             {                       // primary name
                 $idir               = $this['idir'];
                 $otherNames         = new RecordSet('Names',
-                                                array('idir'        => $idir,
-                                                      '`order`'     => '>0')); 
+                                            array('idir'        => $idir,
+                                                  'type'        => '>0')); 
                 foreach($otherNames as $idnx => $nameRec)
                 {                   // loop through other name records
                     if ($nameRec->get('surname') == $oldsurname)
@@ -1264,10 +1271,11 @@ class Name extends Record
                 return 'Private';
         }
 
-        if ($this['order'] == Name::MARRIED)
+        if ($this['type'] == Name::MARRIED)
         {       // check for maiden name
-            $primeName          = new Name(array('idir'     => $idir,
-                                                 'order'    => Name::PRIMARY));
+            $primeName          = new Name(
+                                        array('idir'    => $idir,
+                                              'type'    => Name::PRIMARY));
             $maidenName         = $primeName->row['surname'];
         }       // check for maiden name
         else
@@ -1375,11 +1383,11 @@ class Name extends Record
     /********************************************************************
      *  function Name::getNextOrder                                     *
      *                                                                  *
-     *  Get the next order value for assigning a new alternate name/    *
+     *  Get the next type value for assigning a new alternate name/     *
      *  nickname/sobriquet for an individual.                           *
      *                                                                  *
      *  Returns                                                         *
-     *      next integer value to assign to `order`                     *
+     *      next integer value to assign to `type`                      *
      *      null if unable to complete function                         *
      ********************************************************************/
     private function getNextOrder()
@@ -1393,7 +1401,7 @@ class Name extends Record
         if (!is_int($idir) || $idir == 0)
             return null;
 
-        $query              = 'SELECT COALESCE(MAX(`Order`), 0)+1 ' .
+        $query              = 'SELECT COALESCE(MAX(`Type`), 0)+1 ' .
                                         'FROM tblNX WHERE IDIR=:idir';
         $stmt               = $connection->prepare($query);
         $sqlParms           = array('idir'  => $idir);
@@ -1575,15 +1583,15 @@ class Name extends Record
                         break;
                     }   // set under 'surname'
 
-                    case 'order':
+                    case 'type':
                     {   // type of alternate name record
-                        $fldnames               .= $comma . "`Order`";
-                        $values                 .= $comma . ':order';
+                        $fldnames               .= $comma . "`Type`";
+                        $values                 .= $comma . ':type';
                         if (is_null($value))
                         {   // ask server to calculate value
                             $value              = $this->getNextOrder();
                         }   // ask server to calculate value
-                        $sqlParms['order']      = $value;
+                        $sqlParms['type']       = $value;
                         break;
                     }   // type of alternate name record
 
@@ -1604,7 +1612,7 @@ class Name extends Record
             }       // loop through all fields in record
 
             // ensure 'marriednamecreatedby' set correctly
-            if ($this['order'] == -1 &&
+            if ($this['type'] == Name::MARRIED &&
                 $this['marriednamecreatedby'] == 0)
             {
                 $gender             = $this['gender'];
@@ -1726,7 +1734,7 @@ class Name extends Record
 
                     case 'idnr':
                     case 'idir':
-                    case 'order':
+                    case 'type':
                     case 'marriednamecreatedby':
                     case 'preferredaka':
                     case 'idmr':
@@ -1770,7 +1778,7 @@ class Name extends Record
             $this->changed  = array();  // reset
 
             // ensure 'marriednamecreatedby' set correctly
-            if ($this['order'] == -1 &&
+            if ($this['type'] == Name::MARRIED &&
                 $this['marriednamecreatedby'] == 0)
             {               // correct setting of MarriedNameCreatedBy
                 $gender         = $this['gender'];
@@ -1849,14 +1857,14 @@ class Name extends Record
      *  Name::getFamily                                                 *
      *                                                                  *
      *  This is a saved reference to the associated instance of         *
-     *  Family if order=-1                                              *
+     *  Family if type=Name::MARRIED                                    *
      *                                                                  *
      *  Returns:                                                        *
      *      instance of Family or null                                  *
      ********************************************************************/
     function getFamily()
     {
-        if ($this['order'] == -1 && is_null($this->family))
+        if ($this['type'] == Name::MARRIED && is_null($this->family))
         {
             $idmr               = $this['idmr'];
             if ($idmr > 0)
@@ -1934,7 +1942,7 @@ class Name extends Record
             else
             if ($key == 'marriednamecreatedby')
             {
-                if ($this['order'] < 0)
+                if ($this['type'] < 0)
                 {                       // married name record
                     $retval .= "\t<$key>";
                     if ($value == 0)
@@ -1992,12 +2000,12 @@ class Name extends Record
                 case 'qstag':
                     break;
 
-                case 'order':
+                case 'type':
                 {
                     $retval             .= "$comma\t\"$key\":\t" .
                                             json_encode($value);
                     $retval             .= ",\n\t\"means\":\t";
-                    if ($value == -1)
+                    if ($value == Name::MARRIED)
                         $retval         .= "\"Married Name\"";
                     else
                     if ($value == 0)
@@ -2008,12 +2016,12 @@ class Name extends Record
                     else
                         $retval         .= "\"Undefined value\"";
                     break;
-                }                   // order
+                }                   // type
 
                 case 'marriednamecreatedby':
                 case 'idmr':
                 {
-                    if ($this['order'] != -1)
+                    if ($this['type'] != Name::MARRIED)
                         break;      // ignore
                     $retval     .= "$comma\t\"$key\":\t$value";
                     break;

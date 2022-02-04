@@ -54,8 +54,9 @@
  *      2020/06/02      correct handling of image URL starting with     *
  *                      /Images/                                        *
  *                      move DisplayImage.php to top of hierarchy       *
+ *      2022/01/21      disable ShowImage button if image URL is empty  *
  *                                                                      *
- *  Copyright &copy; 2020 James A. Cobban                               *
+ *  Copyright &copy; 2022 James A. Cobban                               *
  ************************************************************************/
 import {keyDown, args, openFrame, showImage}
             from "../jscripts6/util.js";
@@ -238,6 +239,7 @@ function onLoadBirths()
 
                 case 'Image':
                 {
+                    element.onchange        = changeImage;
                     element.checkfunc   = checkURL;
                     element.checkfunc();
                     break;
@@ -245,13 +247,16 @@ function onLoadBirths()
 
                 case 'clearIdir':
                 {   // clear IDIR association
-                    element.onclick = clearIdir;
+                    element.onclick         = clearIdir;
                     break;
                 }   // clearIDIR association
 
                 case 'ShowImage':
                 {   // display image button
-                    element.onclick = showImage;
+                    element.onclick         = showImage;
+                    if (element.form.Image.value == '')
+                        element.disabled    = true;
+                    else
                     if (typeof(args.showimage) == 'string' &&
                         args.showimage.toLowerCase() == 'yes')
                         element.click();
@@ -369,10 +374,10 @@ function validateForm()
 function resetForm()
 {
     var form        = document.distForm;
-    changeCounty(); // repopulate Township selection
+    changeCounty();     // repopulate Township selection
     changeTownship();   // set defaults
     for(var j = 0; j < form.elements.length; j++)
-    {   // loop through all elements of a form
+    {                   // loop through all elements of a form
         var element = form.elements[j];
         var name    = element.name;
         if (name.length == 0)
@@ -380,25 +385,25 @@ function resetForm()
 
         // set up dynamic functionality based on the name of the element
         switch(name)
-        {
+        {               // switch on name
             case "RegYear":
             case "RegNum":
             case "RegId":
             case "MsVol":
-            {       // do not reset ident fields
+            {           // do not reset ident fields
                 break;
-            }       // do not reset ident fields
+            }           // do not reset ident fields
 
             case "ParentsMarried":
-            {       // do not reset ident fields
+            {           // do not reset ident fields
                 element.checked     = true;
                 break;
-            }       // do not reset ident fields
+            }           // do not reset ident fields
 
             case "Sex":
-            {       // undetermined sex is default
+            {           // undetermined sex is default
                 break;
-            }       // undetermined sex is default
+            }           // undetermined sex is default
 
             default:
             {
@@ -407,11 +412,29 @@ function resetForm()
                     element.value   = "";
                 }       // <input type='text'>
                 break;
-            }       // default
-        }       // switch on name
-    }   // loop through all elements of a form
+            }           // default
+        }               // switch on name
+    }                   // loop through all elements of a form
     return false;
-}   // resetForm
+}   // function resetForm
+
+/************************************************************************
+ *  function changeImage                                                *
+ *                                                                      *
+ *  Take action when the user changes the image URL.                    *
+ *                                                                      *
+ *  Input:                                                              *
+ *      this            <input name='Image'>                            *
+ ************************************************************************/
+function changeImage()
+{
+    let button          		= document.getElementById('ShowImage');
+    if (this.value == '')
+        button.disabled 		= true;
+    else
+        button.disabled 		= false;
+    this.checkfunc();   // validate
+}       // function changeImage
 
 /************************************************************************
  *  function changeFatherName                                           *

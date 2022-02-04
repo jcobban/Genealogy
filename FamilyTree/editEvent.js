@@ -161,9 +161,10 @@
  *      2021/01/16      use XMLSerializer for diagnostic output         *
  *                      use addEventListener                            *
  *      2021/03/07      use beep to signal button click ignored         *
- *      2921/03/15      use addCitJSON.php in place of addCitXml.php    *
+ *      2021/03/15      use addCitJSON.php in place of addCitXml.php    *
+ *      2022/02/01      use addEventListener and removeEventListener    *
  *                                                                      *
- *  Copyright &copy; 2021 James A. Cobban                               *
+ *  Copyright &copy; 2022 James A. Cobban                               *
  ************************************************************************/
 
 /************************************************************************
@@ -254,7 +255,7 @@ function loadEdit()
                 case 'etype':
                 {       // event type input field
                     element.addEventListener('keydown',keyDown);
-                    element.onchange    = changeEtype;
+                    element.addEventListener('change', changeEtype);
                     if (!focusSet)
                     {       // need focus in some field
                         element.focus();    // set focus
@@ -268,7 +269,7 @@ function loadEdit()
                     element.addEventListener('keydown',inputKeyDown);
                     element.abbrTbl     = MonthAbbrs;
                     element.checkfunc   = checkDate;
-                    element.onchange    = dateChanged;
+                    element.addEventListener('change', dateChanged);
                     element.onblur      = gotoDescription;
                     element.focus();    // set focus
                     focusSet            = true;
@@ -279,7 +280,7 @@ function loadEdit()
                 {       // occupation
                     element.addEventListener('keydown',inputKeyDown);
                     element.checkfunc   = checkOccupation;
-                    element.onchange    = change;
+                    element.addEventListener('change', change);
                     element.abbrTbl     = OccAbbrs;
                     break;
                 }       // occupation
@@ -289,7 +290,7 @@ function loadEdit()
                     element.addEventListener('focus', focusLocation);
                     element.addEventListener('keydown',inputKeyDown);
                     element.abbrTbl     = evtLocAbbrs;
-                    element.onchange    = locationChanged;
+                    element.addEventListener('change', locationChanged);
                     break;
                 }       // event location
 
@@ -299,7 +300,7 @@ function loadEdit()
                     element.addEventListener('focus', focusLocation);
                     element.addEventListener('keydown',inputKeyDown);
                     element.abbrTbl     = evtLocAbbrs;
-                    element.onchange    = templeChanged;
+                    element.addEventListener('change', templeChanged);
                     break;
                 }       // event temple
 
@@ -316,7 +317,7 @@ function loadEdit()
                     element.addEventListener('keydown',inputKeyDown);
                     element.abbrTbl     = CauseAbbrs;
                     element.checkfunc   = checkText;
-                    element.onchange    = change;
+                    element.addEventListener('change', change);
                     break;
                 }       // cause of death
 
@@ -324,7 +325,7 @@ function loadEdit()
                 {       // <button id='updEvent'>
                     element.addEventListener('keydown',keyDown);
                     element.addEventListener('click',updateEvent);
-                    element.onchange    = change;   // default handler
+                    element.addEventListener('change', change);   // default handler
                     break;
                 }       // <button id='updEvent'>
 
@@ -359,7 +360,7 @@ function loadEdit()
 
                 case 'note':
                 {       // textual notes on event
-                    element.onchange    = change;   // default handler
+                    element.addEventListener('change', change);   // default handler
                     if (!focusSet)
                     {       // need focus in some field
                         element.focus();    // set focus
@@ -421,7 +422,7 @@ function loadEdit()
                 default:
                 {
                     element.addEventListener('keydown',keyDown);
-                    element.onchange    = change;   // default handler
+                    element.addEventListener('change', change);   // default handler
                     break;
                 }       // default
 
@@ -1358,10 +1359,11 @@ var pendingElement  = null;
 
 function addCitation(ev)
 {
+    console.log("addCitation: 1361 this.id=" + this.id);
     if (!ev)
-    {       // browser is not W3C compliant
-        ev  =  window.event;    // IE
-    }       // browser is not W3C compliant
+    {           // browser is not W3C compliant
+        ev          =  window.event;    // IE
+    }           // browser is not W3C compliant
     ev.stopPropagation();
 
     this.disabled   = true;         // prevent double add cit
@@ -1383,22 +1385,24 @@ function addCitation(ev)
         type        = 9;
         idime       = form.idir.value;      // key of associated record
     }           // special button
+    console.log("1386 type=" + type + ", idime=" + idime);
 
     if (type < 1)
     {
-        console.log("addCitation: invalid value of citation type:" +
-                " id=" + this.id +
-                ", type=" + type +
-                ", idime=" + idime);
+        alert("addCitation: invalid value of citation type:" +
+                    " id=" + this.id +
+                    ", type=" + type +
+                    ", idime=" + idime);
         beep();
         return;
     }
+
     if ((type == 30 || type == 31) && idet < 1)
     {
-        console.log("addCitation: invalid value of idet:" + 
-                " id=" + this.id +
-                ", type=" + type +
-                ", idime=" + idime + ", idet=" + idet);
+        alert("addCitation: invalid value of idet:" + 
+                    " id=" + this.id +
+                    ", type=" + type +
+                    ", idime=" + idime + ", idet=" + idet);
         beep();
         return;
     }
@@ -1409,6 +1413,9 @@ function addCitation(ev)
                 ", type=" + type +
                 ", idime=" + idime);
     }
+    console.log("editEvent: addCitation: id=" + this.id +
+                ", type=" + type +
+                ", idime=" + idime);
 
     if (idime < 1)
     {           // not assigned yet, update record in tblER
@@ -1465,14 +1472,14 @@ function addCitation(ev)
     }       // add button is in footer row
 
     // support popup help for the fields in the added row
-    let sourceCell  = form.Source0;
-    sourceCell.helpDiv  = 'SourceSel';
+    let sourceCell          = form.Source0;
+    sourceCell.helpDiv      = 'SourceSel';
     actMouseOverHelp(sourceCell);
 
     // set actions for detail input text field
-    let element         = form.Page0;
-    element.onblur      = createCitation;   // leave field
-    element.onchange    = createCitation;   // change field
+    let element             = form.Page0;
+    element.onblur          = createCitation;   // leave field
+    element.addEventListener('change', createCitation);   // change field
     actMouseOverHelp(element);
 
     // populate the select with the list of defined sources to 
@@ -1635,7 +1642,7 @@ function gotSources(xmlDoc)
     let option  = addOption(elt,    // Select element
                         'Add New Source',   // text value to display
                         -1);    // key to request add
-    elt.onchange    = checkForAdd;
+    elt.addEventListener('change', checkForAdd);
 
     // customize selection
     elt.size    = 10;   // height of selection list
@@ -1690,21 +1697,34 @@ function noSources()
  *                                                                      *
  *  Parameters:                                                         *
  *      this            <input name='Page...'> element for which this   *
- *                      is the onchange or onblur method                *
+ *                      is the change event or onblur event listener    *
  ************************************************************************/
 function createCitation()
 {
+    console.log("editEvent.js: createCitation: 1699, this->" + this.outerHTML)
     let rownum          = this.name.substring(4);
 
     // prevent double invocation
-    this.onchange       = null;
-    this.onblur         = null;
+    this.removeEventListener('change', createCitation);
+    this.removeEventListener('blur', createCitation);
 
     // get parameters from the form containing this cell
     let form            = this.form;        // form containing element
     let formName        = form.name;        // name of the form
+
+    // type of event to cite
+    let type            = form.elements['type' + rownum].value; 
+    console.log("editEvent.js: createCitation:1723 form.elements[" + "'type" + rownum + "].value=" + type);
+    let idet            = 0;
+    if (form.etype)
+        idet            = form.etype.value;
+
     // key of associated record
     let idime           = form.elements['idime' + rownum].value;
+    if (type == 9)
+        idime           = form.elements['idir'].value;
+    console.log("editEvent.js: createCitation:1711 form.elements[" + "'idime" + rownum + "].value=" + idime);
+
     let addButton       = document.getElementById('addCitation' + idime);
     if (!addButton)
         addButton       = document.getElementById('AddCitation');
@@ -1714,11 +1734,7 @@ function createCitation()
     if (addButton)
         addButton.disabled      = false;    // re-enable adding citations
 
-    // type of event within record
-    let type            = form.elements['type' + rownum].value; 
-    let idet            = 0;
-    if (form.etype)
-        idet            = form.etype.value; 
+    // other parameters
     let pageText        = this.value;       // value of page element
     let cell            = this.parentNode;  // cell containing page element
     let row             = cell.parentNode;  // row containing page element
@@ -1762,7 +1778,7 @@ function createCitation()
             }
             msg             += "}";
 
-            //alert("editEvent.js: createCitation: 1667 " + msg);
+            console.log("editEvent.js: createCitation: 1667 " + msg);
 
             if (debug.toLowerCase() == 'y')
             {           // debugging activated
@@ -1970,8 +1986,8 @@ function addAltCitation(ev)
     let detailTxt   = form.PageA;
     if (detailTxt)
     {
-        detailTxt.onblur    = createCitation;   // leave field
-        detailTxt.onchange  = createCitation;   // change field
+        detailTxt.addEventListener('blur', createCitation);   // leave field
+        detailTxt.addEventListener('change', createCitation);   // change field
     }
     else
     {
@@ -2219,7 +2235,7 @@ function updateCitation(idsx,
  *                                                                      *
  *  Parameters:                                                         *
  *      this        the input element for which this is the             *
- *                  onchange method                                     *
+ *                  change event listener                               *
  ************************************************************************/
 function checkForAdd()
 {

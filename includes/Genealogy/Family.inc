@@ -389,8 +389,10 @@ use \Exception;
  *      2020/03/19      correct construction of events from old         *
  *                      locations                                       *
  *      2020/03/25      undefined Event::setIdir                        *
+ *      2022/01/19      Field name in class Name changed from `Order`   *
+ *                      to `Type` to avoid SQL reserved word            *
  *                                                                      *
- *  Copyright &copy; 2020 James A. Cobban                               *
+ *  Copyright &copy; 2022 James A. Cobban                               *
  ************************************************************************/
 require_once __NAMESPACE__ . '/RecordPic.inc';
 require_once __NAMESPACE__ . '/Person.inc';
@@ -942,13 +944,13 @@ class Family extends RecordPic
 
         // delete the married name records associated with this
         // family, if any
-        $nameParms  = array('`Order`'                   => -1, 
-                            'MarriedNameMarIDID'    => $idmr);
-        $names      = new RecordSet('Names', $nameParms);
+        $nameParms      = array('Type'              => Name::MARRIED, 
+                                'IDMR'              => $idmr);
+        $names          = new RecordSet('Names', $nameParms);
         $names->delete($xml);
 
         // delete the citations associated with this family, if any
-        $citations  = new CitationSet(array('idmr' => $idmr));
+        $citations      = new CitationSet(array('idmr' => $idmr));
         $citations->delete($xml);
 
         // delete the associated child relation entries if any

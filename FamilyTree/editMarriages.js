@@ -173,8 +173,10 @@
  *		2020/02/17      hide right column                               *
  *		                missing initGender from editIndivid requests    *
  *		2020/08/26      correct initGender in editHusb                  *
+ *		2022/01/19      ensure when displaying edit for wife that       *
+ *		                the surname is not empty                        *
  *																		*
- *  Copyright &copy; 2020 James A. Cobban								*
+ *  Copyright &copy; 2022 James A. Cobban								*
  ************************************************************************/
 
 window.onload	= loadEdit;
@@ -894,29 +896,38 @@ function noHusb()
  ************************************************************************/
 function editWife()
 {
-    var lang    			= 'en';
+    let lang    			= 'en';
     if ('lang' in args)
         lang                = args.lang;
-    var	button	            = this;
-    var	form	            = button.form;
-    var idir	            = form.IDIRWife.value;
+    let	button	            = this;
+    let	form	            = button.form;
+    let idir	            = form.IDIRWife.value;
     if (idir > 0)
     {		// wife present
-		for (var ib = 0; ib < editChildButtons.length; ib++)
+		for (let ib = 0; ib < editChildButtons.length; ib++)
 		{			// disable all editChild buttons
 		    editChildButtons[ib].disabled	= true;
 		}			// disable all editChild buttons
-		var script	        = "editIndivid.php?idir=" + idir + 
+		let wifeGiven	    = form.WifeGivenName.value; 
+		let wifeSurname     = form.WifeSurname.value;
+		let treename		= form.treename.value;
+        if (wifeSurname == '')
+        {
+            wifeSurname     = 'Wifeof' +
+                               form.HusbGivenName.value +
+                               form.HusbSurname.value;
+        }
+		let script	        = "editIndivid.php?idir=" + idir + 
                               "&rowid=Wife" +
 							  "&initGivenName=" +
-						encodeURIComponent(form.WifeGivenName.value) + 
+						                encodeURIComponent(wifeGiven) + 
 							  "&initSurname=" +
-						encodeURIComponent(form.WifeSurname.value);
+						                encodeURIComponent(wifeSurname);
 							  '&treeName=' +
-						encodeURIComponent(form.treename.value) +
+						                encodeURIComponent(treename) +
                               '&initGender=F' +
                               '&lang=' + lang;
-		var childWindow	    = openFrame("wifeFrame",
+		let childWindow	    = openFrame("wifeFrame",
 						                script,
 						                "left");
 		childWindows.push(childWindow);
@@ -1058,13 +1069,22 @@ function createWife(e)
     if ('lang' in args)
         lang                = args.lang;
     var	form		        = this.form;
+	let wifeGiven	        = form.WifeGivenName.value; 
+	let wifeSurname         = form.WifeSurname.value;
+	let treename		    = form.treename.value;
+    if (wifeSurname == '')
+    {
+        wifeSurname         = 'Wifeof' +
+                                form.HusbGivenName.value +
+                                form.HusbSurname.value;
+    }
     var script		        = "editIndivid.php?rowid=Wife&initGender=1" +
 		                      "&initGivenName=" +
-                    encodeURIComponent(form.WifeGivenName.value) + 
+                                        encodeURIComponent(wifeGiven) + 
 		                      "&initSurname=" +
-                    encodeURIComponent(form.WifeSurname.value) + 
+                                        encodeURIComponent(wifeSurname) + 
     	                      '&treeName=' +
-                    encodeURIComponent(form.treename.value) +
+                                        encodeURIComponent(treename) +
                               '&lang=' + lang;
     var childWindow	        = openFrame("wifeFrame",
 						                script,

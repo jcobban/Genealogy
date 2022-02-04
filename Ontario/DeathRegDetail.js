@@ -79,8 +79,9 @@
  *      2020/11/21      move showImage to common utilities script       *
  *      2021/02/23      add abbreviations for durations                 *
  *      2021/04/24      add Residence field                             *
+ *      2022/01/21      disable ShowImage button if image URL is empty  *
  *                                                                      *
- *  Copyright &copy; 2021 James A. Cobban                               *
+ *  Copyright &copy; 2022 James A. Cobban                               *
  ************************************************************************/
 
 /************************************************************************
@@ -419,29 +420,33 @@ function onLoadDeath()
 
                 case 'duration':
                 {
-                    element.abbrTbl     = DurationAbbrs;
-                    element.onchange    = changeDuration;
-                    element.checkfunc   = checkText;
+                    element.abbrTbl         = DurationAbbrs;
+                    element.onchange        = changeDuration;
+                    element.checkfunc       = checkText;
                     element.checkfunc();            // check initial value
                     break;
                 }
 
                 case 'image':
                 {
-                    element.checkfunc   = checkURL;
+                    element.onchange        = changeImage;
+                    element.checkfunc       = checkURL;
                     element.checkfunc();            // check initial value
                     break;
                 }       // Image URL
 
                 case 'clearidir':
                 {   // clear IDIR association
-                    element.onclick     = clearIdir;
+                    element.onclick         = clearIdir;
                     break;
                 }   // clearIDIR association
 
                 case 'showimage':
                 {   // display image button
-                    element.onclick     = showImage;
+                    element.onclick         = showImage;
+                    if (element.form.Image.value == '')
+                        element.disabled    = true;
+                    else
                     if (typeof(args.showimage) == 'string' &&
                         args.showimage.toLowercase() == 'yes')
                         element.click();
@@ -904,6 +909,24 @@ function changeDuration()
     this.value      = val.replace(/\bone\syears/i,'1 year');
     this.checkfunc();   // validate
 }       // function changeDuration
+
+/************************************************************************
+ *  function changeImage                                                *
+ *                                                                      *
+ *  Take action when the user changes the image URL.                    *
+ *                                                                      *
+ *  Input:                                                              *
+ *      this            <input name='Image'>                            *
+ ************************************************************************/
+function changeImage()
+{
+    let button          		= document.getElementById('ShowImage');
+    if (this.value == '')
+        button.disabled 		= true;
+    else
+        button.disabled 		= false;
+    this.checkfunc();   // validate
+}       // function changeImage
 
 /************************************************************************
  *  function changeOccupation                                           *

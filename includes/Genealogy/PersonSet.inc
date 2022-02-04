@@ -21,8 +21,10 @@ use \Iterator;
  *      2020/07/28      do surname REGEXP against tblNR                 *
  *      2021/01/01      improve performance of surname searches         *
  *      2021/03/11      optionally generate explain for performance     *
+ *      2022/01/10      change fieldname tblNX.`order` to `type` to     *
+ *                      avoid conflict with SQL reserved word           *
  *                                                                      *
- *  Copyright &copy; 2021 James A. Cobban                               *
+ *  Copyright &copy; 2022 James A. Cobban                               *
  ************************************************************************/
 require_once __NAMESPACE__ . '/RecordSet.inc';
 require_once __NAMESPACE__ . '/Person.inc';
@@ -133,7 +135,7 @@ class PersonSet extends RecordSet
                                            'tblIR.BirthSD,' .
                                            '-99999999)';
 
-        $parms['groupby']   = 'tblIR.IDIR, tblIR.ID, EBirth.EventD, EDeath.EventD, tblNX.Surname, tblNX.GivenName, tblNX.`Order`, EBirth.EventSD, tblIR.BirthSD';
+        $parms['groupby']   = 'tblIR.IDIR, tblIR.ID, EBirth.EventD, EDeath.EventD, tblNX.Surname, tblNX.GivenName, tblNX.`Type`, EBirth.EventSD, tblIR.BirthSD';
         // identify joined tables referenced by the WHERE expression
         $tableName  = 'tblIR' .
                    ' JOIN tblNX ON tblNX.IDIR=tblIR.IDIR' .
@@ -158,7 +160,7 @@ class PersonSet extends RecordSet
                                 "EDeath.EventD AS EDeathD, " .
                                 "tblNX.Surname AS indexsurname, " .
                                 "tblNX.GivenName AS indexgivenname, " .
-                                "tblNX.`Order` AS indextype");
+                                "tblNX.`Type` AS indextype");
 
         if ($this->information['count'] > 1000 && $this->limit > 1000)
         {
@@ -929,7 +931,7 @@ class PersonSet extends RecordSet
         // in search, exclude married names from search
         if (!$incMarried && is_int(strpos($where , 'tblNX')))
         {           // restrict to birth surnames
-            $where      .= $and . "tblNX.`Order`>=0";
+            $where      .= $and . "tblNX.`Type`>=0";
         }           // restrict to birth surnames
 
         if (strlen($message) > 0)

@@ -14,11 +14,12 @@
  *      2018/09/15      open new window for genealogy and Blogs         *
  *      2018/10/07      do not open genealogy page twice                *
  *                      do not use window.open                          *
+ *      2022/01/28      use addEventListener                            *
  *                                                                      *
- *  Copyright &copy; 2018 James Cobban                                  *
+ *  Copyright &copy; 2022 James Cobban                                  *
  ************************************************************************/
 
-window.onload   = indexLoaded;
+window.addEventListener("load", indexLoaded, false);
 
 /************************************************************************
  *  function indexLoaded                                                *
@@ -33,11 +34,12 @@ function indexLoaded()
     let tabsRow = document.getElementById("mainTabsRow");
     if (tabsRow)
     {
-        let cells       = tabsRow.getElementsByTagName("SPAN");
+        let cells           = tabsRow.getElementsByTagName("SPAN");
         for (let i = 0; i < cells.length; i++)
         {       // for each data cell in the row
-            let cell    = cells[i];
-            cell.onclick    = tabSel;   // activate an event method
+            let cell        = cells[i];
+            // activate an event handler for mouse clicks
+            cell.addEventListener("click",  tabSel);
         }       // for each data cell in the row
     }
 }       // function indexLoaded
@@ -54,34 +56,34 @@ function indexLoaded()
 function tabSel(ev)
 {
     if (!ev)
-        ev          = window.event;
+        ev                  = window.event;
     ev.stopPropagation();
 
-    let tabsRow     = this.parentNode;
-    let cells       = tabsRow.getElementsByTagName("SPAN");
+    let tabsRow             = this.parentNode;
+    let cells               = tabsRow.getElementsByTagName("SPAN");
     for (let i = 0; i < cells.length; i++)
-    {               // for each data cell in the row
-        let cell    = cells[i];
+    {                   // for each data cell in the row
+        let cell            = cells[i];
         if (cell != this)
             cell.className  = "tabs";   // set to standard style
-    }               // for each data cell in the row
+    }                   // for each data cell in the row
 
     for (let i = 0; i < this.childNodes.length; i++)
-    {               // loop through child tags
-        let child       = this.childNodes[i];
+    {                   // loop through child tags
+        let child           = this.childNodes[i];
         if (child.nodeName == 'A')
-        {           // link
+        {               // link
             if (child.target == '_blank')
             {           // open new tag
                 this.className      = "tabs";
                 let mainTab         = document.getElementById('contactsTab');
-                mainTab.className  = "tabsFront";
+                mainTab.className   = "tabsFront";
             }
             else
             {
                 this.className      = "tabsFront";
             }
             break;
-        }           // link
-    }               // loop through child tags
+        }               // link
+    }                   // loop through child tags
 }       // function tabSel
