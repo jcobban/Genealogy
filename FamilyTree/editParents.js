@@ -172,48 +172,48 @@ function loadEdit()
 		editPref	= document.indForm.elements['Edit' + args.idmr];
 		if (editPref)
 		{
-		    idmrNotSet	= false;
+		    idmrNotSet	        = false;
 		}
     }			// idmr parameter passed
    
     // handle keystrokes that apply to the entire dialog
-    document.body.onkeydown	= epKeyDown;
+    document.body.onkeydown	    = epKeyDown;
 
     // activate handling of key strokes in text input fields
     // including support for context specific help
     for (var fi = 0; fi < document.forms.length; fi++)
-    {		// loop through all forms
-		var form	= document.forms[fi];
+    {		            // loop through all forms
+		var form	            = document.forms[fi];
 		if (form.name == 'indForm')
-		{	// list of marriages form
+		{	            // list of marriages form
 		    // set action methods for form
-		    form.onsubmit	= validateForm;
-		    form.onreset 	= resetForm;
-		}	// list of marriages form
+		    form.onsubmit	    = validateForm;
+		    form.onreset 	    = resetForm;
+		}	            // list of marriages form
 		else
 		if (form.name == 'famForm')
-		{	// individual marriage form
+		{	            // individual marriage form
 		    // set action methods for form
-		    form.onsubmit	= validateForm;
-		    form.onreset 	= resetForm;
+		    form.onsubmit	    = validateForm;
+		    form.onreset 	    = resetForm;
 
 		    // callback from editEvent.php
 		    form.eventFeedback	= eventFeedback;
-		}	// individual marriage form
+		}	            // individual marriage form
 
-		var formElts	= form.elements;
+		var formElts	        = form.elements;
 		for (var i = 0; i < formElts.length; ++i)
-		{	// loop through all elements
-		    var element	= formElts[i];
+		{	            // loop through all elements
+		    var element	        = formElts[i];
 
 		    if (element.nodeName.toUpperCase() == 'FIELDSET')
 				continue;
 
 		    var	name;
 		    if (element.name && element.name.length > 0)
-				name	= element.name;
+				name	        = element.name;
 		    else
-				name	= element.id;
+				name	        = element.id;
             if (name.length == 0)
                 continue;
 
@@ -236,47 +236,47 @@ function loadEdit()
 		    switch(colName)
 		    {
 				case 'Add':
-				{	// add a marriage
+				{	    // add a marriage
 				    element.onclick	= addFamily;
 				    break;
-				}	// Add
+				}	    // Add
     
 				case 'Finish':
-				{	// close button
+				{	    // close button
 				    element.onclick	= finish;
 				    // put the initial keyboard focus on the "Close" button so
 				    // pressing Enter closes the dialog
 				    element.focus();
 				    break;
-				}	// Finish
+				}	    // Finish
     
 				case 'Reorder':
-				{	// reorder marriages by date
+				{	    // reorder marriages by date
 				    element.onclick	= marrReorder;
 				    break;
-				}	// Reorder
+				}	    // Reorder
 
 				case 'HusbSurname':
-				{	// surname fields
+				{	    // surname fields
 				    element.checkfunc		= checkName;
 				    element.onchange		= changeHusbSurname;
 				    break;
-				}	// surname fields
+				}	    // surname fields
 
 				case 'WifeSurname':
-				{	// surname fields
+				{	    // surname fields
 				    element.checkfunc		= checkName;
 				    element.onchange		= change;
 				    break;
-				}	// surname fields
+				}	    // surname fields
 
 				case 'HusbGivenName':
 				case 'WifeGivenName':
-				{	// name fields
+				{	    // name fields
 				    element.checkfunc		= checkName;
 				    element.onchange		= change;
 				    break;
-				}	// name fields
+				}	    // name fields
 
 				case 'MarD':
 				{		// marriage date
@@ -340,12 +340,6 @@ function loadEdit()
 				case 'detachWife':
 				{
 				    element.onclick		= detachWife;
-				    break;
-				}
-
-				case 'marriageDetails':
-				{
-				    element.onclick		= marriageDetails;
 				    break;
 				}
 
@@ -521,9 +515,9 @@ function loadEdit()
 				    break;
 				}		// Delete family
 
-		    }	// switch on element name
-		}	// loop through all elements in the form
-    }		// loop through all forms
+		    }	        // switch on element name
+		}	            // loop through all elements in the form
+    }		            // loop through all forms
 
     // provide methods for other pages to modify information on husband
     // and wife
@@ -875,6 +869,12 @@ function createMother()
 	let wifeGiven	        = form.WifeGivenName.value; 
 	let wifeSurname         = form.WifeSurname.value;
 	let treename		    = form.treename.value;
+    if (wifeSurname == '')
+    {
+        wifeSurname         = 'Wifeof' +
+                                form.HusbGivenName.value +
+                                form.HusbSurname.value;
+    }
     for (var ib = 0; ib < editChildButtons.length; ib++)
     {				// disable all editChild buttons
 		editChildButtons[ib].disabled	= true;

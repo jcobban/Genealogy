@@ -140,19 +140,18 @@ function onLoad()
         let openerPath      = invoker.location.pathname;
         let dlm             = openerPath.lastIndexOf('/');
         let openerName      = openerPath.substr(dlm + 1);
-        //alert("Person: openerName='" + openerName + "'");
         if (openerName == "editMarriages.php" ||
             openerName == "editParents.php")
             close();
         }   // try
         catch (e) {
             var msg     = "Person.js: onLoad: msg=" + e.message;
-            if (invoker.location)
-            {
-                msg     += ", location=" + invoker.location;
-                if (invoker.location.pathname)
-                    msg += ", pathname=" + invoker.location.pathname;
-            }
+//            if (invoker.location)
+//            {
+//                msg     += ", location=" + invoker.location;
+//                if (invoker.location.pathname)
+//                    msg += ", pathname=" + invoker.location.pathname;
+//            }
             console.log(msg);
         }   // catch
     }       // invoked from another page

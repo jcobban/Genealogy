@@ -34,8 +34,30 @@
 	
 	  $TRACE
 	  $MSG
+      <div id="noStateId">
+	    <form name='refreshForm' id='refreshForm'
+	    	    action='DistForm.php' 
+                method='get'> 
+	      <input type='hidden' name='Census' id='refreshCensus'
+			    value='$CENSUSID'>
+	      <input type="hidden" name="offset" id="refreshoffset" 
+			    value="$OFFSET">
+	      <input type="hidden" name="limit" id="refreshlimit" 
+			    value="$LIMIT">
+	      <input type="hidden" name="lang" id="refreshlang" 
+			    value="$LANG">
+          <label for="refreshProv" class="label">
+              Province ou État n'est pas specifié:
+          </label>
+          <select name="Province" id="refreshProv">
+            <option value=''>Choisir une Province</option>
+            <option value='$CODE' id="prov$CODE">$NAME</option>
+          </select>
+          <button type="submit" id="refreshSubmit">Rafraîchir</button>
+        </form>
+      </div>
 	  <span id="notauthorized">
-	    <p class="warning">
+	  <p class="warning">
 		Vous n'etes pas authorisée.
 	    <a href="/Signon.php" class="button">Enregistrer</a>
 		pour mettre a jour la base de données.
@@ -180,8 +202,8 @@
     <div class="hidden" id="noCensusId">
         L'identifiant de récensement identifiant n'a pas été spécifié. 
     </div>
-    <div class="hidden" id="noStateId">
-        L'identifiant de la Province ou État n'a pas été spécifié. 
+    <div class="hidden" id="invCensusId">
+        L'identifiant de recensement invalide '$censusId'. 
     </div>
      <script src= '/jscripts/CommonForm.js' type="text/javascript">
     </script>

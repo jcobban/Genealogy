@@ -64,8 +64,9 @@ use \Exception;
  *		2020/10/31      default to browser's preferred language         *
  *		2020/12/03      fix XSS errors                                  *
  *		2020/12/17      correct handling of missing HTTP_ACCEPT_LANGUAGE*
+ *		2022/03/23      add display of non-Latin surname initials       *
  *																		*
- *  Copyright &copy; 2020 James A. Cobban								*
+ *  Copyright &copy; 2022 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/Name.inc';
 require_once __NAMESPACE__ . '/FtTemplate.inc';
@@ -183,6 +184,24 @@ $template->set('NAME',		    $name);
 $template->set('TREENAME',		$treeNameText);
 $template->set('birthmin',		$birthmin);
 $template->set('birthmax',		$birthmax);
+
+$initials           = Surname::getInitials(Surname::EXCLUDE_LATIN);
+if (count($initials) > 0)
+{
+    $row            = $template['InitialsRow$rownum']->outerHTML;
+    $entry          = $template['Initial$initial']->outerHTML;
+    $data           = '';
+    foreach($initials as $initial)
+        $data       .= str_replace(array('$initial','$LANG'), 
+                                   array($initial, $lang),
+                                   $entry);
+    $others         = str_replace(array('$rownum',$entry),
+                                  array(0, $data),
+                                  $row);
+}
+else
+    $others         = '';
+$template->set('OTHERS',		$others);
 
 if (!canUser('edit'))
 {

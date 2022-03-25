@@ -13,6 +13,7 @@
  *                      id attributes of elements in a template         *
  *      2020/03/31      translate to French                             *
  *      2022/02/01      support ES2015                                  *
+ *      2022/03/23      support non-Latin surnames                      *
  *                                                                      *
  *  Copyright &copy; 2022 James A. Cobban                               *
  **********************************************************************-->
@@ -156,9 +157,13 @@
           <a class="em4" href="/FamilyTree/Surnames.php?initial=Y&lang=$LANG">Y</a>
           <a class="em4" href="/FamilyTree/Surnames.php?initial=Z&lang=$LANG">Z</a>
         </p>
+        $OTHERS
         <div style="clear: both;"></div>
     </div> <!-- end of <div id="body"> -->
     <div class="hidden" id="templates">
+      <p class="label" id="InitialsRow$rownum">
+        <a class="em4" href="/FamilyTree/Surnames.php?initial=$initial&lang=$LANG" id="Initial$initial">$initial</a>
+      </p>
       <!-- template for dialog for creating new tree -->
       <form name="CreateTreeTemplate" id="CreateTreeTemplate"
                 onsubmit="return false;">

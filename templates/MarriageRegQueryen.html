@@ -20,6 +20,9 @@
     		$COUNTRYNAME</a>:
         <a href="/Canada/genProvince.php?domain=$DOMAIN&lang=$LANG" id="stateCrumb">
     		$STATENAME</a>:
+      <a href="/Ontario/MarriageRegStats.php?RegDomain=$DOMAIN&amp;lang=$LANG">
+  		    Transcription Status
+      </a>:
     </div>
     <div class='body'>
       <h1>$DOMAINNAME: Marriage Registration Query
@@ -382,6 +385,13 @@
       This is normally not selected.
     </div>
     <div class='hidden' id='templates'>
+      <span id="invalidDomain">Domain=$domain is invalid. </span>
+      <span id="unsupportedDomain">Domain=$domain is not supported. </span>
+      <span id="invalidRegYear">RegYear=$regyear is not numeric. </span>
+      <span id="regyearNotSpecified">RegYear parameter was not specified. </span>
+      <span id="invalidRegNum">RegNum=$regnum is not numeric. </span>
+      <span id="regnumNotSpecified">RegNum parameter was not specified. </span>
+      <p id="invalidLang">Lang=$lang is not in BCP 47 standard format.  Lang=en is assumed. </p>
       <div class='left' id='noCountyMsg'>
           Counties summary file "CountiesListXml.php?Prov=$PROVINCE"
           not available from server.

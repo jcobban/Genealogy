@@ -32,11 +32,13 @@ use \Exception;
  *		                more function to script and return JSON         *
  *		2020/04/13      correct order of persons                        *
  *		2021/01/01      correct poor performance if only 1 surname      *
+ *		2022/03/23      feedback next surname                           *
  *																		*
- *  Copyright &copy; 2021 James A. Cobban								*
+ *  Copyright &copy; 2022 James A. Cobban								*
  ************************************************************************/
 header("Content-Type: application/json");
 require_once __NAMESPACE__ . '/LegacyDate.inc';
+require_once __NAMESPACE__ . '/Surname.inc';
 require_once __NAMESPACE__ . '/Person.inc';
 require_once __NAMESPACE__ . '/Family.inc';
 require_once __NAMESPACE__ . '/PersonSet.inc';
@@ -466,7 +468,13 @@ if (strlen($msg) == 0)
     print "      \"cmd\" : \"new PersonSet($msgParms)\"";
     $result		                    = new PersonSet($getParms);
     $info		                    = $result->getInformation();
-    print ",\n      \"query\" : \"" . str_replace('"', '\\"', $info['query']) . "\"";
+    print ",\n      \"query\" : \"" .
+        str_replace('"', '\\"', $info['query']) . "\"";
+    $surnameObj                     = new Surname(array('surname' => $surname));
+    $nextObj                        = $surnameObj->next();
+    print ",\n      \"nextSurname\" : \"" .
+        str_replace('"', '\\"', $nextObj->getSurname()) . "\"";
+
     if (isset($info['count']))
         $count		                = $info['count'];
     else

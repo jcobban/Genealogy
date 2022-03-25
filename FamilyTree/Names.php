@@ -339,9 +339,9 @@ else
         $prefix             = 'Mc';
     else
     if (substr($surname, 0, 2) == "O'")
-        $prefix             = substr($surname, 0, 3);
+        $prefix             = mb_substr($surname, 0, 3);
     else
-        $prefix             = substr($surname, 0, 1);
+        $prefix             = mb_substr($surname, 0, 1);
 }                   // surname provided
 
 // construct the query

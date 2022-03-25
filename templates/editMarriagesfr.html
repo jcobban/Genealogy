@@ -587,10 +587,6 @@
 		location by typing in its name or short name, or by editing the location
 		record itself.
 	</div>
-	<div class="balloon" id="HelpmarriageDetails">
-	    Clicking on this button opens a dialog that permits you to add further
-		details about the marriage and to specify source citations for the fact.
-	</div>
 	<div class="balloon" id="HelpMarEndD">
 	    <p>Supply the date that the marriage or relationship came to an end.
 		If the marriage came to an end as a result of some specific event,
@@ -832,31 +828,40 @@
 	  </table>
 	
 	    <!-- template for marriage event row -->
-		<div class="row" id="MarriageRow">
+		<div class="row" id="MarriageRow$rownum">
 		  <div class="column1">
-		    <label class="column1" for="MarD">
-				Married:
+		    <label class="column1" for="MarD$rownum">
+				Marié:
 		    </label>
-		    <input type="text" name="MarD" id="MarD"
+		    <input type="text" name="MarD$rownum" id="MarD$rownum"
 						size="12" maxlength="100"
 						class="white left" value="$eventd">
 		    <span style="font-weight: bold;">at</span>
-		    <input type="text" name="MarLoc" id="MarLoc"
+		    <input type="text" name="MarLoc$rownum" id="MarLoc$rownum"
 						size="36" maxlength="255"
 						class="white leftnc" value="$eventloc">
 		  </div>
 		  <div>
-		    <button type="button" class="button" id="marriageDetails">
-				Details
+            <input type="hidden" id="IDER$rownum" name="IDER$rownum"
+                    value="$ider">
+            <input type="hidden" 
+                     id="CitType$rownum" name="CitType$rownum"
+                     value="$cittype">
+		    <button type="button" class="button" style="width: 8em;"
+						id="EditIEvent$rownum">
+				Modifier
 		    </button>
-		  </div>
+		    <button type="button" class="button" style="width: 8em;"
+                        id="DelIEvent$rownum">
+				Ecraser
+		    </button>
 		  <div style="clear: both;"></div>
 		</div> <!-- end of Marriage row -->
 
         $EVENTTEMPLATE
 
 	    <!-- template for sealed to spouse event row -->
-		<div class="row" id="SealedRow$temp">
+		<div class="row" id="SealedRow$rownum">
 		  <div class="column1">
 		    <label class="column1" for="SealD">
 				Sealed&nbsp;to&nbsp;Spouse (LDS):
@@ -873,12 +878,17 @@
 		      </select>
 		    </div>
 		    <div>
+            <input type="hidden" id="IDER$rownum" name="IDER$rownum"
+                    value="$ider">
+            <input type="hidden" 
+                     id="CitType$rownum" name="CitType$rownum"
+                     value="18">
 		      <button type="button" class="button"
-						id="EditIEvent18$temp">
+						id="EditIEvent$rownum">
 				Details
 		      </button>
 		      &nbsp;
-		      <button type="button" class="button" id="DelIEvent18$temp">
+		      <button type="button" class="button" id="DelIEvent$rownum">
 				Delete
 		      </button>
 		    </div>
@@ -887,7 +897,7 @@
 	  <!-- end of template for sealed to spouse event row -->
 	
 	  <!-- template for marriage ended event row -->
-		<div class="row" id="EndedRow$temp">
+		<div class="row" id="EndedRow$rownum">
 		  <div class="column1">
 		    <label class="column1" for="MrEndD">
 				Marriage&nbsp;Ended:
@@ -898,11 +908,11 @@
 		  </div>
 		  <div>
 		    <button type="button" class="button"
-						id="EditIEvent24$temp">
+						id="EditIEvent24$rownum">
 				Details
 		    </button>
 		    &nbsp;
-		    <button type="button" class="button" id="DelIEvent24$temp">
+		    <button type="button" class="button" id="DelIEvent24$rownum">
 				Delete
 		    </button>
 		  </div>
@@ -944,16 +954,16 @@
 	  <!-- end of template for marriage event row -->
 	
 	  <!-- template for never married fact row -->
-		<div class="row" id="NotMarriedRow$temp">
+		<div class="row" id="NotMarriedRow$rownum">
 		  <div class="column1">
 		    <label class="column1" for="NotMarried">
 				Not Married:
 		    </label>
-		    <input type="checkbox" name="NotMarried$temp" id="NotMarried$temp"
+		    <input type="checkbox" name="NotMarried$rownum" id="NotMarried$rownum"
 				checked="checked">
 		  </div>
 		  <div>
-		    <button type="button" class="button" id="neverMarriedDetails$temp">
+		    <button type="button" class="button" id="neverMarriedDetails$rownum">
 				Details
 		    </button>
 		  </div>
@@ -962,16 +972,16 @@
 	  <!-- end of template for never married fact row -->
 	
 	  <!-- template for no children fact row -->
-		<div class="row" id="NoChildrenRow$temp">
+		<div class="row" id="NoChildrenRow$rownum">
 		  <div class="column1">
 		    <label class="column1" for="NoChildren">
 				No Children:
 		    </label>
-		    <input type="checkbox" name="NoChildren$temp" id="NoChildren$temp"
+		    <input type="checkbox" name="NoChildren$rownum" id="NoChildren$rownum"
 						checked="checked">
 		  </div>
 		  <div>
-		    <button type="button" class="button" id="noChildrenDetails$temp">
+		    <button type="button" class="button" id="noChildrenDetails$rownum">
 				Details
 		    </button>
 		  </div>
@@ -986,6 +996,7 @@
 	      <button type="button" id="confirmClear$type">
 		    OK
 	      </button>
+          <input type="hidden" id="ider" name="ider" value="$ider">
 	      <input type="hidden" id="formname$type" name="formname$type"
 				    value="$formname">
 		    &nbsp;

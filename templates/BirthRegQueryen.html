@@ -6,8 +6,9 @@
  *																		*
  *  History:															*
  *		2018/10/05		created											*
+ *      2022/03/09      add warning messages for bad parameters         *
  *																		*
- *  Copyright &copy; 2018 James A. Cobban								*
+ *  Copyright &copy; 2022 James A. Cobban								*
  **********************************************************************-->
 	<div id="breadcrumbs" class="hidden">
 	    <a href="/genealogy.php?lang=$LANG">
@@ -19,6 +20,8 @@
 			$COUNTRYNAME</a>:
 	    <a href="/Canada/genProvince.php?domain=$DOMAIN&lang=$LANG" id="stateCrumb">
 			$DOMAINNAME</a>:
+	    <a href="/Canada/BirthRegStats.php?RegDomain=$DOMAIN&lang=$LANG" id="summaryCrumb">
+			Transcription Status</a>:
 	</div>
 	 <div class="body">
 	  <h1>$DOMAINNAME: Birth Registration Query
@@ -415,6 +418,9 @@
 		Loading...
 	</div>
 	<div class="hidden" id="templates">
+      <span id="invalidCode">Invalid code='$code'. </span>
+      <span id="invalidDomain">Invalid domain='$domain'. </span>
+      <span id="invalidLang">Invalid lang='$lang'. </span>
 	  <div id="chooseTownshipCell">
 			<select size="0" name="RegTownship" class="white left">
                 <option value="">Choose a Township</option>

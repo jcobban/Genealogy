@@ -66,8 +66,9 @@ use \Exception;
  *      2021/05/15      extend support for SOURCE to include DROP and   *
  *                      CREATE                                          *
  *      2021/10/17      format large numbers with separators            *
+ *      2022/03/20      accept INSERT IGNORE                            *
  *                                                                      *
- *  Copyright &copy; 2021 James A. Cobban                               *
+ *  Copyright &copy; 2022 James A. Cobban                               *
  ************************************************************************/
     require_once __NAMESPACE__ . '/Address.inc';
     require_once __NAMESPACE__ . '/Child.inc';
@@ -1857,7 +1858,7 @@ $template->set('LANG',              $lang);
 // parse patterns for SQL commands
 $cmdPattern                 = '/^\s*(\w+)\s+(.*)$/';
 $deletePattern              = '/^(\w*)\s*FROM\s+(\w+)\s+(.*)$/i';
-$insertPattern              = '/^INTO\s+(\w+)\s+(.*)$/i';
+$insertPattern              = '/^(IGNORE\s+|)INTO\s+(\w+)\s+(.*)$/i';
 $updatePattern              = '/^(\w+)\s+(.*)\s+WHERE\s+(.*)$/i';
 
 // results of parse
@@ -1968,13 +1969,14 @@ if (strlen($msg) == 0 && $sqlCommand && strlen($sqlCommand) > 0)
                                          $matches);
                 if ($result == 1)
                 {
-                    $table      = $matches[1];
-                    $operands   = $matches[2];
+                    $ignore     = $matches[1];
+                    $table      = $matches[2];
+                    $operands   = $matches[3];
                     $info       = Record::getInformation($table);
                     if ($info)
                     {
                         $table  = $info['table'];
-                        $sqlCommand = "INSERT INTO $table $operands";
+                        $sqlCommand = "INSERT $ignore INTO $table $operands";
                     }
                     $query      = false;
                     $count      = 1;
@@ -2673,7 +2675,12 @@ if (strlen($msg) == 0 && $sqlCommand && strlen($sqlCommand) > 0)
             else
             {
                 $sresult[]      = array('line' => $line, 'cmd' => $sqlCommand, 'error' => 'Y');
-                $warn           .= "<p>parse failed for pattern '$cmdPattern' string '$sqlCommand'</p>\n";
+                if (strlen($sqlCommand) > 200)
+                    $sqlAbbr    = substr($sqlCommand, 0, 150) . ' ... ' .
+                                    substr($sqlCommand, -50);
+                else
+                    $sqlAbbr    = $sqlCommand; 
+                $warn           .= "<p>SqlCommand.php: " . __LINE__ . "parse failed for pattern '$cmdPattern' string '$sqlAbbr'</p>\n";
             }
             $line++;
         }

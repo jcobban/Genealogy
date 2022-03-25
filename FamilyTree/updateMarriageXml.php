@@ -123,7 +123,7 @@ require_once __NAMESPACE__ . '/LegacyDate.inc';
 require_once __NAMESPACE__ . '/common.inc';
 
 // emit the XML header
-print "<?xml version='1.0' encoding='UTF-8'?>\n";
+print ("<?xml version='1.0' encoding='UTF-8'?" . ">\n");
 print "<marriage>\n";
 
 // user must be authorized to edit the database
@@ -394,13 +394,19 @@ if (isset($_POST) && count($_POST) > 0)
 	                $wife                   = null;
 	            if ($wife)
 	            {               // may be new wife or wife's name may be changed 
-	                $wife->save('mard' . __LINE__);
+                    $wife->save(false);
+                    $lastSql    = $wife->getLastSqlCmd();
+                    if (strlen($lastSql) > 0)
+                    {
+                        $ttagname   = "mard" . __LINE__;
+                        print "<$ttagname>$lastSql</$ttagname>\n";
+                    }
 				    $idirwife	            = $wife['idir'];
 	                $family['idirwife']     = $idirwife;
 	            }               // may be new wife or wife's name may be changed 
 
 	    		// this call also sets field 'marsd'
-	    		$family['mard']		        = $value;
+                $family['mard']		        = $value;
 	    		break;
 		    }		// date of marriage
 
@@ -443,8 +449,16 @@ if (isset($_POST) && count($_POST) > 0)
 				if ($value && strlen($value) > 0)
 				{
 					$marLocation	= new Location(array('location' => $value));
-					if (!$marLocation->isExisting())
-					    $marLocation->save('marloc' . __LINE__);
+                    if (!$marLocation->isExisting())
+                    {
+                        $marLocation->save(false);
+                        $lastSql    = $marLocation->getLastSqlCmd();
+                        if (strlen($lastSql) > 0)
+                        {
+                            $ttagname   = 'marloc' . __LINE__;
+                            print "<$ttagname>$lastSql</$ttagname>\n";
+                        }
+                    }
 					$IDLRMar	    = $marLocation->getId();
 				}
 				else
@@ -550,7 +564,13 @@ if (isset($_POST) && count($_POST) > 0)
 
 	            if ($idir >= 0 && !$family->isExisting())
 	            {                   // possibly true on first child
-	                $family->save('cidir' . __LINE__);
+                    $family->save(false);
+                    $lastSql    = $family->getLastSqlCmd();
+                    //if (strlen($lastSql) > 0)
+                    {
+                        $ttagname   = 'cidir' . __LINE__;
+                        print "<$ttagname>$lastSql</$ttagname>\n";
+                    }
 	                $idmr                       = $family->getIdmr();
 	            }                   // possibly true on first child
 
@@ -559,7 +579,13 @@ if (isset($_POST) && count($_POST) > 0)
 				if ($child !== null)
 	            {		            // complete previous child
 	                $isNewChild                 = !$child->isExisting();
-	                $child->save("\tcidir" . __LINE__);
+                    $child->save(false);
+                    $lastSql    = $child->getLastSqlCmd();
+                    if (strlen($lastSql) > 0)
+                    {
+                        $ttagname   = 'cidir' . __LINE__;
+                        print "\t<$ttagname>$lastSql</$ttagname>\n";
+                    }
 	                $cidir                      = $child['idir'];
 	                if ($isNewChild)
 	                {
@@ -686,11 +712,25 @@ if (isset($_POST) && count($_POST) > 0)
 	            if ($child)
 	            {
 	                $child['birthd']	        = $value;
-	                if (!$child->isExisting())
-	                    $child->save('cbirth');
+                    if (!$child->isExisting())
+                    {
+                        $child->save(false);
+                        $lastSql    = $child->getLastSqlCmd();
+                        if (strlen($lastSql) > 0)
+                        {
+                            $ttagname   = 'cbirth' . __LINE__;
+                            print "\t<$ttagname>$lastSql</$ttagname>\n";
+                        }
+                    }
 	                $birthEvent                 = $child->getBirthEvent(true);
 	                $birthEvent['eventd']       = $value;
-	                $birthEvent->save('cbirth');
+                    $birthEvent->save(false);
+                    $lastSql    = $birthEvent->getLastSqlCmd();
+                    if (strlen($lastSql) > 0)
+                    {
+                        $ttagname   = 'cbirth' . __LINE__;
+                        print "\t<$ttagname>$lastSql</$ttagname>\n";
+                    }
 	            }
 				break;
 		    }	            // death date of child
@@ -703,7 +743,13 @@ if (isset($_POST) && count($_POST) > 0)
 	            if ($deathEvent)
 	            {
 	                $deathEvent['eventd']       = $value;
-	                $deathEvent->save('cbirth');
+                    $deathEvent->save(false);
+                    $lastSql    = $deathEvent->getLastSqlCmd();
+                    if (strlen($lastSql) > 0)
+                    {
+                        $ttagname   = 'cdeath';
+                        print "\t<$ttagname>$lastSql</$ttagname>\n";
+                    }
 	            }
 				break;
 		    }	            // death date child
@@ -722,12 +768,14 @@ if (isset($_POST) && count($_POST) > 0)
 	            $e->getTraceAsString();
 		    print "<msg>$msg</msg>\n";
 	    }
-		print "        </$key>\n";	// close off tag
+        print "        </$key>\n";	// close off tag
+        flush();
 	}		                // loop through parameters
 }                       // invoked by method=post
 
 
 print "    </parms>\n";		// close off parms tag
+flush();
 
 // if there were any errors detected, report them and terminate
 if (is_null($idmr))
@@ -744,19 +792,37 @@ if (strlen($msg) > 0)
 
 if ($husb)
 {
-    $husb->save('husb' . __LINE__);
+    $husb->save(false);
+    $lastSql        = $husb->getLastSqlCmd();
+    if (strlen($lastSql) > 0)
+    {
+        $ttagname   = 'husb' . __LINE__;
+        print "\t<$ttagname>$lastSql</$ttagname>\n";
+    }
     $idirhusb	                = $husb->getIdir();
     $family['idirhusb']		    = $idirhusb;
 }
 
 if ($wife)
 {
-    $wife->save('wife' . __LINE__);
+    $wife->save(false);
+    $lastSql        = $wife->getLastSqlCmd();
+    if (strlen($lastSql) > 0)
+    {
+        $ttagname   = 'wife' . __LINE__;
+        print "\t<$ttagname>$lastSql</$ttagname>\n";
+    }
     $idirwife	                = $wife->getIdir();
     $family['idirwife']		    = $idirwife;
 }
 
-$family->save('create' . __LINE__);
+$family->save(false);
+$lastSql    = $family->getLastSqlCmd();
+if (strlen($lastSql) > 0)
+{
+    $ttagname                   = 'create' . __LINE__;
+    print "\t<$ttagname>$lastSql</$ttagname>\n";
+}
 $idmr                           = $family->getIdmr();
 
 if ($wife)
@@ -777,18 +843,38 @@ if ($wife)
 	    $nameRec['surname']		= $family['husbsurname'];
         $nameRec['marriednamecreatedby']	= 1;
     }                   // take husband's surname
-	$nameRec->save('wife' . __LINE__);
+    $nameRec->save(false);
+    $lastSql    = $nameRec->getLastSqlCmd();
+    if (strlen($lastSql) > 0)
+    {
+        $ttagname   = 'name' . __LINE__;
+        print "\t<$ttagname>$lastSql</$ttagname>\n";
+    }
 }
 
 // apply last minute changes to Family if any
-$family->save('create' . __LINE__);
+$family->save(false);
+$lastSql        = $family->getLastSqlCmd();
+if (strlen($lastSql) > 0)
+{
+    $ttagname   = 'create' . __LINE__;
+    print "\t<$ttagname>$lastSql</$ttagname>\n";
+}
 $idmr                           = $family->getIdmr();
 
 // update the male partner if necessary
 if (is_object($husb))
 {		            // have husband
     if (!$husb->isExisting())
-        $husb->save('husb' . __LINE__);
+    {
+        $husb->save(false);
+        $lastSql        = $husb->getLastSqlCmd();
+        if (strlen($lastSql) > 0)
+        {
+            $ttagname   = 'husb' . __LINE__;
+            print "\t<$ttagname>$lastSql</$ttagname>\n";
+        }
+    }
     $idirhusb	            = $husb->getIdir();
     $family['idirhusb']		= $idirhusb;
     if ($husb['gender'] == 0)
@@ -805,7 +891,13 @@ else
 if (is_object($wife))
 {		            // have wife
     $wife['sex']		    = Person::FEMALE;
-	$wife->save('wife' . __LINE__);
+    $wife->save(false);
+    $lastSql        = $wife->getLastSqlCmd();
+    if (strlen($lastSql) > 0)
+    {
+        $ttagname   = 'wife' . __LINE__;
+        print "\t<$ttagname>$lastSql</$ttagname>\n";
+    }
 	$idirWife	            = $wife->getIdir();
 	$family['idirwife']		= $idirWife;
 	$family->setName($wife);
@@ -820,7 +912,13 @@ if (is_object($family))
 {		            // there is an update to make
 	// this updates the record in tblMR and all associated records
 	// in tblCR
-	$family->save('family' . __LINE__);
+    $family->save(false);
+    $lastSql        = $family->getLastSqlCmd();
+    //if (strlen($lastSql) > 0)
+    {
+        $ttagname   = 'family' . __LINE__;
+        print "\t<$ttagname>$lastSql</$ttagname>\n";
+    }
 
 	// include the contents of the updated record	    
     $family->toXml(null);
@@ -830,7 +928,13 @@ if (is_object($family))
         foreach($events as $event)
         {
             $event['idmr']          = $idmr;
-            $event->save('event' . __LINE__);
+            $event->save(false);
+            $lastSql        = $event->getLastSqlCmd();
+            if (strlen($lastSql) > 0)
+            {
+                $ttagname   = 'event' . __LINE__;
+                print "\t<$ttagname>$lastSql</$ttagname>\n";
+            }
         }
     }               // update generic events
 }		            // there is an update to make

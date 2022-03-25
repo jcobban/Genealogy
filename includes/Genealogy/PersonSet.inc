@@ -152,7 +152,7 @@ class PersonSet extends RecordSet
             $tableName  .=
                    " JOIN tblER ON (tblER.IDIR=tblIR.IDIR AND tblER.IDType=0)";
 
-        // if where expression depends upon event records then
+        // if where expression depends upon event records
         parent::__construct($tableName,
                             $parms,
                             "tblIR.*, " .
@@ -727,19 +727,19 @@ class PersonSet extends RecordSet
                         break;
                     }       // birth year to match within range
 
-                }       // act on specific field name
-            }           // comparisons combined by and
-        }           // loop through all parameters
+                }           // act on specific field name
+            }               // comparisons combined by and
+        }                   // loop through all parameters
 
         // construct comparison using both surname and given name
         if (is_string($surname) || is_array($surname))
-        {           // surname field present
+        {                   // surname field present
             if (is_array($surname) && count($surname) > 0)
-            {           // array
+            {               // array
                 if (count($surname) == 2 &&
                     (is_null($surname[1]) ||
                      (strtolower($surname[1]) > strtolower($surname[0]))))
-                {       // range
+                {           // range
                     if (is_null($surname[1]))
                         $lastsurname    = null;
                     else

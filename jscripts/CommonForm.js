@@ -151,8 +151,9 @@
  *      2021/01/16      use XMLSerializer for diagnostic output         *
  *      2021/02/23      in dates insert a space between digit and [     *
  *                      and between letter and [                        *
+ *      2022/03/13      support 'L' for marital status                  *
  *                                                                      *
- *  Copyright &copy; 2021 James A. Cobban                               *
+ *  Copyright &copy; 2022 James A. Cobban                               *
  ************************************************************************/
 
 /************************************************************************
@@ -751,6 +752,8 @@ const  MonthAbbrs = {
  ************************************************************************/
 const  ResTypeAbbrs = {
                 "B"         : "Brick",
+                "BV"        : "BVeneer",
+                "C"         : "Concrete",
                 "F"         : "Frame",
                 "L"         : "Log",
                 "S"         : "Shanty",
@@ -1601,7 +1604,7 @@ function checkSex()
 function checkMStat()
 {
     var element     = this;
-    var re      = /^[BDMSWVCbdmswvc? ]?$/;
+    let re          = /^[BDLMSWVCbdlmswvc? ]?$/;
     var mstat       = element.value;
     setErrorFlag(element, re.test(mstat));
 }       // function checkMStat
@@ -1872,9 +1875,16 @@ function checkYear()
 /************************************************************************
  *  function checkAge                                                   *
  *                                                                      *
- *  Validate the current value of an age field.  Should be numeric age  *
- *  in years, age in months (with a suffix 'm'), a question mark,       *
- *  or [blank].                                                         *
+ *  Validate the current value of an age field.  Should be:             *
+ *      numeric age in years (with optional suffix 'y'),                *
+ *      age in months (with a suffix 'm'),                              * 
+ *      age in months (with suffix '/12'),                              *
+ *      age in weeks (with a suffix 'w'),                               * 
+ *      age in days (with a suffix 'd'),                                *
+ *      age in hours (with a suffix 'h'),                               *
+ *      a question mark, or                                             *
+ *      or [blank].                                                     *
+ *                                                                      *
  *  This is assigned to the checkfunc method of an element.             *
  *                                                                      *
  *  Input:                                                              *
@@ -1883,9 +1893,16 @@ function checkYear()
 function checkAge()
 {
     var element     = this;
-    var re      = /^[mM]?[0-9]+[mM]?$/;
-    var re2     = /^(([0-9½]+)\s*[yY][a-zA-Z]*|)\s*(([0-9½]+)\s*[mM][a-zA-Z]*|)\s*(([0-9½]+)\s*[wW][a-zA-Z]*|)\s*(([0-9½]+)\s*[dD][a-zA-Z]*|)\s*(([0-9½]+)\s*[hH]|)/;
-    var age     = element.value;
+    var re          = /^[mM]?[0-9]+[mM]?$/;
+    var re2         = /^(([0-9½]+)\s*[yY][a-zA-Z]*|)\s*(([0-9½]+)\s*[mM][a-zA-Z]*|)\s*(([0-9½]+)\s*[wW][a-zA-Z]*|)\s*(([0-9½]+)\s*[dD][a-zA-Z]*|)\s*(([0-9½]+)\s*[hH]|)/;
+    var re12        = /([0-9]+)\/12$/;
+    var age         = element.value;
+    var months      = re12.exec(age);
+    if (months !== null)
+    {
+        age         = months[1] + 'm';
+        element.value   = age;
+    }
     setErrorFlag(element, age.length == 0 ||
                           age == '?' ||
                           age.toLowerCase() == '[blank]' ||

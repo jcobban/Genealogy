@@ -175,156 +175,154 @@ $matches			= array();
 foreach($_GET as $key => $value)
 {
     switch(strtolower($key))
-    {		// act on specific keys
+    {		            // act on specific keys
         case 'idir':
-        {		// match an existing individual for merge
+        {		        // match an existing individual for merge
     		if (strlen($value) > 0)
-    		{	// value provided
+    		{	        // value provided
     		    if (ctype_digit($value))
-    		    {	// all numeric
+    		    {	    // all numeric
     				$idir		= $value;
-    				try {
-    				    $indiv   = new Person(array('idir' => $idir));
-    				}		// try
-    				catch (Exception $e) {
+    				$indiv      = new Person(array('idir' => $idir));
+    				if (!$indiv->isExisting())
     				    $msg    .= "No database record for idir=$idir. ";
-    				}	// catch
-    		    }	// all numeric
+    		    }	    // all numeric
     		    else
     				$msg	.= "Invalid value of IDIR='" .
     						   htmlentities($value,ENT_XML1) . "'. ";
-    		}	// value provided
+    		}	        // value provided
     		break;
-        }		// match an existing individual for merge
+        }		        // match an existing individual for merge
 
         case 'surname':
-        {		// match by surname
+        {		        // match by surname
             if (strlen(trim($value)) > 0)
     		    $surname	= $value;
     		break;
-        }		// match by surname
+        }		        // match by surname
 
         case 'lastsurname':
-        {		// match by surname
+        {		        // match by surname
     		if (strlen(trim($value)) > 0)
     		    $lastsurname	= $value;
     		else
     		    $lastsurname	= null;
     		break;
-        }		// match by surname
+        }		        // match by surname
 
         case 'givenname':
-        {		// match by given name pattern
+        {		        // match by given name pattern
             // see note above for surname
             if (strlen(trim($value)) > 0)
     		    $givenname	= str_replace("'", "", $value);
     		break;
-        }		// match by given name pattern
+        }		        // match by given name pattern
 
         case 'treename':
-        {		// match by treename
+        {		        // match by treename
             if (strlen(trim($value)) > 0)
     		    $treename	= $value;
     		break;
-        }		// match by treename
+        }		        // match by treename
 
 
         case 'sex':
-        {		// match by sex
+        {		        // match by sex
     		$sexPassed		= true;
     		if ($value == 'm' || $value == 'M' ||
     		    $value == 'f' || $value == 'F')
     		    $sex		= $value;
     		break;
-        }		// match by sex
+        }		        // match by sex
 
         case 'birthyear':
-        {		// match by approximate year of birth
+        {		        // match by approximate year of birth
     		$birthyearPassed	= true;
     		if (strlen($value) > 0)
-    		{	// value supplied
+    		{	        // value supplied
     		    if (preg_match('/-?\d+/', $value, $matches) == 1)
     				$birthyear	= $matches[0];
     		    else
     				$msg	.= "Invalid value of BirthYear='$value'. ";
-    		}	// value supplied
+    		}	        // value supplied
     		break;
-        }		// match by year of birth
+        }		        // match by year of birth
 
         case 'birthmin':
-        {		// match by year of birth
+        {		        // match by year of birth
     		$birthminPassed	= true;
     		if (strlen($value) > 0)
-    		{	// value supplied
+    		{	        // value supplied
     		    if (preg_match('/-?\d+/', $value, $matches) == 1)
     				$birthmin	= $matches[0];
     		    else
     				$msg	.= "Invalid value of BirthMin='$value'. ";
-    		}	// value supplied
+    		}	        // value supplied
     		else
     		    $birthmin	= -9999;
     		break;
-        }		// match by year of birth
+        }		        // match by year of birth
 
         case 'birthmax':
-        {		// match by year of birth
+        {		        // match by year of birth
     		$birthmaxPassed	= true;
     		if (strlen($value) > 0)
-    		{	// value supplied
+    		{	        // value supplied
     		    if (preg_match('/-?\d+/', $value, $matches) == 1)
     				$birthmax	= $matches[0];
     		    else
     				$msg	.= "Invalid value of BirthMax='$value'. ";
-    		}	// value supplied
+    		}	        // value supplied
     		else
     		    $birthmax	= 9999;
     		break;
-        }		// match by year of birth
+        }		        // match by year of birth
 
         case 'range':
-        {		// range of birth dates
+        {		        // range of birth dates
     		if (strlen($value) > 0)
-    		{	// value supplied
+    		{	        // value supplied
     		    if (ctype_digit($value))
     				$range		= $value;
     		    else
     				$msg	.= "Invalid value of range='$value'. ";
-    		}	// value supplied
+    		}	        // value supplied
     		break;
-        }		// range of birth dates
+        }		        // range of birth dates
 
         case 'incmarried':
-        {		// include married names in response
+        {		        // include married names in response
     		$incMarried	= strtolower($value) == 'y' ||
     						  strtolower($value) == 'yes';
     		break;
-        }		// include married names in response
+        }		        // include married names in response
 
         case 'includeparents':
-        {		// include parents' names in response
+        {		        // include parents' names in response
     		$includeParents	= strtolower($value) == 'y' ||
     						  strtolower($value) == 'yes';
     		break;
-        }		// include parents' names in response
+        }		        // include parents' names in response
 
         case 'includespouse':
-        {		// include spouse's name in response
+        {		        // include spouse's name in response
     		$includeSpouse	= strtolower($value) == 'y' ||
     						  strtolower($value) == 'yes';
     		break;
-        }		// include spouse's name in response
+        }		        // include spouse's name in response
 
         case 'parentsidmr':
-        {		// IDMR of family to add children to
+        {		        // IDMR of family to add children to
     		if (strlen($value) > 0)
-    		{	// value supplied
+    		{	        // value supplied
     		    if (ctype_digit($value))
     		    {		// is numeric
-    				$idmr		= $value;
-    				try {
-    				    $family	= new Family(array('idmr' => $idmr));
-    				    $husbbirthsd= $family->get('husbbirthsd');
-    				    $wifebirthsd= $family->get('wifebirthsd');
+    				$idmr		    = $value;
+                    $family	        = new Family(array('idmr' => $idmr));
+                    if ($family->isExisting())
+                    {
+    				    $husbbirthsd    = $family->get('husbbirthsd');
+    				    $wifebirthsd    = $family->get('wifebirthsd');
     				    if ($husbbirthsd != 0)
     				    {	// have father's birth date
     						$birthmin	= floor($husbbirthsd/10000)+15;
@@ -337,50 +335,49 @@ foreach($_GET as $key => $value)
     						$birthmax	= floor($wifebirthsd/10000)+55;
     				    }	// have mother's birth date
     				    $incMarried	= false;
-    				}	// try
-    				catch (Exception $e) {
+    				}	// existing
+                    else
     				    $msg	.= "No database record for parentsIdmr=$idmr. ";
-    				}	// catch
     		    }		// is numeric
     		    else
     				$msg	.= "Invalid value of parentsIdmr='$value'. ";
-    		}	// value supplied
+    		}	        // value supplied
     		break;
-        }		// IDMR of family to add children to
+        }		        // IDMR of family to add children to
 
         case 'loose':
         {
     		$loose		= strtolower($value) == 'y' ||
     						  strtolower($value) == 'yes';
     		break;
-        }		// loose specified
+        }		        // loose specified
 
         case 'buttonid':
-        {		// feeds back a linkage to the invoker
+        {		        // feeds back a linkage to the invoker
     		$buttonId	= $value;
     		break;
-        }		// feeds back a linkage to the invoker
+        }		        // feeds back a linkage to the invoker
 
         case 'limit':
-        {		// limit number of responses
+        {		        // limit number of responses
     		if (strlen($value) > 0)
-    		{	// value supplied
+    		{	        // value supplied
     		    if (ctype_digit($value))
     				$limit	= $value;
     		    else
     				$msg	.= "Invalid value of Limit='$value'. ";
-    		}	// value supplied
+    		}	        // value supplied
     		break;
-        }		// limit number of responses
+        }		        // limit number of responses
 
-    }		// act on specific keys
-}			// loop through parameters
+    }		            // act on specific keys
+}			            // loop through parameters
 
 // check for various birth year combinations
 if (is_null($birthmin) && is_null($birthmax) && !is_null($birthyear))
 {		// birthyear specified
-    $birthmin	= $birthyear - $range;
-    $birthmax	= $birthyear + $range;
+    $birthmin	            = $birthyear - $range;
+    $birthmax	            = $birthyear + $range;
 }		// birthyear specified
 else
 if ($birthmin > $birthmax)
@@ -439,34 +436,45 @@ else
     if (strlen($surname) == 0 &&
         strlen($givenname) == 0 &&
         count($_COOKIE) > 0)
-    {		    // parameters did not set name
+    {		            // parameters did not set name
         // the familyTree cookie is now extracted by common code for
         // all scripts
         if (array_key_exists('idir', $familyTreeCookie))
-        {		// last referenced individual
+        {		        // last referenced individual
     		$val	        = $familyTreeCookie['idir'];
-    		try {
-    		    $indiv	    = new Person(array('idir' => $val));
+            $indiv	        = new Person(array('idir' => $val));
+            if ($indiv->isExisting())
+            {
     		    $surname	= $indiv->get('surname');
     		    $givenname	= $indiv->get('givenname');
     		    $retval	    = true;		// globals set
-    		} catch(Exception $e) {
+            } 
+            else
+            {
     		    $msg	    .= $e->getMessage();
     		}
-        }		// last referenced individual
-    }		    // parameters did not set initial name
+        }		        // last referenced individual
+    }		            // parameters did not set initial name
 
-flush();
+flush();        // ensure output
     // construct WHERE clause
-    $getParms	= array();
+    $getParms	            = array();
+    print "<surname>$surname</surname>\n";
+    print "<lastsurname>$lastsurname</lastsurname>\n";
     if ($loose)
     {			// loose comparison for names
+        print "<loose>Y</loose>\n";
         $getParms['loose']		= 'Y';
         $getParms['surname']	= "$surname";
     }			// loose comparison for names
     else
     {			// range of surnames
         // starting with the specific name and running to the end
+        if (is_null($lastsurname))
+        {
+            $nextSurname    = new Surname(array('surname' => ">$surname"));
+            $lastsurname    = $nextSurname['surname'];
+        }
         $getParms['surname']	= array($surname, $lastsurname);
     }			// range of surnames
 
@@ -571,7 +579,6 @@ flush();
     $info		            = $result->getInformation();
     print "<cmd>" . htmlspecialchars($info['query']) . "</cmd>\n";
     $count		            = $result->count();
-flush();
 
     // iterate through results
     foreach($result as $idir => $indiv)

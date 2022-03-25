@@ -1541,11 +1541,8 @@ function dialogMouseUp()
  ************************************************************************/
 export function documentOnClick(ev)
 {
-    console.log("util.js: documentOnClick:");
     if (dialogDiv)
     {       // a dialog balloon is displayed
-        console.log("util.js: documentOnClick: dialogDiv=" +
-                    dialogDiv.outerHTML);
         dialogDiv.style.display = 'none';
         dialogDiv               = null;
     }       // a dialog balloon is displayed
@@ -2862,22 +2859,53 @@ export function closeFrame(lastChoice)
  ************************************************************************/
 export function showImage(ev)
 {
-    let form            = this.form;
+    let form                        = this.form;
     if (form.Image)
-    {       // Image field defined
-        args.showimage  = 'yes';    // previous and next request image
-        let imageUrl    = form.Image.value;
+    {                       // Image field defined
+        // previous and next request image
+        args.showimage              = 'yes';
+        let useiframe               = args.useiframe;
+        if (typeof useiframe === 'string')
+        {
+            if (useiframe.toLowerCase() == 'y')
+                useiframe           = true;
+            else
+                useiframe           = false;
+        }
+        else 
+            useiframe               = false;
+
+        let imageUrl                = form.Image.value;
         if (imageUrl.length == 0)
-            alert("util.js: showImage: " +
-                  "no image defined for this registration");
+            popupAlert("util.js: showImage: " +
+                            "no image URL defined for this registration",
+                       this);
         else
-        if (imageUrl.length > 23 &&
+        if (!useiframe &&
+            imageUrl.length > 23 &&
             (imageUrl.substring(0,23) == "http://www.ancestry.ca/" ||
              imageUrl.substring(0,23) == "https://www.ancestry.ca" ||
              imageUrl.substring(0,23) == "http://interactive.ance" ||
-             imageUrl.substring(0,23) == "https://interactive.anc" ||
-             imageUrl.substring(0,23) == "https://www.familysearc"))
-            window.open(imageUrl, "_blank");
+             imageUrl.substring(0,23) == "https://interactive.anc"))
+        {                   // external website does not support iframe
+            // use the dimensions of the root window to limit size
+            // of image display window
+            // locate the window and document instances for the top window
+            // of the application
+            let win                 = window;
+            while(win.frameElement)
+                win                 = win.parent;
+            let doc                 = win.document;
+    
+            let w                   = doc.documentElement.clientWidth/2;
+            w                       = Math.floor(w);
+            let h                   = doc.documentElement.clientHeight;
+            let options             = "width=" + w +
+                                      ",height=" + h +
+                                      ",left=" + w;
+
+            window.open(imageUrl, "ImageFrame", options);
+        }                   // external website does not support iframe
         else
         if (imageUrl.length > 5 &&
             (imageUrl.substring(0,5) == "http:" ||
@@ -2895,6 +2923,10 @@ export function showImage(ev)
                       '/DisplayImage.php?src=/Images/' + imageUrl,
                       "right");
     }       // Image field defined
+    else
+        popupAlert('util.js: ShowImage: ' +
+                'Missing element name="Image" containing URL to display',
+                   this)
     return false;
 }       // function showImage
 

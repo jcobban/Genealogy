@@ -1103,25 +1103,25 @@ class Citation extends RecordPic
                 {
                     //  Facts where IDIME points to a Person Record in tblIR
                     case self::STYPE_UNSPECIFIED:   // 0
-                    case self::STYPE_NAME:      // 1
-                    case self::STYPE_BIRTH:     // 2
-                    case self::STYPE_CHRISTEN:  // 3
-                    case self::STYPE_DEATH:     // 4
-                    case self::STYPE_BURIED:    // 5
+                    case self::STYPE_NAME:          // 1
+                    case self::STYPE_BIRTH:         // 2
+                    case self::STYPE_CHRISTEN:      // 3
+                    case self::STYPE_DEATH:         // 4
+                    case self::STYPE_BURIED:        // 5
                     case self::STYPE_NOTESGENERAL:  // 6
                     case self::STYPE_NOTESRESEARCH: // 7
                     case self::STYPE_NOTESMEDICAL:  // 8
                     case self::STYPE_DEATHCAUSE:    // 9
-                    case self::STYPE_LDSB:      // 15 Baptism
-                    case self::STYPE_LDSE:      // 16 Endowment
-                    case self::STYPE_LDSC:      // 26 Confirmation
-                    case self::STYPE_LDSI:      // 27 Initiatory
+                    case self::STYPE_LDSB:          // 15 Baptism
+                    case self::STYPE_LDSE:          // 16 Endowment
+                    case self::STYPE_LDSC:          // 26 Confirmation
+                    case self::STYPE_LDSI:          // 27 Initiatory
                     {
                         return $refRec;
                     }
 
                     //  IDIME points to Name record in tblNX
-                    case self::STYPE_ALTNAME:   // 10
+                    case self::STYPE_ALTNAME:       // 10 alternate name
                     {
                         $idir   = $refRec->getIdir();
                         return Person::getPerson($idir);
@@ -1137,13 +1137,13 @@ class Citation extends RecordPic
                     }
 
                     //  IDIME points to Marriage Record tblMR.idmr
-                    case self::STYPE_LDSS:      // 18 Sealed to Spouse
+                    case self::STYPE_LDSS:          // 18 Sealed to Spouse
                     case self::STYPE_NEVERMARRIED:  // 19 never married 
-                    case self::STYPE_MAR:       // 20 Marriage    
-                    case self::STYPE_MARNOTE:   // 21 Marriage Note
-                    case self::STYPE_MARNEVER:  // 22 Never Married      
-                    case self::STYPE_MARNOKIDS: // 23 no children
-                    case self::STYPE_MAREND:    // 24 Marriage ended *added**
+                    case self::STYPE_MAR:           // 20 Marriage    
+                    case self::STYPE_MARNOTE:       // 21 Marriage Note
+                    case self::STYPE_MARNEVER:      // 22 Never Married  
+                    case self::STYPE_MARNOKIDS:     // 23 no children
+                    case self::STYPE_MAREND:        // 24 Marriage ended *added**
                     {   
                         $person = $refRec->getHusband();
                         if ($person)
@@ -1152,22 +1152,22 @@ class Citation extends RecordPic
                     }
 
                     //  IDIME points to Event Record tblER.ider 
-                    case self::STYPE_EVENT: // 30 Individual Event
-                    case self::STYPE_MAREVENT:  // 31 Marriage Event
+                    case self::STYPE_EVENT:         // 30 Individual Event
+                    case self::STYPE_MAREVENT:      // 31 Marriage Event
                     {
                         $idsx       = $this->getIdsx();
                         $eventRec   = $this->getRecord();
                         $refRec     = $eventRec->getAssociatedRecord();
                         if ($refRec instanceof Person)
                             return $refRec;
-                        $person = $refRec->getHusband();
+                        $person     = $refRec->getHusband();
                         if ($person)
                             return $person;
                         return $refRec->getWife();
                     }
 
                     //  IDIME points to To-Do records tblTD.IDTD
-                    case self::STYPE_TODO:      // 40 To-Do
+                    case self::STYPE_TODO:          // 40 To-Do
                     {
                         $idir       = $refRec->get('idir');
                         return Person::getPerson($idir);
@@ -1330,9 +1330,25 @@ class Citation extends RecordPic
     function setIdsr($value)
     {
         $oldidsr                    = $this->row['idsr'];
+        if ($value instanceof Source)
+        {
+            if ($value->isExisting())
+            {
+                $source             = $value;
+                $value              = $source['idsr'];
+            }
+        }
+        else
+        if ((is_int($value) || ctype_digit($value)) && $value > 0)
+        {
+            $value                  = (int)$value;
+            $source                 = new Source(array('idsr' => $value));
+        }
+        else
+            return $oldidsr;
+
         if ($value != $oldidsr)
         {           // value changed
-            $source                 = new Source(array('idsr' => $value));
             if ($source->isExisting())
             {
                 $this->source       = $source;
@@ -1577,23 +1593,7 @@ class Citation extends RecordPic
                 return parent::set('idime', $value);
 
             case 'idsr':
-            {
-                if ($value instanceof Source)
-                {
-                    if ($value->isExisting())
-                    {
-                        $this->source           = $value;
-                        return $this->setIdsr($this->source['idsr']);
-                    }
-                }
-                else
-                if (is_int($value) && $value > 0)
-                    return $this->setIdsr($value);
-                else
-                if (ctype_digit($value) && $value > 0)
-                    return $this->setIdsr((int)$value);
-                break;
-            }                   // IDSR
+                return $this->setIdsr($value);
 
             case 'type':
                 return $this->setCitType($value);
@@ -2531,7 +2531,7 @@ class Citation extends RecordPic
             default:
             {   // does not match any interpreted pattern
                 $matches        = array();
-                $result         = preg_match('#https?://\S*#', $detail, $matches);
+                $result         = preg_match('#^https?://\S*#', $detail, $matches);
                 if (substr($title,0,23) == 'Cemetery Transcription,')
                 {
                     $id         = 'sourceCemetery$IDSX';
@@ -2550,6 +2550,7 @@ class Citation extends RecordPic
                 if (substr($callnum, 0, 4) == 'http')
                 {
                     $id         = 'hyperlink$IDSX';
+                    $tag            = $template[$id];
                     $updates    = array('URL'       => $callnum,
                                         'DETAIL'    => $detail);
                 }

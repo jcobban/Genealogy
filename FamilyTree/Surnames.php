@@ -73,7 +73,7 @@ foreach($_GET as $key => $value)
 	{	            // take action depending upon name of parameter
 	    case 'initial':
 	    {		    // initial= specified
-			$initial	                = ucfirst($value);
+            $initial	                = mb_strtoupper(mb_substr($value,0,1));
 			if (strlen($initial) == 0)
 			{
 			    $msg	.= "Invalid zero length surname prefix.";
@@ -85,7 +85,7 @@ foreach($_GET as $key => $value)
 			    $getParms['surname']	= "^M[^c]";
 			}               // exclude "Mc" names
 			else
-			if (ctype_alpha(substr($initial,0,1)))
+			if (preg_match('/^\w/u', $initial))
             {               // surname that starts with a letter
 			    $getParms['surname']	= "^$initial";
 			}               // surname that starts with a letter
@@ -141,7 +141,7 @@ if (!is_null($initial))
 	if (strlen($initial) == 0)
 	    $title	        = $template['nosurname']->innerHTML();
 	else
-    if (ctype_alpha($initial))
+	if (preg_match('/^\w/u', $initial))
     {
         $title	        = $template['starting']->innerHTML();
         $title          = str_replace('$INITIAL', $initial, $title);

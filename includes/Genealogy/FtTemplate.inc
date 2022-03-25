@@ -36,8 +36,11 @@ use Templating\escape;
  *      2021/04/04      escape contact subject URL                      *
  *      2021/05/31      do not access HTTP_USER_AGENT if not present    *
  *      2021/10/25      add rel= attributes to some header tags         *
+ *      2022/02/15      issue warning from validateLang                 *
+ *                      by returning a syntactically invalid parameter  *
+ *                      in the optional second parameter                *
  *                                                                      *
- *  Copyright &copy; 2021 James A. Cobban All Rights Reserved           *
+ *  Copyright &copy; 2022 James A. Cobban All Rights Reserved           *
  ************************************************************************/
 
 /************************************************************************
@@ -201,26 +204,51 @@ class FtTemplate extends Template
      *  Input:                                                          *
      *      $value          a string provided by an application from    *
      *                      user input and therefore unreliable         *
+     *      $valuetext      optional parameter into which the method    *
+     *                      places an output safe version of the        *
+     *                      input value if the input value is not       *
+     *                      a valid IETF BCP 47 language code           *
      *                                                                  *
      *  Returns:                                                        *
      *      An IETF BCP 47 language code possibly country-qualified     *
      *      for example 'es-MX'.  If the syntax of the input value      *
      *      is not consistent with IETF BCP 47 this returns 'en'.       *
      ********************************************************************/
-    public static function validateLang($value)
+    public static function validateLang($value, &$valuetext = null)
     {
+        global  $warn;
+
         $lang               = 'en';
         $value              = str_replace('_','-',$value);
-        if (preg_match('/^([a-zA-Z]{2,3})(-([a-zA-Z0-9]{2,3})|)$/',
+        if (preg_match('/^([a-zA-Z]{2})(-([a-zA-Z0-9]{2,3})|)$/',
                        $value,
                        $matches))
-        {
+        {                       // supported syntax
             if (strlen($matches[2]) > 0)
                 $lang       = strtolower($matches[1]) . '-' .
                               strtoupper($matches[3]);
             else
                 $lang       = strtolower($matches[1]);
-        }
+        }                       // supported syntax
+        else
+        if (preg_match('/^([a-zA-Z]{3})(-([a-zA-Z0-9]{2,3})|)$/',
+                       $value,
+                       $matches))
+        {                       // partial support for ISO 639-2
+            if (strlen($matches[2]) > 0)
+                $lang       = strtolower(substr($matches[1],0,2)) . '-' .
+                              strtoupper($matches[3]);
+            else
+                $lang       = strtolower(substr($matches[1],0,2));
+            if (func_num_args() > 1)
+                $valuetext      = htmlspecialchars($value);
+        }                       // partial support for ISO 639-2
+        else
+        if (func_num_args() > 1)
+        {                       // unsupported syntax
+            $valuetext      = htmlspecialchars($value);
+        }                       // unsupported syntax
+
         return $lang;
     }           // static function validateLang
 

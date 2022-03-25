@@ -503,13 +503,15 @@ function gotNames(obj)
 
     let form                = document.nameForm;
     let select              = form.individ;
-//  let trace               = '';
+    let trace               = '';
+    let nextSurname         = null;
+
     if (obj && typeof(obj) == 'object')
     {
-//      if ('parms' in obj)
-//      {
-//          trace        += "parms=" + JSON.stringify(obj.parms) + "<br>";
-//      }
+        if ('parms' in obj)
+        {
+            trace        += "parms=" + JSON.stringify(obj.parms);
+        }
 //      if ('cmd' in obj)
 //      {
 //          trace        += "cmd=" + JSON.stringify(obj.cmd) + "<br>";
@@ -522,6 +524,13 @@ function gotNames(obj)
 //      {
 //          trace        += "warn=" + JSON.stringify(obj.warn) + "<br>";
 //      }
+        console.log(trace);
+
+        if ('nextSurname' in obj)
+        {
+            nextSurname                     = obj.nextSurname;
+        }
+
         if ('persons' in obj)
         {
             let parms                       = obj.parms;
@@ -533,7 +542,6 @@ function gotNames(obj)
                 let idir                    = person.idir;
                 let gender                  = person.gender;
                 let name                    = person.name;
-//              trace += "{idir=" + idir + ",gender=" + gender + ",name=" + name + "}<br>\n";
 
                 let option                  = new Option(name,
                                                          idir,
@@ -546,43 +554,20 @@ function gotNames(obj)
             }                           // person
 
             // check to make sure we have enough names
-            let nameCount               = select.options.length;
+            let nameCount                   = select.options.length;
             if (nameCount < 51)
             {                           // name count < 51
-                parms.limit             = 51 - nameCount;
+                parms.GivenName             = '';
+                parms.limit                 = 51 - nameCount;
+                if (nextSurname)
+                {
+                    parms.Surname           = nextSurname;
+                }
+                else
                 if (Object.prototype.hasOwnProperty(parms, 'LastSurname'))
                 {           // not first query response
-                    parms.Surname       = parms.LastSurname;
+                    parms.Surname           = parms.LastSurname;
                 }           // not first query response
-                else
-                {           // after first query
-                    // set up for second query
-                    parms.LastSurname   = parms.Surname;
-                    parms.GivenName     = '';
-                }           // after first query
-
-                // adjust delimiting surname
-                let char1   = parms.LastSurname.substring(0,1).toUpperCase();
-                let char2   = parms.LastSurname.substring(1,2);
-                if (char2 >= "z")
-                {       // overflow to next letter
-                    if (char1 < "Z")
-                        parms.LastSurname   =
-                            String.fromCharCode(char1.charCodeAt(0) + 1) +
-                            ' ';
-                    else
-                        parms.LastSurname   = null;
-                }
-                else
-                if (char2 < "a")
-                {       // handle, for example, O' names
-                    parms.LastSurname       = char1 + 'a';
-                }
-                else
-                {       // letters 'a' through 'y'
-                    parms.LastSurname   = char1 +
-                            String.fromCharCode(char2.charCodeAt(0) + 1);
-                }       // letters 'a' through 'y'
 
                 let url             = "/FamilyTree/getIndivNamesJSON.php";
                 let op              = '?';
@@ -596,7 +581,7 @@ function gotNames(obj)
                     traceAlert("nominalIndex.js: gotNames: " + url);
                 // trace                    += "url=" + url + "<br>\n";
                 // invoke script to obtain list of names for selection list
-                if (parms.LastSurname !== null)
+                if (nextSurname !== '')
                 {
                     let options             = {"timeout"    : false};
                     HTTP.get(url,

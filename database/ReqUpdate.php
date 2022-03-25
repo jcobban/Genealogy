@@ -122,9 +122,9 @@ for($io = 0; $io < strlen($provinces); $io += $cl)
     $domainObj	        = $domainset["$cc$province"];
     if (is_null($domainObj))
     {
-        error_log("ReqUpdate.php: " . __LINE__ .
-                    " no entry in \$domainset for '$cc$province', " .
-                "DomainSet(array('cc' => '$cc', 'language' => '$lang'))");
+        //error_log("ReqUpdate.php: " . __LINE__ .
+        //            " no entry in \$domainset for '$cc$province', " .
+        //        "DomainSet(array('cc' => '$cc', 'language' => '$lang'))");
         $provinceName   = "$cc$province";
     }
     else

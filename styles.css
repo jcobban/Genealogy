@@ -126,8 +126,10 @@
  *      2020/03/31      remove iframe.advert                            *
  *      2020/11/19      add .link style                                 *
  *      2021/06/19      add more background colors                      *
+ *      2022/01/17      only override display mode for class button     *
+ *                      on inline elements such as <button>             *
  *                                                                      *
- *  Copyright &copy; 2021 James A. Cobban                               *
+ *  Copyright &copy; 2022 James A. Cobban                               *
  ************************************************************************/
 
    /*********************************************************************
@@ -247,7 +249,7 @@
    /*********************************************************************
     *   Styles for displaying tags that have button behavior            *
     *********************************************************************/
-    .button    { 
+    span.button, button.button, a.button    { 
                 font-family:        sans-serif;
                 font-weight:        bold;
                 font-size:          80%;
@@ -262,7 +264,7 @@
                 padding:            2px 12px 2px 12px;
                 display:            inline-block;
                 }
-    .button:disabled {
+    button.button:disabled {
                 font-family:        sans-serif;
                 font-weight:        bold;
                 font-size:          80%;
@@ -275,6 +277,20 @@
                 border-right:       3px solid #606060;
                 padding:            0px 12px 0px 12px;
                 display:            inline-block;
+                }
+    .button     { 
+                font-family:        sans-serif;
+                font-weight:        bold;
+                font-size:          80%;
+                text-align:         center;
+                text-decoration:    none;
+                background-color:   #E0E0E0;
+                color:              #000000;
+                border-top:         2px solid white;
+                border-left:        3px solid white;
+                border-bottom:      3px solid #606060;
+                border-right:       3px solid #606060;
+                padding:            2px 12px 2px 12px;
                 }
 
    /*********************************************************************

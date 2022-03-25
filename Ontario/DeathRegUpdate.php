@@ -64,8 +64,9 @@ use \Exception;
  *      2018/06/01      add support for lang parameter                  *
  *      2020/03/13      use FtTemplate::validateLang                    *
  *      2021/01/23      REGCOUNTY not set                               *
+ *      2022/02/08      merge death causes and durations from reg       *
  *                                                                      *
- *  Copyright &copy; 2021 James A. Cobban                               *
+ *  Copyright &copy; 2022 James A. Cobban                               *
  ************************************************************************/
 require_once __NAMESPACE__ . "/Domain.inc";
 require_once __NAMESPACE__ . "/County.inc";
@@ -336,11 +337,28 @@ if (strlen($msg) == 0)
 
             // update the cause of death
             if (is_null($oldDeathCause) || strlen($oldDeathCause) == 0)
-            {       // death cause not set
-                $person->set('deathcause', 
-                        $deathCause . ', ' . $deathDur);
+            {           // death cause not set
+                $deathCauses        = explode(',', $deathCause);
+                if (strlen($deathDur) == 0)
+                    $person->set('deathcause', 
+                    $deathCause);
+                else
+                if (count($deathCauses) == 1)
+                    $person->set('deathcause', 
+                                 $deathCause . ', ' . $deathDur);
+                else
+                {       // merge causes and durations
+                    $deathDurs      = explode(',', $deathDur);
+                    $deathCause     = $deathCauses[0] . ', ' .
+                                        $deathDurs[0] . ', ' .
+                                        $deathCauses[1];
+                    if (count($deathDurs) > 1)
+                        $deathCause .= ', ' . $deathDurs[1];
+                    $person->set('deathcause', 
+                                 $deathCause);
+                }       // merge causes and durations
                 $person->save();
-            }       // death cause not set
+            }           // death cause not set
         } catch (Exception $e) {
             $warn   .= "<p>DeathRegUpdate.php: ". __LINE__ . ' ' .
                         $e->getMessage() . "</p>\n";

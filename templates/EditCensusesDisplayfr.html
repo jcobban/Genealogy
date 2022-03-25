@@ -1,36 +1,36 @@
 <!--*********************************************************************
- *  EditCensusesUpdateen.html                                           *
- *                                                                      *
- *  Display form for showing information about the supported Censuses   *
- *                                                                      *
- *  History:                                                            *
- *      2018/01/12      created                                         *
- *                      add columns GroupLines and LastUnderlined       *
- *                      and IDSR                                        *
+ *  EditCensusesUpdateen.html											*
+ *																		*
+ *  Display form for showing information about the supported Censuses	*
+ *																		*
+ *  History:															*
+ *		2018/01/12		created											*
+ *						add columns GroupLines and LastUnderlined		*
+ *						and IDSR										*
  *      2019/04/07      add HelpIDSR                                    *
  *                      support pageUp and pageDown keys                *
- *                                                                      *
- *  Copyright &copy; 2019 James A. Cobban                               *
+ *																		*
+ *  Copyright &copy; 2019 James A. Cobban								*
  **********************************************************************-->
     <div class="hidden" id="breadcrumbs">
-      <a href="/genealogy.php?lang=$LANG">Genealogy</a>: 
+      <a href="/genealogy.php?lang=$LANG">Généalogie</a>: 
       <a href="/genCountry.php?cc=$CC&amp;lang=$LANG">$COUNTRYNAME</a>:
-      <a href="/database/genCensuses.php?lang=$LANG&amp;cc=$CC">Censuses</a>:
+      <a href="/database/genCensuses.php?lang=$LANG&amp;cc=$CC">Récensements</a>:
     </div>
     <div class="body">
       <h1>
         <span class="right">
-      <a href="/database/EditCensusesHelpen.html" target="help">? Help</a>
+  	  <a href="/database/EditCensusesHelpen.html" target="help">? Aide</a>
         </span>
-        Census Administration: $COUNTRYNAME Censuses Table Display
+        Administration des Recensements: $COUNTRYNAME Montre la Table des Recensements
        <div style="clear: both;"></div>
       </h1>
       $TRACE
       $MSG
       <p class="warning">
-        You are not authorized.
+        Vous n'êtes pas autorizé
         <a href="/Signon.php?lang=$LANG" class="button">Sign on</a>
-        to update the database.
+        pour mettre à jour la base des données.
       </p>
       <div class="center" id="topBrowse">
         <span class="left" id="topPrev">
@@ -44,7 +44,7 @@
           </a>
         </span>
           <span id="respdescrows">
-            returned rows $FIRST to $LAST of $TOTAL
+            rangs renvoyés $FIRST à $LAST sur $TOTAL
           </span>
         <div style="clear: both;"></div>
       </div>
@@ -58,113 +58,113 @@
         <input type="hidden" name="cc" id="cc" value="$CC">
         <input type="hidden" name="offset" id="offset" value="$OFFSET">
         <input type="hidden" name="limit" id="limit" value="$LIMIT">
-        <table class="form" id="dataTable">
-          <thead> <!--- Put out the column headers -->
-            <tr id="hdrRow">
-              <th class="colhead">
-                ID
-              </th>
-              <th class="colhead">
-                Name
-              </th>
-              <th class="colhead">
-                Lines
-              </th>
-              <th class="colhead">
-                Collective
-              </th>
-              <th class="colhead">
-                Part<br>of
-              </th>
-              <th class="colhead">
-                Provinces
-              </th>
-              <th class="colhead">
-                Group<br>Lines
-              </th>
-              <th class="colhead">
-                Last<br>Underlined
-              </th>
-              <th class="colhead">
-                Source<br>ID
-              </th>
-              <th class="colhead">
-                Districts
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr id="Row$line">
-              <td class="right">
-                <input type="text" name="CensusId$line"
-                      id="CensusId$line"
-                      value="$censusId" readonly="readonly"
-                      class="white left" style="font-weight: bold;"
-                      size="6">
-              </td>
-              <td class="left">
-                <input type="text" name="Name$line"
-                      id="Name$line" 
-                      value="$name" readonly="readonly" 
-                      class="white leftnc" size="24" maxlength="48">
-              </td>
-              <td class="left">
-                <input type="text" name="LinesPerPage$line"
-                    id="LinesPerPage$line" 
-                    value="$linesperpage" readonly="readonly" 
-                    class="white rightnc" size="2" maxlength="3">
-              </td>
-              <td class="center">
-                <input type="text" name="Collective$line"
-                    id="Collective$line" 
-                    value="$collective" readonly="readonly" 
-                    class="white center" size="1" maxlength="1">
-              </td>
-              <td class="left">
-                <input type="text" name="PartOf$line"
-                    id="PartOf$line" 
-                    value="$partof" readonly="readonly" 
-                    class="white left" size="2" maxlength="2">
-              </td>
-              <td class="left">
-                <input type="text" name="Provinces$line"
-                    id="Provinces$line" 
-                    value="$provinces" readonly="readonly" 
-                    class="white left" size="40" maxlength="254">
-              </td>
-              <td class="left">
-                <input type="text" name="GroupLines$line"
-                    id="GroupLines$line" 
-                    value="$grouplines" readonly="readonly" 
-                    class="white rightnc" size="2" maxlength="3">
-              </td>
-              <td class="left">
-                <input type="text" name="LastUnderline$line"
-                    id="LastUnderline$line" 
-                    value="$lastunderline" readonly="readonly" 
-                    class="white rightnc" size="2" maxlength="3">
-              </td>
-              <td class="button">
-                  <a href="/FamilyTree/Source.php?idsr=$idsr&lang=$LANG">
-                    Source
-                  </a>
-              </td>
-              <td class="button">
-                <a id="ShowDists$line" 
-                    href="/database/DistForm.php?Census=$censusId&amp;lang=$LANG">
-                    Districts
-                </a> 
-              </td>
+      <table class="form" id="dataTable">
+        <thead> <!--- Put out the column headers -->
+          <tr id="hdrRow">
+            <th class="colhead">
+            ID
+            </th>
+            <th class="colhead">
+            Nom
+            </th>
+            <th class="colhead">
+              Lignes
+            </th>
+            <th class="colhead">
+              Collective
+            </th>
+            <th class="colhead">
+              Partie<br>de
+            </th>
+            <th class="colhead">
+              Provinces
+            </th>
+            <th class="colhead">
+              Regrouper<br>Lignes
+            </th>
+            <th class="colhead">
+              Dernière<br>Ligne<br>Soulignée
+            </th>
+            <th class="colhead">
+              Source<br>ID
+            </th>
+            <th class="colhead">
+              Districts
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr id="Row$line">
+        <td class="right">
+          <input type="text" name="CensusId$line"
+        	id="CensusId$line"
+        	value="$censusId" readonly="readonly"
+        	class="white left" style="font-weight: bold;"
+        	size="6">
+        </td>
+        <td class="left">
+          <input type="text" name="Name$line"
+        	id="Name$line" 
+        	value="$name" readonly="readonly" 
+          	class="white leftnc" size="24" maxlength="48">
+          </td>
+          <td class="left">
+            <input type="text" name="LinesPerPage$line"
+          	id="LinesPerPage$line" 
+          	value="$linesperpage" readonly="readonly" 
+          	class="white rightnc" size="2" maxlength="3">
+          </td>
+          <td class="center">
+            <input type="text" name="Collective$line"
+          	id="Collective$line" 
+          	value="$collective" readonly="readonly" 
+          	class="white center" size="1" maxlength="1">
+          </td>
+          <td class="left">
+            <input type="text" name="PartOf$line"
+          	id="PartOf$line" 
+          	value="$partof" readonly="readonly" 
+          	class="white left" size="2" maxlength="2">
+          </td>
+          <td class="left">
+            <input type="text" name="Provinces$line"
+          	id="Provinces$line" 
+          	value="$provinces" readonly="readonly" 
+          	class="white left" size="40" maxlength="254">
+          </td>
+          <td class="left">
+            <input type="text" name="GroupLines$line"
+          	id="GroupLines$line" 
+          	value="$grouplines" readonly="readonly" 
+          	class="white rightnc" size="2" maxlength="3">
+          </td>
+          <td class="left">
+            <input type="text" name="LastUnderline$line"
+          	id="LastUnderline$line" 
+          	value="$lastunderline" readonly="readonly" 
+          	class="white rightnc" size="2" maxlength="3">
+          </td>
+          <td class="button">
+              <a href="/FamilyTree/Source.php?idsr=$idsr&lang=$LANG">
+          	Source
+              </a>
+          </td>
+          <td class="button">
+            <a id="ShowDists$line" 
+          	href="/database/DistForm.php?Census=$censusId&amp;lang=$LANG">
+          	Districts
+            </a> 
+          </td>
             </tr>
           </tbody>
         </table>
       </form>
     </div> <!-- end of <div id="body"> -->
     <div class="hidden">
-        <span id="ccInvalid">CC='$cctext' invalid</span>
-        <p id="offsetIgn">OFFSET='$offsettext' ignored</p>
-        <p id="limitIgn">LIMIT='$limittext' ignored</p>
-        <p id="langIgn">lang='$langtext' ignored interpreted as '$lang'</p>
+        <span id="ccInvalid">CC='$cctext' identifiant du pays invalide</span>
+        <p id="offsetIgn">OFFSET='$offsettext' décalage ignoré</p>
+        <p id="limitIgn">LIMIT='$limittext' limite ignorée</p>
+        <p id="langIgn">lang='$langtext' langue ignorée interprétée comme '$lang'</p>
     </div> <!-- end of <div class="hidden"> -->
     <div class="balloon" id="HelpCensusId">
       The census identifier.  

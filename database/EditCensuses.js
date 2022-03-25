@@ -11,8 +11,9 @@
  *      2019/11/28      correct addition of row and fill defaults from  *
  *                      Census record                                   *
  *      2021/01/16      use addEventListener                            *
+ *      2022/01/18      do not generate TypeError if dataTable missing  *
  *                                                                      *
- *  Copyright &copy; 2021 James A. Cobban                               *
+ *  Copyright &copy; 2022 James A. Cobban                               *
  ************************************************************************/
 
 window.addEventListener('load',onLoad);
@@ -104,13 +105,16 @@ function onLoad()
 
     // enable support for hiding and revealing columns
     var dataTable               = document.getElementById("dataTable");
-    var tblHdr                  = dataTable.tHead;
-    var tblHdrRow               = tblHdr.rows[0];
-    for(i = 0; i < tblHdrRow.cells.length; i++)
-    {       // loop through all cells of header row
-        var th                  = tblHdrRow.cells[i];
-        th.addEventListener('click',columnClick);    // left button click
-        th.addEventListener('contextmenu',columnWiden);  // right button click
+    if (dataTable)
+    {
+        var tblHdr                  = dataTable.tHead;
+        var tblHdrRow               = tblHdr.rows[0];
+        for(i = 0; i < tblHdrRow.cells.length; i++)
+        {       // loop through all cells of header row
+            var th                  = tblHdrRow.cells[i];
+            th.addEventListener('click',columnClick);    // left button click
+            th.addEventListener('contextmenu',columnWiden);  // right button click
+        }
     }
 
 }       // function onLoad

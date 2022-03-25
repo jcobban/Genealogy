@@ -32,8 +32,10 @@ use \Exception;
  *                      get message texts from template                 *
  *      2021/03/29      correct handling of partof                      *
  *      2021/04/04      escape CONTACTSUBJECT                           *
+ *      2022/03/09      avoid Creating default object from empty value  *
+ *                      issue warning for unsupported language          *
  *                                                                      *
- *  Copyright &copy; 2021 James A. Cobban                               *
+ *  Copyright &copy; 2022 James A. Cobban                               *
  ************************************************************************/
 require_once __NAMESPACE__ . "/Domain.inc";
 require_once __NAMESPACE__ . "/DomainSet.inc";
@@ -50,59 +52,62 @@ $partoftext                 = null;
 $countryName                = 'Canada';
 $domainType                 = 'Province';
 $lang                       = 'en';
+$langtext                   = null;
 $offset                     = 0;
 $offsettext                 = null;
 $limit                      = 20;
 $limittext                  = null;
 $parmsDebug                 = '';
 $newCountry                 = false;
+
 if (isset($_GET) && count($_GET) > 0)
 {                       // invoked by method=get
-    $parmsText          = "<p class='label'>\$_GET</p>\n" .
-                              "<table class='summary'>\n" .
-                                "<tr><th class='colhead'>key</th>" .
-                                "<th class='colhead'>value</th></tr>\n";
+    $parmsText              = "<p class='label'>\$_GET</p>\n" .
+                                  "<table class='summary'>\n" .
+                                    "<tr><th class='colhead'>key</th>" .
+                                    "<th class='colhead'>value</th></tr>\n";
     foreach($_GET as $key => $value)
-    {
-        $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
-                            "<td class='white left'>$value</td></tr>\n"; 
+    {                   // loop through all parameters
+        $safevalue          = htmlspecialchars($value);
+        $parmsText          .= "<tr><th class='detlabel'>$key</th>" .
+                            "<td class='white left'>$safevalue</td></tr>\n";
         $key                = strtolower($key);
         $value              = trim($value);
 
         if (strlen($value) > 0)
         switch($key)
-        {
+        {               // check supported parameters
             case 'cc':
             {
                 if (preg_match('/^[a-zA-Z]{2}$/', $value) == 1)
                     $cc             = strtoupper($value);
                 else
-                    $cctext         = htmlspecialchars($value);
+                    $cctext         = $safevalue;
                 break;
-            }       // country code
+            }           // country code
     
             case 'partof':
             {
                 if (preg_match('/^[a-zA-Z]{2}(-|)[a-zA-Z]{2,4}$/', $value) == 1)
                     $partof         = strtoupper($value);
                 else
-                    $partoftext     = htmlspecialchars($value);
+                    $partoftext     = $safevalue;
                 break;
-            }       // country code
+            }           // country code
     
             case 'lang':
             case 'language':
             {
-                $lang               = FtTemplate::validateLang($value);
+                $lang               = FtTemplate::validateLang($value, $langtext);
                 break;
-            }       // language code
+            }           // language code
     
             case 'offset':
             {
                 if (ctype_digit($value))
                     $offset         = $value;
                 else
-                    $offsettext     = htmlspecialchars($value);
+                    $offsettext     = $safevalue;
                 break;
             }
     
@@ -111,16 +116,16 @@ if (isset($_GET) && count($_GET) > 0)
                 if (ctype_digit($value))
                     $limit          = $value;
                 else
-                    $limittext      = htmlspecialchars($value);
+                    $limittext      = $safevalue;
                 break;
             }
     
-        }       // check supported parameters
-    }           // loop through all parameters
+        }               // check supported parameters
+    }                   // loop through all parameters
     if ($debug)
-    {           // ensure listing of parameters not interrupted
+    {                   // ensure listing of parameters not interrupted
         $warn   .= $parmsText . "  </table>\n";
-    }           // ensure listing of parameters not interrupted
+    }                   // ensure listing of parameters not interrupted
 }                       // invoked by method=get
 else
 if (isset($_POST) && count($_POST) > 0)
@@ -166,7 +171,7 @@ if (isset($_POST) && count($_POST) > 0)
             case 'lang':
             case 'language':
             {               // language code
-                $lang               = FtTemplate::validateLang($value);
+                $lang               = FtTemplate::validateLang($value, $langtext);
                 break;
             }               // language code
     
@@ -298,16 +303,12 @@ if (is_string($partoftext))
     $text               = $template['partofInvalid']->innerHTML;
     $msg                .= str_replace('$partof', $partoftext, $text);
 }
+if (is_string($langtext))
+    $warn   .= $template['languageInvalid']->replace('$lang', $langtext);
 if (is_string($offsettext))
-{
-    $text               = $template['offsetIgnored']->outerHTML;
-    $warn               .= str_replace('$offset', $offsettext, $text);
-}
+    $warn   .= $template['offsetIgnored']->replace('$offset', $offsettext);
 if (is_string($limittext))
-{
-    $text               = $template['limitIgnored']->outerHTML;
-    $warn               .= str_replace('$limit', $limittext, $text);
-}
+    $warn   .= $template['limitIgnored']->replace('$limit', $limittext);
 
 $country                = new Country(array('code' => $cc));
 if (!$country->isExisting())
@@ -315,28 +316,36 @@ if (!$country->isExisting())
     $text               = $template['countryInvalid']->innerHTML;
     $msg                .= str_replace('$cc', $cc, $text);
 }
-if ($partof)
-{
-    $domain             = new Domain(array('domain'     => $partof,
-                                           'language'   => $lang));
-    $countryName        = $domain->getName(1);
-}
-else
-    $countryName        = $country->getName($lang);
 
 if ($partof)
-    $domainType         = 'County';
+{
+    $domain                     = new Domain(array('domain'     => $partof,
+                                                   'language'   => $lang));
+    $countryName                = $domain->getName(1);
+}
+else
+    $countryName                = $country->getName($lang);
+
+if ($partof)
+    $domainType                 = 'County';
 else
 if ($cc != 'CA')
-    $domainType         = 'State';
+    $domainType                 = 'State';
 
 
 if (strlen($msg) == 0)
 {           // no errors detected
     // create an array of language information for select <options>
-    $languageSet            = new RecordSet('Languages');
-    $language               = $languageSet[$lang];
-    $language->selected     = true;
+    $languageSet                = new RecordSet('Languages');
+    if ($languageSet->offsetExists($lang))
+        $language               = $languageSet[$lang];
+    else
+    {
+        $warn   .= $template['languageUnsupported']->replace('$lang',$lang);
+        $language               = $languageSet['en'];
+    }
+    if ($language)
+        $language->selected     = true;
 
     // get the set of administrative domains for the country
     $getParms                   = array('cc'        => $cc,

@@ -121,14 +121,15 @@
 		  </div>
 	    </fieldset>
 	  </form> <!-- name="indForm" id="indForm" -->
-	<!--*********************************************************************
-	 *		The current family is displayed in a separate form				*
-	 *																		*
-	 **********************************************************************-->
+	<!--*****************************************************************
+	 *	The current family is displayed in a separate form				*
+	 *																	*
+	 ******************************************************************-->
 	  <form name="famForm" id="famForm"
 		        action="updateMarriageXml.php" method="post">
 		<input type="hidden" name="idmr" id="idmr" value="$IDMR">
-		<input type="hidden" name="treename" id="treename" value="$TREENAME">
+		<input type="hidden" name="treename" id="treename" 
+                value="$TREENAME">
 		<fieldset id="HusbandSet" class="male">
 			<legend class="labelSmall">Husband</legend>
 			<div class="row" id="Husb">
@@ -162,9 +163,10 @@
 					Married Surname:
 			    </label>
 			    <span class="left column1">&nbsp;</span>
-			    <input type="text" name="HusbMarrSurname" id="HusbMarrSurname"
-		                    maxlength="255" class="white left column2"
-		                    value="$HUSBSURNAME">
+			    <input type="text" 
+                        name="HusbMarrSurname" id="HusbMarrSurname"
+		                maxlength="255" class="white left column2"
+		                value="$HUSBSURNAME">
 			  </div>
 			  <div style="clear: both;"></div>
 			</div>
@@ -173,17 +175,17 @@
 					Actions:
 			    </label>
 			    <button type="button" id="chooseHusb"
-					class="button">
+					    class="button">
 					Select Existing Husband
 			    </button>
 			    &nbsp;
 			    <button type="button" id="createHusb"
-					class="button">
+					    class="button">
 					Create New <u>H</u>usband
 			    </button>
 			    &nbsp;
 			    <button type="button" id="detachHusb"
-					class="button">
+					    class="button">
 					Detach Husband
 			    </button>
 			  <div style="clear: both;"></div>
@@ -197,17 +199,17 @@
 					Name:
 			    </label>
 			    <input type="hidden" name="IDIRWife" id="IDIRWife"
-							value="$IDIRWIFE">
+						value="$IDIRWIFE">
 			    <input type="text" name="WifeGivenName" id="WifeGivenName"
-		                    maxlength="120" class="white left column1"
-		                    value="$WIFEGIVENNAME">
+		                maxlength="120" class="white left column1"
+		                value="$WIFEGIVENNAME">
 			    <input type="text" name="WifeSurname" id="WifeSurname"
-		                    maxlength="120" class="white left column2"
-		                    value="$WIFESURNAME">
+		                maxlength="120" class="white left column2"
+		                value="$WIFESURNAME">
 			    <input type="hidden" name="WifeBirthSD" id="WifeBirthSD"
-							value="$WIFEBIRTHSD">
+						value="$WIFEBIRTHSD">
 			    <input type="hidden" name="WifeOrder" id="WifeOrder"
-							value="$WIFEORDER">
+						value="$WIFEORDER">
 			  </div>
 			  <div>
 			    <button type="button" class="button" id="editWife">
@@ -222,9 +224,10 @@
 					Married Surname:
 			    </label>
 			    <span class="left column1">&nbsp;</span>
-			    <input type="text" name="WifeMarrSurname" id="WifeMarrSurname"
-		                    maxlength="255" class="white left column2"
-		                    value="$HUSBSURNAME">
+			    <input type="text" 
+                        name="WifeMarrSurname" id="WifeMarrSurname"
+		                maxlength="255" class="white left column2"
+		                value="$HUSBSURNAME">
 			  </div>
 			  <div style="clear: both;"></div>
 			</div>
@@ -379,51 +382,43 @@
 				<tr id="child$rownum">
 				  <td class="name">
 				    <input type="hidden"
-								name="CIdir$rownum" 
-								id="CIdir$rownum"
-								value="$idir">
+							name="CIdir$rownum" id="CIdir$rownum"
+							value="$idir">
 				    <input type="hidden"
-								name="CIdcr$rownum" 
-								id="CIdcr$rownum"
-								value="$idcr">
+							name="CIdcr$rownum" id="CIdcr$rownum"
+							value="$idcr">
 				    <input type="hidden"
-								name="CGender$rownum" 
-								id="CGender$rownum"
-								value="$sex">
+							name="CGender$rownum" id="CGender$rownum"
+							value="$sex">
 				    <input class="$gender"
-								name="CGiven$rownum" 
-								id="CGiven$rownum"
-								value="$givenname" 
-								type="text" size="15" maxlength="120">
+							name="CGiven$rownum" id="CGiven$rownum"
+							value="$givenname" 
+							type="text" size="15" maxlength="120">
 				  </td>
 				  <td class="name">
 				    <input class="$gender"
-								name="CSurname$rownum"
-								id="CSurname$rownum" 
-								value="$surname"
-								type="text" size="10" maxlength="120">
+							name="CSurname$rownum" id="CSurname$rownum" 
+							value="$surname"
+							type="text" size="10" maxlength="120">
 				  </td>
 				  <td class="name">
 				    <input class="white left"
-								name="Cbirth$rownum"
-								id="Cbirth$rownum" 
-								value="$birthd" 
-								type="text" size="12" maxlength="100">
-				    <input name="Cbirthsd$rownum"
-								id="Cbirthsd$rownum" 
-								type="hidden" 
-								value="$birthsd">
+							name="Cbirth$rownum" id="Cbirth$rownum" 
+							value="$birthd" 
+							type="text" size="12" maxlength="100">
+				    <input name="Cbirthsd$rownum" id="Cbirthsd$rownum" 
+							type="hidden" 
+							value="$birthsd">
 				  </td>
 				  <td class="name">
 				    <input class="white left"
-								name="Cdeath$rownum"
-								id="Cdeath$rownum" 
-								value="$deathd"
-								type="text" size="12" maxlength="100">
+							name="Cdeath$rownum" id="Cdeath$rownum" 
+							value="$deathd"
+							type="text" size="12" maxlength="100">
 				  </td>
 				  <td>
 				    <button type="button" class="button"
-								id="editChild$rownum">
+							id="editChild$rownum">
 						Edit Child
 				    </button>
 				  </td>
@@ -604,10 +599,6 @@
         a different
 		location by typing in its name or short name, or by editing the location
 		record itself.
-	</div>
-	<div class="balloon" id="HelpmarriageDetails">
-	    Clicking on this button opens a dialog that permits you to add further
-		details about the marriage and to specify source citations for the fact.
 	</div>
 	<div class="balloon" id="HelpMarEndD">
 	    <p>Supply the date that the marriage or relationship came to an end.
@@ -853,26 +844,31 @@
 	  </table>
 	
 	    <!-- template for marriage event row -->
-		<div class="row" id="MarriageRow">
+		<div class="row" id="MarriageRow$rownum">
 		  <div class="column1">
-		    <label class="column1" for="MarD">
+		    <label class="column1" for="MarD$rownum">
 				Marriage:
 		    </label>
-		    <input type="text" name="MarD" id="MarD"
+		    <input type="text" name="MarD$rownum" id="MarD$rownum"
 						size="12" maxlength="100"
 						class="white left" value="$eventd">
 		    <span style="font-weight: bold;">at</span>
-		    <input type="text" name="MarLoc" id="MarLoc"
+		    <input type="text" name="MarLoc$rownum" id="MarLoc$rownum"
 						size="36" maxlength="255"
 						class="white leftnc" value="$eventloc">
 		  </div>
 		  <div>
+            <input type="hidden" id="IDER$rownum" name="IDER$rownum"
+                    value="$ider">
+            <input type="hidden" 
+                     id="CitType$rownum" name="CitType$rownum"
+                     value="$cittype">
 		    <button type="button" class="button" style="width: 8em;"
-						id="EditIEvent20">
+						id="EditIEvent$rownum">
 				Details
 		    </button>
 		    <button type="button" class="button" style="width: 8em;"
-                        id="DelIEvent20">
+                        id="DelIEvent$rownum">
 				Delete
 		    </button>
 		  </div>
@@ -880,7 +876,7 @@
 		</div> <!-- end of Marriage row -->
 
 	    <!-- template for sealed to spouse event row -->
-		<div class="row" id="SealedRow$temp">
+		<div class="row" id="SealedRow$rownum">
 		  <div class="column1">
 		    <label class="column1" for="SealD">
 				Sealed&nbsp;to&nbsp;Spouse (LDS):
@@ -894,26 +890,30 @@
 				<option value="$idtr">
 				    $Name
 				</option>
-		      </select>
-		    </div>
-		    <div>
-		      <button type="button" class="button"
-						id="EditIEvent18$temp">
+		    </select>
+		  </div>
+		  <div>
+            <input type="hidden" id="IDER$rownum" name="IDER$rownum"
+                    value="$ider">
+            <input type="hidden" id="CitType$rownum" name="CitType$rownum"
+                     value="18">
+		    <button type="button" class="button"
+						id="EditIEvent$rownum">
 				Details
-		      </button>
+		    </button>
 		      &nbsp;
-		      <button type="button" class="button" id="DelIEvent18$temp">
+		    <button type="button" class="button" id="DelIEvent$rownum">
 				Delete
-		      </button>
-		    </div>
-		    <div style="clear: both;"></div>
+		    </button>
+		  </div>
+		  <div style="clear: both;"></div>
 		</div>
 	  <!-- end of template for sealed to spouse event row -->
 	
 	  <!-- template for marriage ended event row -->
-		<div class="row" id="EndedRow$temp">
+		<div class="row" id="EndedRow$rownum">
 		  <div class="column1">
-		    <label class="column1" for="MrEndD">
+		    <label class="column1" for="MarEndD">
 				Marriage&nbsp;Ended
 		    </label>
 		    <input type="text" name="MarEndD" id="MarEndD"
@@ -921,12 +921,14 @@
 						class="white left" value="$eventd">
 		  </div>
 		  <div>
+            <input type="hidden" id="CitType$rownum" name="CitType$rownum"
+                     value="24">
 		    <button type="button" class="button"
-						id="EditIEvent24$temp">
+						id="EditIEvent$rownum">
 				Details
 		    </button>
 		    &nbsp;
-		    <button type="button" class="button" id="DelIEvent24$temp">
+		    <button type="button" class="button" id="DelIEvent$rownum">
 				Delete
 		    </button>
 		  </div>
@@ -971,16 +973,16 @@
 	  <!-- end of template for general marriage event row -->
 	
 	  <!-- template for never married fact row -->
-		<div class="row" id="NotMarriedRow$temp">
+		<div class="row" id="NotMarriedRow$rownum">
 		  <div class="column1">
 		    <label class="column1" for="NotMarried">
 				Not Married:
 		    </label>
-		    <input type="checkbox" name="NotMarried$temp" id="NotMarried$temp"
+		    <input type="checkbox" name="NotMarried$rownum" id="NotMarried$rownum"
 				checked="checked">
 		  </div>
 		  <div>
-		    <button type="button" class="button" id="neverMarriedDetails$temp">
+		    <button type="button" class="button" id="neverMarriedDetails$rownum">
 				Details
 		    </button>
 		  </div>
@@ -989,16 +991,16 @@
 	  <!-- end of template for never married fact row -->
 	
 	  <!-- template for no children fact row -->
-		<div class="row" id="NoChildrenRow$temp">
+		<div class="row" id="NoChildrenRow$rownum">
 		  <div class="column1">
 		    <label class="column1" for="NoChildren">
 				No Children:
 		    </label>
-		    <input type="checkbox" name="NoChildren$temp" id="NoChildren$temp"
+		    <input type="checkbox" name="NoChildren$rownum" id="NoChildren$rownum"
 						checked="checked">
 		  </div>
 		  <div>
-		    <button type="button" class="button" id="noChildrenDetails$temp">
+		    <button type="button" class="button" id="noChildrenDetails$rownum">
 				Details
 		    </button>
 		  </div>
@@ -1013,6 +1015,7 @@
 	      <button type="button" id="confirmClear$type">
 		    OK
 	      </button>
+          <input type="hidden" id="ider" name="ider" value="$ider">
 	      <input type="hidden" id="formname$type" name="formname$type"
 				    value="$formname">
 		    &nbsp;

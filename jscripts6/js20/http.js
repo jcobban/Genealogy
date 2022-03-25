@@ -325,7 +325,6 @@ HTTP._getResponse = function(request) {
     
         case "text/json":
         case "application/json": 
-            console.log("HTTP._getResponse: 311 type='" + type + "' text='" + request.responseText + "'");
             // If the response is a JSON-encoded value,
             return JSON.parse(request.responseText);
     

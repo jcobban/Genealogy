@@ -17,7 +17,7 @@ use \Exception;
  *                                                                      *
  *          Name                    Type                                *
  *          IDNR                    Integer(10),                        *
- *              used by: tblNX.IDNR, deprecated                         *
+ *              referenced by: tblNX.IDNR, deprecated                   *
  *          Surname                 VARCHAR(120),   unique key          *
  *          SoundsLike              VARCHAR(4),                         *
  *          Pattern                 VARCHAR(64),    added               *
@@ -67,8 +67,10 @@ use \Exception;
  *                      new Surname(array('surname' => ">=$surname")    *
  *      2019/05/17      add Surname::$info                              *
  *      2021/09/15      add method getCount                             *
+ *      2022/03/23      add method next, remove method getIdnr          *
+ *                      add static method getInitials                   *
  *                                                                      *
- *  Copyright &copy; 2021 James A. Cobban                               *
+ *  Copyright &copy; 2022 James A. Cobban                               *
  ************************************************************************/
 require_once __NAMESPACE__ . '/Record.inc';
 
@@ -181,6 +183,8 @@ class Surname extends Record
                 $and                = 'WHERE ';
                 $surname            = null;
                 $idnr               = null;
+                $operator           = '=';
+                $orderby            = 'ASC';
                 $sqlParms           = array();
                 foreach($parms as $fieldname => $value)
                 {       // loop through parameters
@@ -214,26 +218,28 @@ class Surname extends Record
 
                         case 'surname':
                         {
-                            if ($value == '')
+                            $operator       = '=';
+                            if (preg_match("/^(>=|<=|>|<|=)\s*(.*)$/",
+                                           $value,
+                                           $matches))
+                            {
+                                $operator   = $matches[1];
+                                $value      = $matches[2];
+                                if (substr($operator, 0, 1) == '<')
+                                    $orderby    = 'DESC';
+                            }
+                            if ($value == '' && $operator == '=')
                             {           // empty surname
-                                $where      .= $and . "IDNR=1";
+                                $where      .= $and . "`Surname`=''";
                                 $surname    = '';
                             }           //empty surname
                             else
-                            if (substr($value, 0, 2) == '>=')
-                            {           // next surname >= value
-                                $where      .= $and . "Surname>=?";
-                                $value      = substr($value, 2);
+                            {           // next surname comprison value
+                                $where      .= "$and`Surname`$operator?";
                                 $sqlParms[] = $value;
                                 $surname    = $value;
                                 $limit      = ' LIMIT 1';
                             }           // next surname ?= value
-                            else
-                            {           // match on surname
-                                $where      .= $and . "Surname=?";
-                                $sqlParms[] = $value;
-                                $surname    = $value;
-                            }           // match on surname
                             $and            = ' AND ';
                             break;
                         }   // surname
@@ -252,7 +258,7 @@ class Surname extends Record
                 if (strlen($this->msg) == 0)
                 {       // valid parameters
                     // construct the query of the surname table
-                    $query              = "SELECT * FROM tblNR $where$limit";
+                    $query              = "SELECT * FROM tblNR $where ORDER BY `Surname` $orderby $limit";
 
                     // query the database
                     $stmt               = $connection->prepare($query);
@@ -261,6 +267,7 @@ class Surname extends Record
                     if ($stmt->execute($sqlParms))
                     {       // execute successful
                         $result             = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                        $this->lastSqlCmd   = $queryText;
                         if ($debug)
                             $warn   .= '<p>Surname::_construct: ' .
                                 __LINE__ . " query='$queryText'</p>\n";
@@ -328,22 +335,6 @@ class Surname extends Record
         if (strlen($this->msg) > 0)
             $this->msg        .= "Surname::__construct: " . $this->msg;
     }       // function Surname::__construct
-
-    /********************************************************************
-     *  function Surname::getIdnr                                       *
-     *                                                                  *
-     *  Retrieve the unique numeric key of this instance of             *
-     *  Surname.                                                        *
-     ********************************************************************/
-    function getIdnr()
-    {
-        // if necessary insert the record into the
-        // database to associate the object with a database record
-        if ($this->needInsert)
-            $this->save();
-
-        return $this->row['idnr'];
-    }       // function Surname::getIdnr
 
     /********************************************************************
      *  function Surname::getSurname                                    *
@@ -455,21 +446,12 @@ class Surname extends Record
 
                     case 'surname':
                     {   // changing surname also updates soundex
-                        if (substr($value,0,6) == 'Wifeof' ||
-                            substr($value,0,8) == 'Motherof' ||
-                            $value == '')
-                        {       // do not create new record
-                            $this->needInsert       = false;    // do not create
-                        }       // do not create new record
-                        else
-                        {       // create new record
-                            $fldnames               .=
+                        $fldnames               .=
                                 "$comma`surname`, `soundslike`";
-                            $values                 .= 
+                        $values                 .= 
                                 "$comma:surname,LEFT(SOUNDEX(:surname),4)";
-                            $sqlParms['surname']    = $value;
-                            $comma                  = ',';
-                        }       // create new record
+                        $sqlParms['surname']    = $value;
+                        $comma                  = ',';
                         break;
                     }   // changing surname also updates soundex
 
@@ -499,11 +481,12 @@ class Surname extends Record
             $insert         = "INSERT INTO tblNR ($fldnames) VALUES($values)";
 
             // insert the record into the database
-            $stmt           = $connection->prepare($insert);
-            $insertText     = debugPrepQuery($insert, $sqlParms);
+            $stmt                   = $connection->prepare($insert);
+            $insertText             = debugPrepQuery($insert, $sqlParms);
             if ($stmt->execute($sqlParms))
             {           // execute the prepared statement
-                $count      = $stmt->rowCount();
+                $count              = $stmt->rowCount();
+                $this->lastSqlCmd   = $insertText;
                 if ($xml)
                     print "<$tagname count='$count'>$insertText</$tagname>\n";
 
@@ -585,7 +568,8 @@ class Surname extends Record
                 $updateText             = debugPrepQuery($update, $sqlParms);
                 if ($stmt->execute($sqlParms))
                 {       // update successful
-                    $count  = $stmt->rowCount();
+                    $count              = $stmt->rowCount();
+                    $this->lastSqlCmd   = $updateText;
                     if ($xml)
                     {
                         print "<$tagname count='$count'>$updateText</$tagname>\n";
@@ -608,5 +592,79 @@ class Surname extends Record
             }           // changes made
         }               // update existing record
     }       // function Surname::save
+
+    /********************************************************************
+     *  function Surname::next                                          *
+     *                                                                  *
+     *  Returns the instance of class Surname whose surname value is    *
+     *  the next sequential surname in the table.                       *
+     *                                                                  *
+     ********************************************************************/
+    function next()
+    {
+        global  $debug;
+        global  $warn;
+        global  $msg;
+        global  $connection;
+
+        $query              = "SELECT * FROM tblNR WHERE `surname` > '" . 
+                                $this->row['surname'] ."' LIMIT 1";
+
+        // query the database
+        $stmt               = $connection->query($query);
+        if ($stmt)
+        {               // execute successful
+            $result         = $stmt->fetch(PDO::FETCH_ASSOC);
+            if ($result)
+            {           // found surname record
+                $next       = new Surname($result);
+            }           // found surname record
+            else
+            {           // no match on surname
+                $query      = "SELECT * FROM tblNR LIMIT 1";
+                $stmt       = $connection->query($query);
+                $result     = $stmt->fetch(PDO::FETCH_ASSOC);
+                $next       = new Surname($result);
+            }           // no match on surname
+        }               // execute successful
+        return $next;
+    }       // function Surname::next
+
+    /********************************************************************
+     *  static function Surname::getInitials                            *
+     *                                                                  *
+     *  Returns an array of multi-byte strings containing the initial   *
+     *  letters of surnames ordered by Unicode collating.               *
+     *                                                                  *
+     *  Input:  $options    a combination of option flags controlling   *
+     *                      which surnames are included                 *
+     ********************************************************************/
+    const EXCLUDE_LATIN             = 1;
+
+    static function getInitials($options = 0)
+    {
+        global  $debug;
+        global  $warn;
+        global  $msg;
+        global  $connection;
+
+        if ($options && self::EXCLUDE_LATIN)
+            $where          = "WHERE left(`surname`,1) > 'Z' ";
+        else
+            $where          = "";
+        $query              = "SELECT left(`surname`,1) as initial " .
+                                "FROM tblNR " . 
+                                $where .
+                                "GROUP BY initial ORDER BY initial";
+
+        // query the database
+        $stmt               = $connection->query($query);
+        if ($stmt)
+        {
+            return $stmt->fetchAll(PDO::FETCH_COLUMN, 0);
+        }
+        else
+            return array();
+    }       // static function Surname::getInitials
 
 }       // class Surname

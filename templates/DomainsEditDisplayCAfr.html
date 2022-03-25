@@ -10,8 +10,9 @@
  *      2019/02/21      support resizing scrolling row and PgUp/Dn      *
  *      2019/12/02      add partof                                      *
  *      2019/12/05      add category                                    *
+ *      2022/03/09      add language validation                         *
  *																		*
- *  Copyright &copy; 2018 James A. Cobban								*
+ *  Copyright &copy; 2022 James A. Cobban								*
  **********************************************************************-->
     <div id="breadcrumbs" class="hidden">
       <a href="/genealogy.php?lang=fr">
@@ -141,7 +142,7 @@
               </td>
               <td class="left">
                 <a href="/Canada/genProvince.php?domain=$domain&lang=fr"
-                  class="button" target="_blank">Details</a>
+                  class="button" target="_blank">Détails</a>
               </td>
             </tr>
           </tbody>
@@ -154,6 +155,12 @@
       </form>
     </div>
     <div class="hidden">
+        <span id="languageInvalid">
+            lang=$lang  n'est pas valide par défaut à lang=en.
+        </span>
+        <span id="languageUnsupported">
+            lang=$lang n'est pas pris en charge par défaut à.
+        </span>
         <span id="countryInvalid">
             cc=$cc  non prise en charge.
         </span>

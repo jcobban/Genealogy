@@ -818,6 +818,7 @@ class Family extends RecordPic
                     // query the database
                     $stmt               = $connection->prepare($query);
                     $queryText          = debugPrepQuery($query, $sqlParms);
+                    $this->lastSqlCmd   = $queryText;
 
                     if ($stmt->execute($sqlParms))
                     {           // success
@@ -956,17 +957,18 @@ class Family extends RecordPic
         // delete the associated child relation entries if any
         // note that this does not delete the associated instances of Person
         // which must be manually deleted if required
-        $count      = $this->children->delete();
+        $count              = $this->children->delete();
 
         // delete the marriage record
-        $oldJson        = json_encode($this->row);
-        $delete         = "DELETE FROM tblMR WHERE IDMR=:idmr";
-        $sqlParms       = array('idmr' => $idmr);
-        $stmt           = $connection->prepare($delete);
-        $deleteText     = debugPrepQuery($delete, $sqlParms);
+        $oldJson            = json_encode($this->row);
+        $delete             = "DELETE FROM tblMR WHERE IDMR=:idmr";
+        $sqlParms           = array('idmr' => $idmr);
+        $stmt               = $connection->prepare($delete);
+        $deleteText         = debugPrepQuery($delete, $sqlParms);
+        $this->lastSqlCmd   = $deleteText;
         if ($stmt->execute($sqlParms))
         {               // success
-            $count      = $stmt->rowCount();
+            $count          = $stmt->rowCount();
             if ($xml)
                 print "    <$tagname count='$count'>\n" .
                                 "\t$deleteText\n" .
@@ -987,8 +989,9 @@ class Family extends RecordPic
                 $addXM      = "INSERT INTO tblXM VALUE(:idmr)";
 
                 // update the database
-                $stmt       = $connection->prepare($addXM);
-                $addXMText  = debugPrepQuery($addXM, $sqlParms);
+                $stmt               = $connection->prepare($addXM);
+                $addXMText          = debugPrepQuery($addXM, $sqlParms);
+                $this->lastSqlCmd   = $addXMText;
                 if ($stmt->execute($sqlParms))
                 {       // insert released IDMR
                     $countXM    = $stmt->rowCount();
@@ -1392,9 +1395,10 @@ class Family extends RecordPic
         else
         {
             $query      = "SELECT MarStatus FROM tblMS WHERE IDMS=:idms";
-            $sqlParms   = array('idms'  => $idms);
-            $stmt       = $connection->prepare($query);
-            $queryText  = debugPrepQuery($query, $sqlParms);
+            $sqlParms           = array('idms'  => $idms);
+            $stmt               = $connection->prepare($query);
+            $queryText          = debugPrepQuery($query, $sqlParms);
+            $this->lastSqlCmd   = $queryText;
             if ($stmt->execute($sqlParms))
             {
                 $row    = $stmt->fetch(PDO::FETCH_NUM);
@@ -2923,12 +2927,12 @@ catch(Exception $e)
             {
                 if ($value instanceof LegacyDate)
                 {           // parameter is an instance of LegacyDate
-                    $date                           = $value;
+                    $date                   = $value;
                 }           // parameter is an instance of LegacyDate
                 else
                 if (strlen($value) >= 10 && (strpos($value, ' ') === false))
                 {           // parameter is internal date format
-                    $date                           = new LegacyDate($value);
+                    $date                   = new LegacyDate($value);
                 }           // parameter is internal date format
                 else
                 {           // convert the value to instance of LegacyDate
@@ -2947,8 +2951,8 @@ catch(Exception $e)
                     $this->marEvent  = $this->getMarEvent($value !== '');
                 if ($this->marEvent)
                 {
-                    $this->marEvent->set('eventsd', $sort);
-                    return $this->marEvent->set('eventd', $value);
+                    $this->marEvent->setDate('eventsd', $sort);
+                    return $this->marEvent->setDate($value, true);
                 }
                 else
                     return '';
@@ -3325,38 +3329,41 @@ catch(Exception $e)
         // before saving.
         $idirhusb       = $this->row['idirhusb'];
         if ($idirhusb > 0)
-        {       // husband defined
+        {                       // husband defined
             if (is_null($this->husband))
-            {       // husband defined but not allocated
-                $this->husband  = Person::getPerson($idirhusb);
-            }       // husband defined but not allocated
+            {                   // husband defined but not allocated
+                $this->husband          = Person::getPerson($idirhusb);
+            }                   // husband defined but not allocated
 
-            $husbpriname                    = $this->husband->getPriName();
-            $husbpriname['givenname']       = $this['husbgivenname'];
-            $husbpriname['surname']         = $this['husbsurname'];
-            parent::set('husbbirthsd',      $this->husband->get('birthsd'));
-            if ($xml)
-                $this->husband->save('husb' . __LINE__);
-            else
-                $this->husband->save();
-            parent::set('idirhusb', $this->husband->getIdir());
-        }       // husband defined
+            $husbpriname                = $this->husband->getPriName();
+            $husbpriname['givenname']   = $this['husbgivenname'];
+            $husbpriname['surname']     = $this['husbsurname'];
+            parent::set('husbbirthsd',  $this->husband->get('birthsd'));
+            $this->husband->save();
+            $lastSql                    = $this->husband->getLastSqlCmd();
+            if ($xml && strlen($lastSql) > 0)
+            {                   // husband updated
+                $ttagname               = 'husb' . __LINE__;
+                print "\t<$ttagname>$lastSql</$ttagname>\n";
+            }                   // husband updated
+            parent::set('idirhusb',     $this->husband->getIdir());
+        }                       // husband defined
 
-        $idirwife                           = $this->row['idirwife'];
+        $idirwife                       = $this->row['idirwife'];
         if ($idirwife > 0)
-        {                   // wife defined
+        {                       // wife defined
             // implement wife's married name
             if ($this['marriednamerule'] == 1 &&
                 $this['husbsurname'] != '')
-            {               // wife takes husband's surname
+            {                   // wife takes husband's surname
                 parent::set('wifemarrsurname',  $this['husbsurname']);
-            }               // wife takes husband's surname
+            }                   // wife takes husband's surname
             else
-            {               // wife keeps surname
+            {                   // wife keeps surname
                 parent::set('wifemarrsurname',  $this['wifesurname']);
-            }               // wife keeps surname
+            }                   // wife keeps surname
 
-            $wife                   = Person::getPerson($idirwife);
+            $wife                       = Person::getPerson($idirwife);
             if ($wife->isExisting())
             {                   // existing Person
                 parent::set('wifebirthsd',      $wife->get('birthsd'));
@@ -3365,13 +3372,13 @@ catch(Exception $e)
             {                   // new Person
                 $wife->set('givenname',         $this->get('wifegivenname'));
                 $wife->set('surname',           $this->get('wifesurname'));
-                $birthsd            = $this->row['wifebirthsd'];
+                $birthsd                = $this->row['wifebirthsd'];
                 if ($birthsd != -99999999)
                 {
-                    $by             = floor($birthsd/10000);
-                    $birthsd        -= 10000*$by;
-                    $bm             = floor($birthsd/100);
-                    $bd             = $birthsd % 100;
+                    $by                 = floor($birthsd/10000);
+                    $birthsd            -= 10000*$by;
+                    $bm                 = floor($birthsd/100);
+                    $bd                 = $birthsd % 100;
                     if ($bm > 0)
                         $wife->set('birthd',
                                     $by . '/' . $bm . '/' . $bd);
@@ -3379,40 +3386,44 @@ catch(Exception $e)
                         $wife->set('birthd',
                                     'about ' . $by);
                 }
-                if ($xml)
-                    $wife->save('wife' . __LINE__);
-                else
-                    $wife->save();
-                parent::set('idirwife', $wife->getIdir());
             }                   // new Person
+            $this->wife                 = $wife;
+            $this->wife->save();
+            $lastSql                    = $this->wife->getLastSqlCmd();
+            if ($xml && strlen($lastSql) > 0)
+            {                   // wife updated
+                $ttagname               = 'wife' . __LINE__;
+                print "\t<$ttagname>$lastSql</$ttagname>\n";
+            }                   // wife updated
+            parent::set('idirwife',     $wife->getIdir());
         }                       // wife defined
 
         // validate IDLRMar
-        $idlrmar    = $this->row['idlrmar'];
+        $idlrmar            = $this->row['idlrmar'];
         if ($idlrmar > 1)
         {       // 1 is default empty location
-            $marloc     = Location::getLocation($idlrmar);
+            $marloc         = Location::getLocation($idlrmar);
         }       // 1 is default empty location
 
         // To Do
-        $idms       = $this->row['idms'];
-        $idar       = $this->row['idar'];
-        $idtrseal   = $this->row['idtrseal'];
+        $idms               = $this->row['idms'];
+        $idar               = $this->row['idar'];
+        $idtrseal           = $this->row['idtrseal'];
 
         if ($this->marEvent)
         {       // marriage event may have been modified
-            parent::set('mard', $this->marEvent->get('eventd'));
-            parent::set('marsd', $this->marEvent->get('eventsd'));
-            parent::set('idlrmar', $this->marEvent->get('idlrevent'));
+            parent::set('mard',     $this->marEvent->get('eventd'));
+            parent::set('marsd',    $this->marEvent->get('eventsd'));
+            parent::set('idlrmar',  $this->marEvent->get('idlrevent'));
         }       // marriage event may have been modified
 
         // insert the record into the database if it does not already
         // exists, otherwise update those fields that need to be updated
         if ($this->needInsert)
         {       // create new record
-            $fldnames   = '';
-            $values = '';
-            $sqlParms   = array('today'     => $today,
+            $fldnames       = '';
+            $values         = '';
+            $sqlParms       = array('today'     => $today,
                                     'currtime'  => $currtime);
             foreach($this->row as $fld => $value)
             {
@@ -3441,8 +3452,8 @@ catch(Exception $e)
 
                     default:
                     {           // other fields
-                        $fldnames       .= ", `$fld`"; 
-                        $values         .= ", :$fld";
+                        $fldnames           .= ", `$fld`"; 
+                        $values             .= ", :$fld";
                         $sqlParms[$fld]     = $value;
                         break;
                     }           // other fields
@@ -3458,8 +3469,9 @@ catch(Exception $e)
                                 ':today, :currtime ' . $values;
 
             // insert the record into the database
-            $stmt           = $connection->prepare($insert);
-            $insertText     = debugPrepQuery($insert, $sqlParms);
+            $stmt                   = $connection->prepare($insert);
+            $insertText             = debugPrepQuery($insert, $sqlParms);
+            $this->lastSqlCmd       = $insertText;
             if ($stmt->execute($sqlParms))
             {                   // success
 
@@ -3482,28 +3494,29 @@ catch(Exception $e)
                 // get the record identifier set by the database server for
                 // the new record
                 // update primary key value in record, as it was previously 0
-                $id         = $connection->lastInsertId();
+                $id                 = $connection->lastInsertId();
                 $this->row['id']    = $id;
 
                 // obtain the updated record from the database
                 // so the memory copy will include values set by the
                 // SQL server or calculated in the INSERT statement
-                $query      = "SELECT * FROM tblMR WHERE ID=:id";
-                $rParms     = array('id'        => $id);
-                $stmt       = $connection->prepare($query);
-                $queryText  = debugPrepQuery($query, $rParms);
+                $query              = "SELECT * FROM tblMR WHERE ID=:id";
+                $rParms             = array('id'        => $id);
+                $stmt               = $connection->prepare($query);
+                $queryText          = debugPrepQuery($query, $rParms);
+                $this->lastSqlCmd   .= ';' . $queryText;
                 if ($stmt->execute($rParms))
                 {               // success
                     $this->row      = $stmt->fetch(PDO::FETCH_ASSOC);
-                    $idmr       = $this->row['idmr'];
+                    $idmr           = $this->row['idmr'];
                     if ($xml)
                        print "<$tagname idmr=\"$idmr\">$queryText</$tagname>\n";
 
                     if ($debug)
                        $warn        .= "<p>Family::save: " . __LINE__ .
-                                       " idmr=$idmr query='$queryText'</p>\n";
+                                " idmr=$idmr query='$queryText'</p>\n";
 
-                    // log the update
+                    // log the query
                     $this->log($insert, $sqlParms);
 
                     // ensure any children added while the instance was
@@ -3512,10 +3525,17 @@ catch(Exception $e)
                     foreach($children as $child)
                     {
                         $child->set('idmr', $idmr);
-                        if ($xml)
-                            $child->save('child' . __LINE__);
-                        else
-                            $child->save();
+                        $child->save();
+                        $lastSql    = $child->getLastSqlCmd();
+                        if (strlen($lastSql) > 0)
+                        {               // Child updated
+                            if ($xml)
+                            {
+                                $ttagname       = 'child' . __LINE__;
+                                print "\t<$ttagname>$lastSql</$ttagname>\n";
+                            }
+                            $this->lastSqlCmd   .= ';' . $lastSql;
+                        }               // Child updated
                     }
 
                     // make the current user an owner of the new family
@@ -3535,11 +3555,11 @@ catch(Exception $e)
         }                       // create new record
         else
         {                       // update existing record
-            $update     = "UPDATE tblMR SET ";
-            $sqlParms       = array();
-            $set        = '';
-            $comma      = '';
-            $nameChanged    = false;
+            $update         		= "UPDATE tblMR SET ";
+            $sqlParms       		= array();
+            $set            		= '';
+            $comma          		= '';
+            $nameChanged    		= false;
             foreach($this->changed as $fld => $value)
             {
                 switch($fld)
@@ -3566,13 +3586,13 @@ catch(Exception $e)
                     default:
                     {           // other fields
                         $set            .= $comma . "`$fld`=:$fld";
-                        $sqlParms[$fld]     = $value;
+                        $sqlParms[$fld] = $value;
                         $comma          = ', ';
                         break;
                     }           // other fields
                 }               // switch on field name
             }                   // loop through all fields in record
-            $this->changed  = array();  // reset
+            $this->changed              = array();  // reset
 
             if (strlen($set) > 0)
             {                   // changes made to contents of record
@@ -3584,11 +3604,12 @@ catch(Exception $e)
                 $sqlParms['idmr']       = $this->row['idmr'];
 
                 // update the record
-                $stmt       = $connection->prepare($update);
-                $updateText = debugPrepQuery($update, $sqlParms);
+                $stmt               = $connection->prepare($update);
+                $updateText         = debugPrepQuery($update, $sqlParms);
+                $this->lastSqlCmd   = $updateText;
                 if ($stmt->execute($sqlParms))
                 {               // success
-                    $count      = $stmt->rowCount();
+                    $count          = $stmt->rowCount();
                     // update successful
                     if ($xml)
                         print "<$tagname count='$count'>" . $updateText . 
@@ -3607,6 +3628,19 @@ catch(Exception $e)
                                  $this->row['id'],
                                  json_encode($this->former),
                                  json_encode($this->row));
+
+                    if ($this->marEvent)
+                    {
+                        $this->marEvent->save(false);
+                        $lastSql    = $this->marEvent->getLastSqlCmd();
+                        if (strlen($lastSql) > 0)
+                        {       // marEvent updated
+                            $this->lastSqlCmd   .= ';' . $lastSql;
+                            if ($debug)
+                                $warn   .= "<p>Family::save: " . __LINE__ .
+                                            " $lastSql</p>\n";
+                        }       // marEvent updated
+                    }
                 }               // success
                 else
                 {               // error updating record

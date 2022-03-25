@@ -34,11 +34,33 @@
 	
 	  $TRACE
 	  $MSG
-	    <p class='warning'>
+      <div id="noStateId">
+	    <form name='refreshForm' id='refreshForm'
+	    	    action='DistForm.php' 
+                method='get'> 
+	      <input type='hidden' name='Census' id='refreshCensus'
+			    value='$CENSUSID'>
+	      <input type="hidden" name="offset" id="refreshoffset" 
+			    value="$OFFSET">
+	      <input type="hidden" name="limit" id="refreshlimit" 
+			    value="$LIMIT">
+	      <input type="hidden" name="lang" id="refreshlang" 
+			    value="$LANG">
+          <label for="refreshProv" class="label">
+              Province or State identifier not specified:
+          </label>
+          <select name="Province" id="refreshProv">
+            <option value=''>Choose a Province</option>
+            <option value='$CODE' id="prov$CODE">$NAME</option>
+          </select>
+          <button type="submit" id="refreshSubmit">Refresh</button>
+        </form>
+      </div>
+	  <p class='warning'>
 		You are not authorized.
 	    <a href='/Signon.php'><span class='button'>Sign on</span></a>
 		to update the database.
-	    </p>
+	  </p>
 	  <p class='warning' id='countzero'>
 		There are currently no census districts defined in the table
 		for this administrative domain.
@@ -177,8 +199,8 @@
     <div class="hidden" id="noCensusId">
         Census identifier not specified. 
     </div>
-    <div class="hidden" id="noStateId">
-        Province or State identifier not specified. 
+    <div class="hidden" id="invCensusId">
+        Invalid Census Identifier '$censusId'. 
     </div>
     <script src= '/jscripts/CommonForm.js' type="text/javascript">
     </script>

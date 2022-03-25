@@ -19,82 +19,134 @@
       <link rel="stylesheet" type="text/css" href="/styles.css"/>
   </head>
   <body>
-  <div class="topcrumbs">
-    <a href="/indexHelpen.html">Home</a>: 
-    <a href="/genealogyHelpen.html">Genealogy</a>: 
-    <a href="/Canada/genCanadaHelpen.html">Canada</a>: 
-  </div>
-  <div class="help">
-  <h1>Censuses of Canada: Help</h1>
-  <p>This page provides a list of services relating to the various censuses of
-  Canada that are available.  Some of these services are provided by this web site
-  and others by other free web sites.
-  </p>
-  <p>While services that permit viewing census data are available to all
-  visitors, there are additional services that permit you to contribute to
-  the expansion of free census searches.  All of the census searches that are
-  implemented on this web-site can be contributed to by any registered user.
-  </p>
-  <p>There are individual database tables for each of the
-  <a href="QueryDetail1851Helpen.html">1851</a>, 
-  <a href="QueryDetail1861Helpen.html">1861</a>, 
-  <a href="QueryDetail1871Helpen.html">1871</a>, 
-  <a href="QueryDetail1881Helpen.html">1881</a>, 
-  <a href="QueryDetail1891Helpen.html">1891</a>, 
-  <a href="QueryDetail1901Helpen.html">1901</a>, 
-  <a href="QueryDetail1906Helpen.html">1906</a>, 
-  <a href="QueryDetail1911Helpen.html">1911</a>,  
-  <a href="QueryDetail1916Helpen.html">1916</a>, and
-  <a href="QueryDetail1921Helpen.html">1921</a>
-  censuses of Canada, which record all or almost all
-  of the the values recorded in the individual enumeration forms of each of
-  the censuses.  For the post-confederation (1867) censuses that is schedule 1.
-  There is also an option to perform a nominal search of
-  <a href="QueryDetailAllHelpen.html">All</a> censuses of Canada at once. 
-  </p>
-  <p>To support the application there are three additional tables:
-  <ul>
+    <div class="topcrumbs">
+      <a href="/indexHelpen.html">Home</a>: 
+      <a href="/genealogyHelpen.html">Genealogy</a>: 
+      <a href="/Canada/genCanadaHelpen.html">Canada</a>: 
+    </div>
+    <div class="help">
+    <h1>Censuses of Canada: Help</h1>
+    <p>This page provides a list of services relating to the various
+      censuses of Canada that are available.  Some of these services
+      are provided by this web site and others by other free web sites.
+    </p>
+    <p>There are two motivations for maintaining this separate
+      transcription:
+    </p>
+    <ol>
+      <li>This transcription is independent of other transcriptions and
+        therefore will have different errors in transcription.  Almost
+        all other sites share a single transcription organized by the
+        Church of Latter Day Saints (LDS) Family History Library (FHL) 
+        and financed in part by Ancestry.com.  This includes the 
+        <a href="https://www.bac-lac.gc.ca/eng/census/Pages/census.aspx">
+            Library and Archives of Canada</a>.
+        The only other independent transcriptions I am aware of are
+        <a href="http://geneofun.on.ca/ontariocensus/">OntarioGenWeb's Census Project</a> and 
+        <a href="http://automatedgenealogy.com/">Automated Genealogy</a>.
+      <li>The family tree on this site identifies individual pages
+        by the identification scheme used by the Dominion Bureau of
+        Statistics for post-Confederation censuses, which was also
+        retrofitted to the pre-Confederation censuses in the 1950s.  This
+        requires organizing the transcription based upon that
+        identification scheme.
+    </ol>
+    <p>This service supports transcribing every column on the original
+      forms.  For each column the value entered by the transcriber is
+      validated against the guidelines for the column and if not meeting
+      those guidelines the entered value is highlighted in 
+      <span style="color: red;">red</span>.  Many columns also have
+      support for expanding abbreviations to speed up data entry.  These
+      abbreviations are explained in the popup help balloons for each
+      column.
+    </p>
+    <p>Columns which in the original represented a yes/no indicator about
+      the individual are filled in with the gender of the individual.
+      This permits coalescing columns which in the pre-Confederation
+      censuses had separate columns for tracking by gender.  This is 
+      extended to similar columns in post-Confederation censuses.  For
+      example in the Pre-Confederation censuses there were separate columns
+      for school attendance by gender.
+    </p>
+    <p>
+      The pre-Confederation censuses did not include a column for
+      associating members of a single household, only for describing
+      residences.  As a consequence the LDS transcription does not
+      organize its response by household.  This transcription emulates
+      the post-Confederation family column.
+    </p>
+    <p>In each form you can hide individual columns by clicking on the
+      column header.  There is also a 
+      <span class="button">Show Important</span> button that hides fields
+      that are not part of the identification of the individual.
+    </p>
+    <p>While services that permit viewing census data are available to all
+      visitors, there are additional services that permit you to
+      contribute to the expansion of free census searches. Any registered 
+      user can contribute to any of the census searches that are
+      implemented on this web-site .
+    </p>
+    <p>There are individual database tables for each of the
+        <a href="QueryDetail1851Helpen.html">1851</a>, 
+        <a href="QueryDetail1861Helpen.html">1861</a>, 
+        <a href="QueryDetail1871Helpen.html">1871</a>, 
+        <a href="QueryDetail1881Helpen.html">1881</a>, 
+        <a href="QueryDetail1891Helpen.html">1891</a>, 
+        <a href="QueryDetail1901Helpen.html">1901</a>, 
+        <a href="QueryDetail1906Helpen.html">1906</a>, 
+        <a href="QueryDetail1911Helpen.html">1911</a>,  
+        <a href="QueryDetail1916Helpen.html">1916</a>, and
+        <a href="QueryDetail1921Helpen.html">1921</a>
+      censuses of Canada, which record all or almost all of the 
+      values recorded in the individual enumeration forms of each of
+      the censuses.  For the post-confederation (1867) censuses that
+      is schedule 1.
+      There is also an option to perform a nominal search of
+    <a href="QueryDetailAllHelpen.html">All</a> censuses of Canada at once. 
+    </p>
+    <p>To support the application there are three additional tables:
+    <ul>
       <li>The <a href="ReqUpdateDistsHelpen.html">District table</a> 
-  	contains information about the districts into which
-  	each census was divided.  For the pre-confederation (1867) censuses
-  	a District is the same as a County.  Indeed the 1851 census was
-  	delayed until 1852 precisely because in 1851 the counties
-  	in Canada West (Ontario, formerly Upper Canada) were in the
-  	process of being organized as a result of the constitutional changes
-  	introduced as a result of the Durham Report.  However for the
-  	post-confederation censuses the enumeration districts are based upon
-  	the electoral districts (called ridings in Canada).
-      <li>The <a href="ReqUpdateSubDistsHelpen.html">
-  	Sub-District table</a> 
-  	contains information about each of the
-  	enumeration sub-districts into which the Districts were divided.
-  	Generally a Sub-District corresponds to a township, town, large village,
-  	or city ward.  If the population of a Sub-District was such as
-  	to require being divided in order to keep the enumerator's workload
-  	down, then the Sub-District was divided into Divisions.  Each
-  	division has a separate row in this table.
+      	contains information about the districts into which
+      	each census was divided.  For the pre-confederation (1867) censuses
+      	a District is the same as a County.  Indeed the 1851 census was
+      	delayed until 1852 precisely because in 1851 the counties
+      	in Canada West (Ontario, formerly Upper Canada) were in the
+      	process of being organized as a result of the constitutional changes
+      	introduced as a result of the Durham Report.  However for the
+      	post-confederation censuses the enumeration districts are based upon
+      	the electoral districts (called ridings in Canada).
+        <li>The <a href="ReqUpdateSubDistsHelpen.html">
+      	Sub-District table</a> 
+      	contains information about each of the
+      	enumeration sub-districts into which the Districts were divided.
+      	Generally a Sub-District corresponds to a township, town, large village,
+      	or city ward.  If the population of a Sub-District was such as
+      	to require being divided in order to keep the enumerator's workload
+      	down, then the Sub-District was divided into Divisions.  Each
+      	division has a separate row in this table.
       <li>The <a href="ReqUpdatePagesHelpen.html">Page table</a> 
-  	contains information about each individual page in the
-  	individual enumeration schedule of every census.  
-  	This table is therefore conceptually
-  	extremely large.  However it is not populated for a given division
-  	until the first page in that division is transcribed.  Each entry
-  	in the page table tracks information including
-  	how many individuals are recorded on the page, and the URL of the
-  	image of the original page, if that image is available on the web
-  	from a free source (usually the Library and Archives of Canada web
-  	site). 
-  </ul>
-  </div>
-  <div class="botcrumbs">
-    <span class="right">
-      <img SRC="/logo70.gif" height="70" width="70" alt="James Cobban Logo">
-    </span>
-    <a href="/contactAuthor.php?subject=genCensusesHelpen.html" target="_blank">Contact Author</a>
-    <br/>
-    <a href="/indexHelpen.html">Home</a>: 
-    <a href="/genealogyHelpen.html">Genealogy</a>: 
-    <a href="/Canada/genCanadaHelpen.html">Canada</a>: 
-  </div>
+      	contains information about each individual page in the
+      	individual enumeration schedule of every census.  
+      	This table is therefore conceptually
+      	extremely large.  However it is not populated for a given division
+      	until the first page in that division is transcribed.  Each entry
+      	in the page table tracks information including
+      	how many individuals are recorded on the page, and the URL of the
+      	image of the original page, if that image is available on the web
+      	from a free source (usually the Library and Archives of Canada web
+      	site). 
+    </ul>
+    </div>
+    <div class="botcrumbs">
+      <span class="right">
+        <img SRC="/logo70.gif" height="70" width="70" alt="James Cobban Logo">
+      </span>
+      <a href="/contactAuthor.php?subject=genCensusesHelpen.html" target="_blank">Contact Author</a>
+      <br/>
+      <a href="/indexHelpen.html">Home</a>: 
+      <a href="/genealogyHelpen.html">Genealogy</a>: 
+      <a href="/Canada/genCanadaHelpen.html">Canada</a>: 
+    </div>
   </body>
 </html>

@@ -23,8 +23,10 @@
  *      2021/01/16      use XMLSerializer for diagnostic output         *
  *      2021/03/03      separate function of Link and Find buttons      *
  *                      use ECMA 2015 syntax                            *
+ *      2922/02/06      use record identifier from individual row       *
+ *                      if not supplied in parameters to script         *
  *                                                                      *
- *  Copyright &copy; 2021 James A. Cobban                               *
+ *  Copyright &copy; 2022 James A. Cobban                               *
  ************************************************************************/
 
 window.onload   = onLoad;
@@ -566,7 +568,7 @@ function showDetails()
     let rownum      = this.id.substring(7);
     let domain, volume, reportNo, element;
 
-    if (form.Domain)
+    if (form.Domain && form.Domain.value != '')
         domain      = form.Domain.value;
     else
     {
@@ -577,7 +579,7 @@ function showDetails()
             alert("showDetails: cannot find Domain field elements['Domain" +rownum + "']");
     }
 
-    if (form.Volume)
+    if (form.Volume && form.Volume.value != '')
         volume      = form.Volume.value;
     else
     {
@@ -588,7 +590,7 @@ function showDetails()
             alert("showDetails: cannot find Volume field elements['Volume" +rownum + "']");
     }
 
-    if (form.ReportNo)
+    if (form.ReportNo && form.ReportNo.value != '')
         reportNo        = form.ReportNo.value;
     else
     {
@@ -602,16 +604,17 @@ function showDetails()
     let itemNo      = form.elements['ItemNo' + rownum].value;
     let script;
     if (domain == 'CAUC')
-        script  = 'DistrictMarriagesEdit.php?Domain=' + domain +
-                        '&Volume=' + volume +
-                        '&ReportNo=' + reportNo +
-                        '&ItemNo=' + itemNo;
+        script      = 'DistrictMarriagesEdit.php?Domain=' + domain +
+                            '&Volume=' + volume +
+                            '&ReportNo=' + reportNo +
+                            '&ItemNo=' + itemNo;
     else
-        script  = 'CountyMarriagesEdit.php?Domain=' + domain +
-                        '&Volume=' + volume +
-                        '&ReportNo=' + reportNo +
-                        '&ItemNo=' + itemNo;
-    location    = script;
+        script      = 'CountyMarriagesEdit.php?Domain=' + domain +
+                            '&Volume=' + volume +
+                            '&ReportNo=' + reportNo +
+                            '&ItemNo=' + itemNo;
+
+    location        = script;
     return false;
 }       // function showDetails
 

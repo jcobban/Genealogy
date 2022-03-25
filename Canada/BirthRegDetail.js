@@ -229,10 +229,10 @@ function onLoadBirths()
 
                 case 'FatherOccPlace':
                 {
-                    element.abbrTbl = LocAbbrs;
-                    element.onchange    = locationChanged;
-                    element.afterChange = afterChangeFatherOccPlace;
-                    element.checkfunc   = checkAddress;
+                    element.abbrTbl         = LocAbbrs;
+                    element.onchange        = locationChanged;
+                    element.afterChange     = afterChangeFatherOccPlace;
+                    element.checkfunc       = checkAddress;
                     element.checkfunc();
                     break;
                 }       // location fields
@@ -240,7 +240,7 @@ function onLoadBirths()
                 case 'Image':
                 {
                     element.onchange        = changeImage;
-                    element.checkfunc   = checkURL;
+                    element.checkfunc       = checkURL;
                     element.checkfunc();
                     break;
                 }       // Image URL

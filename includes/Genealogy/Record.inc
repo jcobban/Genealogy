@@ -3585,6 +3585,13 @@ function debugPrepQuery($query, $sqlParms, $escape = true)
     if (count($queryParts) > 1)
     {               // substitutions by indexed values
         $queryText              = $queryParts[0];
+        if (count($queryParts) > (count($sqlParms) + 1))
+        {
+            error_log("Record::debugPrepQuery: \$query='$query'");
+            error_log("Record::debugPrepQuery: \$sqlParms=" . print_r($sqlParms, true));
+            error_log("Record::debugPrepQuery: \$queryParts=" . print_r($queryParts, true));
+            array_pop($queryParts);
+        }
         for($i = 1; $i < count($queryParts); $i++)
         {
             $text               = $queryParts[$i];

@@ -447,7 +447,6 @@ if (!is_null($child))
             }           // preferred parents not set
             else
             {
-                $warn   .= "<p>" . __LINE__ . " \$tree->getFamily($idmrparents)</p>\n";
                 $family         = $tree->getFamily($idmrparents);
             }
         }               // at least one set of parents
@@ -550,22 +549,22 @@ if (strlen($msg) == 0 || $family instanceof Family)
     $marriageText                   = $marriageElt->outerHTML;
     $template->set('MARRIAGEROWTEMPLATE',   $marriageText);
     
-    $marriageEvtElt                 = $template['MarriageRow'];
+    $marriageEvtElt                 = $template['MarriageRow$rownum'];
     $marriageEvtText                = $marriageEvtElt->outerHTML;
     
     $eventElt                       = $template['EventRow$rownum'];
     $eventText                      = $eventElt->outerHTML;
     
-    $sealedElt                      = $template['SealedRow$temp'];
+    $sealedElt                      = $template['SealedRow$rownum'];
     $sealedText                     = $sealedElt->outerHTML;
     
-    $endedElt                       = $template['EndedRow$temp'];
+    $endedElt                       = $template['EndedRow$rownum'];
     $endedText                      = $endedElt->outerHTML;
     
-    $notMarriedElt                  = $template['NotMarriedRow$temp'];
+    $notMarriedElt                  = $template['NotMarriedRow$rownum'];
     $notMarriedText                 = $notMarriedElt->outerHTML;
     
-    $noChildrenElt                  = $template['NoChildrenRow$temp'];
+    $noChildrenElt                  = $template['NoChildrenRow$rownum'];
     $noChildrenText                 = $noChildrenElt->outerHTML;
     
     $childElt                       = $template['child$rownum'];
@@ -693,11 +692,14 @@ if (strlen($msg) == 0 || $family instanceof Family)
     $rownum                         = 1;
     $events                         = $family->getEvents();
     if ($events->count() == 0)
+    {           // always a marriage event even if empty
         $events[]                   = $family->getMarEvent(true);
+    }           // always a marriage event even if empty
     $eventTypes                     = $translate['marriageEvents'];
     foreach($events as $ider => $event)
     {           // loop through all events
-        $idet                       = $event->getIdet();
+        $idet                       = $event['idet'];
+        $cittype                    = Citation::STYPE_MAREVENT;
         $eventd                     = $event->getDate();
         $eventloc                   = $event->getLocation()->toString();
         $description                = $event['description'];
@@ -707,18 +709,24 @@ if (strlen($msg) == 0 || $family instanceof Family)
             case Event::ET_MARRIAGE:
             {
                 $templateText       = $marriageEvtText;
+                if ($ider == 0)
+                    $cittype        = Citation::STYPE_MAR;
                 break;
             }
 
             case Event::ET_LDS_SEALED:
             {
                 $templateText       = $sealedText;
+                if ($ider == 0)
+                    $cittype        = Citation::STYPE_LDSS;
                 break;
             }
 
             case Event::ET_MARRIAGE_END:
             {
                 $templateText       = $endedText;
+                if ($ider == 0)
+                    $cittype        = Citation::STYPE_MAREND;
                 break;
             }
 
@@ -729,16 +737,25 @@ if (strlen($msg) == 0 || $family instanceof Family)
             }
         }       // select template based upon IDET
 
-        $rtemplate                  = new Template($templateText);
-        $rtemplate->set('rownum',       $rownum);
-        $rtemplate->set('ider',         $ider);
-        $rtemplate->set('idet',         $idet);
-        $rtemplate->set('eventd',       $eventd);
-        $rtemplate->set('eventloc',     $eventloc);
-        $rtemplate->set('description',  $description);
-        $rtemplate->set('type',         $type);
-        $rtemplate->set('temp',         '');
-        $data                       .= $rtemplate->compile();
+        $data       .= str_replace(array('$rownum',
+                                         '$ider',
+                                         '$idet',
+                                         '$cittype',
+                                         '$eventd',
+                                         '$eventloc',
+                                         '$description',
+                                         '$type',
+                                         '$temp'), 
+                                   array($rownum,
+                                         $ider,
+                                         $idet,
+                                         $cittype,
+                                         $eventd,
+                                         $eventloc,
+                                         $description,
+                                         $type,
+                                         ''),
+                                   $templateText);
         $rownum++;
     }           // loop through all events
 

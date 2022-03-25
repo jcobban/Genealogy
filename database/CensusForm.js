@@ -950,12 +950,6 @@ function changeOwnerTenant()
     let rownum  = this.name.substring(11);
     if (this.value.length > 0)
     {           // owner tenant set
-        field  = form.elements['Address' + rownum];
-        if (field && field.value == '')
-        {
-            field.value  = '[blank]';
-            field.checkfunc();
-        }
         field  = form.elements['HouseRent' + rownum];
         if (field && field.value == '' && value == 'R')
         {
@@ -1305,7 +1299,7 @@ function replDown(curr)
             break;          // stop replicating value on first explicit cell
     }                       // loop to end of page
 
-}       // function changeReplDown
+}       // function replDown
 
 /************************************************************************
  *  function changeFBPlace                                              *
@@ -2106,11 +2100,12 @@ function initElement(element, clear)
     // for individual data elements the field name generally
     // consists of a column name plus the line number as the last
     // two characters
-    let result      = /([a-zA-Z_$]+)(\d*)$/.exec(fldName);
-    let colName      = result[1].toLowerCase();
-    let rowNum      = result[2];
-    if (rowNum.length > 0)
-        rowNum      = parseInt(rowNum);
+    let result          = /([a-zA-Z_$]+)(\d*)$/.exec(fldName);
+    let colName         = result[1].toLowerCase();
+    let rowNumText      = result[2];
+    let rowNum          = rowNumText;
+    if (rowNumText.length > 0)
+        rowNum          = parseInt(rowNumText);
 
     switch(colName)
     {   // column specific initialization
@@ -2168,10 +2163,30 @@ function initElement(element, clear)
         case 'addrmdn':
         case 'addrmuni':
         case 'postoffice':
-        case 'township':
         {   // fields that replicate to subsequent rows
             if (element.addEventListener)
                 element.addEventListener('change', changeReplDown, false);
+            setClassByValue(colName,
+                            rowNum,
+                            form.elements);
+            element.checkfunc  = checkAddress;
+            element.checkfunc();
+            break;
+        }   // fields that replicate to subsequent rows
+
+        case 'township':
+        {   // fields that replicate to subsequent rows
+            let otColumn        = form.elements['OwnerTenant' + rowNumText];
+            if (otColumn)
+            {                   // 1921 census
+                if (element.addEventListener)
+                    element.addEventListener('change', changeAddress, false);
+            }                   // 1921 census
+            else
+            if (element.addEventListener)
+            {
+                element.addEventListener('change', changeReplDown, false);
+            }
             setClassByValue(colName,
                             rowNum,
                             form.elements);

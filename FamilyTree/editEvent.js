@@ -1062,9 +1062,9 @@ function gotEvent(xmlDoc)
             let result  = cmds[i].getAttribute('result');
             if (result && result.length > 0)
             {           // result attribute value present
-                if (ider.value == 0)
+                if (ider !== null && ider.value == 0)
                     ider.value      = result;
-                if (idime.value == 0)
+                if (idime !== null && idime.value == 0)
                     idime.value     = result;
                 break;
             }           // result attribute value present
@@ -1142,7 +1142,7 @@ function gotEvent(xmlDoc)
             }               // loop through forms in invoking page
 
             closeFrame();
-          } catch(ex) { alert("editEvent.js: 1114 Exception " + ex);}
+          } catch(ex) { alert("editEvent.js: 1145 Exception " + ex);}
         }                   // invoked from an existing window
         else
         {

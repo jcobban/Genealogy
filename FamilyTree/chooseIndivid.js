@@ -180,6 +180,8 @@ function gotNames(xmlDoc)
     }
 
     var root	= xmlDoc.documentElement;
+    //var s = new XMLSerializer();
+    //alert("chooseIndivid.js: gotNames: xmlDoc=" + s.serializeToString(root));
     if (root && (root.nodeName == 'names'))
     {			    // valid response
 		var	parms	= {};
@@ -420,17 +422,19 @@ function update()
 
     if (form)
     {			// form present
-		var	url	= '/FamilyTree/getIndivNamesXml.php';
+		var	url	            = '/FamilyTree/getIndivNamesXml.php';
 
-		var nameSet		= false;
+		var nameSet		    = false;
+        var trace           = "chooseIndivid.js: update: 428 ";
 		for(var j = 0; j < form.elements.length; j++)
 		{		// loop through all input elements
-		    var element	= form.elements[j];
+		    var element	    = form.elements[j];
 
-		    var	name	= element.name;
-		    var value	= element.value;
+		    var	name	    = element.name;
+		    var value	    = element.value;
 		    if (name === undefined || name.length == 0)
-				name	= element.id;
+				name	    = element.id;
+            trace           += "'" + name + "'='" + value + "'\n";
 		    // take action specific to the element based on its name
 		    switch(name)
 		    {		// switch on name
@@ -459,25 +463,27 @@ function update()
 				    else
 						url	+= "?Surname=";
 				    break;
-				}	// search pattern for name of individual
+				}	        // search pattern for name of individual
 
 				case 'parentsIdmr':
 				case 'birthmin':
 				case 'birthmax':
-				{	// other limits
+				{	        // other limits
 				    if (value.length > 0 && value != 0)
-				    {	// search using value
+				    {	    // search using value
 						url	+= "&" + name + "=" + value;
-				    }	// search using value
+				    }	    // search using value
 				    break;
-				}	// other limits
+				}	        // other limits
 
-		    }		// switch on element name
-		}		// loop through all input elements
+		    }		        // switch on element name
+            trace       += "url='" + url + "'\n";
+		}		            // loop through all input elements
+        //alert(trace);
 
 		// also check command line arguments
 		for(var key in args)
-		{		// loop through command line arguments
+		{		            // loop through command line arguments
 		    var	value	        = encodeURIComponent(args[key]);
 
 		    switch(key.toLowerCase())

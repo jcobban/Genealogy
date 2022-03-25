@@ -10,17 +10,17 @@
  *  Copyright &copy; 2019 James A. Cobban								*
  **********************************************************************-->
 	<div id="breadcrumbs" class="hidden">
-	    <a href="/genealogy.php?lang=$LANG">Genealogy</a>:
+        <a href="/genealogy.php?lang=$LANG">Généalogie</a>:
 	    <a href="/genCountry.php?cc=$CC&lang=$LANG">$COUNTRYNAME</a>:
-	    <a href="/genCensuses.php?lang=$LANG">Censuses</a>:
+	    <a href="/genCensuses.php?lang=$LANG">Recensements</a>:
 		<a href="/database/CensusUpdateStatus.php?Census=$CENSUSID&Province=$PROVINCE&lang=$LANG">$PROVINCENAME</a>:
 	    <a href="QueryDetail.php?Census=$CENSUSID&District=$DISTID&lang=$LANG">
-            Nominal Search of $CENSUSYEAR Census of $COUNTRYNAME
+            Recherche nominale du Recensement $CENSUSYEAR de $COUNTRYNAME
         </a>:
 	</div>
 	<div class="body">
 	  <h1>
-		$CENSUSNAME District $DISTID $DISTNAME Status
+		$CENSUSNAME District $DISTID $DISTNAME Statut
 	    <span class="right">
 		  <a href="CensusUpdateStatusDistHelpen.html" target="help">? Help</a>
 	    </span>
@@ -31,12 +31,12 @@
 	  <!--- Put out a line with links to previous and next section of table -->
       <div class="center" id="topBrowse">
 	    <div class="left" id="topPrev">
-		    <a href="CensusUpdateStatusDist.php?Census=$PREVCENSUSID&District=$PREVDIST" id="toPrevDist">
+		    <a href="CensusUpdateStatusDist.php?Census=$PREVCENSUSID&District=$PREVDIST&lang=fr" id="toPrevDist">
 		    &lt;--- district $PREVDIST $PREVDISTNAME
 		    </a>
 	    </div>
 	    <div class="right" id="topNext">
-		  <a href="CensusUpdateStatusDist.php?Census=$NEXTCENSUSID&District=$NEXTDIST" id="toNextDist">
+		  <a href="CensusUpdateStatusDist.php?Census=$NEXTCENSUSID&District=$NEXTDIST&lang=fr" id="toNextDist">
 		    district $NEXTDIST $NEXTDISTNAME ---&gt;
 		  </a>
 	    </div>
@@ -60,19 +60,19 @@
 			     Div
 			 </th>
 			 <th class="colhead">
-			     Name
+			     Nom
 			 </th>
 			 <th class="colhead">
-			     Done
+			     Complet
 			 </th>
 			 <th class="colhead">
 			     Pop.
 			 </th>
 			 <th class="colhead">
-			     %Done
+			     %Complet
 			 </th>
 			 <th class="colhead">
-			     %Linked
+			     %Liée
 			 </th>
 			 <th class="colhead" colspan="2">
 			     Action
@@ -113,7 +113,7 @@
 			 </td>
 			 <td class="center">
 		 	    <button type="button" id="Surnames$ir">
-		 		  Surnames
+		 		  Noms de Famille
 		 	    </button>
 			 </td>
 		   </tr>
@@ -149,12 +149,12 @@
 	  <!--- Put out a line with links to previous and next section of table -->
 	  <div class="center" id="botBrowse">
 	    <div class="left" id="botPrev">
-		  <a href="CensusUpdateStatusDist.php?Census=$PREVCENSUSID&District=$PREVDIST" id="btPrevDist">
+		  <a href="CensusUpdateStatusDist.php?Census=$PREVCENSUSID&District=$PREVDIST&lang=fr" id="btPrevDist">
 		    &lt;--- district $PREVDIST $PREVDISTNAME
 		  </a>
 	    </div>
 	    <div class="right" id="botNext">
-		  <a href="CensusUpdateStatusDist.php?Census=$NEXTCENSUSID&District=$NEXTDIST" id="btNextDist">
+		  <a href="CensusUpdateStatusDist.php?Census=$NEXTCENSUSID&District=$NEXTDIST&lang=fr" id="btNextDist">
 		    district $NEXTDIST $NEXTDISTNAME ---&gt;
 		  </a>
 	    </div>

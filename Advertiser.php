@@ -15,8 +15,9 @@ use \NumberFormatter;
  *      2020/01/17      created                                         *
  *      2020/01/22      use NumberFormatter                             *
  *      2020/01/26      improve handling of non-authorized user         *
+ *      2022/03/23      protect against script insertion                *
  *                                                                      *
- *  Copyright &copy; 2020 James A. Cobban                               *
+ *  Copyright &copy; 2022 James A. Cobban                               *
  ************************************************************************/
 require_once __NAMESPACE__ . '/Advertiser.inc';
 require_once __NAMESPACE__ . '/FtTemplate.inc';
@@ -28,23 +29,26 @@ $remoteName                 = null;
 $tempName                   = null;
 $error                      = -1;
 $lang                       = 'en';
+$langtext                   = null;
 
 if (isset($_GET) && count($_GET) > 0)
 {                   // invoked by method=get
-    $parmsText  = "<p class='label'>\$_GET</p>\n" .
-                  "<table class='summary'>\n" .
-                  "<tr><th class='colhead'>key</th>" .
-                      "<th class='colhead'>value</th></tr>\n";
+    $parmsText      = "<p class='label'>\$_GET</p>\n" .
+                      "<table class='summary'>\n" .
+                      "<tr><th class='colhead'>key</th>" .
+                          "<th class='colhead'>value</th></tr>\n";
     foreach($_GET as $key => $value)
     {               // loop through parameters
+        $safevalue  = htmlspecialchars($value);
         $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
-                        "<td class='white left'>$value</td></tr>\n"; 
+                        "<td class='white left'>$safevalue</td></tr>\n"; 
         $fieldLc    = strtolower($key);
         switch($fieldLc)
         {           // act on specific parameter
             case 'lang':
             {       // lang
-                $lang               = FtTemplate::validateLang($value);
+                $lang               = FtTemplate::validateLang($value,
+                                                               $langtext);
                 break;
             }       // lang
 

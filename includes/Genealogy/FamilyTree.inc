@@ -142,7 +142,7 @@ class FamilyTree implements Iterator
         
         // query the database
         if ($debug)
-            $warn           /= "<p>FamilyTree::__construct: $query</p>";
+            $warn           .= "<p>FamilyTree::__construct: $query</p>";
         $stmt               = $connection->query($query);
         if ($stmt)
         {               // success

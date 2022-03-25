@@ -93,7 +93,7 @@
  *      2014/10/06      add method checkURL                             *
  *      2014/10/16      add more female given names                     *
  *      2014/11/22      add more connecting words for occupations       *
- *                      add more male given names                       *
+ *                      add more mala given names                       *
  *      2015/01/26      function chkDate did not handle date ranges     *
  *      2015/02/04      add some religion abbreviations                 *
  *      2015/03/17      add some French location abbreciations          *
@@ -152,8 +152,9 @@
  *      2021/02/23      in dates insert a space between digit and [     *
  *                      and between letter and [                        *
  *      2021/03/21      migrate to ES2015 export                        *
+ *      2022/03/13      support 'L' for marital status                  *
  *                                                                      *
- *  Copyright &copy; 2021 James A. Cobban                               *
+ *  Copyright &copy; 2022 James A. Cobban                               *
  ************************************************************************/
 import {HTTP} from "../jscripts6/js20/http.js";
 import {getOffsetLeft, getOffsetTop, popupAlert, 
@@ -756,6 +757,8 @@ export const  MonthAbbrs = {
  ************************************************************************/
 export const  ResTypeAbbrs = {
                 "B"         : "Brick",
+                "BV"        : "BVeneer",
+                "C"         : "Concrete",
                 "F"         : "Frame",
                 "L"         : "Log",
                 "S"         : "Shanty",
@@ -866,6 +869,7 @@ export const  AgeAbbrs = {
                 "D"         : "days",
                 "Day"       : "day",
                 "Days"      : "days",
+                "Ds"        : "days",
                 "Few"       : "few",
                 "H"         : "hour",
                 "M"         : "months",
@@ -883,6 +887,9 @@ export const  AgeAbbrs = {
                 "M12"       : "12m",
                 "Month"     : "month",
                 "Months"    : "months",
+                "Mi"        : "minutes",
+                "Min"       : "minutes",
+                "Mins"      : "minutes",
                 "Of"        : "of",
                 "One"       : "one",
                 "Sev"       : "several",
@@ -892,9 +899,11 @@ export const  AgeAbbrs = {
                 "W"         : "weeks",
                 "Week"      : "week",
                 "Weeks"     : "weeks",
+                "Wks"       : "weeks",
                 "Y"         : "years",
                 "Year"      : "year",
                 "Years"     : "years",
+                "Ys"        : "years",
                 "["         : "[blank]"
                 };
 
@@ -936,6 +945,7 @@ export const  CauseAbbrs = {
                 "D"             : "days",
                 "Day"           : "day",
                 "Days"          : "days",
+                "Ds"            : "days",
                 "Dia"           : "Diarrhoea",
                 "Dip"           : "Diphtheria",
                 "F"             : "Fever",
@@ -948,6 +958,10 @@ export const  CauseAbbrs = {
                 "In"            : "in",
                 "Is"            : "is",
                 "M"             : "months",
+                "Mi"            : "minutes",
+                "Min"           : "minutes",
+                "Mins"          : "minutes",
+                "Ms"            : "months",
                 "Many"          : "many",
                 "Month"         : "month",
                 "Months"        : "months",
@@ -968,10 +982,12 @@ export const  CauseAbbrs = {
                 "W"             : "weeks",
                 "Week"          : "week",
                 "Weeks"         : "weeks",
+                "Wks"           : "weeks",
                 "With"          : "with",
                 "Y"             : "years",
                 "Year"          : "year",
                 "Years"         : "years",
+                "Ys"            : "years",
                 "["             : "[blank]"
                 };
 
@@ -1489,7 +1505,7 @@ export function checkSex()
 export function checkMStat()
 {
     let element     = this;
-    let re      = /^[BDMSWVCbdmswvc? ]?$/;
+    let re          = /^[BDLMSWVCbdlmswvc? ]?$/;
     let mstat       = element.value;
     setErrorFlag(element, re.test(mstat));
 }       // function checkMStat
@@ -1760,9 +1776,16 @@ export function checkYear()
 /************************************************************************
  *  function checkAge                                                   *
  *                                                                      *
- *  Validate the current value of an age field.  Should be numeric age  *
- *  in years, age in months (with a suffix 'm'), a question mark,       *
- *  or [blank].                                                         *
+ *  Validate the current value of an age field.  Should be:             *
+ *      numeric age in years (with optional suffix 'y'),                *
+ *      age in months (with a suffix 'm'),                              * 
+ *      age in months (with suffix '/12'),                              *
+ *      age in weeks (with a suffix 'w'),                               * 
+ *      age in days (with a suffix 'd'),                                *
+ *      age in hours (with a suffix 'h'),                               *
+ *      a question mark, or                                             *
+ *      or [blank].                                                     *
+ *                                                                      *
  *  This is assigned to the checkfunc method of an element.             *
  *                                                                      *
  *  Input:                                                              *
@@ -1771,9 +1794,16 @@ export function checkYear()
 export function checkAge()
 {
     let element     = this;
-    let re      = /^[mM]?[0-9]+[mM]?$/;
-    let re2     = /^(([0-9½]+)\s*[yY][a-zA-Z]*|)\s*(([0-9½]+)\s*[mM][a-zA-Z]*|)\s*(([0-9½]+)\s*[wW][a-zA-Z]*|)\s*(([0-9½]+)\s*[dD][a-zA-Z]*|)\s*(([0-9½]+)\s*[hH]|)/;
-    let age     = element.value;
+    let re          = /^[mM]?[0-9]+[mM]?$/;
+    let re2         = /^(([0-9½]+)\s*[yY][a-zA-Z]*|)\s*(([0-9½]+)\s*[mM][a-zA-Z]*|)\s*(([0-9½]+)\s*[wW][a-zA-Z]*|)\s*(([0-9½]+)\s*[dD][a-zA-Z]*|)\s*(([0-9½]+)\s*[hH]|)/;
+    let re12        = /([0-9]+)\/12$/;
+    let age         = element.value;
+    let months      = re12.exec(age);
+    if (months !== null)
+    {
+        age         = months[1] + 'm';
+        element.value   = age;
+    }
     setErrorFlag(element, age.length == 0 ||
                           age == '?' ||
                           age.toLowerCase() == '[blank]' ||

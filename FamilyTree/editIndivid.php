@@ -698,6 +698,15 @@ if ($person instanceof Person)
 
     $given                  = $person['givenname'];
     $surname                = $person['surname'];
+    $surnameRec             = new Surname(array('surname' => $surname));
+    if (!$surnameRec->isExisting())
+    {
+        $count              = $surnameRec->save();
+        if ($count)
+        {
+            $lastSql        = $surnameRec->getLastSqlCmd();
+        }
+    }
     $evBirth                = null;
     $haveBirth              = false;
     $evChristen             = null;

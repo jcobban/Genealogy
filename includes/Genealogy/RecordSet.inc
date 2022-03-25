@@ -119,8 +119,9 @@ use \Templating\Template;
  *      2021/09/17      minor improvement to surname handling           *
  *      2021/09/30      correct determining count for query with        *
  *                      GROUP BY clause                                 *
+ *      2022/03/23      add some multibyte string support               *
  *                                                                      *
- *  Copyright &copy; 2021 James A. Cobban                               *
+ *  Copyright &copy; 2022 James A. Cobban                               *
  ************************************************************************/
 require_once __NAMESPACE__ . '/Record.inc';
 require_once __NAMESPACE__ . '/Surname.inc';
@@ -1261,15 +1262,15 @@ class RecordSet implements Iterator, Countable, ArrayAccess
             $subindex           = null;
         }
 
-        $matches        = array();
-        $where          = '';
+        $matches                = array();
+        $where                  = '';
         if (is_array($value))
-        {       // list of values
-            $values     = $value;
+        {                   // list of values
+            $values             = $value;
             if (count($values) == 0)
                 return '';
-            $oldwhere       = $where;   // prepare for ':' range
-            $or             = '';
+            $oldwhere           = $where;   // prepare for ':' range
+            $or                 = '';
             for($i = 0; $i < count($values); $i++)
             {
                 $value          = trim($values[$i]);
@@ -1451,7 +1452,7 @@ class RecordSet implements Iterator, Countable, ArrayAccess
                     $this->sqlParms[]   = $value;
                 }
             }               // comparison operator
-        }           // optional operator and integer
+        }                   // optional operator and integer
         else
         {
             $warn       .= "<p>RecordSet: " . __LINE__ . " Invalid $fldname value " .
@@ -1626,8 +1627,8 @@ class RecordSet implements Iterator, Countable, ArrayAccess
                     $frstch         = '';
                     $lastch         = '';
                 }
-                //print "<p>pattern='$pattern'</p>\n";
-                //print "<p>frstch='$frstch', body='$body', rest='$rest', lastch='$lastch'</p>\n";
+                //$warn   .= "<p>" . __LINE__ . " pattern='$pattern'</p>\n";
+                //$warn   .= "<p>" . __LINE__ . " frstch='$frstch', body='$body', rest='$rest', lastch='$lastch'</p>\n";
     
             if (strlen($pattern) > 5 &&
                 strtoupper(substr($pattern, 0, 5) == 'LIKE '))
@@ -1662,14 +1663,14 @@ class RecordSet implements Iterator, Countable, ArrayAccess
             {               // special pattern to match whole value
                 if (is_string($refname))
                 {
-                    $where      .= $or . "$fldname=:$refname$i";
-                                    $this->sqlParms["$refname$i"]   = $body;
+                    $where              .= $or . "$fldname=:$refname$i";
+                    $this->sqlParms["$refname$i"]   = $body;
                     $i++;
                 }
                 else
                 {
-                    $where      .= $or . "$fldname=?";
-                                    $this->sqlParms[]   = $body;
+                    $where              .= $or . "$fldname=?";
+                    $this->sqlParms[]   = $body;
                 }
             }               // match whole value
             else
@@ -1677,7 +1678,7 @@ class RecordSet implements Iterator, Countable, ArrayAccess
                 strlen($body) > 0 &&
                 strlen($rest) == 0)
             {               // match at beginning
-                $vlen           = strlen($body);
+                $vlen           = mb_strlen($body);
                 $value          = $body;
 
                 if (is_string($refname))
@@ -1855,7 +1856,11 @@ class RecordSet implements Iterator, Countable, ArrayAccess
                                      $surname)
     {
         global  $connection;
+        global  $debug;
+        global  $warn;
 
+        if ($debug)
+            $warn   .= "<p>RecordSet::getSurnameChk('$table','$surname')\n";
         // default is to generate positional insertion points (?)
         // use name insertion points (:name) if either the $refname parameter
         // is passed or the the constructor sets $this->usenames
@@ -1889,7 +1894,7 @@ require_once __NAMESPACE__ . '/Surname.inc';
                 $queryText              = debugPrepQuery($findSurnames, $surnParms);
                 if ($stmt->execute($surnParms))
                 {       // success
-                    $this->sqlLastCmd   = $queryText;
+                    $this->lastSqlCmd   = $queryText;
                     $count              = $stmt->rowCount();
                     if ($count > 0)
                     {
@@ -2028,10 +2033,10 @@ require_once __NAMESPACE__ . '/Surname.inc';
         $nsclass                = __NAMESPACE__ . "\\" . $className;
 
         foreach($this->parms as $fldname => $value)
-        {                   // loop through all parameters
+        {                       // loop through all parameters
             $expression         = '';
             if (is_int($fldname) && is_array($value))
-            {               // OR expression
+            {                   // OR expression
                 $or             = '';
                 $orExpression   = '';
                 foreach($value as $fld2 => $val2)
@@ -2045,24 +2050,24 @@ require_once __NAMESPACE__ . '/Surname.inc';
             " Unrecognized field name '$fldname' in selection criteria</p>\n";
                     }
                     else
-                    {       // valid field names
+                    {           // valid field names
                         if (is_string($initRow[$fieldLc]))
                             $expression = $this->getWherePattern($fieldLc,
-                                                 $val2);
+                                                                 $val2);
                         else
                         if (is_int($initRow[$fieldLc]))
                             $expression = $this->getWhereInt($fieldLc,
-                                                 $val2);
+                                                             $val2);
                         else
                             $expression = $this->getWhereCommon($fieldLc,
-                                                $val2);
+                                                                $val2);
                         if (strlen($expression) > 0)
                         {
                             $orExpression   .= $or . $expression;
                             $or         = ' OR ';
                         }
-                    }       // valid field namess
-                }       // loop through comparisons
+                    }           // valid field namess
+                }               // loop through comparisons
                 if (strlen($orExpression) > 0)
                 {
                     $where  .= $and . '(' . $orExpression . ')';
@@ -2108,12 +2113,22 @@ require_once __NAMESPACE__ . '/Surname.inc';
                 {               // valid field names
                     if (array_key_exists($fieldLc, $initRow))
                     {           // field defined in initrow
-                        if ($fieldLc == 'surname')
-                            $surname    = $value;
-                        else
                         if (is_string($initRow[$fieldLc]))
-                            $expression = $this->getWherePattern($fieldLc,
-                                                                 $value);
+                        {
+                            if ($fieldLc == 'surname')
+                            {
+                                if (is_string($value))
+                                    $expression =
+                                        $this->getWherePattern($fieldLc,
+                                                               $value);
+                                else
+                                    $surname    = $value;
+                            }
+                            else
+                                $expression =
+                                        $this->getWherePattern($fieldLc,
+                                                               $value);
+                        }
                         else
                         if (is_int($initRow[$fieldLc]))
                             $expression = $this->getWhereInt($fieldLc,
@@ -2289,7 +2304,7 @@ require_once __NAMESPACE__ . '/Surname.inc';
             $stmt           = $connection->prepare($delete);
             if ($stmt->execute($this->sqlParms))
             {       // success
-                $this->sqlLastCmd   = $deleteText;
+                $this->lastSqlCmd   = $deleteText;
                 $result     = $stmt->rowCount();
             }       // success
             else
@@ -2534,7 +2549,7 @@ require_once __NAMESPACE__ . '/Surname.inc';
                 $stmt       = $connection->prepare($update);
                 if ($stmt->execute($sqlParms))
                 {       // success
-                    $this->sqlLastCmd   = $updateText;
+                    $this->lastSqlCmd   = $updateText;
                     $count      = $stmt->rowCount();
                 }       // success
                 else
@@ -2688,7 +2703,7 @@ require_once __NAMESPACE__ . '/Surname.inc';
         $stmt       = $connection->prepare($query);
         if ($stmt->execute($this->sqlParms))
         {       // success
-            $this->sqlLastCmd   = $queryText;
+            $this->lastSqlCmd   = $queryText;
             if ($debug)
                 $warn           .= "<p>RecordSet.inc: " . __LINE__ .
                                    " \"$queryText\"</p>\n";
@@ -2811,6 +2826,7 @@ require_once __NAMESPACE__ . '/Surname.inc';
         global  $msg;
         global  $connection;
 
+
         $maxsetsize         = 1000;
         if (array_key_exists('maxsetsize', $this->information))
             $maxsetsize     = $this->information['maxsetsize'];
@@ -2853,11 +2869,11 @@ require_once __NAMESPACE__ . '/Surname.inc';
             $stmt               = $connection->prepare($query);
             if ($stmt->execute($this->sqlParms))
             {       // success
-                $this->sqlLastCmd   = $queryText;
+                $this->lastSqlCmd   = $queryText;
                 $result         = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 if ($debug)
                 {
-                    $warn       .= "<p>RecordSet.inc: " . __LINE__ .
+                    $warn       .= "<p>RecordSet:rewind: " . __LINE__ .
                                    " \"$queryText\"</p>\n";
                 }
 

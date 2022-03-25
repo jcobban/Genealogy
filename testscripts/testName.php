@@ -2,6 +2,7 @@
 namespace Genealogy;
 use \PDO;
 use \Exception;
+
 /************************************************************************
  *  test class Surname							                        *
  *									                                    *
@@ -10,7 +11,6 @@ require_once __NAMESPACE__ . '/common.inc';
 require_once __NAMESPACE__ . '/Surname.inc';
 
 htmlHeader('Test Surname Class');
-showTrace();
 ?>
 <body>
 <?php

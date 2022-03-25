@@ -48,6 +48,7 @@ use \NumberFormatter;
  *                      DeathSet::getStatistics now returns county name *
  *      2021/05/29      $highest, $totcount, $totlinked undefined       *
  *      2021/10/18      display linked relative to transcribed          *
+ *      2022/02/08      avoid divide by zero                            *
  *                                                                      *
  *  Copyright &copy; 2021 James A. Cobban                               *
  ************************************************************************/
@@ -302,6 +303,11 @@ else
     $template['form']->update(null);
 
 $total                              = $highest - $lowest + 1;
+// protect against divide by zero
+if ($total < 1)
+    $total                          = 1;
+if ($totcount < 1)
+    $totcount                       = 1;
 $formatter->setAttribute(NumberFormatter::FRACTION_DIGITS, 0);
 $template->set('TOTAL',             $formatter->format($totcount));
 $template->set('LOWEST',            $lowest);

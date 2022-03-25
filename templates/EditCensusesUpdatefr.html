@@ -1,5 +1,5 @@
 <!--*********************************************************************
- *  EditCensusesUpdateen.html											*
+ *  EditCensusesUpdatefr.html											*
  *																		*
  *  Display form for editting information about supported Censuses		*
  *																		*
@@ -9,20 +9,21 @@
  *						and IDSR										*
  *      2019/04/07      add HelpIDSR                                    *
  *                      support pageUp and pageDown keys                *
+ *      2022/01/18      add support for editing in French
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
  **********************************************************************-->
   <div class="hidden" id="breadcrumbs">
-    <a href="/genealogy.php?lang=$LANG">Genealogy</a>: 
-    <a href="/genCountry.php?cc=$CC&amp;lang=$LANG">$COUNTRYNAME</a>:
-    <a href="/database/genCensuses.php?lang=$LANG&amp;cc=$CC">Censuses</a>:
+      <a href="/genealogy.php?lang=$LANG">Généalogie</a>: 
+      <a href="/genCountry.php?cc=$CC&amp;lang=$LANG">$COUNTRYNAME</a>:
+      <a href="/database/genCensuses.php?lang=$LANG&amp;cc=$CC">Récensements</a>:
   </div>
     <div class="body">
       <h1>
         <span class="right">
-        <a href="/database/EditCensusesHelpen.html" target="help">? Help</a>
+        <a href="/database/EditCensusesHelpen.html" target="help">? Aide</a>
         </span>
-        Census Administration: $COUNTRYNAME Censuses Table Update
+        Administration des Recensements: $COUNTRYNAME Mettre à Jour la Table des Recensements
        <div style="clear: both;"></div>
       </h1>
       $TRACE
@@ -39,7 +40,7 @@
           </a>
         </span>
           <span id="respdescrows">
-            returned rows $FIRST to $LAST of $TOTAL
+            rangs renvoyés $FIRST à $LAST sur $TOTAL
           </span>
         <div style="clear: both;"></div>
       </div>
@@ -60,31 +61,31 @@
                 ID
               </th>
               <th class="colhead">
-                Name
+                Nom
               </th>
 		      <th class="colhead">
-		        Lines
+		        Lignes
 		      </th>
 		      <th class="colhead">
 		        Collective
 		      </th>
 		      <th class="colhead">
-		        Part<br>of
+                Partie<br>de
 		      </th>
 		      <th class="colhead">
 		        Provinces
 		      </th>
 		      <th class="colhead">
-		        Group<br>Lines
+                Regrouper<br>Lignes
 		      </th>
 		      <th class="colhead">
-		        Last<br>Underlined
+                Dernière<br>Ligne<br>Soulignée
 		      </th>
 		      <th class="colhead">
 		        Source<br>ID
 		      </th>
 		      <th class="colhead">
-		        Delete
+		        Écraser
 		      </th>
 		      <th class="colhead">
 		        Districts
@@ -149,9 +150,8 @@
 		          class="white rightnc" size="2" maxlength="3">
 		      </td>
 		      <td class="center">
-		        <button type="button" id="Delete$line" 
-		          class="button">
-		        Delete
+		        <button type="button" id="Delete$line" class="button">
+		                Écraser
 		        </button>
 		      </td>
 		      <td class="button">
@@ -165,16 +165,16 @@
 	    </table>
         <p>
           <input type="hidden" name="CensusId99" id="CensusId99" value="">
-          <button type="submit" id="Submit">Update Database</button>
-          <button type="button" id="Add">Add Census</button>
+          <button type="submit" id="Submit">Mettre à Jour la Base des Donées</button>
+          <button type="button" id="Add">Ajouter Recensement</button>
         </p>
       </form>
     </div> <!-- end of <div id="body"> -->
     <div class="hidden">
-        <span id="ccInvalid">CC='$cctext' invalid</span>
-        <p id="offsetIgn">OFFSET='$offsettext' ignored</p>
-        <p id="limitIgn">LIMIT='$limittext' ignored</p>
-        <p id="langIgn">lang='$langtext' ignored interpreted as '$lang'</p>
+        <span id="ccInvalid">CC='$cctext' identifiant du pays invalide</span>
+        <p id="offsetIgn">OFFSET='$offsettext' décalage ignoré</p>
+        <p id="limitIgn">LIMIT='$limittext' limite ignorée</p>
+        <p id="langIgn">lang='$langtext' langue ignorée interprétée comme '$lang'</p>
     </div> <!-- end of <div class="hidden"> -->
     <div class="balloon" id="HelpCensusId">
       The census identifier.  

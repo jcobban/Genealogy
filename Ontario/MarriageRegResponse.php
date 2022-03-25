@@ -114,8 +114,11 @@ use \Templating\Template;
  *      2019/07/08      correct handling of 1870-1872 marriages         *
  *      2019/12/13      remove M_ prefix from field names               *
  *      2020/06/13      set REGCOUNTY                                   *
+ *      2022/02/15      correct menu                                    *
+ *                      validate parameters and issue error messages    *
+ *                      correct forward and back links                  *
  *                                                                      *
- *  Copyright &copy; 2020 James A. Cobban                               *
+ *  Copyright &copy; 2022 James A. Cobban                               *
  ************************************************************************/
 require_once __NAMESPACE__ . '/Country.inc';
 require_once __NAMESPACE__ . '/Domain.inc';
@@ -255,8 +258,9 @@ $parmsText      = "<p class='label'>\$_GET</p>\n" .
 foreach ($_GET as $key => $value)
 {           // loop through all parameters
     $value                          = trim($value);
+    $safevalue                      = htmlspecialchars($value);
     $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
-                         "<td class='white left'>$value</td></tr>\n"; 
+                         "<td class='white left'>$safevalue</td></tr>\n"; 
     if (strlen($value) > 0)
     {
         $fieldLc                    = strtolower($key);
@@ -265,39 +269,64 @@ foreach ($_GET as $key => $value)
             case 'count':
             case 'limit':
             {       // limit number of rows returned
-                $limit              = $value;
+                if (ctype_digit($value))
+                {
+                    $limit          = $value;
+                }
+                else
+                    $msg            .= "Invalid $key=$safevalue ignored. ";
                 break;
             }       // limit number of rows returned
     
             case 'offset':
             {       // starting offset
-                $getparms[$fieldLc] = $value;
-                $offset             = $value;
+                if (ctype_digit($value))
+                {
+                    $getparms[$fieldLc] = $value;
+                    $offset             = $value;
+                }
+                else
+                    $msg            .= "Invalid $key=$safevalue ignored. ";
                 break;
             }       // starting offset
     
             case 'regdomain':
             {
-                $getparms[$fieldLc] = $value;
-                $domain             = $value;
-                $npuri              .= "$npand$key=$value";
-                $npand              = '&';
+                if (preg_match('/^[a-zA-Z]{4,5}$/', $value))
+                {
+	                $getparms[$fieldLc] = $value;
+	                $domain             = $value;
+	                $npuri              .= "$npand$key=$value";
+	                $npand              = '&';
+                }
+                else
+                    $msg            .= "Invalid $key=$safevalue ignored. ";
                 break;
             }       // RegDomain
     
             case 'regyear':
             {       // year of registration
-                $getparms[$fieldLc] = $value;
-                $regyear            = $value;
-                $npuri              .= "$npand$key=$value";
-                $npand              = '&';
+                if (ctype_digit($value))
+	            {
+	                $getparms[$fieldLc] = $value;
+	                $regyear            = $value;
+	                $npuri              .= "$npand$key=$value";
+                    $npand              = '&';
+                }
+                else
+                    $msg            .= "Invalid $key=$safevalue ignored. ";
                 break;
             }       // year of registration
     
             case 'regnum':
             {       // RegNum
-                $getparms[$fieldLc] = $value;
-                $regNum             = $value;
+                if (ctype_digit($value))
+	            {
+                    $getparms[$fieldLc] = $value;
+                    $regNum             = $value;
+                }
+                else
+                    $msg            .= "Invalid $key=$safevalue ignored. ";
                 break;
             }       // registration number
     
@@ -487,16 +516,13 @@ foreach ($_GET as $key => $value)
     
             case 'lang':
             {       // requested language
-                $lang           = FtTemplate::validateLang($value);
-                $npuri              .= "$npand$key=$value";
+                $lang               = FtTemplate::validateLang($value);
                 $npand              = '&';
                 break;
             }       // requested language
     
             case 'debug':
             {       // debug handled by common.inc
-                $npuri              .= "$npand$key=$value";
-                $npand              = '&';
                 break;
             }       // debug
 
@@ -516,58 +542,67 @@ foreach ($_GET as $key => $value)
     }               // non-empty value
 }                   // loop through all parameters
 if ($debug && count($_GET) > 0)
-    $warn       .= $parmsText . "</table>\n";
+    $warn                   .= $parmsText . "</table>\n";
 
 if (is_string($offset) && !ctype_digit($offset))
 {
-    error_log("MarriageRegResponse.php: " . __LINE__ .
-                            " offset='$offset'\n");
-    $warn               .= "<p>MarriageRegResponse.php: " . __LINE__ .
-                            " offset='$offset'</p>\n";
-    $result             = preg_match('/\d*/',$offset, $matches);
-    $offset             = $matches[0];
+    $warn                   .= "<p>MarriageRegResponse.php: " . __LINE__ .
+                                " offset='$offset'</p>\n";
+    $result                 = preg_match('/\d*/',$offset, $matches);
+    $offset                 = $matches[0];
     if (strlen($offset) == 0)
-        $offset         = 0;
+        $offset             = 0;
 }
 
 if (is_string($limit) && !ctype_digit($limit))
 {
-    error_log("MarriageRegResponse.php: " . __LINE__ .
-                            " limit='$limit'\n");
-    $warn               .= "<p>MarriageRegResponse.php: " . __LINE__ .
-                            " limit='$limit'</p>\n";
-    $result             = preg_match('/\d*/',$limit, $matches);
-    $limit              = $matches[0];
+    $warn                   .= "<p>MarriageRegResponse.php: " . __LINE__ .
+                                " limit='$limit'</p>\n";
+    $result                 = preg_match('/\d*/',$limit, $matches);
+    $limit                  = $matches[0];
     if (strlen($limit) == 0)
-        $limit          = 0;
+        $limit              = 0;
 }
 
 $getparms['limit']          = $limit;
-$npuri                      .= "$npuri{$npand}Limit=$limit";
+$npuri                      .= "{$npand}Limit=$limit";
 
 // start the template
 $template           = new FtTemplate("MarriageRegResponse$lang.html");
 $trtemplate         = $template->getTranslate();
 
 // validate county code
+if (strlen($msg) == 0)
+{
+    $marriages              = new MarriageSet($getparms);
+    $firstMarriage          = $marriages->rewind();
+}
+else
+    $firstMarriage          = null;
+
 if ($regCounty)
 {                       // county code
     $countyObj              = new County($domain, $regCounty);
     $countyName             = $countyObj->get('name');
 }                       // county code
 else
-{
+if ($firstMarriage)
+{                       // get county code from first record
+    $regCounty              = $firstMarriage['regcounty'];
+    $regTownship            = $firstMarriage['regtownship'];
+    $countyObj              = new County($domain, $regCounty);
+    $countyName             = $countyObj->get('name');
+}                       // get county code from first record
+else
+{                       // do not display county stats 
     $template->updateTag('countyStats',null);
-    $template->updateTag('townshipStats',null);
-}
+}                       // do not display county stats 
 
 if ($regyear == 0)
 {
     $template->updateTag('yearStats',null);
-    $template->updateTag('countyStats',null);
-    $template->updateTag('townshipStats',null);
 }
-else
+
 if ($regTownship == '')
 {
     $template->updateTag('townshipStats',null);
@@ -579,8 +614,7 @@ if ($regNum == 0)
 // if no error messages display the query
 if (strlen($msg) == 0)
 {
-    $marriages      = new MarriageSet($getparms);
-    $info           = $marriages->getInformation();
+    $info               = $marriages->getInformation();
     if ($debug)
     {
         $warn           = "<p class='label'>\$info</p>\n" .

@@ -192,39 +192,41 @@ window.onload	= loadEdit;
 function loadEdit()
 {
     // the edit button for the preferred marriage
-    var	editPref	= null;
-    var	idmrNotSet	= true;
+    var	editPref	            = null;
+    var	idmrNotSet	            = true;
 
     if ('idmr' in args)
-    {			// idmr parameter passed
-		editPref	= document.indForm.elements['Edit' + args.idmr];
+    {			        // idmr parameter passed
+		editPref	    = document.indForm.elements['Edit' + args.idmr];
 		if (editPref)
 		{
-		    idmrNotSet	= false;
+		    idmrNotSet	        = false;
 		}
-    }			// idmr parameter passed
+    }			        // idmr parameter passed
 
     // handle keystrokes that apply to the entire dialog
-    document.body.onkeydown	= emKeyDown;
+    document.body.onkeydown	    = emKeyDown;
 
     // activate handling of key strokes in text input fields
     // including support for context specific help
+    var ignoredNames    = '';
+    var sep             = '';
     for (var fi = 0; fi < document.forms.length; fi++)
-    {		// loop through all forms
-		var form		= document.forms[fi];
-		form.onsubmit		= validateForm;
-		form.onreset 		= resetForm;
+    {		            // loop through all forms
+		var form		        = document.forms[fi];
+		form.onsubmit		    = validateForm;
+		form.onreset 		    = resetForm;
 		if (form.name == 'famForm')
-		{	// individual marriage form
+		{	            // individual marriage form
 		    // callback from editEvent
 		    form.eventFeedback	= eventFeedback;
-		}	// individual marriage form
+		}	            // individual marriage form
 
 		// act on elements within the form
-		var formElts	= form.elements;
+		var formElts	        = form.elements;
 		for (var i = 0; i < formElts.length; ++i)
-		{			// loop through all elements
-		    var element	= formElts[i];
+		{			    // loop through all elements
+		    var element	        = formElts[i];
 
 		    if (element.nodeName.toUpperCase() == 'FIELDSET')
 				continue;
@@ -266,8 +268,9 @@ function loadEdit()
     
 				case 'Finish':
 				{		// close window
-				    element.onclick	= finish;
-				    // put the initial keyboard focus on the "Close" button so
+				    element.onclick	        = finish;
+				    // put the initial keyboard focus
+                    // on the "Close" button so
 				    // pressing Enter closes the dialog
 				    element.focus();
 				    break;
@@ -322,7 +325,7 @@ function loadEdit()
 					    element.disabled	= true;
 				    else
 					    editChildButtons.push(element);
-				    element.onclick		= editHusb;
+				    element.onclick		    = editHusb;
 				    break;
 				}		// open dialog to edit Husband
 
@@ -395,12 +398,6 @@ function loadEdit()
 				    element.onclick		= detachWife;
 				    break;
 				}		// detach wife
-
-				case 'marriageDetails':
-				{		// open dialog to edit marriage event
-				    element.onclick		= marriageDetails;
-				    break;
-				}		// open dialog to edit marriage event
 
 				case 'noteDetails':
 				{		// open dialog to edit marriage notes
@@ -570,10 +567,17 @@ function loadEdit()
 				    break;
 				}		// Delete family
 
+                default:
+                {
+                    ignoredNames    += sep + element.name;
+                    sep             = ', ';
+                }
 		    }			// switch on element name
-		}			// loop through all elements in the form
-    }				// loop through all forms
+		}			    // loop through all elements in the form
+    }				    // loop through all forms
 
+    if (ignoredNames.length > 0)
+        console.log("editMarriages.js: ignored=" + ignoredNames);
     // provide methods for other pages to modify information on husband
     // and wife
     var	husbRow			= document.getElementById('Husb');

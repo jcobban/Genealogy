@@ -1470,7 +1470,7 @@ else
     if (substr($surname,0,2) == 'Mc')
         $prefix         = 'Mc';
     else
-        $prefix         = substr($surname,0,1);
+        $prefix         = mb_substr($surname,0,1);
 
     // format dates for title
     if ($person->get('private') == 2 && !$isOwner)

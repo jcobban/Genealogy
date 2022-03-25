@@ -28,8 +28,9 @@ use \Exception;
  *      2020/06/17      moved to top folder                             *
  *      2020/07/01      display credit to source                        *
  *		2021/01/03      correct XSS vulnerability                       *
+ *		2022/03/21      correct next and prev links for LAC URLs        *
  *                                                                      *
- *  Copyright &copy; 2021 James A. Cobban                               *
+ *  Copyright &copy; 2022 James A. Cobban                               *
  ************************************************************************/
 require_once __NAMESPACE__ . "/FtTemplate.inc";
 require_once __NAMESPACE__ . "/Language.inc";
@@ -116,7 +117,7 @@ if (strlen($msg) == 0)
         $dirname                = '.';
     else
     {
-        $dirname                = substr($imageName, 0, $lastsep);
+        $dirname                = substr($imageName, 0, $lastsep + 1);
         $imageName              = substr($imageName, $lastsep + 1);
     }
 
