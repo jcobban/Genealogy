@@ -142,8 +142,9 @@ use \Exception;
  *      2021/02/04      improve parameter checking and messages         *
  *      2021/04/04      escape CONTACTSUBJECT                           *
  *      2021/04/16      handle subdistrict id with colon better         *
+ *      2022/04/17      handle invocation with collective Census        *
  *                                                                      *
- *  Copyright &copy; 2021 James A. Cobban                               *
+ *  Copyright &copy; 2022 James A. Cobban                               *
  ************************************************************************/
 require_once __NAMESPACE__ . '/FtTemplate.inc';
 require_once __NAMESPACE__ . '/SubDistrict.inc';
@@ -537,10 +538,17 @@ if ($censusId)
         $cc                 = $censusRec['cc'];
         $censusYear         = $censusRec['year'];
         $partof             = $censusRec['partof'];
+        $collective         = $censusRec['collective'];
         if ($partof)
         {
             $province       = $censusRec['province'];
         }
+        if ($collective)
+        {
+            $censusId       = $province . $censusYear;
+            $censusRec      = new Census(array('censusid'   => $censusId));
+        }
+
         $parms['censusid']  = $censusId;
     }
     else

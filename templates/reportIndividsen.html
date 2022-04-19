@@ -7,8 +7,10 @@
  *  History:															*
  *		2018/12/24      use class Template                              *
  *      2019/07/28      ensure all tags closed                          *
+ *      2022/04/18      support template instantiation                  *
+ *                      correct link in breadcrumbs                     *
  *																		*
- *  Copyright &copy; 2018 James A. Cobban								*
+ *  Copyright &copy; 2022 James A. Cobban								*
  **********************************************************************-->
       <div id="breadcrumbs" class="hidden">
         <a href="/genealogy.php?lang=$LANG">
@@ -16,7 +18,7 @@
         <a href='/FamilyTree/Services.php?lang=$LANG'>
     	    Services
         </a>:
-        <a href="/FamilyTree/reqReportIndivids.php.php?lang=$LANG">
+        <a href="/FamilyTree/reqReportIndivids.php?lang=$LANG">
     		New Report</a>:
       </div>
       <div class='body'>
@@ -28,28 +30,29 @@
         </h1>
         $TRACE
         $MSG
-	    <div class="center">
+	    <div class="center" id="paging">
 	        rows $prevoffset to $nextoffset of $count
-	      <div class="left">
+	      <span class="left" id="prevLink">
 			<a href="reportIndivids.php?Offset=$prevoffset&amp;Limit=$limit$search">&lt;--</a>
-	      </div>
-	      <div class="right">
+	      </span>
+	      <span class="right" id="nextLink">
 		<a href="reportIndivids.php?Offset=$nextoffset&amp;Limit=$limit$search">--&gt;</a>
-          </div>
-          <div style="clear: both;"></div>
-        </div>
-        <table>
+          </span>
+          <span style="clear: both;"></span>
+        </div>  <!--- div id="paging" -->
+
+        <table id="dataTable">
           <!--- Put out the column headers -->
           <thead>
-            <tr>
-    	      <th id="colHeader" class="colhead">
+            <tr id="headerRow">
+    	      <th id="colHeader$i" class="colhead">
     			$fldname 
     	      </th>
     	    </tr>
     	  </thead>
     	  <tbody>
-            <tr>
-    		  <td id="valueCell" class="$class">
+            <tr id="datarow$rownum">
+    		  <td id="valueCell$i" class="$class">
 	    	    $value 
 		      </td>
             </tr>

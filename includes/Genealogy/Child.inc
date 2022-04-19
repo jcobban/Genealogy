@@ -181,6 +181,11 @@ class Child extends Record
     private $sealEvent  = null;
 
     /********************************************************************
+     *  Child->events      array of instances of Event                  *
+     ********************************************************************/
+    private $events         = null;
+
+    /********************************************************************
      *  Child::$initRow                                                 *
      *                                                                  *
      *  static array containing default values for all fields in a      *
@@ -1071,16 +1076,55 @@ class Child extends Record
      ********************************************************************/
     function getEvents()
     {
-        $event          = $this->getParSealEvent(false);
-        if ($event)
-        {
-            if ($event['ider'] > 0)
-                return array($event['ider']     => $event);
+        if ($this->events == null)
+        {       // need to perform query for events
+            $event          = $this->getParSealEvent(false);
+            if ($event)
+            {
+                if ($event['ider'] > 0)
+                    $this->events   = array($event['ider']     => $event);
+                else
+                    $this->events   = array('parseal'          => $event);
+            }
             else
-                return array('parseal'          => $event);
+                $this->events       = array();
         }
-        return array();
+        return $this->events;
     }       // function Child::getEvents
+
+    /********************************************************************
+     *  function Child::addEvent                                        *
+     *                                                                  *
+     *  Add a new child related event represented by an instance of     *
+     *  Event to this Child.                                            *
+     *                                                                  *
+     *  Input:                                                          *
+     *      $xml        either boolean or instance of Event             *
+     *                                                                  *
+     *  Returns:                                                        *
+     *          Instance of Event                                       *
+     ********************************************************************/
+    function addEvent($xml=false)
+    {
+        if (is_bool($xml))
+        {
+            $parms              = array('idtype'    => Event::IDTYPE_CHILD,
+                                        'idir'      =>  $this);
+            $event              = new Event($parms);
+        }
+        else
+        if ($xml instanceof $event)
+        {
+            $event              = $xml;
+            $event['idtype']    = Event::IDTYPE_CHILD;
+            $event['idir']      = $this->row['idcr'];
+            $xml                = false;
+        }
+        $event->save($xml);                     // write to database
+        $this->events           = null;         // force reinitialization
+
+        return $event;
+    }       // function Child:addEvent
 
     /********************************************************************
      *  function Child::toXml                                           *

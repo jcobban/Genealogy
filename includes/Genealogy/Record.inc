@@ -223,8 +223,9 @@ use \Iterator;
  *      2021/06/14      set SoundsLike when Surname set in method save  *
  *      2021/12/11      insert spaces into some SqlLog fields so they   *
  *                      display more compactly in a query               *
+ *      2022/04/17      improve method debugBacktrace                   *
  *                                                                      *
- *  Copyright &copy; 2021 James A. Cobban                               *
+ *  Copyright &copy; 2022 James A. Cobban                               *
  ************************************************************************/
 
 /************************************************************************
@@ -993,14 +994,18 @@ class Record implements Iterator, ArrayAccess
     /********************************************************************
      *  function Record::debugBacktrace                                 *
      *                                                                  *
-     *  Return a string containing a caller backtrace.                  *
+     *  Get a string containing a caller backtrace.                     *
+     *                                                                  *
+     *  Input:                                                          *
+     *      $depth      maximum number of call backs to analyze         *
      *                                                                  *
      *  Returns:                                                        *
      *      string                                                      *
      ********************************************************************/
-    protected function debugBacktrace()
+    protected function debugBacktrace($depth = 5)
     {
-        $trace                          = debug_backtrace(DEBUG_BACKTRACE_PROVIDE_OBJECT,5);
+        $trace          = debug_backtrace(DEBUG_BACKTRACE_PROVIDE_OBJECT, 
+                                          $depth);
         $retval                         = '';
         $comma                          = '';
         $level                          = 1;
@@ -1017,7 +1022,7 @@ class Record implements Iterator, ArrayAccess
             $retval     .= "$comma $level function=$classRef$function" .
                                 " called by line=" . $call['line'] .
                                 " in " . $call['file'];
-            $comma                      = ',';
+            $comma                      = ",\n";
             $level++;
         }
         return htmlspecialchars($retval);

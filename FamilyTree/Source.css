@@ -1,12 +1,13 @@
 /************************************************************************
- *  Source.css								*
- *									*
- *  Stylesheet for the script Source.php				*
- *									*
- *  History:								*
- *	2014/03/12	created						*
- *									*
- *  Copyright &copy; 2014 James A. Cobban				*
+ *  Source.css								                            *
+ *									                                    *
+ *  Stylesheet for the script Source.php				                *
+ *									                                    *
+ *  History:			                            					*
+ *	    2014/03/12	    created						                    *
+ *	    2022/04/07      wrap long text                                  *
+ *									                                    *
+ *  Copyright &copy; 2014 James A. Cobban				                *
  ************************************************************************/
 
     div.row {	white-space:	nowrap;
@@ -23,4 +24,5 @@
 		width:		11em;
 		}
 
-    div.data {	margin-left:	12em; }
+    div.data {	margin-left:	12em;
+                white-space:    normal; }

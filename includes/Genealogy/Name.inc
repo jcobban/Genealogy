@@ -187,6 +187,7 @@ use Templating\TemplateTag;
  *                      Record::debugBacktrace                          *
  *      2022/01/10      change fieldname `order` to `type` to avoid     *
  *                      conflict with SQL reserved word                 *
+ *      2022/04/06      add ability to create new alternate name        *
  *                                                                      *
  *  Copyright &copy; 2022 James A. Cobban                               *
  ************************************************************************/
@@ -322,6 +323,7 @@ class Name extends Record
     {
         global  $debug;
         global  $warn;
+        global  $connection;
 
         $idnx                   = null;
         $idir                   = null;
@@ -386,7 +388,11 @@ class Name extends Record
 
                 case 'type':
                 {                           // Type
-                    $type                  = intval($value);
+                    if (ctype_digit($value))
+                        $type               = intval($value);
+                    else
+                    if (strtolower($value) == 'alt')
+                        $type               = 'alt';
                     break;
                 }                           // Type
 
@@ -435,7 +441,7 @@ class Name extends Record
 
         if (is_null($idnx))
         {                                   // IDNX not specified
-            if (is_null($type))
+            if (!is_int($type))
             {                               // type not specified
                 if ($idmr > 0 && $idir > 0)
                 {                           // Type must be Name::MARRIED
@@ -452,19 +458,33 @@ class Name extends Record
                         {
                             $where              .= $and . "GivenName=:givenname";
                             $sqlParms['givenname']  = $givenname;
-                            $and                = ' AND ';
                         }
                         if (!is_null($surname))
                         {
                             $where              .= $and . "Surame=:surname";
                             $sqlParms['surname']= $surname;
-                            $and                = ' AND ';
                         }
                         $where                  .= $and . "`Type`>0";
+                        $and                    = ' AND ';
                     }                       // alternate name
                     else
+                    if ($type == 'alt')
+                    {                       // new alternate name
+                        $getmax = "SELECT MAX(`Type`) FROM tblNX WHERE `IDIR`=$idir";
+                        $stmt   = $connection->query($getmax, PDO::FETCH_NUM);
+                        if ($stmt)
+                        {
+                            $row                = $stmt->fetch();
+                            $sqlParms['type']   = $row[0] + 1 ;
+                            $where              .= $and . '`Type`=:type';
+                            $and                = ' AND ';
+                        }
+                    }                       // new alternate name
+                    else
                     {                       // get primary name
-                        $where                  .= $and . "`Type`=0";
+                        $sqlParms['type']       = 0;
+                        $where                  .= $and . "`Type`=:type";
+                        $and                    = ' AND ';
                     }                       // get primary name
                 }                           // IDIR specified
             }                               // Type not specified
@@ -619,6 +639,19 @@ class Name extends Record
                             break;
                         }
 
+                        case 'idir':
+                        {
+                            if ($value instanceof Person)
+                            {
+                                $this->person       = $value;
+                                $idir               = $value->getId();
+                            }
+                            else
+                                $idir               = $value;
+                            $parms['idir']          = $idir;
+                            break;
+                        }
+
                         case 'idmr':
                         {
                             if ($value instanceof Family)
@@ -665,9 +698,7 @@ class Name extends Record
                     $queryText          = debugPrepQuery($query, $sqlParms);
                     if ($stmt->execute($sqlParms))
                     {               // successful query
-                        if ($debug)
-                            $warn       .= "<p>Name.inc: " . __LINE__ .
-                                                " query='$queryText'</p>\n";
+                        $this->lastSqlCmd   = $queryText;
                         $row                = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         if (count($row) >= 1)
                         {           // found existing name record
@@ -696,18 +727,16 @@ class Name extends Record
                         {           // no existing record
                             $count              = 0;
                             $dbrow              = self::$initRow;
-                            $gender             = Person::UNKNOWN;
+                            if (array_key_exists('type', $sqlParms))
+                                $type           = $sqlParms['type'];
+                            if (array_key_exists('idir', $sqlParms))
+                                $idir           = $sqlParms['idir'];
+                            else
                             if ($this->person)
-                            {       // person passed as parameter
-                                $person             = $this->person;
-                                $idir               = $person['idir'];
-                                $dbrow['idir']      = $idir;
-                                if (array_key_exists('type', $sqlParms))
-                                {
-                                    $type          = $sqlParms['type'];
-                                    $dbrow['type'] = $type;
-                                }
-                            }       // person passed as parameter
+                                $idir           = $this->person['idir'];
+                            $gender             = Person::UNKNOWN;
+                            $dbrow['idir']      = $idir;
+                            $dbrow['type']      = $type;
 
                             if ($this->family)
                             {       // family passed as parameter
@@ -768,7 +797,8 @@ class Name extends Record
                     
                                     case 'type':
                                     {
-                                        $dbrow['type']      = $value;
+                                        if (ctype_digit($value))
+                                            $dbrow['type']  = $value;
                                         break;
                                     }
                                 }
@@ -1232,7 +1262,13 @@ class Name extends Record
         {
             $person             = $this->getPerson();
             if ($person)
-                $warn           .= $person->dump('Name::getName');
+            {
+                $this->row['givenname']     = $person['givenname'];
+                $this->row['surname']       = $person['surname'];
+                $this->row['soundslike']    = $person['soundslike'];
+                if ($this->row['surname'] == '')
+                    $warn           .= $person->dump('Name::getName');
+            }
         }
         $evBirth                = null;
         $evDeath                = null;

@@ -126,13 +126,13 @@ if (count($_POST) > 0)
             {       // userid cannot change and is identifier
                 break;
             }       // userid
-    
+
             case 'password':
             {
                 $password           = trim($value);
                 break;
             }       // password
-    
+
             case 'newpassword':
             {
                 $value              = trim($value);
@@ -142,43 +142,43 @@ if (count($_POST) > 0)
                 }       // request to change password
                 break;
             }       // new password
-    
+
             case 'newpassword2':
             {
                 $newPassword2   = trim($value);
                 break;
             }       // new password repeat
-    
+
             case 'email':
             {       // request to change email address
                 $email          = $safevalue;
                 break;
             }       // request to change email address
-    
+
             case 'cellphone':
             {       // request to change cellphone address
                 $cellphone      = $safevalue;
                 break;
             }       // request to change cellphone address
-    
+
             case 'language':
             {       // request to change language 
                 $language       = $safevalue;
                 break;
             }       // request to change language
-    
+
             case 'usemail':
             {       // request to enable e-mail
                 $useEmail       = true;
                 break;
             }       // request to enable e-mail
-    
+
             case 'usetext':
             {       // request to enable e-mail
                 $useText       = true;
                 break;
             }       // request to enable e-mail
-    
+
             case 'nohelp':
             {       // request to suppress popup help
                 $nohelp         = true;
@@ -292,7 +292,7 @@ if (strlen($newPassword) > 0)
     else
         $user->set('password', $newPassword);
 }
-    
+
 if (count($_POST) > 0 && strlen($msg) == 0)
 {               // apply changes
     $user->save();

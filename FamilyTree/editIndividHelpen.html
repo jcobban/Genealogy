@@ -1,11 +1,11 @@
 <!DOCTYPE HTML >
 <html>
 <head>
-   <title>Edit Individual: Help</title>
+   <title>Edit Person: Help</title>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <meta http-equiv="Content-Style-Type" content="text/css">
     <meta name="author" content="James A. Cobban">
-    <meta name="copyright" content="&copy; 2018 James A. Cobban">
+    <meta name="copyright" content="&copy; 2022 James A. Cobban">
 <!--*********************************************************************
  *  editIndividHelpen.html												*
  *																		*
@@ -26,6 +26,7 @@
  *		2014/12/04		add preferred checkbox							*
  *		2018/02/04		update header/footer links						*
  *      2018/11/18      renamed to xxxxxxxxHelpen.html                  *
+ *      2022/04/06      add support for alternate names                 *
  **********************************************************************-->
     <link rel="stylesheet" type="text/css" href="/styles.css"/>
 </head>
@@ -35,10 +36,10 @@
 	<a href="/genealogyHelpen.html">Genealogy</a>: 
 	<a href="/FamilyTree/ServicesHelpen.html">Services</a>: 
 	<a href="/FamilyTree/nominalIndexHelpen.html">Nominal Index</a>: 
-	<a href="/FamilyTree/PersonHelpen.html">Individual Page</a>: 
+	<a href="/FamilyTree/PersonHelpen.html">Person Page</a>: 
 </div>
 <div class="help">
-<h1>Edit Individual: Help</h1>
+<h1>Edit Person: Help</h1>
 <p>This page is used to update information recorded about an
 individual.
 </p>
@@ -48,26 +49,27 @@ on any of the dialogs in this application pops up a text bubble that
 explains the purpose of the field and describes
 the values that may be entered into the field.
 </p>
+<img src="/Images/EditPersonTop.png" alt="Action buttons of Edit Person dialog">
 <p>When you have completed making all of the desired changes to this 
 form, apply the changes to the database by clicking on the 
-<span class="button"><u>U</u>pdate&nbsp;Individual</span>
+<span class="button"><u>U</u>pdate&nbsp;Person</span>
 button or using one of the keyboard short-cuts: ctrl-S or alt-U. 
 Note that the initial letter 'U' in the button label is underlined to
 remind you of the option to use alt-U as a keyboard short-cut.
 </p>
-<p>If the individual has no family connections:  That is the individual
+<p>If the person has no family connections:  That is the person
 is neither a spouse in a relationship, nor a child belonging to a
 family, then a
-<span class="button"><u>D</u>elete&nbsp;Individual</span>
-button is displayed giving you the option of deleting the individual
+<span class="button"><u>D</u>elete&nbsp;Person</span>
+button is displayed giving you the option of deleting the person
 from the database altogether.
 You may either click on this button with
 the mouse, or use the keyboard short-cut alt-D to perform this function.
 Note that the initial letter 'D' in the button label is underlined to
 remind you of the option to use alt-D as a keyboard short-cut.
-There is no method for deleting an individual that has a family connection:
-You must remove all such connections before deleting an individual.  However
-you always have the option of merging an individual with another existing
+There is no method for deleting a person that has a family connection:
+You must remove all such connections before deleting a person.  However
+you always have the option of merging a person with another existing
 individual.
 </p>
 <p>A <span class="button"><u>M</u>erge</span>
@@ -77,19 +79,34 @@ that you have determined is a duplicate reference to the same individual.
 Clicking on the <span class="button"><u>M</u>erge</span>
 button with the mouse, or using the keyboard
 short-cut alt-M invokes the 
-<a href="/FamilyTree/mergeIndividHelpen.html">Merge Individuals web page</a>.
+<a href="/FamilyTree/mergeIndividHelpen.html">Merge Persons web page</a>.
 Note that the initial letter 'M' in the button label is underlined to
 remind you of the option to use alt-M as a keyboard short-cut.
 </p>
-<p>The family tree database manager assigned the IDIR value.   It is a
+<p>The <span class="button"><u>G</u>rant Access</span> button permits you
+allow other members of your family to have access to the private information
+about specific members of your family and to contribute to your family 
+tree by adding new members and modifying information about them.
+Clicking on this button displays the 
+<a href="/FamilyTree/grantIndividHelpen.html">Grant Access web page</a>.
+</p>
+<p>The <span class="button"><u>S</u>earch</span> button is under
+construction.  The only option that works at the moment is the 
+vital statistics record search.
+</p>
+<h2>Identity</h2>
+<img src="/Images/EditPersonIdentity.png" alt="Identity portion of Edit Person Dialog">
+<p>The family tree database manager assigns the internal IDIR value
+when a member of the family tree is added.  It is a
 unique numeric key for this individual that is used to reference this
 individual from other records in the database.  This is separate from the
-preceding field to permit renumbering individuals.  If the database is loaded
-from a GEDCOM file then the IDIR value matches the numeric portion of the
-index of the INDI record.
-This cannot currently be changed.
+preceding field to permit renumbering individuals. 
+If the database is loaded from a GEDCOM file then the IDIR value
+matches the numeric portion of the index of the INDI record.
+This cannot be changed and will be hidden at some point because there
+is nothing that most users can use it for.
 </p>
-<p>You may edit the surname of the individual.
+<p>You may edit the surname of the person.
 Note that changing the surname causes
 a number of other fields and records to be updated.  In particular the
 readonly Soundex value is updated in this dialog.
@@ -101,14 +118,15 @@ And appropriate changes are made to the entries for this individual in the
 Also if the surname does not already appear in the database, a record is
 added into the surname table, 'tblNR'.
 </p>
-<p>You may edit the given names of the individual. 
+<p>You may edit the given names of the person. 
 The given names field in all marriages of which this individual is a partner
-is changed, and the appropriate entries in the alternate names table, 'tblNX'
+is changed, and the appropriate entries in the alternate names table
 are updated.
 </p>
 <p>The <span class="button">Details</span>
 button following the "Given Names" field 
-pops up a <a href="/FamilyTree/editNameHelpen.html">dialog</a> that provides the
+pops up a <a href="/FamilyTree/editNameHelpen.html">dialog</a> that
+provides the
 ability to add further information about the name into the database.
 In particular this includes textual notes, for example explaining where the
 name came from, such as being named after an uncle or grandmother,
@@ -117,7 +135,15 @@ the person was known.
 The dialog also provides the ability to cite sources for knowledge of the
 name.
 </p>
-<p>You must specify the gender of the individual.  For the 100 most common
+<p>Aside from marriage the names of a person can change for other
+reasons including personal choice.  If a person has alternate names
+these are listed below the primary names with the option to view or modify
+details.  There is also a <span class="button">Add&nbsp;Name</span> button
+to permit defining an additional alternate name. 
+This pops up a <a href="/FamilyTree/editNameHelpen.html">dialog</a> that
+provides the ability to modify any of the information about an alternate
+name.
+<p>You must specify the gender of the person.  For the 100 most common
 female given names in the 19th century the gender defaults to female.
 </p>
 <p>If this dialog is invoked from the list of children on a marriage,
@@ -134,90 +160,99 @@ or not the information about that relationship is to be revealed to
 casual viewers.  For example some families are uncomfortable about 
 advertising adoptions.
 <h2>Events</h2>
+<img src="/Images/EditPersonEvents.png" alt="Events portion of Edit Person Dialog">
 <p>All of the recorded events or facts for this individual are presented
-in this dialog in a consistent way so they can be added, modified, or deleted
+in this dialog in a consistent way so they can be added, modified,
+or deleted
 using consistent actions.  An event is an action that took place at some
 specific moment in time and at some specific location although the exact
 date and place may not be known.  An event changes the status of the
 individual.  Death is an example of an event that changes the status
-of the individual from living to dead.  A fact is an attribute of the
+of the person from living to dead.  A fact is an attribute of the
 individual which persists for some period of time but may be observed at
-some specific time and place.  For example the fact that the individual was
+some specific time and place.  For example the fact that the person was
 working as a Carpenter in a particularly community may be observed at some
 specific time, but was true both before and after the observation. 
 Each row of the list of events and facts contains six elements.
 <ol>
     <li>The type of event or fact, such as Birth, or Death, or Immigrated,
-	or "worked as a".
+    	or "worked as a".
     <li>The date on which the event took place or the fact was observed.
-	Although an event takes place on a specific date the exact date may not
-	be known.  For example a person may only be known to have died between
-	1881 and 1890.  On the other hand a fact persists through time so you
-	may record that the individual worked as a Miller from 1881 to 1891.
-	If known this is normally expressed as numeric day,
-	an abbreviation of the month name, and the year.  For example
-	"13 Aug 1894".
+    	Although an event takes place on a specific date the exact date
+        may not be known. 
+        For example a person may only be known to have died between
+	    1881 and 1890.  On the other hand a fact persists through time
+        so you may record that the person worked as a Miller
+        from 1881 to 1891.
+    	If known this is normally expressed as numeric day,
+    	an abbreviation of the month name, and the year.  For example
+    	"13 Aug 1894".
     <li>For most facts, but not typically for events, the description of the
-	fact, that is any information other than the location
-	is presented in an input field.
-	For example for the "Worked as a" event the description is the
-	name of the occupation, and possibly the name of the employer.
+    	fact, that is any information other than the location
+    	is presented in an input field.
+    	For example for the "Worked as a" event the description is the
+    	name of the occupation, and possibly the name of the employer.
     <li>The location where the event took place or the fact was observed.
-	Each location in this
-	application is actually a reference to a record in the 
-	<a href="/FamilyTree/LocationsHelpen.html">location table</a>. 
-	The text you enter is used to find or create a record in this table.
+    	Each location in this
+    	application is actually a reference to a record in the 
+	    <a href="/FamilyTree/LocationsHelpen.html">location table</a>. 
+    	The text you enter is used to find or create a record in
+        this table.
+	    <br>
+    	When you finish typing in the location field,
+        indicated by for example tabbing to the next field
+        or using the mouse to click in another field,
+    	the text you have typed is first processed to capitalize all words
+    	except for a handful of prepositions and standard abbreviations
+    	are expanded.  You can see the full list of supported abbreviations
+    	by holding the mouse cursor over the field for 2 seconds.
 	<br>
-	When you finish typing in the location field, indicated by for example
-	tabbing to the next field or using the mouse to click in another field,
-	the text you have typed is first processed to capitalize all words
-	except for a handful of prepositions and standard abbreviations
-	are expanded.  You can see the full list of supported abbreviations
-	by holding the mouse cursor over the field for 2 seconds.
+    	Then the resulting text is used to search the location table for a
+    	match.  The search is done ignoring the case of letters.
+    	The application looks first for a full match on the short name for
+    	a location and if one is found the full name replaces
+        the entered value.
+    	If this search fails then a search is made for location names that
+    	start with the supplied text.  If only one match is found then that
+    	location replaces the typed value. 
+        If more than one match is found then a selection list
+    	appears under the input text field giving you the option of
+        selecting
+    	the best match.  Note that even after the application has filled
+    	in the value you do not have to accept it as is.  For example say
+    	you want to record that an event took place at a specific location
+    	in Westminster township.  You can
+    	type in "westminster".  When you leave the input field 
+    	the full location name associated with that string replaces the 
+    	portion you have entered, for example
+    	"Westminster, Middlesex, ON, CA".  You may then go back into the
+    	field and insert the specific location within the township
+    	at the front.
 	<br>
-	Then the resulting text is used to search the location table for a
-	match.  The search is done ignoring the case of letters.
-	The application looks first for a full match on the short name for
-	a location and if one is found the full name replaces the entered value.
-	If this search fails then a search is made for location names that
-	start with the supplied text.  If only one match is found then that
-	location replaces
-	the typed value.  If more than one match is found then a selection list
-	appears under the input text field giving you the option of selecting
-	the best match.  Note that even after the application has filled
-	in the value you do not have to accept it as is.  For example say
-	you want to record that an event took place at a specific location
-	in Westminster township.  You can
-	type in "westminster".  When you leave the input field 
-	the full location name associated with that string replaces the 
-	portion you have entered, for example
-	"Westminster, Middlesex, ON, CA".  You may then go back into the
-	field and insert the specific location within the township
-	at the front.
-	<br>
-	If no matches are found to the supplied text then you are warned
-	that if you proceed to update the database a new location record
-	will be created.
+    	If no matches are found to the supplied text then you are warned
+    	that if you proceed to update the database a new location record
+    	will be created.
     <li>A checkbox indicating whether this instance is the preferred
-	instance for events of a particular class.  For example you can
-	designate one Birth event as the preferred instance.  Only this
-	instance is reported in situations where only one can be reported.
+    	instance for events of a particular class.  For example you can
+    	designate one Birth event as the preferred instance.  Only this
+    	instance is reported in situations where only one can be reported.
     <li>Clicking on the <span class="button">Details</span> button
-	opens a <a href="/FamilyTree/editEventHelpen.html">dialog</a> that permits you 
-	to alter all of the information recorded about a fact or event, not
-	just the identifying fields that are displayed on the main page.
-	In particular this includes source citations for the fact and
-	frequently extended comment text.
+    	opens a <a href="/FamilyTree/editEventHelpen.html">dialog</a>
+        that permits you 
+    	to alter all of the information recorded about a fact or event, not
+    	just the identifying fields that are displayed on the main page.
+    	In particular this includes source citations for the fact and
+    	frequently extended comment text.
     <li>Clicking on the <span class="button">Delete</span> button
-	removes the associated event from the individual.  For some types
-	of events this will result in the entire row disappearing from
-	the main page, however for some key events are simply blanked out
-	so you can reenter them without having to explicitly add an event.
-	The application prompts for you to confirm the intention to delete
-	the event.
+    	removes the associated event from the person.  For some types
+    	of events this will result in the entire row disappearing from
+    	the main page, however for some key events are simply blanked out
+    	so you can reenter them without having to explicitly add an event.
+    	The application prompts for you to confirm the intention to delete
+    	the event.
 </ol>
 <p>The first row in the events display specifies the date and location
-where the individual was born.  This row is always present even if the
+where the person was born.  This row is always present even if the
 information is unknown.
 </p>
 <p>The second row specifies the date of and location where the
@@ -229,28 +264,28 @@ term "christening" is specifically used to describe a baptism in a
 trinitarian Christian church.  On the other hand
 the term "baptism" is used exclusively for the LDS sacrament.
 </p>
-<p>If the individual has been baptized by the LDS then that information
+<p>If the person has been baptized by the LDS then that information
 appears in the next row.  This row is present only if information about the
 LDS baptism has been recorded.
 The location information for a baptism, which is usually the name of the
 temple, cannot be modified on this page.  Click on the
 <span class="button">Details</span> button.
 </p>
-<p>If the individual has been endowed by the LDS then that information
+<p>If the person has been endowed by the LDS then that information
 appears in the next row.  This row is present only if information about the
 LDS endowment has been recorded.
 The location information for an endowment, which is the name of the
 temple, cannot be modified on this page.  Click on the
 <span class="button">Details</span> button.
 </p>
-<p>If the individual has been confirmed by the LDS then that information
+<p>If the person has been confirmed by the LDS then that information
 appears in the next row.  This row is present only if information about the
 LDS confirmation has been recorded.
 The location information for a confirmation, which is usually the name of the
 temple, cannot be modified on this page.  Click on the
 <span class="button">Details</span> button.
 </p>
-<p>If the individual has received initiatory by the LDS then that information
+<p>If the person has received initiatory by the LDS then that information
 appears in the next row.  This row is present only if information about the
 LDS initiatory has been recorded.
 The location information for an initiatory, which is the name of the
@@ -261,69 +296,89 @@ temple, cannot be modified on this page.  Click on the
 displayed in subsequent rows according to their defined order.  
 The fields in which the information is displayed can be modified, and any
 changes entered will be applied to the events when you click on the
-<span class="button"><u>U</u>pdate&nbsp;Individual</span> button, or using
+<span class="button"><u>U</u>pdate&nbsp;Person</span> button, or using
 the keyboard combinations Ctrl-S or Alt-U.
-The individual event records
+the person event records
 may be reordered by date by clicking on the 
 <span class="button"><u>O</u>rder Events by Date</span> button, or
 using the keyboard combination Alt-O.
-<p>After the individual event records the next row
+<p>After the person event records the next row
 in the events display specifies the date and location
-where the individual died.  This row is always present even if the
+where the person died.  This row is always present even if the
 information is unknown.
 </p>
 <p>The next row in the events display specifies the date and location
-where the individual was buried.  This row is always present even if the
+where the person was buried.  This row is always present even if the
 information is unknown.
 </p>
 <p>The next row after the events list contains two buttons.
 <ol>
     <li>The <span class="button">Add <u>E</u>vent</span> button 
-	pops up a <a href="/FamilyTree/editEventHelpen.html">dialog</a> that provides the
-	ability to add a new event.  This includes not only events
-	represented by records in the events table, but also the four
-	LDS sacraments.
+    	pops up a <a href="/FamilyTree/editEventHelpen.html">dialog</a>
+        that provides the
+    	ability to add a new event.  This includes not only events
+    	represented by records in the events table, but also the four
+    	LDS sacraments.
     <li>The <span class="button"><u>O</u>rder Events by Date</span> button
-	reorders those events that are represented by records in the
-	events table by the date of the event.
+    	reorders those events that are represented by records in the
+    	events table by the date of the event.
 </ol>
+<h2>Other Details</h2>
+<img src="/Images/EditPersonOther.png" alt="Other portion of Edit Person Dialog">
+<p>On the next row of the dialog you can control the visibility
+of information
+about the person to casual visitors.  Note that all people less than
+103 years old are automtically treated as private.  
+By setting Private to "Yes" you can 
+designate that a person older than 103 is to be handled the same way.
+By setting Private to "Invisible" the very existence of the person is not
+revealed.  
+</p>
+<p>If the "Never Married" checkbox is selected then the report on the 
+individual will include a note that they were never married.  Note that 
+this checkbox cannot be selected if the person is a spouse in a family.
+</p>
 <p>
-The General Notes field contains extended textual notes about the individual.
+The "User Reference" field is typically used to contain an identifier
+that is significant to the author of the tree.  For example it may indicate
+the relationship of the person to the author.
+</p>
+<p>
+The "Ancestral Reference" field is set to the unique identifier for the
+corresponding individual in the Ancestral File database maintained by
+the Church of Jesus Christ of Latter Day Saints (LDS) and viewable on
+its website <a href="/FamilyTree/http://www.familysearch.org">www.familysearch.org</a>.
+</p>
+<p>The "Ancestor Interest" selection list is used to indicate how much
+interest you have in adding information about the ancestors of this individual.
+<p>
+<p>The "Descendant Interest" selection list is used to indicate how much
+interest you have in adding information about the descendants of this
+individual.
+<p>
+<h2>Buttons</h2>
+<img src="/Images/EditPersonButtons.png" alt="Buttons portion of Edit Person Dialog">
+<p>
+The General Notes field contains extended textual notes about the person.
 This information, and associated citations, can be viewed and edited by
 clicking on the <span class="button">Edit&nbsp;General&nbsp;<u>N</u>otes</span>
 button, or using the
 Alt-N keyboard shortcut.  This displays the
 <a href="/FamilyTree/editNotesHelpen.html">Edit General Notes</a> dialog.
 </p>
-<p>The Death Cause field is used to enter information on the cause of
-death, typically as reported on the death certificate, although also sometimes
-reported in obituaries, or even on grave markers.  This information may include
-the duration of the final illness.  It also may contain multiple causes, 
-particularly if the death certificate reports both an immediate cause of death,
-and contributing illness information.
-</p>
-<p>The <span class="button">Details</span> button 
-following the cause of death information field
-pops up a <a href="/FamilyTree/editEventHelpen.html">dialog</a> that provides the
-ability to add further information about the cause of death into the database.
-In particular this includes textual notes, and
-citations to sources supporting the conclusions.
-</p>
-<p>The <span class="button">Delete</span> button on this row just
-blanks out the death cause, for consistency with the way that events are
-handled.
-</p>
-<p>Clicking on the <span class="button">Edit&nbsp;<u>P</u>arents</span> button,
-or using the alt-P keyboard shortcut, opens a
+<p>Clicking on the <span class="button">Edit&nbsp;<u>P</u>arents</span>
+button, or using the alt-P keyboard shortcut, opens a
 <a href="/FamilyTree/editParentsHelpen.html">list of sets of parents dialog</a>
 that permits selecting
 from or adding to the sets of parents for this individual.
 As an aid to understanding the purpose of this button, if there are no 
 existing sets of parents for this individual the text on the button reads
 <span class="button">Add&nbsp;<u>P</u>arents</span>.
-<span class="message">Warning:</span> Do not use this button if your intention
-is to add the current individual as a child of an already existing family, as
-the dialog this button invokes can only create completely new families.
+<span class="message">Warning:</span> Do not use this button if your
+intention is to add the current individual as a child of
+an already existing family, as
+the dialog this button invokes can only <b>create</b> 
+completely new families.
 Instead go to one of the partners in the family that you wish to add this
 individual to, edit that parent and click on the
 <span class="button">Edit&nbsp;<u>F</u>amilies</span> button of that parent.
@@ -345,16 +400,15 @@ button, or using the alt-I keyboard shortcut, opens a
 that permits editing
 or adding to or deleting from the images associated with this individual.
 Note that you also have the option of associating images with the family
-rather than the individual.  The images here should be those in which the
+rather than the person.  The images here should be those in which the
 individual is the principle subject.
 </p>
-<p>An individual may have an associated address record which provides more
-detail about how to contact the individual, which may include a detailed
+<p>a person may have an associated address record which provides more
+detail about how to contact the person, which may include a detailed
 surface mail address, phone numbers, an e-mail address, and a web page URL.
 If such a record already exists for this individual the dialog displays an
-<span class="button">Edit&nbsp;<u>A</u>ddress</span> button for the address. 
-If the address does not already exist
-the dialog displays an
+<span class="button">Edit&nbsp;<u>A</u>ddress</span> button for
+the address.  If the address does not already exist the dialog displays an
 <span class="button">Add&nbsp;<u>A</u>ddress</span> button.
 Clicking on this button with the mouse, or using the alt-A keyboard shortcut
 displays an
@@ -377,45 +431,6 @@ clicking on the <span class="button">Edit&nbsp;Medical&nbsp;Notes</span> button.
 This displays the
 <a href="/FamilyTree/editNotesHelpen.html">Edit Medical Notes</a> dialog.
 </p>
-<p>On the next row of the dialog you can control the visibility of information
-about the individual to casual visitors.  Note that all individuals less than
-98 years old are treated as private.  That means their name is visible to
-visitors but no other information.  By setting Private to "Yes" you can 
-designate that an individual older than 98 is to be handled the same way.
-By setting Private to "Invisible" the very existence of the individual is not
-revealed.  
-</p>
-<p>If the "Never Married" checkbox is selected then the report on the 
-individual will include a note that they were never married.  Note that 
-this checkbox cannot be selected if the individual is a spouse in a family.
-</p>
-<p>
-The "User Reference" field is typically used to contain an identifier
-that is significant to the author of the tree.  For example it may indicate
-the relationship of the individual to the author.
-</p>
-<p>
-The "Ancestral Reference" field is set to the unique identifier for the
-corresponding individual in the Ancestral File database maintained by
-the Church of Jesus Christ of Latter Day Saints (LDS) and viewable on
-its website <a href="/FamilyTree/http://www.familysearch.org">www.familysearch.org</a>.
-</p>
-<p>The "Ancestor Interest" selection list is used to indicate how much
-interest you have in adding information about the ancestors of this individual.
-<p>
-<p>The "Descendant Interest" selection list is used to indicate how much
-interest you have in adding information about the descendants of this
-individual.
-<p>
-<p>If you are sharing the research and maintenance of a portion of the
-family tree with other family historians, you can grant them permission to
-update the family tree by clicking on the 
-<span class="button">Grant&nbsp;Access</span> button.  When you
-click on this button a 
-<a href="/FamilyTree/grantIndividHelpen.html">dialog</a>
-is displayed that asks you to select the
-other user to whom you wish to grant this authority to update the
-current individual, and the current individual's ancestors and descendants.  
 </div>
 <div class="botcrumbs">
     <span class="right">
@@ -427,7 +442,7 @@ current individual, and the current individual's ancestors and descendants.
 	<a href="/genealogyHelpen.html">Genealogy</a>: 
 	<a href="/FamilyTree/ServicesHelpen.html">Services</a>: 
 	<a href="/FamilyTree/nominalIndexHelpen.html">Nominal Index</a>: 
-	<a href="/FamilyTree/PersonHelpen.html">Individual Page</a>: 
+	<a href="/FamilyTree/PersonHelpen.html">Person Family Page</a>: 
     <div style="clear: both;"></div>
 </div>
 </body>

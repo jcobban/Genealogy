@@ -267,7 +267,7 @@ class CountySet extends RecordSet
                 $domainSet      = true;
             }   // valid domain
             else
-                $warn   .= "<p>CountySet::getWhere: Invalid domain code '$value'.</p>";
+                error_log("CountySet::getWhere: Invalid domain code '$value'. " . $this->debugBacktrace());
         }           // domain id supplied
         else
             $warn   .= "<p>CountySet::getWhere: Missing domain code.</p>";

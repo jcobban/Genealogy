@@ -124,13 +124,13 @@ function responses($id  , $indent)
  ************************************************************************/
 
 // process input parameters
-$id                 = 0;
-$keyvalue           = 0;
-$lang               = 'en';
-$table              = 'Blogs';
-$keyname            = 'blogid';
-$edit               = false;
-$update             = false;
+$id                 		= 0;
+$keyvalue           		= 0;
+$lang               		= 'en';
+$table              		= 'Blogs';
+$keyname            		= 'blogid';
+$edit               		= false;
+$update             		= false;
 
 if (isset($_GET) && count($_GET) > 0)
 {                       // invoked to display message form
@@ -140,9 +140,11 @@ if (isset($_GET) && count($_GET) > 0)
                       "<th class='colhead'>value</th></tr>\n";
     foreach($_GET as $key => $value)
     {                   // loop through all parameters
-        $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
-                        "<td class='white left'>$value</td></tr>\n"; 
-        $value          = trim($value);
+        $safevalue          = htmlspecialchars($value);
+        $parmsText          .= "<tr><th class='detlabel'>$key</th>" .
+                                "<td class='white left'>" .
+                                "$safevalue</td></tr>\n";
+        $value              = trim($value);
         switch(strtolower($key))
         {               // act on specific parameters
             case 'blogid':
@@ -322,7 +324,7 @@ if (isset($_GET) && count($_GET) > 0)
 
             case 'username':
             {
-                $id                 = $value;
+                $id                 = $safevalue;
                 $keyname            = $key;
                 $table              = 'Users';
                 break;
@@ -330,8 +332,8 @@ if (isset($_GET) && count($_GET) > 0)
 
             case 'table':
             {           // get the table name
-                if (strlen($value) > 0)
-                    $table          = $value;
+                if (strlen($safevalue) > 0)
+                    $table          = $safevalue;
                 break;
             }           // get the table name
 
@@ -356,15 +358,16 @@ if (isset($_GET) && count($_GET) > 0)
 else
 if (isset($_POST) && count($_POST) > 0)
 {                       // invoked to update database
-    $parmsText  = "<p class='label'>\$_POST</p>\n" .
-                  "<table class='summary'>\n" .
-                  "<tr><th class='colhead'>key</th>" .
-                      "<th class='colhead'>value</th></tr>\n";
+    $parmsText          = "<p class='label'>\$_POST</p>\n" .
+		                  "<table class='summary'>\n" .
+		                  "<tr><th class='colhead'>key</th>" .
+		                      "<th class='colhead'>value</th></tr>\n";
     foreach($_POST as $key => $value)
     {                   // loop through all parameters
-        $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
-                        "<td class='white left'>$value</td></tr>\n"; 
-        $value          = trim($value);
+        $safevalue          = htmlspecialchars($value);
+        $parmsText          .= "<tr><th class='detlabel'>$key</th>" .
+                        "<td class='white left'>$safevalue</td></tr>\n"; 
+        $value              = trim($value);
         switch(strtolower($key))
         {               // act on specific parameters
             case 'blogid':

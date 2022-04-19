@@ -27,22 +27,19 @@ use \Exception;
  *      2021/05/24      correct errors because it was run under the     *
  *                      client's authorization, not the administrator   *
  *      2021/06/08      method save no longer has a parameter           *
+ *      2022/03/27      use common arrayToXML                           *
  *                                                                      *
- *  Copyright &copy; 2021 James A. Cobban                               *
+ *  Copyright &copy; 2022 James A. Cobban                               *
  ************************************************************************/
-header("Content-Type: text/xml");
 require_once __NAMESPACE__ . '/User.inc';
 require_once __NAMESPACE__ . '/common.inc';
 
 // emit the XML header
-print "<?xml version='1.0' encoding='UTF-8'?".">\n";
-print "<confirmed>\n";
+$confirmed          = array('parms'     => $_GET);
 
-$clientid         = null;
-print "    <parms>\n";
-foreach($_POST as $key => $value)
+$clientid           = null;
+foreach($_GET as $key => $value)
 {
-    print "\t<$key>$value</$key>\n";
     switch (strtolower($key))
     {
         case 'clientid':
@@ -50,56 +47,57 @@ foreach($_POST as $key => $value)
             break;
     }
 }
-print "    </parms>\n";
 
 // get the updated values of the fields in the record
 
 
 if (!canUser('all'))
 {       // not authorized
-    $msg        .= 'User not authorized to confirm user. ';
+    $msg            .= 'Current user is not authorized to confirm user. ';
 }       // not authorized
 
 if ($clientid == null)
 {
-    $msg        .= 'Missing mandatory parameter clientid=. ';
+    $msg            .= 'Missing mandatory parameter clientid=. ';
 }
 
-showTrace();
+if (strlen($warn) > 0)
+{
+    $confirmed['warn']  = $warn;
+}
 
 if (strlen($msg) == 0)
 {                   // no errors detected
     // confirm the indicated event entry
     $client             = new User(array('username' => $clientid));
-    if ($client['auth'] == 'pending')
+    if ($client->isExisting() && $client['auth'] == 'pending')
     {               // user is awaiting confirmation
-        print "<id>{$client['id']}</id>\n";
+        $confirmed['id']        = $client['id'];
         $client->set('auth', 'blog,edit');
-        $count          = $client->save();
+        $count                  = $client->save();
         if ($count == 0)
         {
-            print "    <msg>No user confirmed.</msg>\n";
-            error_log("confirmUserXml.php: User $clientId authorization previously '{$client['auth']}");
+            $confirmed['msg']   = "No user confirmed";
         }
         else
         {           // send e-mail to the new user to validate the address
-            print "<cmd count='$count'>" . $client->getLastSqlCmd() . "</cmd>\n";
-            $email      = $client['email'];
-            $sent       = mail($email,
+            $confirmed['cmd']   = $client->getLastSqlCmd();
+            $email              = $client['email'];
+            $sent               = mail($email,
              "[JamesCobban.net] Thank You for Registering as User $clientid",
              " Thank you.\n\n" .
              "Administrator");
         }           // send e-mail to the new user to validate the address
     }               // user is awaiting confirmation
+    else
+    if (!$client->isExisting())
+    {
+        $confirmed['msg']       = htmlentities("User '$clientid' is not defined", ENT_XML1);
+    }
 }                   // no errors detected
 else
 {
-    error_log("confirmUserXml.php: User $clientId authorization failed msg=$msg");
-    print "    <msg>\n";
-    print $msg;
-    print "    </msg>\n";
+    $confirmed['msg']           = $msg;
 }
 
-// close root node of XML output
-print "</confirmed>\n";
-
+print arrayToXML($confirmed, array('nodename' => 'confirmed'));

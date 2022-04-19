@@ -317,6 +317,7 @@
  *                      use addEventListener                            *
  *      2021/03/04      avoid creating duplicate events                 *
  *      2022/02/01      replace calls to onchange with dispatchEvent    *
+ *      2022/04/06      add ability to edit and add alternate names     *
  *                                                                      *
  *  Copyright &copy; 2022 James A. Cobban                               *
  ************************************************************************/
@@ -782,10 +783,17 @@ function activateElements(form)
             }       // buttons to edit event details
 
             case 'editname':
+            case 'altname':
             {
                 element.addEventListener('click', editName);
                 break;
-            }       // edit primary name
+            }       // edit primary or alternate name
+
+            case 'addname':
+            {
+                element.addEventListener('click', addName);
+                break;
+            }       // add a new alternate name
 
             case 'clear':
             {       // buttons to clear event details
@@ -1547,38 +1555,34 @@ function resetForm()
  *  function editName                                                   *
  *                                                                      *
  *  This method is called when the user requests to edit                *
- *  information about the primary name of the current individual.       *
+ *  information about the primary or an alternate name of the Person.   *
  *                                                                      *
  *  Input:                                                              *
- *      this    <button id='editName'>                                  *
+ *      this    <button id='editName...'>                               *
  *      ev      click Event                                             *
  ************************************************************************/
 function editName(ev)
 {
+    const idpatt    = /\d+$/;
+
     if (!ev)
         ev          = window.event;
     ev.stopPropagation();
 
     let form        = this.form;
-    let idnx        = this.id.substring(8);
+    let idnx        = idpatt.exec(this.id)[0];
     if (idnx == 0)
     {
         newSearch   = this;     // identify button that was clicked
         refresh();
         return;
     }
-    let given       = encodeURIComponent(form.GivenName.value);
-    let surname     = encodeURIComponent(form.Surname.value);
-    let treeName    = encodeURIComponent(form.treeName.value);
     let lang            = 'en';
     if ('lang' in args)
         lang            = args.lang;
 
     // open edit dialog in right half of window
     let url = "/FamilyTree/editName.php?idnx=" + idnx +
-                                      "&given=" + given +
-                                      "&surname=" + surname +
-                                      "&treename=" + treeName +
                                       "&lang=" + lang;
     if (debug.toLowerCase() == 'y')
         url             += "&debug=y";
@@ -1587,6 +1591,42 @@ function editName(ev)
                               "right"));
     return true;
 }   // function editName
+
+/************************************************************************
+ *  function addName                                                    *
+ *                                                                      *
+ *  This method is called when the user requests to add a new           *
+ *  alternate name for the Person.                                      *
+ *                                                                      *
+ *  Input:                                                              *
+ *      this    <button id='addName'>                                   *
+ *      ev      click Event                                             *
+ ************************************************************************/
+function addName(ev)
+{
+    if (!ev)
+        ev              = window.event;
+    ev.stopPropagation();
+
+    let form            = this.form;
+    let idir            = form.idir.value;
+    let treeName        = encodeURIComponent(form.treeName.value);
+    let lang            = 'en';
+    if ('lang' in args)
+        lang            = args.lang;
+
+    // open edit dialog in right half of window
+    let url = "/FamilyTree/editName.php?idir=" + idir +
+                                      "&type=alt" +
+                                      "&treename=" + treeName +
+                                      "&lang=" + lang;
+    if (debug.toLowerCase() == 'y')
+        url             += "&debug=y";
+    windowList.push(openFrame("event",
+                              url,
+                              "right"));
+    return true;
+}   // function addName
 
 /************************************************************************
  *  function editMarriages                                              *

@@ -189,7 +189,7 @@ if (isset($_GET) && count($_GET) > 0)
                     $censusIdText   = $savevalue;
                 break;
             }           // Census Identifier
-    
+
             case 'province':
             {           // Province code (pre-confederation)
                 if (preg_match('/^[a-zA-Z]{2}$/', $value))
@@ -198,7 +198,7 @@ if (isset($_GET) && count($_GET) > 0)
                     $provinceText   = $safevalue;
                 break;
             }           // Province code
-    
+
             case 'district':
             {           // District number
                 if (is_array($value))
@@ -220,14 +220,14 @@ if (isset($_GET) && count($_GET) > 0)
                     $distIDtext             = htmlspecialchars($value);
                 break;
             }           // District number
-    
+
             case 'subdistrict':
             {           // subdistrict id
                 $subDistID                      = $safevalue;
                 $getParms['subdistrict']        = $subDistID;
                 break;
             }           // subdistrict id
-    
+
             case 'division':
             case 'div':
             {           // division
@@ -245,7 +245,7 @@ if (isset($_GET) && count($_GET) > 0)
                 }
                 break;
             }           // division
-    
+
             case 'page':
             {           // "Page"
                 if (ctype_digit($value))
@@ -257,7 +257,7 @@ if (isset($_GET) && count($_GET) > 0)
                     $pagetext                   = $safevalue;
                 break;
             }           // "Page"
-    
+
             case 'lang':
             {
                     $lang           = FtTemplate::validateLang($value);
@@ -591,6 +591,11 @@ if (strlen($msg) == 0)
         $oldReligion                = '';
         $oldOrigin                  = '';
         $oldNationality             = '';
+        $oldAddrtwp                 = '';
+        $oldAddrrng                 = '';
+        $oldAddrmdn                 = '';
+        $oldAddrmuni                = '';
+
         foreach($lineSet as $censusLine)
         {
             $rtemplate                  = new Template($rowHtml);
@@ -611,7 +616,7 @@ if (strlen($msg) == 0)
                             $line       = '0' . $line;
                         break;
                     }       // line number on page
-    
+
                     case 'family':
                     {
                         if ($value == $oldFamily)
@@ -630,7 +635,7 @@ if (strlen($msg) == 0)
                         }
                         break;
                     }       // family number
-    
+
                     case 'surname':
                     {
                         if ($value == $oldSurname)
@@ -650,7 +655,7 @@ if (strlen($msg) == 0)
                         }
                         break;
                     }       // surname
-    
+
                     case 'origin':
                     {
                         if ($value == $oldOrigin)
@@ -662,7 +667,7 @@ if (strlen($msg) == 0)
                         }
                         break;
                     }       // ethnic origin
-    
+
                     case 'nationality':
                     {
                         if ($value == $oldNationality)
@@ -674,7 +679,7 @@ if (strlen($msg) == 0)
                         }
                         break;
                     }       // nationality
-    
+
                     case 'religion':
                     {
                         if ($value == $oldReligion)
@@ -686,7 +691,55 @@ if (strlen($msg) == 0)
                         }
                         break;
                     }       // religion
-    
+
+                    case 'addrtwp':
+                    {       // prairie township number
+                        if ($value == $oldAddrtwp)
+                            $censusLine->set('adrtwpclass', 'same');
+                        else
+                        {
+                            $censusLine->set('adrtwpclass', 'black');
+                            $oldAddrtwp     = $value;
+                        }
+                        break;
+                    }       // prairie township number
+
+                    case 'addrrng':
+                    {       // prairie range
+                        if ($value == $oldAddrrng)
+                            $censusLine->set('adrrngclass', 'same');
+                        else
+                        {
+                            $censusLine->set('adrrngclass', 'black');
+                            $oldAddrrng     = $value;
+                        }
+                        break;
+                    }       // prairie range
+
+                    case 'addrmdn':
+                    {       // prairie meridian
+                        if ($value == $oldAddrmdn)
+                            $censusLine->set('adrmdnclass', 'same');
+                        else
+                        {
+                            $censusLine->set('adrmdnclass', 'black');
+                            $oldAddrmdn     = $value;
+                        }
+                        break;
+                    }       // prairie meridian
+
+                    case 'addrmuni':
+                    {       // prairie municipality
+                        if ($value == $oldAddrmuni)
+                            $censusLine->set('adrmuniclass', 'same');
+                        else
+                        {
+                            $censusLine->set('adrmuniclass', 'black');
+                            $oldAddrmuni     = $value;
+                        }
+                        break;
+                    }       // prairie municipality
+
                     // default value of Mother's birthplace is
                     // Father's birthplace
                     // so if they are equal Mother's birthplace is default value
@@ -698,7 +751,7 @@ if (strlen($msg) == 0)
                             $censusLine->set('mbpclass', 'black');
                         break;
                     }       // mothersbirthplace
-    
+
                     case 'idir':
                     {
                         if (is_null($value))
@@ -720,7 +773,7 @@ if (strlen($msg) == 0)
                         }
                         break;
                     }       // idir
-    
+
                     case 'ownertenant':
                     {
                         if (is_string($value) && strlen($value) > 1)
@@ -731,7 +784,7 @@ if (strlen($msg) == 0)
                             $censusLine->set($field, strtoupper($value));
                         break;
                     }
-    
+
                     default:
                     {
                         if (is_null($value))

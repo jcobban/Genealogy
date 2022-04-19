@@ -706,12 +706,23 @@ class CensusLine extends Record
                     {           // string
                         $censusId       = $value;
                         $this->censusId = $censusId;
-                        $censusObj      = new Census(array('censusid' => $censusId));
+                        $censusParms    = array('censusid' => $censusId);
+                        $censusObj      = new Census($censusParms);
                         if ($censusObj->isExisting())
                         {           // valid census identifier
                             $censusYear = intval(substr($censusId, 2));
-                            $table  = 'Census' . $censusYear;
+                            $table      = 'Census' . $censusYear;
                             $this->table= $table;
+                            if ($censusObj['collective'])
+                            {
+                                error_log('CensusLine::__construct: ' .
+                                          __LINE__ .
+                        " invoked with collective censusID=$value\n" .
+                                          $this->debugBacktrace());
+                                $censusId   = 'CW' . $censusYear;
+                                $province   = 'CW';
+                            }
+                            else
                             if ($censusYear < 1867)
                                 $province   = substr($censusId, 0, 2);
                         }           // valid census identifier
@@ -728,6 +739,16 @@ class CensusLine extends Record
                         $censusYear     = intval(substr($censusId, 2));
                         $table          = 'Census' . $censusYear;
                         $this->table    = $table;
+                        if ($censusObj['collective'])
+                        {
+                            error_log('CensusLine::__construct: ' .
+                                      __LINE__ .
+                    " invoked with collective censusID=$value\n" .
+                                      $this->debugBacktrace());
+                            $censusId   = 'CW' . $censusYear;
+                            $province   = 'CW';
+                        }
+                        else
                         if ($censusYear < 1867)
                             $province   = substr($censusId, 0, 2);
                     }
@@ -909,7 +930,7 @@ class CensusLine extends Record
                     else
                     {       // create a new record
                         // set defaults
-                        $dbrow      = self::$defaultRows[$censusId];
+                        $dbrow          = self::$defaultRows[$censusId];
                         $dbrow['line']  = $line;
                         if (array_key_exists('province', $dbrow))
                             $dbrow['province']  = $province;

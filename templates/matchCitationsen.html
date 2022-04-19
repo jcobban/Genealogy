@@ -5,12 +5,13 @@
  *																		*
  *  History:															*
  *		2020/05/13		created											*
+ *      2022/04/01      implemented fully                               *
  *																		*
- *  Copyright &copy; 2020 James A. Cobban								*
+ *  Copyright &copy; 2022 James A. Cobban								*
  **********************************************************************-->
     <div class="hidden" id="breadcrumbs">
       <a href="/genealogy.php?lang=$LANG">Genealogy</a>:
-      <a href="/genCountry.php?cc=CA&amp;lang=$LANG">Canada</a>:
+      <a href="/genCountry.php?cc=$CC&amp;lang=$LANG">Canada</a>:
       <a href="/database/genCensuses.php?lang=$LANG">Censuses</a>:
       <a href="/database/CensusUpdateStatus.php?Census=$CENSUSID&amp;lang=$LANG">
   			Summary
@@ -23,7 +24,7 @@
       </a>:	
     </div>
     <div class="body">
-	  <h1>Census of Canada: Match Citations
+	  <h1>Census of $COUNTRYNAME: Match Citations
 	    <span class='right'>
 		<a href='matchCitationsHelpen.html' target='help'>? Help</a>
 	    </span>
@@ -38,20 +39,20 @@
         		href='/FamilyTree/Person.php?idir=$idir&lang=$lang'>
     	    $surname, $givenName
 	      </a>
-	      born $birthYear matched $mRow[surname],
-		    $mRow[givennames]
-		    born about $mRow[byear]
+	      born $birthYear matched $msurname,
+		    $mgivennames
+		    born about $mbyear
 	        on line <span id='line$i'>$line</span>.
 	  </p>
 	  <p>Checking events:</p>
 	  <p id="eventMatch">
 	      <a id='ftlink$i' 
         		href='/FamilyTree/Person.php?idir=$idir&lang=$lang'>
-	        $row[1], $givenName
+	        $surname, $givenName
 	      </a>
-	      born $birthYear matched $mRow[surname],
-		    $mRow[givennames]
-		    born about $mRow[byear]
+	      born $birthYear matched $msurname,
+		    $mgivennames
+		    born about $mbyear
 	        on line <span id='line$i'>$line</span>.
       </p>
       </div>

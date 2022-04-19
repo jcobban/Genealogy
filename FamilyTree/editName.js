@@ -359,31 +359,8 @@ function gotName(jsonObj)
 		    opener	    = window.opener;
 		if (opener)
 		{		            // invoked from an existing window
-		    // reflect changes made to the main fields of the name
-		    // back to the opener's form
-		    for (var fi = 0; fi < opener.document.forms.length; fi++)
-		    {		        // loop through forms in invoking page
-				var	srcForm	= opener.document.forms[fi];
-				if (srcForm.nameFeedback)
-				{	        // feedback method defined on the form
-				    var	parms	                    = {};
-				    for (var ei = 0; ei < form.elements.length; ei++)
-				    {		// copy element values to parms
-						var	element	                = form.elements[ei];
-						if (element.name.length > 0)
-						{
-						    if (element.type == 'checkbox' &&
-							    !(element.checked))
-							    parms[element.name]	= 0;
-						    else
-							    parms[element.name]	= element.value;
-						}
-				    }		// copy element values to parms
-				    srcForm.nameFeedback(parms);
-				    break;
-				}	        // feedback method defined on the form
-		    }		        // loop through forms in invoking page
-		    closeFrame();		// close this window
+		    opener.location.reload();// refresh opener
+		    closeFrame();	// close this window
 		}		            // invoked from an existing window
 		else
 		    alert("editName.js: gotName: Not invoked as a dialog");

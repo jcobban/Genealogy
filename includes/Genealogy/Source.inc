@@ -185,8 +185,9 @@ use \Iterator;
  *      2018/12/02      support field synonyms in constructor           *
  *                      report constructor errors through $this->msg    *
  *      2019/04/15      replace is_a with instanceof                    *
+ *      2022/03/27      replace xmlentities with htmlentities           *
  *                                                                      *
- *  Copyright &copy; 2018 James A. Cobban                               *
+ *  Copyright &copy; 2022 James A. Cobban                               *
  ************************************************************************/
 require_once __NAMESPACE__ . '/Record.inc';
 require_once __NAMESPACE__ . '/Address.inc';
@@ -492,7 +493,7 @@ class Source extends RecordPic
         $where              = '';
         $and                = 'WHERE ';
         $sqlParms           = array();
-        
+
         foreach($parms as $field => $value)
         {                   // loop through all field names
             $fieldLc        = strtolower($field);
@@ -718,7 +719,7 @@ class Source extends RecordPic
         else
             $this->extras['typetext']   = $this->getTypeText();
         $typetext   = $this->extras['typetext'];
-   
+
         $oldvalue                       = $this->template;
         if ($template instanceof Template)
             $this->template             = $template;
@@ -1320,11 +1321,13 @@ class Source extends RecordPic
                 case 'enteredd':
                 {       // legacy internal date format
                     $date   = new LegacyDate($value);
-                    $retval .= "    <{$fld}c>" . xmlentities($value) .
-                                       "</{$fld}c>\n";
+                    $retval .= "    <{$fld}c>" .
+                                        htmlentities($value, ENT_XML1) .
+                                        "</{$fld}c>\n";
                     $value  = $date->toString();
-                    $retval .= "    <$fld>" . xmlentities($value) .
-                                       "</$fld>\n";
+                    $retval .= "    <$fld>" . 
+                                        htmlentities($value, ENT_XML1) .
+                                        "</$fld>\n";
                     break;
                 }       // legacy internal date format
 
@@ -1332,15 +1335,17 @@ class Source extends RecordPic
                 {   // document type
                     $retval .= "    <$fld>" . $value . "</$fld>\n";
                     $value  = $this->getTypeText();
-                    $retval .= "    <type>" . xmlentities($value) .
-                                       "</type>\n";
+                    $retval .= "    <type>" .
+                                        htmlentities($value, ENT_XML1) .
+                                        "</type>\n";
                     break;
                 }
 
                 default:
                 {       // fields passed back with no interpretation
-                    $retval .= "    <$fld>" . xmlentities($value) .
-                                       "</$fld>\n";
+                    $retval .= "    <$fld>" .
+                                        htmlentities($value, ENT_XML1) .
+                                        "</$fld>\n";
                     break;
                 }       // fields passed back with no interpretation
             }       // switch on field name

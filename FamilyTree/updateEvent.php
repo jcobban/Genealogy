@@ -169,67 +169,67 @@ $citParms                   = array();
 $citations                  = array();      // list of citations
 
 print "    <parms>\n";
-error_log("updateEvent.php: <parms>\n",3,$document_root . "/logs/updateEvent.txt");
 try {
 foreach($_POST as $key => $value)
 {       // loop through all parameters
     $xmlkey         = str_replace("$","_",$key);
     print "\t<$xmlkey>" . htmlspecialchars($value,ENT_XML1) . "</$xmlkey>\n";
-    error_log("updateEvent.php: $xmlkey='$value'\n",
-              3,
-              $document_root . "/logs/updateEvent.txt");
+    error_log("updateEvent.php: $xmlkey='$value'");
 
     switch($key)
     {   // act on specific keys
         case 'idir':
         {       // idir of individual to be updated
             $idir                       = $value;
-            if (strlen($idir) > 0)
+            if (ctype_digit($idir))
+            {
                 $person                 = new Person(array('idir' => $idir));
-            if (!$person->isOwner())
-                $msg    .= "User not authorized to update individual $idir. ";
+                if (!$person->isOwner())
+                    $msg    .= "User not authorized to update individual $idir. ";
+            }
+            else
+                error_log("updateEvent.php: idir='$value'");
             break;
         }       // idir of individual to be updated
 
         case 'idmr':
         {       // idmr of family to be updated
             $idmr                       = $value;
-            if (strlen($idmr) > 0)
+            if (ctype_digit($idmr))
                 $family                 = new Family(array('idmr' => $idmr));
+            else
+                error_log("updateEvent.php: idmr='$value'");
             break;
         }       // idmr of family to be updated
 
         case 'ider':
         {       // ider to be updated
             $ider                       = $value;
-            if (strlen($ider) > 0)
+            if (ctype_digit($ider))
             {
                 $event                  = new Event(array('ider' => $ider));
             }
+            else
+                error_log("updateEvent.php: ider='$value'");
             break;
         }       // ider to be updated
 
         case 'idcr':
         {       // idcr to be updated
-            $idcr                       = $value;
-            if (strlen($idcr) > 0)
+            if (ctype_digit($value))
             {
-                $child                  = new Child(array('idcr' => $idcr));
-                try {
-                    $idir               = $child->getIdir();
-                    $person             = new Person(array('idir' => $idir));
-                    if (!$person->isOwner())
-                        $msg    .=
+                $idcr               = $value;
+                $child              = new Child(array('idcr' => $idcr));
+                $idir               = $child->getIdir();
+                $person             = new Person(array('idir' => $idir));
+                if (!$person->isOwner())
+                    $msg    .=
             "User not authorized to update individual $idir. ";
-                    $idmr               = $child->getIdmr();
-                    $family             = new Family(array('idmr' => $idmr));
-                }
-                catch (Exception $e)
-                {
-                    $person             = null;
-                    $family             = null;
-                }
+                $idmr               = $child->getIdmr();
+                $family             = new Family(array('idmr' => $idmr));
             }
+            else
+                error_log("updateEvent.php: idcr='$value'");
             break;
         }       // idcr to be updated
 

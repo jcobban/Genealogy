@@ -104,13 +104,13 @@ use \Exception;
  *  that may not yet have been written to the database because          *
  *  the family record is in the process of being created:               *
  *                                                                      *
- *      initSurname      initial surname for the child                  *
- *      fathGivenName  father's given name                              *
- *      fathSurname      father's surname                               *
- *      mothGivenName  mother's given name                              *
- *      mothSurname      mother's surname                               *
+ *      initSurname     initial surname for the child                   *
+ *      fathGivenName   father's given name                             *
+ *      fathSurname     father's surname                                *
+ *      mothGivenName   mother's given name                             *
+ *      mothSurname     mother's surname                                *
  *                                                                      *
- *  History:                                                              *
+ *  History:                                                            *
  *      2010/08/11      Correct error in mailto: subject line, and add  *
  *                      birth date and death date into title.           *
  *      2010/08/11      encode field values with htmlspecialchars       *
@@ -376,8 +376,14 @@ use \Exception;
  *      2020/07/19      only show death case if requested               *
  *      2021/01/26      template controls which events are always       *
  *                      displayed.                                      *
+ *      2022/03/25      remove unnecessary and premature creation of    *
+ *                      Surname instance                                *
+ *      2022/04/06      add support for adding and editing alternate    *
+ *                      names                                           *
+ *                      on creating new Person use Nicknames table      *
+ *                      to get default gender                           *
  *                                                                      *
- *  Copyright &copy; 2021 James A. Cobban                               *
+ *  Copyright &copy; 2022 James A. Cobban                               *
  ************************************************************************/
 require_once __NAMESPACE__ . '/Person.inc';
 require_once __NAMESPACE__ . '/Family.inc';
@@ -698,15 +704,6 @@ if ($person instanceof Person)
 
     $given                  = $person['givenname'];
     $surname                = $person['surname'];
-    $surnameRec             = new Surname(array('surname' => $surname));
-    if (!$surnameRec->isExisting())
-    {
-        $count              = $surnameRec->save();
-        if ($count)
-        {
-            $lastSql        = $surnameRec->getLastSqlCmd();
-        }
-    }
     $evBirth                = null;
     $haveBirth              = false;
     $evChristen             = null;
@@ -1156,8 +1153,6 @@ if ($person && $person->isExisting())
     $ancestralRef   = str_replace('"','&quot;',$person->get('ancestralref'));
 
     // construct title
-    $eGiven         = str_replace('"','&quot;',$given);
-    $eSurname       = str_replace('"','&quot;',$surname);
     $name           = $person->getName(Person::NAME_INCLUDE_DATES);
     if (strlen($name) == 0)
         $name              = 'New Person';
@@ -1170,6 +1165,24 @@ else
     {
         $id                 = $person->get('id');
         $gender             = $person->get('gender');
+        $givennames         = preg_split('/\s+/', $person['givenname']);
+        $nicknameset        = new RecordSet('Nicknames',
+                                            array('nickname' => $givennames));
+        foreach($nicknameset as $nickname)
+        {
+            if ($nickname['gender'] == 0)
+            {
+                $gender         = 0;
+                break;
+            }
+            else
+            if ($nickname['gender'] == 1)
+            {
+                $gender         = 1;
+                break;
+            }
+        }
+        $person['gender']   = $gender;
         $genderClass        = $genderClasses[$gender];
         $private            = $person->get('private');
     }
@@ -1178,6 +1191,25 @@ else
         $id                 = 0;
         $gender             = 2;
         $genderClass        = 'unknown';
+        $givennames         = preg_split('/\s+/', $given);
+        $nicknameset        = new RecordSet('Nicknames',
+                                            array('nickname' => $givennames));
+        foreach($nicknameset as $nickname)
+        {
+            if ($nickname['gender'] == 0)
+            {
+                $gender         = 0;
+                $genderClass    = 'male';
+                break;
+            }
+            else
+            if ($nickname['gender'] == 1)
+            {
+                $gender         = 1;
+                $genderClass    = 'female';
+                break;
+            }
+        }
         $private            = false;
     }
     $neverMarried           = 0;
@@ -1216,9 +1248,6 @@ else
     }                   // permit adding parents or families
 
     // construct title
-    $eGiven                 = '';
-    $eSurname               = '';
-
     switch($rowid)
     {
         case 'husb':
@@ -1248,10 +1277,27 @@ else
     $idar                   = 0;
 }                       // adding new person
 
+$eGiven                     = str_replace('"','&quot;',$given);
+$eSurname                   = str_replace('"','&quot;',$surname);
+
 $title                      = "Edit $name";
 $nameuri                    = rawurlencode($surname . ', ' . $given);
 $priName                    = $person->getPriName();
 $idnx                       = $priName['idnx'];
+$nameset                    = new RecordSet('tblNX',
+                                            array('idir'    => $idir,
+                                            'type'    => '>0'));
+$nametext                   = '';
+$ntemplate                  = $template['altNameRow'];
+$nttext                     = $ntemplate->outerHTML;
+foreach($nameset as $altidnx => $altname)
+{                       // loop through alternate names
+    $nametext   .= str_replace(array('$ALTNAME','$IDNX'),
+                               array( $altname->getName(), $altidnx),
+                               $nttext);
+}                       // loop through alternate names
+$ntemplate->update($nametext);
+
 $template->set('NAMEURI',           $nameuri);
 $template->set('SURNAME',           $surname);
 $template->set('GIVEN',             $given);

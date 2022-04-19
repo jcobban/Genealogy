@@ -64,8 +64,9 @@ use \Exception;
  *      2020/01/22      internationalize numbers                        *
  *      2020/03/13      use FtTemplate::validateLang                    *
  *      2021/04/04      escape CONTACTSUBJECT                           *
+ *      2022/03/30      improve diagnostics                             *
  *                                                                      *
- *  Copyright &copy; 2021 James A. Cobban                               *
+ *  Copyright &copy; 2022 James A. Cobban                               *
  ***********************************************************************/
 require_once __NAMESPACE__ . '/FtTemplate.inc';
 require_once __NAMESPACE__ . '/Census.inc';
@@ -80,31 +81,55 @@ require_once __NAMESPACE__ . '/common.inc';
  ***********************************************************************/
 // default values of parameters
 $cc                 = 'CA';
+$cctext             = null;
 $countryName        = 'Canada';
 $lang               = 'en';     // default english
+$langtext           = null;
 
 // determine which districts to display
-foreach ($_GET as $key => $value)
-{           // loop through all parameters
-    switch(strtolower($key))
-    {
-        case 'cc':
-        case 'countrycode':
-        {
-            $cc             = strtoupper($value);
-            if ($cc == 'UK')
-                $cc         = 'GB';
-            break;
-        }
-
-        case 'lang':
-        {       // debug handled by common code
-                $lang               = FtTemplate::validateLang($value);
-            break;
-        }       // debug handled by common code
-
-    }       // switch on parameter name
-}           // foreach parameter
+// if invoked by method=get process the parameters
+if (isset($_GET) && count($_GET) > 0)
+{                   // invoked by URL to display current status of account
+    $parmsText              = "<p class='label'>\$_GET</p>\n" .
+                               "<table class='summary'>\n" .
+                                  "<tr><th class='colhead'>key</th>" .
+                                    "<th class='colhead'>value</th></tr>\n";
+    foreach($_GET as $key => $value)
+    {               // loop through all parameters
+        $safevalue          = htmlspecialchars($value);
+        $parmsText          .= "<tr><th class='detlabel'>$key</th>" .
+                                "<td class='white left'>" .
+                                "$safevalue</td></tr>\n"; 
+        switch(strtolower($key))
+        {           // switch on parameter name
+            case 'cc':
+            case 'countrycode':
+            {
+                if (preg_match('/^[a-zA-Z]{2}$/', $value))
+                {
+                    $cc         = strtoupper($value);
+                    if ($cc == 'UK')
+                        $cc     = 'GB';
+                }
+                else
+                {
+                    $cctext     = $safevalue;
+                }
+                break;
+            }
+    
+            case 'lang':
+            {       // requested language of communication
+                $lang           = FtTemplate::validateLang($value,
+                                                           $langtext);
+                break;
+            }       // requested language of communication
+    
+        }           // switch on parameter name
+    }               // foreach parameter
+    if ($debug)
+        $warn               .= $parmsText . "</table>\n";
+}                   // invoked by URL to display current status of account
 
 // initialize template
 if (canUser('edit'))
@@ -117,8 +142,13 @@ if (file_exists($tempBase . $baseName))
     $includeSub     = "genCensuses$action$cc$lang.html";
 else
     $includeSub     = "genCensuses{$action}__$lang.html";
-$template       = new FtTemplate($includeSub);
-$formatter                          = $template->getFormatter();
+$template           = new FtTemplate($includeSub);
+$formatter          = $template->getFormatter();
+
+if (is_string($cctext))
+    $warn           .= "<p>Invalid country code '$cctext', Canada assumed.</p>\n";
+if (is_string($langtext))
+    $warn           .= "<p>Invalid language identifier '$langtext', English assumed.</p>\n";
 
 // initialize substitution values
 $languageObj        = new Language(array('code' => $lang));
@@ -147,7 +177,8 @@ $queryText          = debugPrepQuery($query, $sqlParms);
 if ($stmt->execute($sqlParms))
 {       // success
     if ($debug)
-        $warn   .= "<p>genCensuses.php: " . __LINE__ . " $queryText</p>\n";
+        $warn       .= "<p>genCensuses.php: " . __LINE__ .
+                        " $queryText</p>\n";
     $statistics     = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     foreach($statistics as $row)
@@ -166,11 +197,11 @@ if ($stmt->execute($sqlParms))
 }       // loop through each census
 else
 {
-    $msg    .= "query='$queryText': message=" .
-                    print_r($stmt->errorInfo(), true) . ". ";
+    $msg            .= "query='$queryText': message=" .
+                        print_r($stmt->errorInfo(), true) . ". ";
 }       // error on request
 
-$title      = $countryName . ": Censuses";
+$title              = $countryName . ": Censuses";
 
 foreach($cendone as $year => $value)
     $template->set('CENDONE' . $year, $formatter->format(floatval($value)));

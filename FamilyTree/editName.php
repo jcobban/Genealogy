@@ -37,8 +37,10 @@ use \Templating\Template;
  *		2019/08/06      use FtTemplate                                  *
  *		2019/08/13      given name was not initialized                  *
  *      2020/12/05      correct XSS vulnerabilities                     *
+ *      2022/04/05      page title was not set                          *
+ *                      add ability to create new alternate name        *
  *																		*
- *  Copyright &copy; 2020 James A. Cobban								*
+ *  Copyright &copy; 2022 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/Name.inc';
 require_once __NAMESPACE__ . '/Person.inc';
@@ -53,6 +55,7 @@ $idnx		        = null;	        // index of Name
 $idnxText           = 'missing';    
 $formname           = '';           // JavaScript feedback
 $idir		        = null;	        // index of Person
+$idirtext           = null;
 $person		        = null;	        // instance of Person
 $name		        = null;	        // instance of Name
 $givenname          = null;
@@ -70,9 +73,9 @@ if (isset($_GET) && count($_GET) > 0)
                       "<th class='colhead'>value</th></tr>\n";
 	foreach($_GET as $key => $value)
 	{
+        $safevalue  = htmlspecialchars($value);
         $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
-                        "<td class='white left'>" .
-                        htmlspecialchars($value) . "</td></tr>\n"; 
+                        "<td class='white left'>$safevalue</td></tr>\n"; 
 	    if (strlen($value) == 0)
             continue;
 	    switch(strtolower($key))
@@ -82,32 +85,41 @@ if (isset($_GET) && count($_GET) > 0)
 	            if (ctype_digit($value) & $value > 0)
 	                $idnx	        = intval($value);
 	            else
-	                $idnxText       = htmlspecialchars($value);
+	                $idnxText       = $safevalue;
 				break;
 		    }		            //idnx
 	
+		    case 'idir':
+	        {	                // key of instance of Person
+	            if (ctype_digit($value) & $value > 0)
+	                $idir	        = intval($value);
+	            else
+	                $idirText       = $safevalue;
+				break;
+		    }		            // key of instance of Person
+	
 		    case 'form':
 	        {
-				$formname	        = htmlspecialchars($value);
+				$formname	        = $safevalue;
 				break;
             }		            // form name
 
             case 'given':
             case 'givenname':
 	        {
-				$givenname	        = htmlspecialchars($value);
+				$givenname	        = $safevalue;
 				break;
             }		            // given name
 
             case 'surname':
 	        {
-				$surname	        = htmlspecialchars($value);
+				$surname	        = $safevalue;
 				break;
             }		            // surname
 
             case 'treename':
 	        {
-				$treename	        = htmlspecialchars($value);
+				$treename	        = $safevalue;
 				break;
             }		            // tree name
 
@@ -146,13 +158,18 @@ if (is_int($idnx))
         if ($treename)
             $name['treename']   = $treename;
         $template->set('IDIR',		            $idir);
-        $template->set('PERSONNAME',$name->getName(Name::NAME_INCLUDE_DATES));
+        $personName             = $name->getName(Name::NAME_INCLUDE_DATES);
+        $template->set('PERSONNAME',            $personName);
 	    $surname				= $name['surname'];
 		$template->set('SURNAME',		        $surname);
+        $esurname		        = str_replace('"','&quot;',$surname);
+		$template->set('ESURNAME',		        $esurname);
 	    $soundslike				= $name['soundslike'];
 		$template->set('SOUNDSLIKE',	        $soundslike);
 	    $givenname				= $name['givenname'];
 		$template->set('GIVENNAME',		        $givenname);
+        $egivenname		        = str_replace('"','&quot;',$givenname);
+		$template->set('EGIVENNAME',		    $egivenname);
 	    $prefix		    		= $name['prefix'];
 		$template->set('PREFIX',		        $prefix);
 	    $nametitle				= $name['title'];
@@ -162,9 +179,11 @@ if (is_int($idnx))
 	    $order		    		= $name['order'];
         $template->set('ORDER',		            $order);
         if ($order < 2)
-            $template->set('TYPE',              $types[$order]);
+            $type               = $types[$order];
         else
-            $template->set('TYPE',              $types[1]);
+            $type               = $types[1];
+        $template->set('TYPE',                  $type);
+        $template->set('TITLE',                 "$type for $personName");
 	    $marriednamecreatedby	= $name['marriednamecreatedby'];
 		$template->set('MARRIEDNAMECREATEDBY',	$marriednamecreatedby);
 	    $preferredaka			= $name['preferredaka'];
@@ -225,13 +244,84 @@ if (is_int($idnx))
     }
 }
 else
-{
+if (is_int($idir))
+{                       // create new alternate name
+    $template->set('IDNX',		                0);
+    $person             = new Person(array('idir'   => $idir));
+    if ($person->isExisting())
+    {
+        $name		            = new Name(array('idir' => $idir,
+                                                 'type' => 'alt'));
+        $type                   = $name['type'];
+        if ($givenname)
+            $name['givenname']  = $givenname;
+        if ($surname)
+            $name['surname']    = $surname;
+        if ($treename)
+            $name['treename']   = $treename;
+        $template->set('IDIR',		            $idir);
+        $personName             = $name->getName(Name::NAME_INCLUDE_DATES);
+        $template->set('PERSONNAME',            $personName);
+	    $surname				= $name['surname'];
+		$template->set('SURNAME',		        $surname);
+        $esurname		        = str_replace('"','&quot;',$surname);
+		$template->set('ESURNAME',		        $esurname);
+	    $soundslike				= $name['soundslike'];
+		$template->set('SOUNDSLIKE',	        $soundslike);
+	    $givenname				= $name['givenname'];
+        $template->set('GIVENNAME',		        $givenname);
+        $egivenname		        = str_replace('"','&quot;',$givenname);
+		$template->set('EGIVENNAME',		    $egivenname);
+	    $prefix		    		= $name['prefix'];
+		$template->set('PREFIX',		        $prefix);
+	    $nametitle				= $name['title'];
+		$template->set('NAMETITLE',		        $nametitle);
+	    $userref				= $name['userref'];
+		$template->set('USERREF',		        $userref);
+	    $order		    		= $name['order'];
+        $template->set('ORDER',		            $order);
+        $type                   = $types[1];
+        $template->set('TYPE',                  $type);
+        $template->set('TITLE',                 "$type for $personName");
+	    $marriednamecreatedby	= $name['marriednamecreatedby'];
+		$template->set('MARRIEDNAMECREATEDBY',	$marriednamecreatedby);
+	    $preferredaka			= $name['preferredaka'];
+		$template->set('PREFERREDAKA',		    $preferredaka);
+		$template->set('PREFERREDAKACHECKED',	'');
+		$template->set('NOTES',		            '');
+        $template->set('MARRIEDNAMEMARIDID',	0);
+
+        // set up parameters for nominal index link in page header
+	    if (strlen($givenname) > 2)
+			$givenPre	= substr($givenname, 0, 2);
+	    else
+	    if (strlen($givenname) == 0)
+			$givenPre	= 'A';
+	    else
+			$givenPre	= $givenName;
+	    $nameuri		= rawurlencode($surname . ', ' . $givenPre);
+		$template->set('NAMEURI',		        $nameuri);
+        $row            = $template['sourceRow$IDSX'];
+        $row->update();
+    }
+    else
+    {
+        $text       = $template['invalididir']->innerHTML;
+        $msg        .= str_replace('$IDIR', $idir, $text);
+		$template->set('TYPE',		            $types['1']);
+        $template->set('PERSONNAME',		    '');
+        $template['personLink']->update(null);
+        $template['nameForm']->update(null);
+    }
+}                       // create new alternate name
+else
+{                       // idnx not supplied
     $text           = $template['invalididnx']->innerHTML;
     $msg            .= str_replace('$IDNX', $idnxText, $text);
 	$template->set('TYPE',		                $types['invalid']);
     $template->set('PERSONNAME',		        $types['missing']);
     $template['personLink']->update(null);
     $template['nameForm']->update(null);
-}
+}                       // idnx not supplied
 
 $template->display();

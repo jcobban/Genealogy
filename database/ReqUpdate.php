@@ -38,8 +38,9 @@ use \Exception;
  *						information about country and province			*
  *		2017/09/12		use get( and set(								*
  *		2020/03/13      use FtTemplate::validateLang                    *
+ *		2022/03/30      improve diagnostics                             *
  *																		*
- *  Copyright &copy; 2020 James A. Cobban								*
+ *  Copyright &copy; 2022 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . "/Census.inc";
 require_once __NAMESPACE__ . "/Country.inc";
@@ -49,36 +50,44 @@ require_once __NAMESPACE__ . "/common.inc";
 
 // defaults
 $censusId               = 'CA1881';
+$censusText             = null;
 $censusYear				= null;
 $cc			            = 'CA';
 $countryName			= 'Canada';
 $lang                   = 'en';
+$langText               = null;
 
 // get parameter values into local variables
 // validate all parameters passed to the server
 if (count($_GET) > 0)
 {	                // invoked by URL to display current status of account
-    $parmsText  = "<p class='label'>\$_GET</p>\n" .
-                  "<table class='summary'>\n" .
-                  "<tr><th class='colhead'>key</th>" .
-                      "<th class='colhead'>value</th></tr>\n";
+    $parmsText          = "<p class='label'>\$_GET</p>\n" .
+                              "<table class='summary'>\n" .
+                              "<tr><th class='colhead'>key</th>" .
+                                  "<th class='colhead'>value</th></tr>\n";
     foreach ($_GET as $key => $value)
     {			    // loop through all parameters
-        $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
-                        "<td class='white left'>$value</td></tr>\n"; 
+        $safevalue      = htmlspecialchars($value);
+        $parmsText      .= "<tr><th class='detlabel'>$key</th>" .
+                           "<td class='white left'>$safevalue</td></tr>\n"; 
         switch(strtolower($key))
         {		    // switch on parameter name
             case 'census':
             {		// census identifier
-                $censusId		= $value;
-                if (strlen($censusId) == 4)
+                if (preg_match('/^[0-9]{4}$/', $value))
                     $censusId	= 'CA' . $censusId;
+                else
+                if (preg_match('/^[a-zA-Z0-9]{4,7}$/', $value))
+                    $censusId		= $value;
+                else
+                    $censusText     = $safevalue;
                 break;
             }		// census identifier
 
             case 'lang':
             {
-	            $lang               = FtTemplate::validateLang($value);
+                $lang               = FtTemplate::validateLang($value, 
+                                                               $langtext);
                 break;
             }
 
@@ -88,18 +97,23 @@ if (count($_GET) > 0)
         $warn           .= $parmsText . "</table>\n";
 }	                // invoked by URL
 
+$tempBase		        = $document_root . '/templates/';
+if (file_exists($tempBase . "CensusReqUpdate$cc" . "en.html"))
+    $template           = new FtTemplate("CensusReqUpdate$cc$lang.html");
+else
+    $template           = new FtTemplate("CensusReqUpdate__$lang.html");
+
+if (is_string($censusText))
+    $warn               .= "<p>Census='$censusText' invalid, defaults to 'CA1881'</p>\n";
+if (is_string($langtext))
+    $warn           .= "<p>Invalid language identifier '$langtext', English assumed.</p>\n";
+
 $census	                = new Census(array('censusid'	=> $censusId));
 $censusYear		        = $census['year'];
 $cc			            = $census['cc'];
 $provinces		        = $census['provinces'];
 $country		        = new Country(array('code' => $cc));
 $countryName	        = $country->get('name');
-
-$tempBase		        = $document_root . '/templates/';
-if (file_exists($tempBase . "CensusReqUpdate$cc" . "en.html"))
-    $template           = new FtTemplate("CensusReqUpdate$cc$lang.html");
-else
-    $template           = new FtTemplate("CensusReqUpdate__$lang.html");
 
 if (!$census->isExisting())
     $warn	.= "<p>Census '$censusId' not pre-defined.</p>\n";

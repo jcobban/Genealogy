@@ -224,8 +224,9 @@ use \Templating\Template;
  *      2021/03/19      if administrator explicitly sets userid get     *
  *                      authorization and options from that userid      *
  *                      ignoring session and cookie values              *
+ *      2022/03/22      remove xmlentities                              *
  *                                                                      *
- *  Copyright &copy; 2021 James A. Cobban                               *
+ *  Copyright &copy; 2022 James A. Cobban                               *
  ************************************************************************/
 // identify the SQL server to connect to based upon the URL
 // initializes the global variable $dsn
@@ -1389,28 +1390,3 @@ function debugParm($value)
 
     return $valueText;
 }       // function debugParm
-
-/************************************************************************
- *  xmlentities                                                         *
- *                                                                      *
- *  For some reason PHP does not have a function that translates        *
- *  characters that have a special meaning in XML ('&', '<', '>') to    *
- *  their corresponding character entities.  The closest is the         *
- *  function htmlentities, but that translates all of the characters    *
- *  for which entities are defined in HTML, not just the 3 supported    *
- *  by XML.                                                             *
- *                                                                      *
- *  Parameter:                                                          *
- *      in      string to translate                                     *
- *                                                                      *
- *  Returns:                                                            *
- *      string with '&', '<', and '>' replaced by character entities.   *
- *                                                                      *
- *  Deprecated: use htmlentities(,ENT_XML1)                             *
- ************************************************************************/
-function xmlentities($in)
-{
-    $specchars  = array('&', '<', '>', '&mdash;');
-    $entities   = array("&amp;", "&lt;", "&gt;", "-");
-    return str_replace($specchars, $entities, $in);
-}       // xmlentities

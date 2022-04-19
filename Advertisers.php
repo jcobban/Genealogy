@@ -11,7 +11,7 @@ use \NumberFormatter;
  *  Parameters:                                                         *
  *      offset          starting offset in results set                  *
  *      limit           maximum number of rows to display               *
- *      name            pattern to limit by adname                      *
+ *      pattern         pattern to limit by adname                      *
  *      lang            preferred language of communication             *
  *                                                                      *
  *  History:                                                            *
@@ -23,8 +23,10 @@ use \NumberFormatter;
  *      2020/01/17      when adding an account also create a blank      *
  *                      template for the advertisement                  *
  *      2020/01/22      use NumberFormatter                             *
+ *      2022/03/26      protect against script insertion                *
+ *                      ignore non-numeric offset and limit             *
  *                                                                      *
- *  Copyright &copy; 2020 James A. Cobban                               *
+ *  Copyright &copy; 2022 James A. Cobban                               *
  ************************************************************************/
 require_once __NAMESPACE__ . '/Advertiser.inc';
 require_once __NAMESPACE__ . '/Language.inc';
@@ -33,10 +35,12 @@ require_once __NAMESPACE__ . '/UserSet.inc';
 require_once __NAMESPACE__ . '/common.inc';
 
 $lang                       = 'en';
+$langtext                   = null;
 $offset                     = 0;
 $limit                      = 20;
 $id                         = '';
 $pattern                    = '^.+';    // at least one character
+$patterntext                = null;
 $mainParms                  = array();
 $administrator              = canUser('all');
 $duplicates                 = array();
@@ -48,47 +52,49 @@ if (isset($_GET) && count($_GET) > 0)
                   "<tr><th class='colhead'>key</th>" .
                       "<th class='colhead'>value</th></tr>\n";
     foreach($_GET as $key => $value)
-    {               // loop through parameters
+    {                       // loop through parameters
+        $safevalue  = htmlspecialchars($value);
         $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
-                        "<td class='white left'>$value</td></tr>\n"; 
+                        "<td class='white left'>$safevalue</td></tr>\n"; 
         $fieldLc    = strtolower($key);
         switch($fieldLc)
-        {           // act on specific parameter
+        {                   // act on specific parameter
             case 'pattern':
             {       // lang
-                $pattern            = $value;
-                break;
-            }       // lang
-
-            case 'adname':
-            {       // lang
-                $adname             = $value;
+                if (strpos($value, '<') === false)
+                    $pattern            = $value;
+                else
+                    $patterntext        = $safevalue;
                 break;
             }       // lang
 
             case 'lang':
             {       // lang
-                $lang               = FtTemplate::validateLang($value);
+                $lang               = FtTemplate::validateLang($value,
+                                                               $langtext);
                 break;
             }       // lang
 
             case 'offset':
             {
-                $offset             = (int)$value;
+                if (ctype_digit($value))
+                    $offset         = (int)$value;
                 break;
             }
 
             case 'limit':
             {
-                $limit              = (int)$value;
+                if (ctype_digit($value))
+                    $limit          = (int)$value;
                 break;
             }
-        }           // act on specific parameter
-    }               // loop through parameters
+        }                   // act on specific parameter
+    }                       // loop through parameters
     if ($debug)
         $warn       .= $parmsText . "</table>\n";
+
     if ($administrator)
-    {               // only the administrator can use this dialog
+    {                       // only the administrator can use this dialog
         // create the main counter entry if it does not already exist
         $advertiser                 = new Advertiser(array('adname' => ''));
         $advertiser->save();
@@ -109,11 +115,11 @@ if (isset($_GET) && count($_GET) > 0)
                 }           // advertiser banner ad
             }               // loop through files
         }                   // found advertisements directory
-    }               // only the administrator can use this dialog
-}                   // invoked by method=get
+    }                       // only the administrator can use this dialog
+}                           // invoked by method=get
 else
 if (isset($_POST) && count($_POST) > 0)
-{                   // invoked by method=post
+{                           // invoked by method=post
     $parmsText      = "<p class='label'>\$_POST</p>\n" .
                       "<table class='summary'>\n" .
                       "<tr><th class='colhead'>key</th>" .
@@ -121,8 +127,9 @@ if (isset($_POST) && count($_POST) > 0)
     $advertiser                     = null;
     foreach($_POST as $key => $value)
     {                       // loop through parameters
+        $safevalue  = htmlspecialchars($value);
         $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
-                        "<td class='white left'>$value</td></tr>\n"; 
+                        "<td class='white left'>$safevalue</td></tr>\n"; 
         $fieldLc                    = strtolower($key);
         if (preg_match('/^([a-zA-Z]+)(\d*)$/', $fieldLc, $matches))
         {
@@ -148,19 +155,22 @@ if (isset($_POST) && count($_POST) > 0)
                 if ($administrator && $advertiser)
                 {
                     $advertiser->save();
-                    $adname         = $advertiser['adname'];
+                    $adnamesafe     = $advertiser['adname'];
+                    $adname         = htmlspecialchars_decode($adnamesafe);
                     $adurl          = "Advertisements/$adname.html";
                     if (!file_exists("$document_root/$adurl"))
                     {
-                        $contents   = file_get_contents($document_root . '/Advertisements/AdForRent.html');
+                        $contents   = file_get_contents($document_root .
+                                        '/Advertisements/AdForRent.html');
                         $contents   = str_replace('This Space for Rent',
-                                                  'Reserved for ' . $adname,
+                                                "Reserved for $adnamesafe",
                                                   $contents);
                         file_put_contents("$document_root/$adurl", $contents);
-                        $warn   .= "<p>created $document_root/$adurl</p>\n";
+                        $warn       .= 
+            "<p>Created $document_root/Advertisements/$adnamesafe</p>\n";
                     }
                 }
-                $adname                 = $value;
+                $adname             = htmlspecialchars($value);
                 break;
             }               // advertiser name
 
@@ -171,7 +181,7 @@ if (isset($_POST) && count($_POST) > 0)
                 {
                     $chkAdvertiser  = new Advertiser(array('adname' => $adname));
                     if ($chkAdvertiser->isExisting())
-                        $duplicates[]   = $adname;
+                        $duplicates[]           = $adname;
                     else
                         $advertiser['adname']   = $adname;
                 }
@@ -188,8 +198,8 @@ if (isset($_POST) && count($_POST) > 0)
             {               // email address
                 if ($administrator)
                 {
-                    $advertiser         = new Advertiser(array('row' => $row));
-                    $warn               .= "<p>Advertiser: " . $advertiser['adname'] . " deleted.<p>\n";
+                    $advertiser     = new Advertiser(array('row' => $row));
+                    $warn           .= "<p>Advertiser: " . $advertiser['adname'] . " deleted.<p>\n";
                     $advertiser->delete(false);
                 }
                 break;
@@ -198,19 +208,22 @@ if (isset($_POST) && count($_POST) > 0)
 
             case 'lang':
             {               // lang
-                $lang                   = FtTemplate::validateLang($value);
+                $lang               = FtTemplate::validateLang($value,
+                                                               $langtext);
                 break;
             }               // lang
 
             case 'offset':
             {
-                $offset                 = (int)$value;
+                if (ctype_digit($value))
+                    $offset                 = (int)$value;
                 break;
             }
 
             case 'limit':
             {
-                $limit                  = (int)$value;
+                if (ctype_digit($value))
+                    $limit                  = (int)$value;
                 break;
             }
         }           // act on specific parameter
@@ -228,6 +241,12 @@ foreach($duplicates as $name)
     $text           = $template['duplicateName']->innerHTML;
     $msg            .= str_replace('$adname', $name, $text);
 }
+
+// warnings
+if (is_string($patterntext))
+    $warn           .= "<p>pattern='$patterntext' unsupported regular expression</p>\n";
+if (is_string($langtext))
+    $warn           .= "<p>lang='$langtext' is not support BCP47 syntax</p>\n";
 
 // if not the administrator do nothing
 if ($administrator)
@@ -314,8 +333,10 @@ if ($administrator)
     foreach($advertisers as $adname => $advertiser)
     {                       // create display of a page of advertisers
         $rtemplate          = new \Templating\Template($rowText);
-        $rtemplate->set('adname',       $advertiser['adname']);
-        $rtemplate->set('ademail',      $advertiser['ademail']);
+        $rtemplate->set('adname',      
+                        htmlspecialchars($advertiser['adname']));
+        $rtemplate->set('ademail',     
+                        htmlspecialchars($advertiser['ademail']));
         $rtemplate->set('rowtype',      $rowtype);
         $rtemplate->set('id',           $id);
         $rtemplate->set('row',          $advertiser['row']);

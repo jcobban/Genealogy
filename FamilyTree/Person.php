@@ -2004,8 +2004,9 @@ try {
         if (strlen($userid) > 0)
             $template->updateTag('blogEmailRow', null);
 
-        if ($userid == '' || $user['auth'] == 'visitor')
+        if (!canUser('blog'))
         {
+            $template['blogHr']->update(null);
             $template['message']->update(null);
             $template['blogEmailRow']->update(null);
             $template['blogPostRow']->update(null);
@@ -2090,7 +2091,7 @@ $template->updateTag('Source$idsr',
 $template->updateTag('showLocDiv$idlr',
                      $locationTable);
 if (!canUser('edit'))
-        $template->updateTag('editLoc$idlr', null);
+    $template->updateTag('editLoc$idlr', null);
 
 // create popup balloons for each of the temples referenced on this page
 $template->updateTag('showTplDiv$idtr',

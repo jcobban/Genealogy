@@ -93,8 +93,9 @@ use \NumberFormatter;
  *      2018/11/29      use Template                                    *
  *      2020/01/22      internationalize numbers                        *
  *      2020/10/10      remove field prefix for Pages table             *
+ *      2022/03/30      fix error if district id empty or invalid       *
  *                                                                      *
- *  Copyright &copy; 2020 James A. Cobban                               *
+ *  Copyright &copy; 2022 James A. Cobban                               *
  ************************************************************************/
 require_once __NAMESPACE__ . '/District.inc';
 require_once __NAMESPACE__ . '/SubDistrict.inc';
@@ -337,11 +338,15 @@ if (is_string($districtIdtext))
 {
     $msg            .= $template['distSyntax']->replace('$districtId', 
                                                         $districtIdtext);
+    $district       = new District(array('censusid'     => $census,
+                                         'id'           => '0'));
 }
 else
 if (strlen($districtId) == 0)
 {
     $msg            .= $template['districtMissing']->innerHTML;
+    $district       = new District(array('censusid'     => $census,
+                                         'id'           => '0'));
 }
 else
 {                   // district number specified

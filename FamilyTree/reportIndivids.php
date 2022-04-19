@@ -2,6 +2,7 @@
 namespace Genealogy;
 use \PDO;
 use \Exception;
+use \Templating\Template;
 /************************************************************************
  *  reportIndivids.php                                                  *
  *                                                                      *
@@ -54,6 +55,8 @@ use \Exception;
  *                      support external table names such as Persons    *
  *      2021/05/03      correct handling of requests with multiple      *
  *                      tables                                          *
+ *      2022/04/18      construct page from template                    *
+ *                      fix handling of order                           *
  *                                                                      *
  *  Copyright &copy; 2021 James A. Cobban                               *
  ************************************************************************/
@@ -65,7 +68,9 @@ require_once __NAMESPACE__ . '/common.inc';
 
 // get the parameters
 $fields                     = '';
+$fieldstext                 = null;
 $orderby                    = '';
+$ordertext                  = null;
 $and                        = '';
 $offset                     = 0;
 $limit                      = 20;
@@ -97,12 +102,17 @@ if (isset($_GET) && count($_GET) > 0)
                                   "<th class='colhead'>value</th></tr>\n";
     foreach($_GET as $key => $value)
     {                   // loop through input parameters
-        $parmsText      .= "<tr><th class='detlabel'>$key</th>" .
-                            "<td class='white left'>" .
-                            htmlspecialchars(var_export($value,true)) .
-                            "</td></tr>\n";
         if (is_string($value))
-            $value      = trim($value); 
+            $safevalue      = htmlspecialchars($value);
+        else
+        if (is_int($value))
+            $safevalue      = $value;
+        else
+            $safevalue      = htmlspecialchars(var_export($value,true));
+        $parmsText      .= "<tr><th class='detlabel'>$key</th>" .
+                            "<td class='white left'>$safevalue</td></tr>\n";
+        if (is_string($value))
+            $value          = trim($value); 
         switch(strtolower($key))
         {               // switch on parameter name
             case 'fields':
@@ -111,21 +121,34 @@ if (isset($_GET) && count($_GET) > 0)
                 // $fldarray is an array of names
                 if (is_array($value))
                 {
-                    $fldarray   = $value;
-                    for($i = 0; $i < count($fldarray); $i++)
+                    $fldarray           = $value;
+                    $comma              = '';
+                    foreach($value as $i => $field)
                     {
-                        $fields .= ',' . $fldarray[$i];
-                        $search .= "&amp;fields[]=" . $fldarray[$i];
+                        if (preg_match('/^([a-zA-Z0-9.]*|`[a-zA-Z0-9.`]*`)$/',
+                                        $field)) 
+                        {
+                            $fields     .= $comma . $field;
+                            $search     .= "&amp;fields[]=" . $field;
+                            $comma      = ',';
+                        }
+                        else
+                        {
+                            $fieldstext = $safevalue;
+                            break;
+                        }
                     }
-                    if (strlen($fields) > 1)
-                        $fields = substr($fields, 1);
                 }
                 else
+                if (is_string($value) && 
+                    preg_match('/^[a-zA-Z0-9`,]*$/', $value))
                 {
-                    $fields     = $value;
-                    $search     .= "&amp;fields=" . urlencode($fields);
-                    $fldarray   = explode(',', $fields);
+                    $fields         = $value;
+                    $search         .= "&amp;fields=" . urlencode($fields);
+                    $fldarray       = explode(',', $fields);
                 }
+                else
+                    $fieldstext     = $safevalue;
                 break;
             }
 
@@ -134,19 +157,32 @@ if (isset($_GET) && count($_GET) > 0)
                 // $orderby becomes a comma separated list of names
                 if (is_array($value))
                 {
-                    for($i = 0; $i < count($value); $i++)
+                    $comma      = '';
+                    foreach($value as $i => $field)
                     {
-                        $orderby    .= ',' . $value[$i];
-                        $search     .= "&amp;orderby[]=" . $value[$i];
+                        if (preg_match('/^([a-zA-Z0-9.]*|`[a-zA-Z0-9.`]*`)$/', 
+                                        $field))
+                        {
+                            $orderby    .= $comma . $field;
+                            $search     .= "&amp;orderby[]=" . $field;
+                            $comma      = ',';
+                        }
+                        else
+                        {
+                            $ordertext  = $safevalue;
+                            break;
+                        }
                     }
-                    if (strlen($orderby) > 1)
-                        $orderby    = substr($orderby, 1);
                 }
                 else
+                if (is_string($value) && 
+                    preg_match('/^[a-zA-Z0-9`,]*$/', $value))
                 {
                     $orderby        = $value;
                     $search         .= "&amp;orderby=" . urlencode($value);
                 }
+                else
+                    $ordertext      = $safevalue;
                 break;
             }
 
@@ -156,7 +192,7 @@ if (isset($_GET) && count($_GET) > 0)
                 if (!is_null($info))
                 {
                     $table          = $info['table'];
-                    $search         .= "&amp;$key=" . urlencode($value);
+                    $search         .= "&amp;table=" . urlencode($value);
                 }
                 else
                     $badTableName   = $value;
@@ -188,10 +224,10 @@ if (isset($_GET) && count($_GET) > 0)
                 if (ctype_digit($value) && $value < 3)
                 {
                     $recParms[$key] = $value;
-                    $search         .= "&amp;$key=" . urlencode($value);
+                    $search         .= "&amp;$key=$value";
                 }
                 else
-                    $gendertext     = htmlspecialchars($value);
+                    $gendertext     = $safevalue;
                 break;
             }
 
@@ -365,7 +401,9 @@ $t                      = $translate['tranTab'];
 
 if (count($recParms) > 0 && strlen($fields) > 0)
 {       // some limits on reply
-    if (strlen($orderby) == 0)
+    if (strlen($orderby) > 0)
+        $recParms['order']      = $orderby;
+    else
     {
         if (count($fldarray) > 1)
             $recParms['order']  = $fldarray[0] . ',' . $fldarray[1];
@@ -373,8 +411,12 @@ if (count($recParms) > 0 && strlen($fields) > 0)
             $recParms['order']  = $fldarray[0];
     }
 
+
     $recParms['offset']         = $offset;
     $recParms['limit']          = $limit;
+    $template->set('offset', $offset);
+    $template->set('limit', $limit);
+    $template->set('search', $search);
 
     // to avoid a long wait, first check to see how many responses there are
     $set        = new RecordSet($table,
@@ -397,255 +439,202 @@ else
     $msg    .= "Missing restrictions on which records to return. ";
 }       // missing mandatory parameters
 
-htmlHeader('Report on Persons',
-            array(  '/jscripts/CommonForm.js',
-                    '/jscripts/js20/http.js',
-                    '/jscripts/util.js',
-                    '/jscripts/default.js'));
-?>
-<body>
-<?php
-pageTop(array('/genealogy.php'      => 'Genealogy',
-              '/FamilyTree/Services.php'    => 'Services',
-              'reqReportIndivids.php'   => 'New Report'));
-?>
-  <div class="body">
-  <h1>
-      <span class="right">
-        <a href="reportIndividsHelpen.html" target="help">? Help</a>
-      </span>
-        Report on Persons
-  </h1>
-<?php
-showTrace();
-
-if (strlen($msg) > 0)
-{
-?>
-  <p class="message"><?php print $msg; ?></p>
-<?php
-}       // errors detected
-else
+if (strlen($msg) == 0)
 {       // no errors detected
     if ($count > 0)
     {       // query issued
         $prevoffset = max(0, $offset-$limit);
         $nextoffset = min($count, $offset+$limit);
-?>
-        <div class="center">
-            <?php print "rows $prevoffset to $nextoffset of $count"; ?>
-          <div class="left">
-<?php
-        if ($offset > 0)
-        {   // provide link  to previous set
-?>
-            <a href="reportIndivids.php?Offset=<?php print $prevoffset; ?>&amp;Limit=<?php print $limit . $search; ?>">&lt;--</a>
-<?php
-        }   // provide link to previous set
-?>
-          </div>
-          <div class="right">
-<?php
-        {   // provide link to next set
-?>
-        <a href="reportIndivids.php?Offset=<?php print $nextoffset; ?>&amp;Limit=<?php print $limit . $search; ?>">--&gt;</a>
-<?php
-        }   // provide link to next set
-?>
-          </div>
-          <div style="clear: both;"></div>
-        </div>
-    <table>
-      <!--- Put out the column headers -->
-      <thead>
-        <tr>
-        
-<?php
-        for($i = 0; $i < count($fldarray); $i++)
+        $template->set('prevoffset',        $prevoffset);
+        $template->set('nextoffset',        $nextoffset);
+        $template->set('count',             $count);
+        if ($offset <= 0)
+            $template['prevLink']->update();
+        if ($offset > $count - $limit)
+            $template['nextLink']->update();
+        $header     = array();
+        foreach($fldarray as $i => $field)
         {
-            if (substr($fldarray[$i], 0, 6) == 'tblIR.' ||
-                substr($fldarray[$i], 0, 6) == 'tblER.')
-                $fldname    = substr($fldarray[$i], 6);
+            if (substr($field, 0, 6) == 'tblIR.' ||
+                substr($field, 0, 6) == 'tblER.')
+                $fldname    = substr($field, 6);
             else
-                $fldname    = $fldarray[$i];
+                $fldname    = $field;
             if (substr($fldname, 0, 4) == 'IDLR')
                 $fldname    = substr($fldname, 4) . " Place";
-?>
-          <th class="colhead">
-            <?php print $fldname; ?> 
-          </th>
-<?php
+            $header[]       = array('i'         => $i,
+                                    'fldname'   => $fldname);
         }   // loop through all fields
-?>
-        </tr>
-      </thead>
-      <tbody>
-<?php
-        $even           = false;
+        $template['colHeader$i']->update($header);
+
         // display the results
+        $even           = false;
+        $body           = '';
+        $ctemplate      = $template['valueCell$i'];
+        $ctemplateBody  = $ctemplate->outerHTML;
+        $rownum         = 0;
         foreach($set as $row)
         {
+            $rownum++;
             if ($even)
                 $class  = 'even left';
             else
                 $class  = 'odd left';
-            $saveclass  = $class;
-?>
-        <tr>
-<?php
-        for($i = 0; $i < count($fldarray); $i++)
-        {
-            if (substr($fldarray[$i], 0, 6) == 'tblIR.' ||
-                substr($fldarray[$i], 0, 6) == 'tblER.')
-                $fldname    = strtolower(substr($fldarray[$i], 6));
-            else
-                $fldname    = strtolower($fldarray[$i]);
-            $value          = $row[$fldname];
-            $isOwner        = false;
-            switch($fldname)
-            {   // format depending upon field name
-                case 'idir':
-                {
-                    $class  = 'button';
-                    $value  = "<a href='Person.php?id=$value' target='indiv'>View</a>";
-                    if ($bprivlim == 9999)
-                        $isOwner    = true;
-                    else
-                        $isOwner= RecOwner::chkOwner($value, 'tblIR');
-                    break;
-                }       // hyperlink to details
+            $contents   = array();
 
-                case 'birthd':
-                case 'chrisd':
-                case 'baptismd':
-                case 'confirmationd':
-                {
-                    $date   = new LegacyDate($value);
-                    if ($isOwner)
-                        $value  = $date->toString(9999);
-                    else
-                        $value  = $date->toString($bprivlim);
-                    break;
-                }       // dates
-
-                case 'deathd':
-                case 'buriedd':
-                case 'initiatoryd':
-                case 'endowd':
-                case 'eventd':
-                {
-                    $date   = new LegacyDate($value);
-                    if ($isOwner)
-                        $value  = $date->toString(9999);
-                    else
-                        $value  = $date->toString($dprivlim);
-                    break;
-                }       // dates
-
-                case 'idlrbirth':
-                case 'idlrchris':
-                case 'idlrdeath':
-                case 'idlrburied':
-                case 'idlrevent':
-                {
-                    $loc    = new Location(array('idlr' => $value));
-                    $value  = $loc->toString();
-                    break;
-                }       // location keys
-
-                case 'gender':
-                {
-                    switch ($value)
-                    {   // switch on value
-                        case 0:
-                        {
-                        $value  = 'Male';
+            foreach($fldarray as $i => $field)
+            {               // loop through all fields in row
+                if (substr($fldarray[$i], 0, 6) == 'tblIR.' ||
+                    substr($fldarray[$i], 0, 6) == 'tblER.')
+                    $fldname    = strtolower(substr($fldarray[$i], 6));
+                else
+                    $fldname    = strtolower($fldarray[$i]);
+                $value          = $row[$fldname];
+                $isOwner        = false;
+                switch($fldname)
+                {           // format depending upon field name
+                    case 'idir':
+                    {
+                        $class      = 'button';
+                        $value      = "<a href='Person.php?id=$value' target='indiv'>View</a>";
+                        if ($bprivlim == 9999)
+                            $isOwner    = true;
+                        else
+                            $isOwner    = RecOwner::chkOwner($value, 'tblIR');
                         break;
-                        }
+                    }       // hyperlink to details
     
-                        case 1:
-                        {
-                        $value  = 'Female';
+                    case 'birthd':
+                    case 'chrisd':
+                    case 'baptismd':
+                    case 'confirmationd':
+                    {
+                        $date       = new LegacyDate($value);
+                        if ($isOwner)
+                            $value  = $date->toString(9999);
+                        else
+                            $value  = $date->toString($bprivlim);
                         break;
-                        }
+                    }       // dates near birth
     
-                        default:
-                        {
-                        $value  = 'Unknown';
+                    case 'deathd':
+                    case 'buriedd':
+                    case 'initiatoryd':
+                    case 'endowd':
+                    case 'eventd':
+                    {
+                        $date       = new LegacyDate($value);
+                        if ($isOwner)
+                            $value  = $date->toString(9999);
+                        else
+                            $value  = $date->toString($dprivlim);
                         break;
-                        }
-                    }   // switch on value
-                    break;
-                }       // gender
-
-                case 'tag1':
-                case 'tag2':
-                case 'tag3':
-                case 'tag4':
-                case 'tag5':
-                case 'tag6':
-                case 'tag7':
-                case 'tag8':
-                case 'tag9':
-                case 'taggroup':
-                case 'taganc':
-                case 'tagdec':
-                case 'savetag':
-                case 'qstag':
-                case 'srchtagigi':
-                case 'srchtagrg':
-                case 'srchtagfs':
-                case 'rgexclude':
-                case 'remindertag':
-                {
-                    switch ($value)
-                    {   // switch on value
-                        case 0:
-                        {
-                            $value  = 'false';
-                            break;
-                        }
+                    }       // dates during lifetime
     
-                        case 1:
-                        {
-                            $value  = 'true';
-                            break;
-                        }
+                    case 'idlrbirth':
+                    case 'idlrchris':
+                    case 'idlrdeath':
+                    case 'idlrburied':
+                    case 'idlrevent':
+                    {
+                        $loc    = new Location(array('idlr' => $value));
+                        $value  = $loc->toString();
+                        break;
+                    }       // location keys
     
-                        default:
+                    case 'gender':
+                    {
+                        switch ($value)
                         {
-                            $value  = 'Unknown';
-                            break;
-                        }
-                    }   // switch on value
-                    break;
-                }       // flags
+                            case 0:
+                            {
+                                $value  = 'Male';
+                                break;
+                            }
+        
+                            case 1:
+                            {
+                                $value  = 'Female';
+                                break;
+                            }
+        
+                            default:
+                            {
+                                $value  = 'Unknown';
+                                break;
+                            }
+                        }   // switch on value
+                        break;
+                    }       // case 'gender'
+    
+                    case 'tag1':
+                    case 'tag2':
+                    case 'tag3':
+                    case 'tag4':
+                    case 'tag5':
+                    case 'tag6':
+                    case 'tag7':
+                    case 'tag8':
+                    case 'tag9':
+                    case 'taggroup':
+                    case 'taganc':
+                    case 'tagdec':
+                    case 'savetag':
+                    case 'qstag':
+                    case 'srchtagigi':
+                    case 'srchtagrg':
+                    case 'srchtagfs':
+                    case 'rgexclude':
+                    case 'remindertag':
+                    {
+                        switch ($value)
+                        {
+                            case 0:
+                            {
+                                $value  = 'false';
+                                break;
+                            }
+        
+                            case 1:
+                            {
+                                $value  = 'true';
+                                break;
+                            }
+        
+                            default:
+                            {
+                                $value  = 'Unknown';
+                                break;
+                            }
+                        }   // switch on value
+                        break;
+                    }       // flags
+    
+                }           // format depending upon field name
 
-
-            }   // format depending upon field name
-?>
-        <td class="<?php print $class; ?>">
-            <?php print $value; ?> 
-        </td>
-<?php
-                $class  = $saveclass;
-            }       // loop through all fields in row
-?>
-    </tr>
-<?php
+                $contents[] = array('i'         => $i,
+                                    'class'     => $class,
+                                    'value'     => $value);
+            }               // loop through all fields in row
+            $ttemplate      = new Template($ctemplateBody);
+            $ttemplate['valueCell$i']->update($contents);
+            $body           .= "<tr id=\"datarow$rownum\">\n" .
+                                $ttemplate->compile() .
+                               "</tr>\n";
             $even   = !$even;
-        }           // loop through results
-?>
-  </tbody>
-</table>
-<?php
-    }               // query issued
-}                   // no errors detected
-showTrace();
-?>
-</div>
-<?php
-    pageBot();
-?>
-</body>
-</html>
+        }                   // loop through results
+        $template['datarow$rownum']->update($body);
+    }                       // query issued
+    else
+    {
+        $template['paging']->update();
+        $template['dataTable']->update();
+    }
+}                           // no errors detected
+else
+{
+    $template['paging']->update();
+    $template['dataTable']->update();
+}
+
+$template->display();

@@ -115,9 +115,11 @@
                     value="$MOTHERSURNAME">
         </div>
       </form>
-      <div class="row">
-    <hr>    <!-- start of blog section of page -->
-      <form name="blogForm" id="blogForm" action="blogIndiv.php" method="post"
+      <div class="row" style="width: 100%" id="blogHr">
+        <hr>	<!-- start of blog section of page -->
+      </div>
+      <form name="blogForm" id="blogForm" 
+            action="blogIndiv.php" method="post"
             enctype='multipart/form-data'>
         <div id="blog$blid">
           <p class='label'>
@@ -126,7 +128,7 @@
           <p>
           $text
           </p>
-          <div id="deleteButtons$showButtons"> <!-- $username == $USERID -->
+          <div id="deleteButtons$showButtons">
             <p>
               <button type="button" id="blEdit$blid">
                     Modifier la Message
@@ -135,7 +137,7 @@
                     Ecraser la Message
               </button>
             </p>
-          </div> <!-- $username == $USERID -->
+          </div> <!-- id="deleteButtons$showButtons" -->
         </div> <!-- id="blog$blid" -->
       <input type="hidden" name="userid" id="userid"
             value="$USERID">
@@ -307,10 +309,10 @@ $DEATHCAUSES
       <span data-key='17'>$Pronoun est involvé in a court case about $Description $onDate $atLocation.$Citations $Notes</span>
       <span data-key='18'>$Pronoun est cremé $Description $onDate $atLocation.$Citations $Notes</span>
       <span data-key='19'>$Pronoun a recu une degreée de $Description $onDate $atLocation.$Citations $Notes</span>
-      <span data-key='20'>$Pronoun sont divorcés $Description $onDate $atLocation.$Citations $Notes</span>
-      <span data-key='21'>$Pronoun filed for divorce $Description $onDate $atLocation.$Citations $Notes</span>
+      <span data-key='20'>Ils sont divorcés $Description $onDate $atLocation.$Citations $Notes</span>
+      <span data-key='21'>Ils ont demandé le divorce $Description $onDate $atLocation.$Citations $Notes</span>
       <span data-key='22'>$Pronoun est educé à $Description $onDate $atLocation.$Citations $Notes</span>
-      <span data-key='23'>$Pronoun emigré $Description $onDate de $atLocation.$Citations $Notes</span>
+      <span data-key='23'>$Pronoun a emigré $Description $onDate de $atLocation.$Citations $Notes</span>
       <span data-key='24'>$Pronoun est employé comme un $Description $onDate $atLocation.$Citations $Notes</span>
       <span data-key='25'>$Pronoun sont engagés $Description $onDate $atLocation.$Citations $Notes</span>
       <span data-key='26'>$Pronoun a reçu First Holy Communion $Description $onDate $atLocation.$Citations $Notes</span>
@@ -322,11 +324,11 @@ $DEATHCAUSES
       <span data-key='32'>$Pronoun a immigré $Description $onDate a $atLocation.$Citations $Notes</span>
       <span data-key='33'>$Pronoun est interviewed $Description $onDate $atLocation.$Citations $Notes</span>
       <span data-key='34'>$Pronoun $Description land $onDate $atLocation.$Citations $Notes</span>
-      <span data-key='35'>$Pronoun a publié les banns de mariage $Description $onDate $atLocation.$Citations $Notes</span>
-      <span data-key='36'>$Pronoun a signé un contract de mariage $Description $onDate $atLocation.$Citations $Notes</span>
-      <span data-key='37'>$Pronoun a obtenu un license pour mariage $Description $onDate $atLocation.$Citations $Notes</span>
-      <span data-key='38'>$Pronoun a publié un intent a marier $Description $onDate $atLocation.$Citations $Notes</span>
-      <span data-key='39'>$Pronoun a obtenu un settlement de mariage $Description $onDate $atLocation.$Citations $Notes</span>
+      <span data-key='35'>Ils ont publié les banns de mariage $Description $onDate $atLocation.$Citations $Notes</span>
+      <span data-key='36'>Ils ont signé un contract de mariage $Description $onDate $atLocation.$Citations $Notes</span>
+      <span data-key='37'>Ils ont obtenu un license pour mariage $Description $onDate $atLocation.$Citations $Notes</span>
+      <span data-key='38'>Ils ont publié un intent a marier $Description $onDate $atLocation.$Citations $Notes</span>
+      <span data-key='39'>Ils ont obtenu un settlement de mariage $Description $onDate $atLocation.$Citations $Notes</span>
       <span data-key='40'>$Pronoun a reçu des attentions medicaux pour $Description $onDate $atLocation.$Citations $Notes</span>
       <span data-key='41'>$Pronoun est un membre de $Description $onDate $atLocation.$Citations $Notes</span>
       <span data-key='42'>$Pronoun a servie dans le militaire $Description $onDate $atLocation.$Citations $Notes</span>

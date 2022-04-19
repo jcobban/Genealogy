@@ -264,6 +264,18 @@ function loadEdit()
                     break;
                 }       // event type input field
 
+                case 'idet':
+                {
+                    let idet                = element.value;
+                    let etypeSelect         = form.etype;
+                    if (etypeSelect)
+                        etypeSelect.value   = idet;
+                    else
+                        console.log("editEvent.js: loadEdit: 274 " +
+                            " idet=" + idet + " etype field not found");
+                    break;
+                }
+
                 case 'date':
                 {       // event date 
                     element.addEventListener('keydown',inputKeyDown);
@@ -296,7 +308,6 @@ function loadEdit()
 
                 case 'temple':
                 {       // event temple
-                    alert('editEvent.js: loadEdit: temple');
                     element.addEventListener('focus', focusLocation);
                     element.addEventListener('keydown',inputKeyDown);
                     element.abbrTbl     = evtLocAbbrs;
@@ -861,11 +872,11 @@ function updateEvent(ev)
         {
             case 'etype':
             {
-                parms.etype     = form.etype.value;
+                parms.etype         = form.etype.value;
                 if (parms.etype > 1000)
-                    parms.type  = Math.floor(parms.etype / 1000);
+                    parms.type      = Math.floor(parms.etype / 1000);
                 else
-                    parms.type  = form.type.value;  // individual event
+                    parms.type      = form.type.value;  // individual event
                 break;
             }
 
@@ -895,15 +906,15 @@ function updateEvent(ev)
             case 'citType':
             case 'AddCitation':
             {
-                parms[elt.name] = elt.value;
+                parms[elt.name]     = elt.value;
                 break;
             }   // supported fields
 
             case 'temple':
             {
-                parms.temple    = elt.value;
-                let option  = elt.options[elt.selectedIndex];
-                parms.location  = option.text.trim();
+                parms.temple        = elt.value;
+                let option          = elt.options[elt.selectedIndex];
+                parms.location      = option.text.trim();
                 break;
             }   // supported fields
 
@@ -958,7 +969,7 @@ function updateEvent(ev)
 
     // if there are no parms then there was an error setting up the
     // event edit, so just close the window
-    if (parms.length == 0)
+    if (Object.keys(parms).length == 0)
     {
         closeFrame();
         return;
@@ -1097,45 +1108,45 @@ function gotEvent(xmlDoc)
             // back to the opener's form
             for (var fi = 0; fi < opener.document.forms.length; fi++)
             {               // loop through forms in invoking page
-                let srcForm = opener.document.forms[fi];
+                let srcForm     = opener.document.forms[fi];
                 if (srcForm.eventFeedback)
                 {           // feedback method defined on the form
                     let parms   = {};
                     for (var ei = 0; ei < form.elements.length; ei++)
                     {       // copy select element values to parms
-                    let element                     = form.elements[ei];
-                    if (element.type == 'checkbox' &&
-                        !(element.checked))
-                        parms[element.name]         = 0;
-                    else
-                    if (element.name == 'occupation' ||
-                        element.name == 'description')
-                    {
-                        let text                    = element.value;
-                        if (typeof tinyMCE !== 'undefined')
-                        {
-                            let mceElt              = tinyMCE.get(element.name);
-                            if (mceElt)
+                        let element                 = form.elements[ei];
+                        if (element.type == 'checkbox' &&
+                            !(element.checked))
+                            parms[element.name]     = 0;
+                        else
+                        if (element.name == 'occupation' ||
+                            element.name == 'description')
+                        {   // may be a tinyMCE editor
+                            let text                = element.value;
+                            if (typeof tinyMCE !== 'undefined')
                             {
-                                text                = mceElt.getContent();
-                                let results         = /<p>(.*)<\/p>/.exec(text);
-                                if (results)
-                                    text            = results[1];
+                                let mceElt          = tinyMCE.get(element.name);
+                                if (mceElt)
+                                {
+                                    text            = mceElt.getContent();
+                                    let results     = /<p>(.*)<\/p>/.exec(text);
+                                    if (results)
+                                        text        = results[1];
+                                }
                             }
-                        }
-                        parms.description           = text;
-                    }
-                    else    
-                    if (element.name == 'temple')
-                    {
-                        parms.temple    = element.value;
-                        let index       = element.selectedIndex;
-                        let option      = element.options[index];
-                        parms.location  = option.text.trim();
-                    }
-                    else    
-                    if (element.name.length > 0)
-                        parms[element.name] = element.value;
+                            parms.description       = text;
+                        }   // may be a tinyMCE editor
+                        else    
+                        if (element.name == 'temple')
+                        {   // selection list
+                            parms.temple    = element.value;
+                            let index       = element.selectedIndex;
+                            let option      = element.options[index];
+                            parms.location  = option.text.trim();
+                        }   // selection list
+                        else    
+                        if (element.name.length > 0)
+                            parms[element.name] = element.value;
                     }       // copy element values to parms
                     srcForm.eventFeedback(parms);
                 }           // feedback method defined on the form
@@ -1452,11 +1463,11 @@ function addCitation(ev)
         sourceName  = 'Source for IDSR=' + idsr;
     }           // backwards compatibility
 
-    let parms       = {"rownum" : 0,
-                       "detail" : detail,
-                       'idime'  : idime,
-                       'stype'  : type,
-                       'idsr'   : idsr,
+    let parms       = {"rownum"     : 0,
+                       "detail"     : detail,
+                       'idime'      : idime,
+                       'stype'      : type,
+                       'idsr'       : idsr,
                        'sourceName' : sourceName};
     let newRow      = createFromTemplate('sourceRow$rownum',
                                          parms,
@@ -1702,7 +1713,7 @@ function noSources()
 function createCitation()
 {
     console.log("editEvent.js: createCitation: 1699, this->" + this.outerHTML)
-    let rownum          = this.name.substring(4);
+    let rownum          = this.name.substring(4);   // IDSX if existing
 
     // prevent double invocation
     this.removeEventListener('change', createCitation);
@@ -1713,17 +1724,15 @@ function createCitation()
     let formName        = form.name;        // name of the form
 
     // type of event to cite
-    let type            = form.elements['type' + rownum].value; 
-    console.log("editEvent.js: createCitation:1723 form.elements[" + "'type" + rownum + "].value=" + type);
+    let type            = form.type.value; 
     let idet            = 0;
     if (form.etype)
         idet            = form.etype.value;
 
     // key of associated record
-    let idime           = form.elements['idime' + rownum].value;
+    let idime           = form.idime.value;
     if (type == 9)
-        idime           = form.elements['idir'].value;
-    console.log("editEvent.js: createCitation:1711 form.elements[" + "'idime" + rownum + "].value=" + idime);
+        idime           = form.idir.value;
 
     let addButton       = document.getElementById('addCitation' + idime);
     if (!addButton)
@@ -1777,8 +1786,6 @@ function createCitation()
                 comma       = ',';
             }
             msg             += "}";
-
-            console.log("editEvent.js: createCitation: 1667 " + msg);
 
             if (debug.toLowerCase() == 'y')
             {           // debugging activated
@@ -1903,7 +1910,8 @@ function gotAddCit(jsonDoc)
                 {               // citation created
                     let idsx        = citation.idsx;
                     parms.idsx      = idsx;
-                    let newRow      = createFromTemplate('sourceRow$idsx',
+                    parms.detail    = citation.srcdetail;
+                    let newRow      = createFromTemplate('sourceRown$idsx',
                                                          parms,
                                                          null);
                     tbody.insertBefore(newRow, nextRow);

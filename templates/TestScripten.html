@@ -1,0 +1,40 @@
+<!--*********************************************************************
+ *  AddressDisplayen.html												*
+ *																		*
+ *  Display a web page containing details of a particular Address		*
+ *  from the Legacy database.  If the current user is authorized to		*
+ *  edit the database, this web page supports that.						*
+ *																		*
+ *  History:															*
+ *		2018/02/10		created											*
+ *		2018/11/02      pass authentication key to GoogleApis           *
+ *      2019/09/25      checkboxes must be both readonly for appearance *
+ *                      and disabled so they cannot be clicked          *
+ *																		*
+ *  Copyright &copy; 2019 James A. Cobban								*
+ **********************************************************************-->
+	<div id="breadcrumbs" class="hidden">
+	    <a href="/genealogy.php?lang=$LANG">Genealogy</a>:
+	    <a href="/FamilyTree/Services.php?lang=$LANG">Services</a>:
+	</div>
+	<div class="body">
+	    <h1>
+	      <span class="right">
+		<a href="/FamilyTree/testscripts/TestScriptHelpen.html" target="help">? Help</a>
+	      </span>
+		    $TITLE
+	    </h1>
+	    $MSG
+	    $TRACE
+    </div> <!-- class='body' -->
+    <div class="hidden" id="templates">
+    </div>
+    <div class="balloon" id="Helpidar">
+	  The unique numeric identifier of the address record in the database.
+	  This is assigned by the system when a new address is created, and cannot
+	  be altered by the user.
+    </div>
+    <script src="/jscripts/js20/http.js" type="application/javascript">
+	</script>
+    <script src="/jscripts/util.js" type="application/javascript">
+	</script>

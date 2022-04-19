@@ -138,7 +138,7 @@
 		        </label>
 		        <input type="text" name="Surname" id="Surname"
 		                placeholder="Supply Surname of new Individual"
-		                class="leftname" maxlength="120"
+		                class="leftname" size="64" maxlength="120"
 		                value="$SURNAME">
 		        <div style="clear: both;"></div>
 		      </div>
@@ -147,10 +147,10 @@
 		          <label class="column1" for="GivenName">
 		                Given&nbsp;Names:
 		          </label>
-		          <input type="text" name="GivenName" id="GivenName" size="64"
+		          <input type="text" name="GivenName" id="GivenName"
 		                placeholder="Supply Given Name of new Individual"
-                        maxlength="120" class="leftname" 
-		                value="$GIVEN">
+                        size="64" maxlength="120" class="leftname" 
+		                value="$EGIVEN">
                 </div>
                 <button type="button" class="button" 
                         id="editName$IDNX">
@@ -158,6 +158,30 @@
 		        </button>
 		        <div style="clear: both;"></div>
 		      </div>
+              <div class="row" id="altNameRow">
+		        <div class="column1">
+		          <label class="column1">
+                      Alternate Name:
+		          </label>
+                  $ALTNAME
+                </div>
+                <button type="button" class="button"
+                            id="altName$IDNX">
+                      Details
+                </button>
+		        <div style="clear: both;"></div>
+              </div>
+              <div class="row" id="addNameRow">
+		        <div class="column1">
+		          <label class="column1">
+		          </label>
+                  <button type="button" class="button"
+                            id="addName">
+                      Add Name
+                  </button>
+                </div>
+		        <div style="clear: both;"></div>
+              </div>
 		      <div class="row" id="GenderRow">
 		        <div class="column1">
 		          <label class="column1" for="Gender">

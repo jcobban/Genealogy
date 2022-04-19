@@ -10,8 +10,9 @@
  *      2019/09/25      checkboxes must be both readonly for appearance *
  *                      and disabled so they cannot be clicked          *
  *      2021/03/10      change widths for source citation               *
+ *      2022/05/06      add invalid IDIR message text                   *
  *                                                                      *
- *  Copyright &copy; 2021 James A. Cobban                               *
+ *  Copyright &copy; 2022 James A. Cobban                               *
  **********************************************************************-->
     <div id="breadcrumbs" class="hidden">
       <a href="/index.html">Home</a>:
@@ -34,7 +35,7 @@
         <span class="right">
           <a href="editNameHelpen.html" target="help">? Help</a>
         </span>
-        View $TYPE Name for $PERSONNAME
+        View $TYPE Name for <a href="Person.php?idid=$IDIR">$PERSONNAME</a>
       </h1>
       $TRACE
       $MSG
@@ -98,11 +99,12 @@
         </div>
         <div class="row" id="OrderRow">
           <label class="column1" for="order">
-            Order:
+            Type:
           </label>
           <input type="text" name="order" id="order"
                     size="6" class="ina rightnc" 
                     readonly="readonly" value="$ORDER">
+          $TYPEINT
           <div style="clear: both;"></div>
         </div>
         <div class="row" id="PreferredRow">
@@ -235,6 +237,7 @@
       </form>
 
       <span id="invalididnx">Invalid IDNX value '$IDNX'</span>
+      <span id="invalididnx">Invalid IDIR value '$IDIR'</span>
 
       <div id="types">
           <span data-key="-1">Married</span>

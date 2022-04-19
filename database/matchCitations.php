@@ -32,8 +32,9 @@ use \Exception;
  *      2017/08/16      script legacyIndivid.php renamed to Person.php  *
  *      2017/12/15      use class CensusLine                            *
  *      2020/03/13      use FtTemplate::validateLang                    *
+ *      2022/04/01      use template for all output                     *
  *                                                                      *
- *  Copyright &copy; 2020 James A. Cobban                               *
+ *  Copyright &copy; 2022 James A. Cobban                               *
  ************************************************************************/
     require_once __NAMESPACE__ . '/SubDistrict.inc';
     require_once __NAMESPACE__ . '/CensusLine.inc';
@@ -47,363 +48,423 @@ use \Exception;
  *                                                                      *
  *  Input:                                                              *
  *      $row            array returned from database                    *
- *      $row[0]         idir                                            *
- *      $row[1]         surname                                         *
- *      $row[2]         givenName                                       *
- *      $row[3]         birthSD                                         *
- *      $row[4]         sex                                             *
+ *      	$row[0]         idir                                        *
+ *      	$row[1]         surname                                     *
+ *      	$row[2]         givenName                                   *
+ *      	$row[3]         birthSD                                     *
+ *      	$row[4]         sex                                         *
+ *      $etemplate      string of HTML with text insertion points       *
+ *                                                                      *
+ *  Returns:                                                            *
+ *      String of HTML to insert in resulting page                      *
  ************************************************************************/
-function checkRow($row)
+function checkRow($row, $etemplate)
 {
     global  $connection;
-    global  $debug;
-    global  $warn;
-    global  $msg;
-    global  $census;    // census ID 'CCyyyy'
-    global  $censusYear;
-    global  $table;
-    global  $province;
-    global  $district;
-    global  $subDistrict;
-    global  $division;
-    global  $page;
-    global  $i;
+    global  $debug;         // debug output requested
+    global  $warn;          // accumulate warnings
+    global  $msg;           // accumulate error messages
+    global  $lang;          // user's preferred language
+    global  $census;        // census ID 'CCyyyy'
+    global  $censusYear;    // yyyy
+    global  $table;         // database table to search
+    global  $province;      // province code for pre-confederation
+    global  $district;      // district number
+    global  $subDistrict;   // sub-district identifier
+    global  $division;      // division identifier
+    global  $page;          // page identifier
+    global  $i;             // row number
 
-    $idir   = $row[0];
-    $surname    = $row[1];
+    $idir       			= $row[0];
+    $surname    			= $row[1];
     // remove characters from surname that have special meaning
     // to REGEXP or not handled by SOUNDEX
-    $surname    = str_replace('?','',$surname);
-    $surname    = str_replace('*','',$surname);
-    $surname    = str_replace('[','',$surname);
-    $surname    = str_replace(']','',$surname);
-    $surname    = str_replace("'",'',$surname);
+    $surname    			= str_replace('?','',$surname);
+    $surname    			= str_replace('*','',$surname);
+    $surname    			= str_replace('[','',$surname);
+    $surname    			= str_replace(']','',$surname);
+    $surname    			= str_replace("'",'',$surname);
 
-    $givenName  = $row[2];
+    $givenName  			= $row[2];
     if ($row[4] == 0)
-    $sexTest    = " AND Sex='M'";
+        $sexTest            = " AND Sex='M'";
     else
     if ($row[4] == 1)
-    $sexTest    = " AND Sex='F'";
-    $birthsd    = $row[3];  // yyyymmdd
-    $rxResult   = preg_match('/^[A-Za-z]/', $surname);
+        $sexTest            = " AND Sex='F'";
+    $birthsd                = $row[3];  // yyyymmdd
+    $rxResult               = preg_match('/^[A-Za-z]/', $surname);
     if (strlen($surname) > 0 && $rxResult > 0)
     {   // surname acceptable to SOUNDEX
-    $birthYear  = floor($birthsd / 10000);
-
-    // pattern for matching surnames: 1st two characters and last
-    if (strlen($surname) > 3)
-        $surPattern = '^' . substr($surname, 0, 2) . '.*' .
-                      substr($surname, strlen($surname) - 1) . '$';
-    else
-        $surPattern = '^' . $surname . '$';
-
-    // pattern for matching given names: 1st two chars anywhere
-    if (strlen($givenName) > 2)
-        $partGiven  = substr($givenName, 0, 2);
-    else
-        $partGiven  = $givenName;
-    $rxResult   = preg_match('/^[A-Z]+$/i', $partGiven);
-    if ($rxResult == 0) 
-        $partGiven  = ".";  // match anything
-
-    if ($censusYear < 1867)
-    {
-        $provinceW  = "Province=:province AND ";
-        $sqlParms   = array('province'  => $province);
-    }
-    else
-    {
-        $provinceW  = '';
-        $sqlParms   = array();
-    }
-
-    // the following looks for lines in the specified page
-    // where:
-    //  1. The surname matches by SOUNDEX and failing
-    //     that the first 2 characters and the last character
-    //     of the surname match.
-    //  2. The first 2 characters of the given name occur
-    //     somewhere in the given name in the census page.
-    //  3. The birth year is within 3 years of the birth
-    //     year in the family tree.
-    //  4. Matches on sex
-    $match  = "SELECT Line, Surname, GivenNames, BYear FROM $table " .
-                    "WHERE $provinceW District=:district AND " .
-                            "SubDistrict=:subDistrict AND " .
-                            "Division=:division AND " .
-                            "Page=:page AND " .
-                            "(SurnameSoundex=LEFT(SOUNDEX(:surname),4) OR ".
-                            "Surname REGEXP :surPattern) AND " .
-                            "GivenNames REGEXP :partGiven AND " .
-                            "ABS(:birthYear - BYear) < 4 " .
-                             $sexTest;
-    $sqlParms['district']       = $district;
-    $sqlParms['subDistrict']    = $subDistrict;
-    $sqlParms['division']       = $division;
-    $sqlParms['page']       = $page;
-    $sqlParms['surname']        = $surname;
-    $sqlParms['surPattern']     = $surPattern;
-    $sqlParms['partGiven']      = $partGiven;
-    $sqlParms['birthYear']      = $birthYear; 
-
-    $stmt       = $connection->prepare($match);
-    $matchText  = debugPrepQuery($match, $sqlParms);
-    if ($stmt->execute($sqlParms))
-    {       // successful query
-        $mResult    = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        if ($debug)
-            $warn   .= "<p>matchCitations.php: " . __LINE__ . " $matchText</p>\n";
-
-        // action depends upon how many matches the above
-        // pattern returned
-        if (count($mResult) > 1 && strlen($givenName) > 2)
-        {       // more than one match
-            if ($debug)
-                $warn   .= '<p>number of rows in result=' .
-                                count($mResult) . "</p>\n";
-            // make given name test more restrictive
-            // look for match on 4 characters instead of just 2
-            // for example on "John" rather than "Jo"
-            if (strlen($givenName) > 4)
-                $givPattern = substr($givenName, 0, 4);
-            else
-                $givPattern = $givenName;
-            foreach($mResult as $mRow)
-            {       // loop through matches
-                $rxResult   = preg_match("/$givPattern/i",
-                                     $mRow['givennames']);
-                if ($rxResult == 1)
-                    break;
-                $lastRow    = $mRow;
-            }       // loop through matches
-            if (!$mRow)
-                $mRow       = $lastRow;
-        }       // more than one match
-        else
-        if (count($mResult) > 0)
-        {       // at most one match
-            $mRow       = $mResult[0];
-        }       // at most one match
-        else
-            $mRow       = null;
-
-        if ($mRow)
-        {
-            $line   = $mRow['line'];
-?>
-    <p>
-      <a id='ftlink<?php print $i; ?>' 
-    href='/FamilyTree/Person.php?idir=<?php print $idir; ?>&lang=$lang'>
-    <?php print $row[1]; ?>, <?php print $givenName; ?>
-      </a>
-      born <?php print $birthYear; ?> matched <?php print $mRow['surname']; ?>,
-        <?php print $mRow['givennames']; ?>
-        born about <?php print $mRow['byear']; ?>
-        on line <span id='line<?php print $i; ?>'><?php print $line; ?></span>.
-<?php
-            $cenParms   = array('census'    => $census,
-                                'district'  => $district,
-                                'subdistrict'   => $subDistrict,
-                                'division'  => $division,
-                                'page'      => $page,
-                                'line'      => $line);
-            $censusLine = new CensusLine($cenParms);
-            $censusLine->set('idir', $idir);
-            $censusLine->save();
-        }
-
-    }       // successful query
-    else
-    {
-        $msg    .= "'" . htmlentities($match) . "': " .
-                       print_r($connection->errorInfo(),true);
-    }       // error on query
+	    $birthYear          = floor($birthsd / 10000);
+	
+	    // pattern for matching surnames: 1st two characters and last
+	    if (strlen($surname) > 3)
+	        $surPattern     = '^' . substr($surname, 0, 2) . '.*' .
+    	                      substr($surname, strlen($surname) - 1) . '$';
+	    else
+	        $surPattern     = '^' . $surname . '$';
+	
+	    // pattern for matching given names: 1st two chars anywhere
+	    if (strlen($givenName) > 2)
+	        $partGiven      = substr($givenName, 0, 2);
+	    else
+	        $partGiven      = $givenName;
+	    $rxResult           = preg_match('/^[A-Z]+$/i', $partGiven);
+	    if ($rxResult == 0) 
+	        $partGiven      = ".";  // match anything
+	
+	    if ($censusYear < 1867)
+	    {
+	        $provinceW      = "Province=:province AND ";
+	        $sqlParms       = array('province'  => $province);
+	    }
+	    else
+	    {
+	        $provinceW      = '';
+	        $sqlParms       = array();
+	    }
+	
+	    // the following looks for lines in the specified page
+	    // where:
+	    //  1. The surname matches by SOUNDEX and failing
+	    //     that the first 2 characters and the last character
+	    //     of the surname match.
+	    //  2. The first 2 characters of the given name occur
+	    //     somewhere in the given name in the census page.
+	    //  3. The birth year is within 3 years of the birth
+	    //     year in the family tree.
+	    //  4. Matches on sex
+	    $match  = "SELECT Line, Surname, GivenNames, BYear FROM $table " .
+	                    "WHERE $provinceW District=:district AND " .
+	                            "SubDistrict=:subDistrict AND " .
+	                            "Division=:division AND " .
+	                            "Page=:page AND " .
+	                            "(SurnameSoundex=LEFT(SOUNDEX(:surname),4) OR ".
+	                            "Surname REGEXP :surPattern) AND " .
+	                            "GivenNames REGEXP :partGiven AND " .
+	                            "ABS(:birthYear - BYear) < 4 " .
+	                             $sexTest;
+	    $sqlParms['district']       = $district;
+	    $sqlParms['subDistrict']    = $subDistrict;
+	    $sqlParms['division']       = $division;
+	    $sqlParms['page']           = $page;
+	    $sqlParms['surname']        = $surname;
+	    $sqlParms['surPattern']     = $surPattern;
+	    $sqlParms['partGiven']      = $partGiven;
+	    $sqlParms['birthYear']      = $birthYear; 
+	
+	    $stmt               = $connection->prepare($match);
+	    $matchText          = debugPrepQuery($match, $sqlParms);
+	    if ($stmt->execute($sqlParms))
+	    {       // successful query
+	        $mResult        = $stmt->fetchAll(PDO::FETCH_ASSOC);
+	        if ($debug)
+                $warn       .= "<p>matchCitations.php: " . __LINE__ . 
+                                    " $matchText</p>\n";
+	
+	        // action depends upon how many matches the above
+	        // pattern returned
+	        if (count($mResult) > 1 && strlen($givenName) > 2)
+	        {       // more than one match
+	            if ($debug)
+	                $warn   .= '<p>number of rows in result=' .
+	                                count($mResult) . "</p>\n";
+	            // make given name test more restrictive
+	            // look for match on 4 characters instead of just 2
+	            // for example on "John" rather than "Jo"
+	            if (strlen($givenName) > 4)
+	                $givPattern = substr($givenName, 0, 4);
+	            else
+	                $givPattern = $givenName;
+	            foreach($mResult as $mRow)
+	            {       // loop through matches
+	                $rxResult   = preg_match("/$givPattern/i",
+	                                     $mRow['givennames']);
+	                if ($rxResult == 1)
+	                    break;
+	                $lastRow    = $mRow;
+	            }       // loop through matches
+	            if (!$mRow)
+	                $mRow       = $lastRow;
+	        }       // more than one match
+	        else
+	        if (count($mResult) > 0)
+	        {       // at most one match
+	            $mRow           = $mResult[0];
+	        }       // at most one match
+	        else
+	            $mRow           = null;
+	
+	        if ($mRow)
+	        {
+                $line           = $mRow['line'];
+                $msurname       = $mRow['surname'];
+                $mgivennames    = $mRow['givennames'];
+                $mbyear         = $mRow['byear'];
+                $text           = str_replace(
+                    array('$i', '$idir', '$lang', '$surname', '$givenName', '$birthYear', '$msurname', '$mgivennames', '$mbyear', '$line'), 
+                    array( $i ,  $idir ,  $lang ,  $row[1] ,  $row[2], $birthYear ,  $msurname ,  $mgivennames ,  $mbyear ,  $line) ,  
+                    $etemplate);
+	            $cenParms       = array('census'    => $census,
+		                                'district'  => $district,
+		                                'subdistrict'   => $subDistrict,
+		                                'division'  => $division,
+		                                'page'      => $page,
+		                                'line'      => $line);
+	            $censusLine     = new CensusLine($cenParms);
+	            $censusLine->set('idir', $idir);
+                $censusLine->save();
+                return $text;
+            }
+	    }       // successful query
+	    else
+	    {
+	        $msg    .= "'" . htmlentities($match) . "': " .
+	                       print_r($connection->errorInfo(),true);
+	    }       // error on query
     }           // surname acceptable to SOUNDEX
+    return '';
 }       // function checkRow
 
-    // check authorization
-    if (!canUser('edit'))
-    $msg    .= 'You are not authorized to perform this function. ';
+// interpret parameters
+$census                 = null;
+$censusYear             = null;
+$table                  = null;
+$province               = null;
+$district               = null;
+$subDistrict            = null;
+$division               = null;
+$page                   = null;
+$lang                   = 'en';
+$langtext               = null;
+$censustext             = null;
+$provincetext           = null;
+$districttext           = null;
+$subdistricttext        = null;
+$divisiontext           = null;
+$pagetext               = null;
 
-    $census     = null;
-    $censusYear     = null;
-    $table      = null;
-    $province       = null;
-    $district       = null;
-    $subDistrict    = null;
-    $division       = null;
-    $page       = null;
-    $lang       = 'en';
-
-    // process parameters
+// process parameters
+if (isset($_GET) && count($_GET) > 0)
+{
+    $parmsText              = "<p class='label'>\$_GET</p>\n" .
+                               "<table class='summary'>\n" .
+                                  "<tr><th class='colhead'>key</th>" .
+                                    "<th class='colhead'>value</th></tr>\n";
     foreach($_GET as $key => $value)
-    {       // loop through all parameters
-    $key    = strtolower($key);
-    switch($key)
-    {   // act on each specific parameter
-        case 'census':
-        case 'censusid':
-        {   // census identifier: XXyyyy
-            $census     = $value;
-            $censusYear = substr($census, 2);
-            $table      = 'Census' . $censusYear;
-            switch($censusYear)
+    {                       // loop through all parameters
+        $safevalue              = htmlspecialchars($value);
+        $parmsText              .= "<tr><th class='detlabel'>$key</th>" .
+                                    "<td class='white left'>" .
+                                    "$safevalue</td></tr>\n"; 
+        $key                    = strtolower($key);
+        switch($key)
+        {                   // act on each specific parameter
+            case 'census':
+            case 'censusid':
+            {               // census identifier: XXyyyy
+                if (preg_match('/^[a-zA-Z]{2}[0-9]{4}$/', $value))
+                {           // valid syntax
+                    $census             = $value;
+                    $censusYear         = substr($census, 2);
+                    $table              = 'Census' . $censusYear;
+                }
+                else
+                    $censustext         = $safevalue;
+                break;
+            }           // census identifier
+    
+            case 'province':
+            {           // province code (pre-confederation)
+                if ($value == '')
+                    $province           = '';
+                else
+                if (preg_match('/^[a-zA-Z]{2}$/', $value))
+                    $province           = strtoupper($value);
+                else
+                    $provincetext       = $safevalue;
+                break;
+            }           // province code
+    
+            case 'district':
+            {   // district identifier
+                if (preg_match("/^[0-9.]+$/", $value))
+                    $district           = $value;
+                else
+                    $districttext       = $safevalue;
+                break;
+            }   // district identifier
+    
+            case 'subdistrict':
+            {   // subDistrict identifier
+                if (preg_match("/^[a-zA-Z0-9.]+$/", $value))
+                    $subDistrict        = $value;
+                else
+                    $subdistricttext    = $safevalue;
+                break;
+            }   // subDistrict identifier
+    
+            case 'division':
+            {   // division identifier
+                if (preg_match("/^[a-zA-Z0-9]+$/", $value))
+                    $division           = $value;
+                else
+                    $divisiontext       = $safevalue;
+                break;
+            }   // division identifier
+    
+            case 'page':
+            {   // page number
+                if (preg_match("/^[0-9]+$/", $value))
+                    $page               = $value;
+                else
+                    $pagetext           = $safevalue;
+                break;
+            }   // page number
+    
+            case 'lang':
             {
-                case '1851':
-                {
-                    $idsr       = 11;
-                    $preConfed  = true;
-                    break;
-                }
-
-                case '1861':
-                {
-                    $idsr       = 12;
-                    $preConfed  = true;
-                    break;
-                }
-
-                case '1871':
-                {
-                    $idsr       = 13;
-                    $preConfed  = false;
-                    break;
-                }
-
-                case '1881':
-                {
-                    $idsr       = 16;
-                    $preConfed  = false;
-                    break;
-                }
-
-                case '1891':
-                {
-                    $idsr       = 17;
-                    $preConfed  = false;
-                    break;
-                }
-
-                case '1901':
-                {
-                    $idsr       = 19;
-                    $preConfed  = false;
-                    break;
-                }
-
-                case '1906':
-                {
-                    $idsr       = 224;
-                    $preConfed  = false;
-                    break;
-                }
-
-                case '1911':
-                {
-                    $idsr       = 271;
-                    $preConfed  = false;
-                    break;
-                }
-
-                case '1916':
-                {
-                    $idsr       = 389;
-                    $preConfed  = false;
-                    break;
-                } 
-
-                case '1921':
-                {
-                    $idsr       = 466;
-                    $preConfed  = false;
-                    break;
-                }
-
-                default:
-                {
-                    $msg    .= "Invalid census year: $censusYear. ";
-                    break;
-                }
-
+                $lang               = FtTemplate::validateLang($value,
+                                                               $langtext);
+                break;
             }
-            break;
-        }   // census identifier
-
-        case 'province':
-        {   // province code (pre-confederation)
-            $province   = $value;
-            break;
-        }   // province code
-
-        case 'district':
-        {   // district identifier
-            $district   = $value;
-            $rxResult   = preg_match("/^[0-9.]+$/", $district);
-            if ($rxResult != 1)
-                $msg    .= "District value '$district' is invalid. ";
-            break;
-        }   // district identifier
-
-        case 'subdistrict':
-        {   // subDistrict identifier
-            $subDistrict    = $value;
-            break;
-        }   // subDistrict identifier
-
-        case 'division':
-        {   // division identifier
-            $division   = $value;
-            break;
-        }   // division identifier
-
-        case 'page':
-        {   // page number
-            $page       = $value;
-            $rxResult   = preg_match("/^[0-9]+$/", $page);
-            if ($rxResult != 1)
-                $msg    .= "Page number '$page' is invalid. ";
-            break;
-        }   // page number
-
-        case 'lang':
-        {
-                $lang               = FtTemplate::validateLang($value);
-            break;
-        }
-
-        case 'debug':
-        {
-            break;
-        }
-
-        default:
-        {
-            $msg    .= "Unexpected parameter: $key=$value. ";
-            break;
-        }
-    }   // act on each specific parameter
+    
+            case 'debug':
+            {
+                break;
+            }
+    
+            default:
+            {
+                $warn    .= "<p>Unexpected parameter: $key=$value ignored</p>\n";
+                break;
+            }
+        }   // act on each specific parameter
     }       // loop through all parameters
+    if ($debug)
+        $warn               .= $parmsText . "</table>\n";
+}                   // invoked by URL to display current status of account
 
-    if (is_null($census))
+$template           = new FtTemplate("matchCitations$lang.html");
+
+// check authorization
+if (!canUser('edit'))
+    $msg        .= 'You are not authorized to perform this function. ';
+
+if (is_string($censustext))
+{
+    $msg        .= "Invalid syntax for Census identifier '$censustext'. ";
+    $template->set('CENSUSID',          $censustext);
+    $template->set('COUNTRYNAME',       'Unknown');
+    $template->set('CC',                'CA');
+}
+else
+if (is_null($census))
+{
     $msg        .= "Missing mandatory parameter census. ";
+    $template->set('CENSUSID',          '');
+    $template->set('COUNTRYNAME',       'Unknown');
+    $template->set('CC',                'CA');
+}
+else
+{           // syntactically valid Census identifer provided
+    $template->set('CENSUSID',          $census);
+    $censusObj      = new Census(array('censusid' => $census));
+    if ($censusObj->isExisting())
+    {       // census is defined
+        $idsr       = $censusObj['idsr'];
+        $censusYear = $censusObj['year'];
+        $cc         = $censusObj['countrycode'];
+        $preConfed  = ($cc == 'CA') && ($censusYear < 1867);
+        $country    = $censusObj->getCountry();
+        $template->set('COUNTRYNAME', $country->getName());
+        $template->set('CC', $cc);
+    }       // census is defined
+    else
+    {       // census is not defined
+        $msg    .= "Census '$census' is not defined. ";
+        $country    = $censusObj->getCountry();
+        $template->set('COUNTRYNAME', $country->getName());
+        $template->set('CC', $cc);
+    }       // census is not defined
+}           // syntactically valid Census identifer provided
 
-    $dName  = 'Not Found';
-    $subdName   = 'Not Found';
+if (is_string($provincetext))
+{
+    $msg    .= "State or province identifier '$provincetext' is invalid. ";
+    $template->set('PROVINCE',          $provincetext);
+}
+else
+if (is_string($province))
+    $template->set('PROVINCE',          $province);
+else
+    $template->set('PROVINCE',          '');
 
-    // if there are no errors, perform the function
-    if (strlen($msg) == 0)
-    {       // no errors
+if (is_string($districttext))
+{
+    $msg    .= "District identifier '$districttext' is invalid. ";
+    $template->set('DISTRICT',          $districttext);
+}
+else
+if (is_null($district))
+{
+    $msg        .= "Missing mandatory parameter District. ";
+    $template->set('DISTRICT',          '');
+}
+else
+    $template->set('DISTRICT',          $district);
+
+if (is_string($subdistricttext))
+{
+    $msg    .= "Sub-District identifier '$subdistricttext' is invalid. ";
+    $template->set('SUBDISTRICT',       $subdistricttext);
+}
+else
+if (is_null($subDistrict))
+{
+    $msg        .= "Missing mandatory parameter SubDistrict. ";
+    $template->set('SUBDISTRICT',       '');
+}
+else
+    $template->set('SUBDISTRICT',       $subDistrict);
+
+if (is_string($divisiontext))
+{
+    $msg    .= "Division identifier '$divisiontext' is invalid. ";
+    $template->set('DIVISION',          $divisiontext);
+}
+else
+if (is_null($division))
+{
+    $msg        .= "Missing mandatory parameter Division. ";
+    $template->set('DIVISION',          '');
+}
+else
+    $template->set('DIVISION',          $division);
+
+if (is_string($pagetext))
+    $msg    .= "Page number '$pagetext' is invalid. ";
+
+if (is_string($langtext))
+    $warn   .= "<p>Language identifier '$langtext' is invalid.  English assumed. </p>\n";
+
+$template->set('LANG',              $lang);
+$template->set('CC',                $cc);
+// if there are no errors, perform the function
+if (strlen($msg) == 0)
+{                   // no errors
     $subDist    = new SubDistrict(array('SD_Census' => $census,
-                                    'SD_DistId' => $district,
-                                    'SD_Id'     => $subDistrict,
-                                    'SD_Div'    => $division));;
+                                        'SD_DistId' => $district,
+                                        'SD_Id'     => $subDistrict,
+                                        'SD_Div'    => $division));
     $dName      = $subDist->get('d_name');
     $subdName   = $subDist->get('sd_name');
+    $template->set('DISTNAME',      $dName);
+    $template->set('SUBDISTNAME',   $subdName);
 
     // establish pattern for matching citations to the specified page
     if ($preConfed)
-    {   // pre-confederation census
+    {               // pre-confederation census
         if (strlen($division) > 0)
             $pattern    = "'^$province, dist $district .* subdist $subDistrict .* div $division page +$page$'";
         else
@@ -434,7 +495,7 @@ function checkRow($row)
                             tblSX.Type=2 AND
                             tblSX.SrcDetail REGEXP $pattern";
 
-    $stmt       = $connection->query($iquery);
+    $stmt           = $connection->query($iquery);
     if ($stmt)
     {       // successful query
         $iresult    = $stmt->fetchAll(PDO::FETCH_NUM);
@@ -451,118 +512,49 @@ function checkRow($row)
                                 tblSX.Type=30 AND
                                 tblSX.SrcDetail REGEXP $pattern";
 
-        $stmt   = $connection->query($equery);
+        $stmt           = $connection->query($equery);
         if ($stmt)
-        {       // query successful
+        {           // query successful
             $eresult    = $stmt->fetchAll(PDO::FETCH_NUM);
             if ($debug)
                 $warn   .= "<p>matchCitations.php: " . __LINE__ . ' '. htmlspecialchars($equery) . "</p>\n";
-        }       // query successful
+        }           // query successful
         else
         {
-            $msg    .= $equery . ': ' .
-                       print_r($connection->errorInfo(),true);
-        }       // error on query
-    }       // successful query
+            $msg        .= $equery . ': ' .
+                           print_r($connection->errorInfo(),true);
+        }           // error on query
+    }               // successful query
     else
-    {
-        $msg    .= "'$iquery': " .
-                       print_r($connection->errorInfo(),true);
-    }       // error on query
-    }       // no errors
+    {               // error on query
+        $msg            .= "'$iquery': " .
+                               print_r($connection->errorInfo(),true);
+    }               // error on query
 
-    // start HTML page
-    htmlHeader('Census of Canada: Match Citations',
-            array('/jscripts/CommonForm.js',
-                  '/jscripts/util.js',
-                  '/jscripts/js20/http.js',
-                  '/database/matchCitations.js'));
-?>
-<body>
-<?php
-    pageTop(array(
-    "/genealogy.php?lang=$lang" => "Genealogy" ,
-    "/Canada/genCountry.php?cc=CA&lang=$lang"   => "Canada",
-    "/database/genCensuses.php?lang=$lang"  => "Censuses",
-    "/database/CensusUpdateStatus.php?Census=$censusYear&lang=$lang"
-                            => "Summary",
-    "/database/CensusUpdateStatusDist.php?Census=$census&amp;Province=$province&amp;District=$district&lang=$lang"      => "District $district $dName Summary",
-    "/database/CensusUpdateStatusDetails.php?Census=$census&amp;Province=$province&amp;District=$district&amp;SubDistrict=$subDistrict&amp;Division=$division&lang=$lang"
-                            => "Division Details"));
-?>  
-<div class='body'>
-  <h1>Census of Canada: Match Citations
-    <span class='right'>
-    <a href='matchCitationsHelpen.html' target='help'>? Help</a>
-    </span>
-    <div style='clear: both;'></div>
-  </h1>
-<?php
-    $action = 'None';
-
-    // print trace
-    showTrace();
-
-    // print error messages if any
-    if (strlen($msg) > 0)
-    {       // errors in parameters
-?>
-    <p class='message'><?php print $msg; ?></p>
-<?php
-    $msg    = '';
-    }       // errors in parameters
-    else
-    {       // no errors, continue with request
-    print "<p>Checking births:</p>\n";
-    $i      = 0;
+    $i                  = 0;
+    $etemplate          = $template['birthMatch']->outerHTML;
+    $text               = '';
     foreach($iresult as $row)
-    {   // loop through all results
-        checkRow($row);
-        // print trace
-        showTrace();
+    {               // loop through all results
+        $text           .= checkRow($row, $etemplate);
+        $i++;
+    }               // loop through all results
+    $template['birthMatch']->update($text);
 
-        if (strlen($msg) > 0)
-        {       // trace information present
-?>
-    <p class='message'><?php print $msg; ?></p>
-<?php
-            $msg    = '';
-        }       // trace information present
-        $i++;
-    }   // loop through all results
-    print "<p>Checking events:</p>\n";
-    $i      = 0;
+    $etemplate          = $template['eventMatch']->outerHTML;
     foreach($eresult as $row)
-    {   // loop through all results
-        checkRow($row);
+    {               // loop through all results
+        $text           .= checkRow($row, $etemplate);
         $i++;
-    }   // loop through all results
-    }       // no errors
-?>
-  </div>
-<?php
-    pageBot();
-?>
-  <!-- balloons to pop up when mouse moves over forward and back links -->
-  <div class='popup' id='mouseprenpprev'>
-    <p class='label'>
-    Go to Page <?php print $page - 1; ?>&nbsp;
-    </p>
-  </div>
-  <div class='popup' id='mouseprenpnext'>
-    <p class='label'>
-    Go to Page <?php print $page + 1; ?>&nbsp;
-    </p>
-  </div>
-  <div class='popup' id='mousepostnpprev'>
-    <p class='label'>
-    Go to Page <?php print $page - 1; ?>&nbsp;
-    </p>
-  </div>
-  <div class='popup' id='mousepostnpnext'>
-    <p class='label'>
-    Go to Page <?php print $page + 1; ?>&nbsp;
-    </p>
-  </div>
-</body>
-</html>
+    }               // loop through all results
+    $template['eventMatch']->update($text);
+}                   // no errors
+else
+{
+    $template->set('DISTNAME',      'Not Found');
+    $template->set('SUBDISTNAME',   'Not Found');
+    $template['birthMatch']->update(null);
+    $template['eventMatch']->update(null);
+}
+
+$template->display();

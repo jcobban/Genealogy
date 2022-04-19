@@ -752,7 +752,7 @@ const  MonthAbbrs = {
  ************************************************************************/
 const  ResTypeAbbrs = {
                 "B"         : "Brick",
-                "BV"        : "BVeneer",
+                "Bv"        : "B Veneer",
                 "C"         : "Concrete",
                 "F"         : "Frame",
                 "L"         : "Log",

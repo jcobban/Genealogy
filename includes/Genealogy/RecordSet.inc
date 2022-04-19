@@ -120,6 +120,7 @@ use \Templating\Template;
  *      2021/09/30      correct determining count for query with        *
  *                      GROUP BY clause                                 *
  *      2022/03/23      add some multibyte string support               *
+ *      2022/04/17      add method debugBacktrace                       *
  *                                                                      *
  *  Copyright &copy; 2022 James A. Cobban                               *
  ************************************************************************/
@@ -361,73 +362,63 @@ class RecordSet implements Iterator, Countable, ArrayAccess
         global  $msg;
         global  $connection;
 
-        $parmsText                      = "<p>RecordSet:__construct('$tableName', ";
-        if (is_null($parameters))
-            $parmsText                  .= "null";
-        else
-        if (is_array($parameters))
-        {
-            $parmsText                  .= "array(";
-            $comma                      = '';
-            foreach($parameters as $field => $value)
-            {
-                $parmsText              .= $comma . "`$field`=";
-                if (is_numeric($value))
-                    $parmsText          .= $value;
-                else
-                if (is_null($value))
-                    $parmsText          .= "null";
-                else
-                if (is_bool($value))
-                {
-                    if ($value)
-                        $parmsText      .= "true";
-                    else
-                        $parmsText      .= "false";
-                }
-                else
-                if (is_string($value))
-                    $parmsText          .= htmlspecialchars("'$value'");
-                else
-                if ($value instanceof Record)
-                    $parmsText          .= "class " . get_class($value) .
-                                            ' ' .  $value->getName();
-                else
-                if ($value instanceof Template)
-                    $parmsText          .= "class Template";
-                else
-                if (is_string($value))
-                {
-                    $parmsText          .= "'$value'";
-                }
-                else
-                {
-                    $parmsText          .= print_r($value, true);
-                }
-                $comma                  = ',';
-            }                   // loop through elements of parm 2
-
-            $parmsText                  .= ")";
-        }
-        if ($fields != '*')
-            $parmsText                  .= ",'$fields'";
-        $parmsText                      .= ")</p>\n";
-
-        $trace                          = debug_backtrace();
-        foreach($trace as $call)
-        {
-            if (array_key_exists('class', $call))
-                $classRef               = $call['class'] . '::';
-            else
-                $classRef               = '';
-            $parmsText   .= "<p>RecordSet::__construct: " . __LINE__ .
-
-                        " function=" . $classRef . $call['function'] .
-                        " called by line=" . $call['line'] .
-                        " in " . $call['file'] . "</p>\n";
-        }
         if ($debug)
-            $warn                           .= $parmsText;
+        {
+            $parmsText      = "<p>RecordSet:__construct('$tableName', ";
+            if (is_null($parameters))
+                $parmsText                  .= "null";
+            else
+            if (is_array($parameters))
+            {
+                $parmsText                  .= "array(";
+                $comma                      = '';
+                foreach($parameters as $field => $value)
+                {
+                    $parmsText              .= $comma . "`$field`=";
+                    if (is_numeric($value))
+                        $parmsText          .= $value;
+                    else
+                    if (is_null($value))
+                        $parmsText          .= "null";
+                    else
+                    if (is_bool($value))
+                    {
+                        if ($value)
+                            $parmsText      .= "true";
+                        else
+                            $parmsText      .= "false";
+                    }
+                    else
+                    if (is_string($value))
+                        $parmsText          .= htmlspecialchars("'$value'");
+                    else
+                    if ($value instanceof Record)
+                        $parmsText          .= "class " . get_class($value) .
+                                                ' ' .  $value->getName();
+                    else
+                    if ($value instanceof Template)
+                        $parmsText          .= "class Template";
+                    else
+                    if (is_string($value))
+                    {
+                        $parmsText          .= "'$value'";
+                    }
+                    else
+                    {
+                        $parmsText          .= print_r($value, true);
+                    }
+                    $comma                  = ',';
+                }                   // loop through elements of parm 2
+    
+                $parmsText                  .= ")";
+            }
+            if ($fields != '*')
+                $parmsText                  .= ",'$fields'";
+            $parmsText                      .= ")</p>\n";
+
+            $warn                           .= $parmsText .
+                                                $this->debugBacktrace();
+        }                           // debug output
 
         // validate parameters
         $orderby                            = '';
@@ -2838,17 +2829,7 @@ require_once __NAMESPACE__ . '/Surname.inc';
                         " is too many records to read into memory for query '" .
                         htmlspecialchars($this->information['query']) .
                         "' from parms " . print_r($this->parms, true) . ".</p>\n";
-            $callback       = debug_backtrace(false);
-            foreach($callback as $info)
-            {
-                if (array_key_exists('type', $info))
-                    $funcname   = $info['class'] . $info['type'] . $info['function'];
-                else
-                    $funcname   = $info['function'];
-                $file           = $info['file'];
-                $line           = $info['line'];
-                $warn   .= "<p style]'text-indent: 2em;'>$funcname at $file:$line</p>\n";
-            }
+            $warn   .= $this->debugBacktrace();
             $this->limit    = 0;
         }
 
@@ -3105,6 +3086,43 @@ require_once __NAMESPACE__ . '/Surname.inc';
             $this->rewind();
         return isset($this->list[$offset]) ? $this->list[$offset] : null;
     }       // public function offsetGet($offset)
+
+    /********************************************************************
+     *  function RecordSet::debugBacktrace                              *
+     *                                                                  *
+     *  Get a string containing a caller backtrace.                     *
+     *                                                                  *
+     *  Input:                                                          *
+     *      $depth      maximum number of call backs to analyze         *
+     *                                                                  *
+     *  Returns:                                                        *
+     *      string                                                      *
+     ********************************************************************/
+    protected function debugBacktrace($depth = 5)
+    {
+        $trace          = debug_backtrace(DEBUG_BACKTRACE_PROVIDE_OBJECT,
+                                          $depth);
+        $retval         = '';
+        $comma          = '';
+        $level          = 1;
+
+        foreach($trace as $call)
+        {
+            if (array_key_exists('class', $call))
+                $classRef               = $call['class'] . '::';
+            else
+                $classRef               = '';
+            $function                   = $call['function'];
+            if ($function == 'constDebug' || $function == 'debugBacktrace')
+                continue;
+            $retval     .= "$comma level function=$classRef$function" .
+                                " called by line=" . $call['line'] .
+                                " in " . $call['file'];
+            $comma                      = ",\n";
+            $level++;
+        }
+        return htmlspecialchars($retval);
+    }       // protected function Record::debugBacktrace()
 
 }       // class RecordSet
 

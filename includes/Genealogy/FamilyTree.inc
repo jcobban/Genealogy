@@ -37,8 +37,9 @@ use \Iterator;
  *      2021/03/09      add methods isValid, dump, getErrors            *
  *                      to match interface for Record                   *
  *                      remove Exception throw in constructor           *
+ *      2022/93/27      replace xmlentities with htmlentities           *
  *                                                                      *
- *  Copyright &copy; 2021 James A. Cobban                               *
+ *  Copyright &copy; 2022 James A. Cobban                               *
  ************************************************************************/
 
 /************************************************************************
@@ -332,7 +333,8 @@ class FamilyTree implements Iterator
         {
             if (substr($key, 1, 1) == '_')
                 $key    = substr($key, 2);
-            $retval .= "\t<$key>" . xmlentities($value) . "</$key>\n";
+            $retval     .= "\t<$key>" .
+                            htmlentities($value, ENT_XML1) . "</$key>\n";
         }
         if ($top !== null)
             $retval .= "    </$top>\n";

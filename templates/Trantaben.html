@@ -543,10 +543,10 @@
     <div id="typeText">
       <span data-key="0">Generic Fact</span>
       <span data-key="1">Name Fact</span>
-      <span data-key="2">Birth Event</span>
-      <span data-key="3">Christening Event</span>
-      <span data-key="4">Death Event</span>
-      <span data-key="5">Buried Event</span>
+      <span data-key="2">Birth</span>
+      <span data-key="3">Christening</span>
+      <span data-key="4">Death</span>
+      <span data-key="5">Buried</span>
       <span data-key="6">General Notes</span>
       <span data-key="7">Research Notes</span>
       <span data-key="8">Medical Notes</span>
@@ -555,20 +555,20 @@
       <span data-key="11">Child Status</span>
       <span data-key="12">Relationship to Father</span>
       <span data-key="13">Relationship to Mother</span>
-      <span data-key="15">LDS Baptism Event</span>
-      <span data-key="16">LDS Endowment Event</span>
-      <span data-key="17">LDS Sealed to Parents Event</span>
-      <span data-key="18">LDS Sealed to Spouse Event</span>
+      <span data-key="15">LDS Baptism</span>
+      <span data-key="16">LDS Endowment</span>
+      <span data-key="17">LDS Sealed to Parents</span>
+      <span data-key="18">LDS Sealed to Spouse</span>
       <span data-key="19">Person Never Married Fact</span>
-      <span data-key="20">Marriage Event</span>
+      <span data-key="20">Marriage</span>
       <span data-key="21">Marriage Note</span>
       <span data-key="22">Never Married Fact</span>
       <span data-key="23">This Couple had no Children Fact</span>
       <span data-key="24">Marriage Ended</span>
-      <span data-key="26">LDS Confirmation Event</span>
-      <span data-key="27">LDS Initiatory Event</span>
+      <span data-key="26">LDS Confirmation</span>
+      <span data-key="27">LDS Initiatory</span>
       <span data-key="30">Event</span>
-      <span data-key="31">Marriage Event</span>
+      <span data-key="31">Marriage</span>
       <span data-key="40">To Do</span>
       <span data-key="100">Temporary</span>
     </div>
@@ -619,7 +619,7 @@
       <span data-key="36">entered marriage contract</span>
       <span data-key="12">enumerated in a census</span>
       <span data-key="66">identified with ethnicity</span>
-      <span data-key="65">belonged to family group</span>
+      <span data-key="65">family group</span>
       <span data-key="21">filed for a divorce </span>
       <span data-key="26">had first communion</span>
       <span data-key="67">funeral</span>
@@ -658,7 +658,7 @@
       <span data-key="52">owned property</span>
       <span data-key="61">photo</span>
       <span data-key="19">received a degree</span>
-      <span data-key="53">belonged to the religious affiliation </span>
+      <span data-key="53">religious affiliation </span>
       <span data-key="55">retired</span>
       <span data-key="76">sealed to spouse</span>
       <span data-key="18000">sealed to spouse</span>    // obsolete
@@ -915,6 +915,29 @@
       <span data-key="70">Other Marriage Fact</span>
       <span data-key="76">sealed to spouse</span>
       <span data-key="18000">Sealed to Spouse (LDS)</span>
+    </div>
+
+    <!--*****************************************************************
+     *  $childEvents                                                    *
+     *                                                                  *
+     *  This table is used to create the selection list for             *
+     *  events specific to a child.  Where the event type               *
+     *  is greater than 999 it indicates an event recorded in the       *
+     *  Family record itself, and the code is the citation              *
+     *  type times 1000.                                                *
+     ******************************************************************-->
+    <div id="childEvents">
+      <span data-key="0">Choose an event type:</span>
+      <span data-key="1">Null
+      </span>
+      <span data-key="2">Adoption
+      </span>
+      <span data-key="78">
+          Sealed to Parents (LDS)
+      </span>
+      <span data-key="17000">
+          Sealed to Parents (LDS) Deprecated
+      </span>
     </div>
 
     <!--*****************************************************************

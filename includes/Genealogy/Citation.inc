@@ -305,6 +305,7 @@ class Citation extends RecordPic
      ********************************************************************/
     const STYPE_EVENT               = 30;   // Individual Event
     const STYPE_MAREVENT            = 31;   // Marriage Event
+    const STYPE_CHILDEVENT          = 32;   // Child Event
 
     /********************************************************************
      *  IDIME points to To-Do records tblTD.IDTD                        *

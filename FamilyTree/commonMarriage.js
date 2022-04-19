@@ -201,6 +201,7 @@
  *      2019/11/15      add language parameter to opening editIndivid   *
  *      2020/02/12      exploit Template                                *
  *      2020/03/18      new implementation of adding events             *
+ *      2022/04/16      support new layout implementation               *
  *                                                                      *
  *  Copyright &copy; 2020 James A. Cobban                               *
  ************************************************************************/
@@ -219,8 +220,6 @@ var EDIT_CHILD_PREFIX       = "editChild";
 var EDIT_CHILD_PREFIX_LEN   = EDIT_CHILD_PREFIX.length;
 var DELETE_PREFIX           = "Delete";
 var DELETE_PREFIX_LEN       = DELETE_PREFIX.length;
-var DELETE_EVENT_PREFIX     = "DelEvent";
-var DELETE_EVENT_PREFIX_LEN = DELETE_EVENT_PREFIX.length;
 var EDIT_EVENT_PREFIX       = "EditEvent";
 var EDIT_EVENT_PREFIX_LEN   = EDIT_EVENT_PREFIX.length;
 
@@ -2258,17 +2257,21 @@ function childOrder(first, second)
 function editEvent(ev)
 {
     let form            = this.form;
-    let rownum          = this.id.substring(9);
-    let iderElt         = document.getElementById('ider' + rownum);
+    var matches         = this.id.match(/\d*$/);
+    var rownum          = matches[0];
+    var iderElt         = form.elements['ider' + rownum];
     if (iderElt)
     {
         let ider        = iderElt.value;
+        let idet        = form.elements['idet' + rownum].value;
         let idmr        = form.idmr.value;
         if (idmr && idmr > 0)
         {           // existing family
             let url     = 'editEvent.php?idmr=' + idmr +
                                     '&ider=' + ider +
+                                    '&idet=' + idet +
                                     '&type=31';
+
             let eventWindow = openFrame("eventLeft",
                                         url,
                                         "left");
@@ -2370,7 +2373,7 @@ function editIEvent(ev)
  *                                                                      *
  *  Parameters:                                                         *
  *      this        <button id='DelEvent9999'> where the number is the  *
- *                  key of an instance of Event                         *
+ *                  row identifier of the displayed event               *
  *      ev          instance of Event                                   *
  ************************************************************************/
 function delEvent(ev)
@@ -2379,8 +2382,11 @@ function delEvent(ev)
         ev          = window.event;
     ev.stopPropagation();
 
-    var form    = this.form;
-    var ider    = this.id.substring(DELETE_EVENT_PREFIX_LEN);
+    var form        = this.form;
+    var matches     = this.id.match(/\d*$/);
+    var rownum      = matches[0];
+    var iderElt     = form.elements['ider' + rownum];
+    var ider        = iderElt.value;
     var parms       = {"type"       : '31',
                        "formname"   : form.name, 
                        "template"   : "",
@@ -2607,7 +2613,7 @@ function changeEventList(ev)
         let addEventRow         = this.parentNode;
         let fieldset            = addEventRow.parentNode;
         let events              = document.getElementById('events');
-        let rownum              = events.childElementCount;
+        let rownum              = events.childElementCount + 1;
         let template            = document.getElementById('EventRow$rownum');
         if (template)
         {
@@ -2628,10 +2634,14 @@ function changeEventList(ev)
             let locElt          = document.getElementById('EventLoc' + rownum);
             locElt.abbrTbl      = evtLocAbbrs;
             if (idet == 76)
-                locElt.onchange     = templeChanged;
+                locElt.onchange = templeChanged;
             else
-                locElt.onchange     = locationChanged;
+                locElt.onchange = locationChanged;
             actMouseOverHelp(locElt);
+            let editBtn         = document.getElementById('EditEvent' + rownum);
+            editBtn.onclick     = editEvent;
+            let delBtn          = document.getElementById('DelEvent' + rownum);
+            delBtn.onclick      = delEvent;
         }
         else
             alert("no template EventRow$rownum");
