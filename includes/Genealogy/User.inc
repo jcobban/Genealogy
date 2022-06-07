@@ -145,6 +145,64 @@ class User extends Record
      ********************************************************************/
     protected static    $hashsalt   = '';
 
+    protected $stream = false; 
+
+    /** 
+     * SMTP port number 
+     * @var int 
+     */ 
+    protected $port = 25; 
+
+    /** 
+     * Email address for request 
+     * @var string 
+     */ 
+    protected $from = 'root@localhost'; 
+
+    /** 
+     * The connection timeout, in seconds. 
+     * @var int 
+     */ 
+    protected $max_connection_timeout = 30; 
+
+    /** 
+     * Timeout value on stream, in seconds. 
+     * @var int 
+     */ 
+    protected $stream_timeout = 5; 
+
+    /** 
+     * Wait timeout on stream, in seconds. 
+     * * 0 - not wait 
+     * @var int 
+     */ 
+    protected $stream_timeout_wait = 0; 
+
+    /** 
+     * Whether to throw exceptions for errors. 
+     * @type boolean 
+     * @access protected 
+     */ 
+    protected $exceptions = false; 
+
+    /** 
+     * The number of errors encountered. 
+     * @type integer 
+     * @access protected 
+     */ 
+    protected $error_count = 0;
+
+    /** 
+     * How to handle debug output. 
+     * Options: 
+     * * `echo` Output plain-text as-is, appropriate for CLI 
+     * * `html` Output escaped, line breaks converted to `<br>`, appropriate for browser output 
+     * * `log` Output to error log as configured in php.ini 
+     * @type string 
+     */ 
+    protected $Debugoutput = 'echo'; 
+
+
     // masks to turn on an off specific options
     const OPT_USEMAIL_ON        = 1;
     const OPT_NOHELP_ON         = 2;
@@ -415,7 +473,8 @@ class User extends Record
                 if ($needInsert)
                 {                   // ensure both email and username set
                     if ($dbrow['email'] == '')
-                        $dbrow['email']     = $dbrow['username'];
+                        if (filter_var($dbrow['username'], FILTER_VALIDATE_EMAIL))
+                            $dbrow['email']     = $dbrow['username'];
                     if ($dbrow['username'] == '')
                         $dbrow['username']  = $dbrow['email'];
                 }                   // ensure both email and username set
@@ -666,6 +725,13 @@ class User extends Record
                     $value      = trim($value);
                 if ($value == $this->row['email'])
                     return $value;      // no change
+                if (!filter_var($value, FILTER_VALIDATE_EMAIL))
+                {
+                    $msg        .= "User::set('email','" .
+                                    htmlspecialchars($value) .
+                                    "') ignored for invalid syntax. ";
+                    return $this->row['email'];
+                }
 
                 // construct the query of the user table
                 $query          = "SELECT * FROM Users " .
@@ -777,22 +843,247 @@ class User extends Record
             return null;
     }       // static function getRealFieldName
 
-    /************************************************************************
-     *  public function User::can                                           *
-     *                                                                      *
-     *  This method returns true if the user can perform                    *
-     *  the indicated function.                                             *
-     *                                                                      *
-     *  Parameters:                                                         *
-     *      action      string describing function to be performed          *
-     *                      'edit'      alter databases                     *
-     *                      'blog'      post blogs                          *
-     *                      'admin'     administrator                       *
-     *                      'debug'     authorized debugger                 *
-     *                      'pending'   user waiting for confirmation       *
-     *                      'all'       master administrator                *
-     *                                                                      *
-     ************************************************************************/
+    /** 
+     * Get array of MX records for host. Sort by weight information. 
+     * @param string $hostname The Internet host name. 
+     * @return array Array of the MX records found. 
+     */ 
+    public function getMXrecords($hostname) { 
+        $mxhosts = array(); 
+        $mxweights = array(); 
+        if (getmxrr($hostname, $mxhosts, $mxweights) === FALSE) { 
+            $this->set_error('MX records not found or an error occurred'); 
+            $this->edebug($this->ErrorInfo); 
+        } else { 
+            array_multisort($mxweights, $mxhosts); 
+        } 
+        /** 
+         * Add A-record as last chance (e.g. if no MX record is there). 
+         * Thanks Nicht Lieb. 
+         * @link http://www.faqs.org/rfcs/rfc2821.html RFC 2821 - Simple Mail Transfer Protocol 
+         */ 
+        if (empty($mxhosts)) { 
+            $mxhosts[] = $hostname; 
+        } 
+        return $mxhosts; 
+    }           // public function getMXrecords
+
+    /********************************************************************
+     *  function User::edebug                                           *
+     *                                                                  *
+     *  debug output                                                    *
+     ********************************************************************/
+    protected function edebug($str) {
+        global  $debug; 
+
+        if ($debug) { 
+        switch ($this->Debugoutput) { 
+            case 'log': 
+                //Don't output, just log 
+                error_log($str); 
+                break;
+
+            case 'html': 
+                //Cleans up output a bit for a better looking, HTML-safe output 
+                $msg    .= htmlentities( 
+                        preg_replace('/[\r\n]+/', '', $str), ENT_QUOTES, 'UTF-8' 
+                ) 
+                . "<br>\n"; 
+                break; 
+
+            case 'echo': 
+            default: 
+                //Normalize line breaks 
+                $str = preg_replace('/(\r\n|\r|\n)/ms', "\n", $str); 
+                echo gmdate('Y-m-d H:i:s') . "\t" . str_replace( 
+                        "\n", "\n \t ", trim($str) 
+                ) . "\n"; 
+        }
+        } 
+    }       // protected function edebug
+
+    /********************************************************************
+     *  function User::checkEmail                                       *
+     *                                                                  *
+     *  Check the User's email address to ensure it is valid.           *
+     ********************************************************************/
+    public function checkEmail()
+    {
+        global $warn;
+
+        $email                  = $this->row['email'];
+        $matches                = array();
+        if (preg_match('/^([^@]*)@([^@]*)$/', $email, $matches))
+        {
+            $domain             = $matches[2];
+            $mxs                = $this->getMXrecords($domain);
+            $timeout            = ceil(30 / count($mxs));
+            $this->stream       = FALSE;
+            $this->error_count  = 0;
+    
+            foreach ($mxs as $host) { 
+                $this->stream = @stream_socket_client("tcp://$host:" . $this->port, $errno, $errstr, $timeout); 
+                if ($this->stream === FALSE) { 
+                    if ($errno == 0) { 
+                        $this->set_error("Problem initializing the socket"); 
+                        $this->edebug($this->ErrorInfo); 
+                        if ($this->exceptions) { 
+                            throw new verifyEmailException($this->ErrorInfo); 
+                        } 
+                        return FALSE; 
+                    } else { 
+                        $this->edebug($host . ":" . $errstr); 
+                    } 
+                } else { 
+                    stream_set_timeout($this->stream, $this->stream_timeout); 
+                    stream_set_blocking($this->stream, 1); 
+    
+                    if ($this->_streamCode($this->_streamResponse()) == '220') { 
+                        $this->edebug("Connection success {$host}"); 
+                        break; 
+                    } else { 
+                        fclose($this->stream); 
+                        $this->stream = FALSE; 
+                    } 
+                } 
+            }                   // check each MX record
+
+
+            if ($this->stream === FALSE) { 
+                $this->set_error("All connection fails"); 
+                $this->edebug($this->ErrorInfo); 
+                if ($this->exceptions) { 
+                    throw new verifyEmailException($this->ErrorInfo); 
+                } 
+                return FALSE; 
+            } 
+
+            // contact the mail agent to verify account
+            $this->_streamQuery("HELO " . self::parse_email($this->from)); 
+            $this->_streamResponse(); 
+            $this->_streamQuery("MAIL FROM: <{$this->from}>"); 
+            $this->_streamResponse(); 
+            $this->_streamQuery("RCPT TO: <{$email}>"); 
+            $code       = $this->_streamCode($this->_streamResponse()); 
+            $this->_streamResponse(); 
+            $this->_streamQuery("RSET"); 
+            $this->_streamResponse();
+            $code2      = $this->_streamCode($this->_streamResponse()); 
+            $this->_streamQuery("QUIT"); 
+            fclose($this->stream); 
+            
+            $code       = !empty($code2)?$code2:$code;
+            switch ($code) { 
+                case '250': 
+                /** 
+                 * http://www.ietf.org/rfc/rfc0821.txt 
+                 * 250 Requested mail action okay, completed 
+                 * email address was accepted 
+                 */ 
+                case '450': 
+                case '451': 
+                case '452': 
+                    /** 
+                     * http://www.ietf.org/rfc/rfc0821.txt 
+                     * 450 Requested action not taken: the remote mail server 
+                     * does not want to accept mail from your server for 
+                     * some reason (IP address, blacklisting, etc..) 
+                     * Thanks Nicht Lieb. 
+                     * 451 Requested action aborted: local error in processing 
+                     * 452 Requested action not taken: insufficient system storage 
+                     * email address was greylisted (or some temporary error occured on the MTA) 
+                     * i believe that e-mail exists 
+                     */ 
+                    return TRUE;
+                case '550':
+                    return FALSE; 
+                default : 
+                    return FALSE; 
+            }  
+        }
+        else
+        {
+        $warn   .= "<p>checkEmail: parse failed</p>\n";
+            $this->msg  .= "checkEmail: invalid e-mail address '$email'. ";
+            return false;
+        }
+
+    }       // public function checkEmail
+
+    /** 
+     * Add an error message to the error container. 
+     * @access protected 
+     * @param string $msg 
+     * @return void 
+     */ 
+    protected function set_error($msg) { 
+        $this->error_count++; 
+        $this->ErrorInfo = $msg; 
+    } 
+
+    /** 
+     * Check if an error occurred. 
+     * @access public 
+     * @return boolean True if an error did occur. 
+     */ 
+    public function isError() { 
+        return ($this->error_count > 0); 
+    } 
+
+    /** 
+     * Reads all the line long the answer and analyze it. 
+     * If an error occurs, returns FALSE 
+     * @access protected 
+     * @return string Response 
+     */ 
+    protected function _streamResponse($timed = 0) { 
+        $reply = stream_get_line($this->stream, 1); 
+        $status = stream_get_meta_data($this->stream); 
+
+        if (!empty($status['timed_out'])) { 
+            $this->edebug("Timed out while waiting for data! (timeout {$this->stream_timeout} seconds)"); 
+        } 
+
+        if ($reply === FALSE && $status['timed_out'] && $timed < $this->stream_timeout_wait) { 
+            return $this->_streamResponse($timed + $this->stream_timeout); 
+        } 
+
+
+        if ($reply !== FALSE && $status['unread_bytes'] > 0) { 
+            $reply .= stream_get_line($this->stream, $status['unread_bytes'], self::CRLF); 
+        } 
+        $this->edebug($reply); 
+        return $reply; 
+    } 
+
+
+    /** 
+     * Get Response code from Response 
+     * @param string $str 
+     * @return string 
+     */ 
+    protected function _streamCode($str) { 
+        preg_match('/^(?<code>[0-9]{3})(\s|-)(.*)$/ims', $str, $matches); 
+        $code = isset($matches['code']) ? $matches['code'] : false; 
+        return $code; 
+    } 
+
+    /********************************************************************
+     *  public function User::can                                       *
+     *                                                                  *
+     *  This method returns true if the user can perform                *
+     *  the indicated function.                                         *
+     *                                                                  *
+     *  Parameters:                                                     *
+     *      action      string describing function to be performed      *
+     *                      'edit'      alter databases                 *
+     *                      'blog'      post blogs                      *
+     *                      'admin'     administrator                   *
+     *                      'debug'     authorized debugger             *
+     *                      'pending'   user waiting for confirmation   *
+     *                      'all'       master administrator            *
+     *                                                                  *
+     ********************************************************************/
     function can($action)
     {
         $authorized         = $this->row['auth'];

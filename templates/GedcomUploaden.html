@@ -1,0 +1,72 @@
+<!--*********************************************************************
+ *  GedcomUploaden.html                                                 *
+ *                                                                      *
+ *  Template for a web page for uploading a GEDCOM 5.5 file into the    *
+ *  Legacy database.                                                    *
+ *                                                                      *
+ *  History:                                                            *
+ *      2022/05/13      created                                         *
+ *                                                                      *
+ *  Copyright &copy; 2022 James A. Cobban                               *
+ **********************************************************************-->
+    <div id="breadcrumbs" class="hidden">
+      <a href="/genealogy.php?lang=$LANG">
+        Genealogy
+      </a>:
+      <a href="/FamilyTree/Services.php?lang=$LANG">
+        Services
+      </a>:
+    </div>
+    <div class="body">
+
+      <div class="body">
+        <h1 class="clear">
+          Upload GEDCOM 5.5 File
+          <span class="right">
+            <a href="GedcomUploadHelpen.html" target="help">? Help</a>
+          </span>
+        </h1>
+        <div style="clear: both;"></div>
+      </div>
+      $TRACE
+      $MSG
+      <form name="fileForm" id="fileForm"
+            action="GedcomUpdate.php" method="post"
+            enctype="multipart/form-data">
+        <p>
+          <!-- MAX_FILE_SIZE must precede the file input field -->
+          <input type="hidden" name="MAX_FILE_SIZE" value="1500000" />
+          <!-- Name of input element determines name in $_FILES array -->
+          <span class="label">Send this file:</span> 
+          <input name="userfile" type="file"
+                      size="64"
+                      accept="application/x-gedcom"/>
+        </p>
+        <p>
+          <button type="submit" id="submit">
+              <u>U</u>pload
+          </button>
+        </p>
+      </form>
+      </div>
+      <div class="balloon" id="Helpsubmit">
+        <p>Clicking on this button applies all of the changes made to
+          this fact or picture and closes the dialog.  Note that pressing
+          the Enter key while editting any text field in this dialog also
+          performs this function.
+        </p>
+      </div>
+      <div class="hidden" id="templates">
+        <span id="notAuth">
+          You must be signed on with authority to update the database 
+          to use this feature.
+        </span>
+      </div>
+    <script src="/jscripts/CommonForm.js" type="application/javascript">
+    </script>
+    <script src="/jscripts/js20/http.js" type="application/javascript">
+    </script>
+    <script src="/jscripts/util.js" type="application/javascript">
+    </script>
+    <script src="GedcomUpload.js" type="application/javascript">
+    </script>

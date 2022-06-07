@@ -226,10 +226,10 @@
  *                      find its closest enclosing non-hidden parent    *
  *      2021/03/30      remove changeDiv, it was obsoleted years ago    *
  *      2021/07/03      correct vertical position of popup dialogs      *
+ *      2022/05/21      update global debug flag from args              *
  *                                                                      *
- *  Copyright &copy; 2021 James A. Cobban                               *
+ *  Copyright &copy; 2022 James A. Cobban                               *
  ************************************************************************/
- /*  global tinyMCE, tinyMCEparms                                       */
 
 /************************************************************************
  *  constants for letter key codes                                      *
@@ -326,60 +326,6 @@ else
 }
 
 /************************************************************************
- *  function getArgs                                                    *
- *                                                                      *
- *  Extract the arguments from the location URL when invoked by         *
- *  method='get'                                                        *
- *                                                                      *
- *  Returns:                                                            *
- *      associative array of arguments                                  *
- ************************************************************************/
-export function getArgs()
-{
-    let args    = new Object();
-    let query   = location.search.substring(1); // search excluding '?'
-    let pairs   = query.split("&");     // split on ampersands
-    for (let i = 0; i < pairs.length; i++)
-    {       // loop through all pairs
-        let pos = pairs[i].indexOf('=');
-        if (pos == -1)
-            continue;
-        // argument names are case-insensitive
-        let name    = pairs[i].substring(0, pos).toLowerCase();
-        let value   = pairs[i].substring(pos + 1);
-        value       = decodeURIComponent(value);
-        args[name]  = value;
-
-        // set the global diagnostic flag
-        switch(name)
-        {
-            case 'debug':
-                debug               = value;
-                break;
-
-            case 'text':
-                activateMCE         = false;
-                break;
-
-            case 'lang':
-                lang                = value;
-                break;
-
-        }
-    }       // loop through all pairs
-
-    return args;
-}       // function getArgs
-
-/************************************************************************
- *  global variable args                                                *
- *                                                                      *
- *  Make arguments from the search portion of the URL available to all  *
- *  scripts.                                                            *
- ************************************************************************/
-export var args     = getArgs();
-
-/************************************************************************
  * specify the style for tinyMCE editing                                *
  *                                                                      *
  *  tinyMCEparms is a configuration structure which is defined in the   *
@@ -387,9 +333,12 @@ export var args     = getArgs();
  *  tinyMCE script, so this is a test for the presence of that script.  *
  ************************************************************************/
 
+if (tinyMCEparms == null)
+    alert('tinyMCEparms is null');
+if (activateMCE && (typeof tinyMCE) == 'undefined')
+    alert('tinyMCE is undefined');
 if (activateMCE && tinyMCEparms && typeof tinyMCE !== 'undefined')
 {
-    // alert("tinyMCEparms=" + JSON.stringify(tinyMCEparms));
     tinyMCE.init(tinyMCEparms);
 }
 
@@ -454,6 +403,60 @@ var dx;                  // distance from left of dialog to mouse
  *  by method='get' or method='post'                                    *
  ************************************************************************/
 export var debug            = 'n';  // default to no debug
+
+/************************************************************************
+ *  function getArgs                                                    *
+ *                                                                      *
+ *  Extract the arguments from the location URL when invoked by         *
+ *  method='get'                                                        *
+ *                                                                      *
+ *  Returns:                                                            *
+ *      associative array of arguments                                  *
+ ************************************************************************/
+export function getArgs()
+{
+    let args    = new Object();
+    let query   = location.search.substring(1); // search excluding '?'
+    let pairs   = query.split("&");     // split on ampersands
+    for (let i = 0; i < pairs.length; i++)
+    {       // loop through all pairs
+        let pos = pairs[i].indexOf('=');
+        if (pos == -1)
+            continue;
+        // argument names are case-insensitive
+        let name    = pairs[i].substring(0, pos).toLowerCase();
+        let value   = pairs[i].substring(pos + 1);
+        value       = decodeURIComponent(value);
+        args[name]  = value;
+
+        // set the global diagnostic flag
+        switch(name)
+        {
+            case 'debug':
+                debug               = value;
+                break;
+
+            case 'text':
+                activateMCE         = false;
+                break;
+
+            case 'lang':
+                lang                = value;
+                break;
+
+        }
+    }       // loop through all pairs
+
+    return args;
+}       // function getArgs
+
+/************************************************************************
+ *  global variable args                                                *
+ *                                                                      *
+ *  Make arguments from the search portion of the URL available to all  *
+ *  scripts.                                                            *
+ ************************************************************************/
+export var args     = getArgs();
 
 /************************************************************************
  *  helpDiv                                                             *
@@ -934,7 +937,7 @@ export function displayHelp()
             buttons[0].focus();
     }                   // have a help division to display
     else
-        console.log("util.js: displayHelp: Logic Error, Cannot find <div id='" + helpDivName + "'>");
+        console.log("util.js: displayHelp: Logic Error, Cannot find <div id='" + helpDivName + "'> for " + this.outerHTML);
 }       // function displayHelp
 
 /************************************************************************
@@ -1061,7 +1064,7 @@ export function popupHelpHandler(ev)
  ************************************************************************/
 export function popupHelp()
 {
-    console.log("util.js: popupHelp: this=" + this.outerHTML);
+    //console.log("util.js: popupHelp: this=" + this.outerHTML);
     if (!this.helpAlreadyDisplayed)
     {                       // help for this element not displayed
         displayHelp.call(this);
@@ -1906,7 +1909,8 @@ function advertLoaded (evt){
     let results         = this.responseText.match(pattern);
     let contents        = results[1];
     let frame           = document.getElementById('advertFrame');
-    frame.outerHTML     = contents;
+    if (frame)
+        frame.outerHTML = contents;
 }       // function advertLoaded
 
 function advertError(evt){

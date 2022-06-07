@@ -203,7 +203,7 @@ class Marriage extends Record
                                  1  => array('year' => 1869, 'reel' => 1),
                                  2  => array('year' => 1869, 'reel' => 1),
                             // 2/3  => array('year' => 1869, 'reel' => 1),
-                                 3  => array('year' => 1869, 'reel' => 1),
+                                 3  => array('year' => 1870, 'reel' => 1),
                                  4  => array('year' => 1870, 'reel' => 2),
                                  5  => array('year' => 1870, 'reel' => 2),
                                  6  => array('year' => 1870, 'reel' => 2),

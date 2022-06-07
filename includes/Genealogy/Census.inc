@@ -334,7 +334,7 @@ class Census extends Record
                     }           // process modify parameters
 
                     $this->row              = $dbrow;
-                    $this->country          =  $this->getCountry();
+                    $this->country          = $this->getCountry();
                     if ($province == '')
                     {
                         if ($dbrow['name'] == '')

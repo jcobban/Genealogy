@@ -20,8 +20,10 @@
  *      2018/12/21      increase probability of digits and letters      *
  *                      in generated password, and trim password        *
  *      2021/03/29      use common displayDialog for password mismatch  *
+ *      2022/05/25      add method ForgotPassword                       *
+ *                      generatePassword autofills password and repeat  *
  *                                                                      *
- *  Copyright &copy; 2021 James A. Cobban                               *
+ *  Copyright &copy; 2022 James A. Cobban                               *
  ************************************************************************/
 
 window.onload               = onLoadRegister;
@@ -93,6 +95,16 @@ function onLoadRegister()
                     break;
                 }       // email address
 
+                case 'ForgotPassword':
+                {
+                    element.onclick     = forgotPassword;
+                    if (form.userid.value == '')
+                    {
+                        element.disabled    = true;
+                    }
+                    break;
+                }
+
                 case 'close':
                 {
                     element.onclick     = finish;
@@ -128,14 +140,19 @@ function finish()
 function checkUserid()
 {
     if (uidPattern.test(this.value))
-        this.className='black white leftnc';
+        this.className          ='black white leftnc';
     else
-        this.className='error white left';
-    var emailElement    = document.getElementById('email');
+        this.className          ='error white left';
+    var emailElement            = document.getElementById('email');
     if (this.value.indexOf('@') >= 0 &&
         emailElement &&
         emailElement.value.length == 0)
-        emailElement.value  = this.value;
+        emailElement.value      = this.value;
+    if (this.value != '')
+    {
+        var forgotElt           = document.getElementById('ForgotPassword');
+        forgotElt.disabled      = false;
+    }
 }       // function checkUserid
 
 /************************************************************************
@@ -285,6 +302,28 @@ function scorePassword(pass)
 }       // function scorePassword
 
 /************************************************************************
+ *  forgotPassword                                                      *
+ *                                                                      *
+ *  Invoke the process to reset password an existing user.              *
+ *                                                                      *
+ *  Input:                                                              *
+ *      this        <button type=button id='Register'>                  *
+ ************************************************************************/
+function forgotPassword()
+{
+    var lang            = 'en';
+    if ('lang' in args)
+        lang            = args.lang;
+    var form            = this.form;
+
+    // change the action so the values are submitted to the
+    // password reset function instead of the sign-on function
+    form.password.value = '';
+    form.action         = 'forgotPassword.php?lang=' + lang;
+    form.submit();
+}       // function forgotPassword
+
+/************************************************************************
  *  generatePassword                                                    *
  *                                                                      *
  *  Generate a new random password for the user.                        *
@@ -315,9 +354,13 @@ function generatePassword()
             code        = code + 32;
         newPass[i]  = code;
     }
-    var password    = String.fromCharCode.apply(null, newPass);
+    var password        = (String.fromCharCode.apply(null, newPass)).trim();
     var outputElement   = document.getElementById('randomPassword');
-    outputElement.value = password.trim();
+    outputElement.value = password;
+    var outputElement   = document.getElementById('password');
+    outputElement.value = password;
+    var outputElement   = document.getElementById('password2');
+    outputElement.value = password;
     return false;
 }       // function generatePassword
 

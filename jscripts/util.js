@@ -224,8 +224,9 @@
  *      2021/03/30      remove changeDiv                                *
  *      2021/04/20      do not scroll menu popup                        *
  *      2021/07/03      correct vertical position of popup dialogs      *
+ *      2022/05/21      update global debug flag from args              *
  *                                                                      *
- *  Copyright &copy; 2021 James A. Cobban                               *
+ *  Copyright &copy; 2022 James A. Cobban                               *
  ************************************************************************/
 
 /************************************************************************
@@ -320,60 +321,6 @@ else
 {
     alert("AudioContext not supported.  Upgrade your browser.")
 }
-
-/************************************************************************
- *  function getArgs                                                    *
- *                                                                      *
- *  Extract the arguments from the location URL when invoked by         *
- *  method='get'                                                        *
- *                                                                      *
- *  Returns:                                                            *
- *      associative array of arguments                                  *
- ************************************************************************/
-function getArgs()
-{
-    let args    = new Object();
-    let query   = location.search.substring(1); // search excluding '?'
-    let pairs   = query.split("&");     // split on ampersands
-    for (let i = 0; i < pairs.length; i++)
-    {       // loop through all pairs
-        let pos = pairs[i].indexOf('=');
-        if (pos == -1)
-            continue;
-        // argument names are case-insensitive
-        let name    = pairs[i].substring(0, pos).toLowerCase();
-        let value   = pairs[i].substring(pos + 1);
-        value       = decodeURIComponent(value);
-        args[name]  = value;
-
-        // set the global diagnostic flag
-        switch(name)
-        {
-            case 'debug':
-                debug               = value;
-                break;
-
-            case 'text':
-                activateMCE         = false;
-                break;
-
-            case 'lang':
-                lang                = value;
-                break;
-
-        }
-    }       // loop through all pairs
-
-    return args;
-}       // function getArgs
-
-/************************************************************************
- *  global variable args                                                *
- *                                                                      *
- *  Make arguments from the search portion of the URL available to all  *
- *  scripts.                                                            *
- ************************************************************************/
-var args    = getArgs();
 
 /************************************************************************
  * specify the style for tinyMCE editing                                *
@@ -476,6 +423,60 @@ var helpDelayTimer   = null;
  *  instance of HTMLIFrameElement occupying half of the window.         *
  ************************************************************************/
 var iframe           = null;
+
+/************************************************************************
+ *  function getArgs                                                    *
+ *                                                                      *
+ *  Extract the arguments from the location URL when invoked by         *
+ *  method='get'                                                        *
+ *                                                                      *
+ *  Returns:                                                            *
+ *      associative array of arguments                                  *
+ ************************************************************************/
+function getArgs()
+{
+    let args    = new Object();
+    let query   = location.search.substring(1); // search excluding '?'
+    let pairs   = query.split("&");     // split on ampersands
+    for (let i = 0; i < pairs.length; i++)
+    {       // loop through all pairs
+        let pos = pairs[i].indexOf('=');
+        if (pos == -1)
+            continue;
+        // argument names are case-insensitive
+        let name    = pairs[i].substring(0, pos).toLowerCase();
+        let value   = pairs[i].substring(pos + 1);
+        value       = decodeURIComponent(value);
+        args[name]  = value;
+
+        // set the global diagnostic flag
+        switch(name)
+        {
+            case 'debug':
+                debug               = value;
+                break;
+
+            case 'text':
+                activateMCE         = false;
+                break;
+
+            case 'lang':
+                lang                = value;
+                break;
+
+        }
+    }       // loop through all pairs
+
+    return args;
+}       // function getArgs
+
+/************************************************************************
+ *  global variable args                                                *
+ *                                                                      *
+ *  Make arguments from the search portion of the URL available to all  *
+ *  scripts.                                                            *
+ ************************************************************************/
+var args    = getArgs();
 
 /************************************************************************
  *  function getHelpPopupOption                                         *

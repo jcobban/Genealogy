@@ -338,15 +338,11 @@ if (is_string($districtIdtext))
 {
     $msg            .= $template['distSyntax']->replace('$districtId', 
                                                         $districtIdtext);
-    $district       = new District(array('censusid'     => $census,
-                                         'id'           => '0'));
 }
 else
 if (strlen($districtId) == 0)
 {
     $msg            .= $template['districtMissing']->innerHTML;
-    $district       = new District(array('censusid'     => $census,
-                                         'id'           => '0'));
 }
 else
 {                   // district number specified

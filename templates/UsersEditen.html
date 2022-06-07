@@ -65,21 +65,28 @@
 	          </span>
 	      </button>
 	    &nbsp;
-	      <a href="mailto:?to=$TOLIST&amp;bcc=$BCCLIST&amp;subject=[JamesCobban.net]%20General%20Notice"
+	      <a href="MailUsers.php?options=1"
 			    class="button" id="bulkMail">
 	          <span style="white-space: nowrap; text-indent: 0em;">
 	              Send Mail to all Users
 	          </span>
 	      </a>
 	    &nbsp;
-	      <a href="mailto:?to=$TOLIST&amp;bcc=$PENDLIST&amp;subject=[JamesCobban.net]%20General%20Notice" 
+	      <a href="MailUsers.php?auth=pending"
 		    class="button" id="pendMail">
 	          <span style="white-space: nowrap; text-indent: 0em;">
 	              Send Mail to all Pending Users
 	          </span>
 	      </a>
 	    &nbsp;
-	      <a href="mailto:?to=$TOLIST&amp;bcc=$INSLIST&amp;subject=[JamesCobban.net]%20Insecure%20Password%20Notice" 
+	      <a href="MailUsers.php?pattern=^Visitor" 
+		    class="button" id="pendMail">
+	          <span style="white-space: nowrap; text-indent: 0em;">
+	              Send Mail to all Vistors
+	          </span>
+	      </a>
+	    &nbsp;
+        <a href="MailUsers.php?password=length>0"
 		    class="button" id="insMail">
 	          <span style="white-space: nowrap; text-indent: 0em;">
 	              Send Mail to all Users with Insecure Passwords

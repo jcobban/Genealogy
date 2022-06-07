@@ -138,9 +138,12 @@ use Templating\TemplateTag;
  *      2019/07/21      use Location::getLocation                       *
  *      2019/12/19      replace xmlentities with htmlentities           *
  *      2020/12/06      support getLastSqlCmd method                    *
+ *      2022/05/30      add getName method                              *
+ *                      do not throw exceptions from constructor        *
+ *                      improve constructor parameter validation        *
  *                                                                      *
- *  Copyright &copy; 2020 James A. Cobban                               *
- ************************************************************************/  
+ *  Copyright &copy; 2022 James A. Cobban                               *
+ ************************************************************************/
 require_once __NAMESPACE__ . '/Record.inc';
 require_once __NAMESPACE__ . '/LegacyDate.inc';
 require_once __NAMESPACE__ . '/FtTemplate.inc';
@@ -150,7 +153,7 @@ require_once __NAMESPACE__ . '/FtTemplate.inc';
  *                                                                      *
  *  Definition of a class implementing behavior for Picture records     *
  *  within a genealogy database.                                        *
- ************************************************************************/  
+ ************************************************************************/
 
 class Picture extends Record
 {
@@ -170,6 +173,7 @@ class Picture extends Record
     const   IDTYPEAddress   = 70;   // Address          tblAR.IDAR
     const   IDTYPELocation  = 71;   // Location         tblLR.IDLR
     const   IDTYPETemple    = 72;   // Temple           tblTR.IDTR
+    const   IDTYPEMAX       = 72;   // maximum value
 
     /********************************************************************
      * values of the PicType field                                      *
@@ -177,12 +181,14 @@ class Picture extends Record
     const   PIC_TYPE_PICTURE= 0;    // image file
     const   PIC_TYPE_SOUND  = 1;    // sound file
     const   PIC_TYPE_VIDEO  = 2;    // video file
-    const   PIC_TYPE_OTHER  = 3;    // other file   
+    const   PIC_TYPE_OTHER  = 3;    // other file
+    const   PIC_TYPE_MAX    = 3;    // maximum value
 
     /********************************************************************
      *  Picture::$IdTypeNames                                           *
      *                                                                  *
      * translate values of IDType field to text                         *
+     * This should be moved to the language specific translate table    *
      ********************************************************************/
     public static $IdTypeNames  = array(
                         0   =>  'Person',
@@ -203,6 +209,7 @@ class Picture extends Record
      *  Picture::$PicTypeNames                                          *
      *                                                                  *
      * translate values of PicType field to text                        *
+     * This should be moved to the language specific translate table    *
      ********************************************************************/
     public static $PicTypeNames = array(
                         0   =>  'Image File',
@@ -216,24 +223,24 @@ class Picture extends Record
      *  array containing default values for a new record                *
      ********************************************************************/
     protected static    $initRow    = array(
-                        'idbr'              => 0, 
-                        'idir'              => 0, 
-                        'idtype'            => 0, 
-                        'pictype'           => 0, 
-                        'picorder'          => 0, 
-                        'picname'           => '', 
+                        'idbr'              => 0,
+                        'idir'              => 0,
+                        'idtype'            => 0,
+                        'pictype'           => 0,
+                        'picorder'          => 0,
+                        'picname'           => '',
                         'picnameurl'        => '',
-                        'idbppic'           => 1, 
-                        'piccaption'        => '', 
-                        'picd'              => '', 
-                        'picsd'             => '', 
-                        'picdate'           => '', 
-                        'picdesc'           => '', 
-                        'picprint'          => 0, 
-                        'picsoundname'      => '', 
-                        'picsoundnameurl'   => '', 
-                        'idbpsound'         => 0, 
-                        'used'              => 0, 
+                        'idbppic'           => 1,
+                        'piccaption'        => '',
+                        'picd'              => '',
+                        'picsd'             => '',
+                        'picdate'           => '',
+                        'picdesc'           => '',
+                        'picprint'          => 0,
+                        'picsoundname'      => '',
+                        'picsoundnameurl'   => '',
+                        'idbpsound'         => 0,
+                        'used'              => 0,
                         'picpref'           => 1,
                         'filingref'         => '');
 
@@ -295,43 +302,56 @@ class Picture extends Record
         global      $warn;
         global      $connection;
 
-        $dbrow              = null;
-        $needInsert         = false;
-        $where              = '';
-        $and                = 'WHERE ';
-        $sqlParms           = array();
-        $picnameurl         = null;
+        $dbrow              	= null;
+        $needInsert         	= false;
+        $where              	= '';
+        $and                	= 'WHERE ';
+        $sqlParms           	= array();
+        $picnameurl             = null;
 
         // action depends upon type of first parameter
         if (is_array($id))
-            $parms          = $id;
+        {
+            $parms              = $id;
+            $picnameurl         = null;
+            $idtype             = null;
+            $pictype            = null;
+            $idir               = null;
+        }
         else
         if (is_string($id))
-        {       // string
+        {                   // string
             if (ctype_digit($id))
-            {       // ignore other parameters
-                $idbr       = intval($id);
-                $parms      = array('idbr'  => $idbr);
-            }       // ignore other parameters
+            {               // ignore other parameters
+                $idbr           	= intval($id);
+                $parms          	= array('idbr'  => $idbr);
+                $idtype         	= null;
+                $pictype        	= null;
+                $idir           	= null;
+            }               // ignore other parameters
             else
-            {       // search for URL
-                $picnameurl = $id;      // to clarify following logic
-                $parms      = array('idir'      => $idir,
-                                    'idtype'    => $idtype,
-                                    'pictype'   => $pictype);
-                $this->row  = array();
+            {               // search for URL
+                $picnameurl         = $id;
+                $this->row          = array();
                 $this->splitUrl('picture',
                                 $picnameurl);
-                $parms      = $this->row;
+                $parms              = $this->row;
+                $parms['idir']      = $idir;
+                $parms['idtype']    = $idtype;
+                $parms['pictype']   = $pictype;
+                $idtype         	= null;
+                $pictype        	= null;
+                $idir           	= null;
             }       // search for URL
         }       // string
         else
         if (is_int($id))
-            $parms      = array('idbr'  => $id);
+            $parms                  = array('idbr'  => $id);
         else
         {
-            throw new Exception("Picture::__construct: called with " .
-                 gettype($id) . ", value='" . print_r($id, true) . "'");
+            $this->msg      = "Picture::__construct: called with " .
+                gettype($id) . ", value=" . var_export($id, true) . "\n";
+            return;
         }
 
         $fieldsValid                    = true;
@@ -342,38 +362,30 @@ class Picture extends Record
                 $fieldLc                = self::$translate[$fieldLc];
             switch($fieldLc)
             {
-                case 'idbr':
-                {
+                case 'idbr':        // key of existing record
+                    if ($value < 1)
+                        break;
                     $where              .= $and . 'IDBR=:idbr';
                     $idbr               = $value;
                     $sqlParms['idbr']   = $value;
                     $and                = ' AND ';
-                    break;
-                }
+                    break;          // key of existing record
 
-                case 'picnameurl':
-                {   // create new record for picture/video/sound URL
-                    $picnameurl         = $value;// to clarify following logic
-                    break;
-                }       // picture/video/sound file name
+                case 'picnameurl':  // full URL of document
+                    $picnameurl         = $value;
+                    break;          // full URL of document
 
                 case 'idtype':
-                {
                     $idtype             = $value;
                     break;
-                }
 
                 case 'pictype':
-                {
                     $pictype            = $value;
                     break;
-                }
 
                 case 'idir':
-                {
                     $idir               = $value;
                     break;
-                }
 
                 case 'picorder':
                 case 'picname':
@@ -389,65 +401,64 @@ class Picture extends Record
                 case 'idbpsound':
                 case 'used':
                 case 'picpref':
-                case 'filingref':
-                {                   // not keys
-                    break;
-                }                   // not keys
+                case 'filingref':   // not keys
+                    break;          // not keys
 
                 default:
-                {
-                    $fieldsValid    = false;
+                    $fieldsValid        = false;
                     break;
-                }
-            }
-        }
+            }                       // act on specific field names
+        }                           // loop through parameters
 
         if (count($parms) >= count(self::$initRow) && $fieldsValid)
-        {               // full row returned from database query
-            $dbrow                  = $parms;
-            $needInsert             = false;
-        }               // full row returned from database query
+        {                           // full row from database query
+            $dbrow                      = $parms;
+            $needInsert                 = false;
+        }                           // full row from database query
         else
         if (strlen($where) > 0)
-        {               // numeric identifier of record
+        {                           // numeric identifier of record
             // construct the query of the picture/video/sound file table
-            $query              = 'SELECT * FROM tblBR ' . $where;
+            $query                      = "SELECT * FROM tblBR $where";
 
             // query the database
-            $stmt               = $connection->prepare($query);
-            $queryText          = debugPrepQuery($query, $sqlParms);
+            $stmt                       = $connection->prepare($query);
+            $queryText              = debugPrepQuery($query, $sqlParms);
             if ($stmt->execute($sqlParms))
-            {       // success
-                $this->lastSqlCmd   = $queryText;
-                if ($debug)
-                    $warn       .= "<p>Picture::__construct: " .
-                                      "'$queryText'</p>\n";
-                $row            = $stmt->fetch(PDO::FETCH_ASSOC);
+            {                       // success
+                $this->lastSqlCmd       = $queryText;
+                $row                    = $stmt->fetch(PDO::FETCH_ASSOC);
 
                 if (is_array($row))
-                {       // found picture/video/sound file record
-                    $dbrow  = $row;
-                    $needInsert = false;
-                }       // found picture/video/sound file record
+                {                   // found picture/video/sound record
+                    $dbrow              = $row;
+                    $needInsert         = false;
+                }                   // found picture/video/sound record
                 else
-                {       // failed
-                    $dbrow      = self::$initRow;
-                    $needInsert = true;
-                }       // failed
-            }           // success
+                {                   // failed
+                    $dbrow              = self::$initRow;
+                    $needInsert         = true;
+                }                   // failed
+            }                       // success
             else
-            {           // error performing query
-                throw new Exception('Picture::__construct: ' .
-                                "'$queryText', " . 
-                                print_r($stmt->errorInfo(),true));
-            }           // error performing query
-        }               // numeric identifier of record
+            {                       // error performing query
+                $this->msg          .= 'Picture::__construct: ' .
+                                "'$queryText', " .
+                                print_r($stmt->errorInfo(),true);
+                return;
+            }                       // error performing query
+        }                           // numeric identifier of record
         else
-        {               // add record with new picture URL
+        if ($picnameurl !== null &&
+            $idtype !== null &&
+            $pictype !== null && 
+            $idir !== null)
+        {                           // add record
             // the new record is added after all of the existing records
             // so the PicOrder field is initialized to the number of
             // existing records for the current individual
-            $query      = 'SELECT COALESCE(MAX(`PicOrder`),0)+1 FROM tblBR ' .
+            // THIS SHOULD BE DEFERRED UNTIL THE RECORD IS SAVED
+            $query  = 'SELECT COALESCE(MAX(`PicOrder`),0)+1 FROM tblBR ' .
                                 'WHERE IdType=:idtype AND IDIR=:idir';
             $sqlParms               = array('idtype'    => $idtype,
                                             'idir'      => $idir);
@@ -455,37 +466,45 @@ class Picture extends Record
             $stmt                   = $connection->prepare($query);
             $queryText              = debugPrepQuery($query, $sqlParms);
             if ($stmt->execute($sqlParms))
-            {       // success
-                $this->lastSqlCmd   = $queryText;
+            {                       // success
+                $this->lastSqlCmd   	= $queryText;
                 if ($debug)
                     print "<p>Picture::__construct: '$queryText'</p>\n";
 
-                $ctrow              = $stmt->fetch(PDO::FETCH_NUM);
-                $dbrow              = self::$initRow;
-                $dbrow['idir']      = $idir; 
-                $dbrow['idtype']    = $idtype; 
-                $dbrow['pictype']   = $pictype; 
-                $dbrow['picorder']  = $ctrow[0];
-                $this->row          = $dbrow;
+                $ctrow              	= $stmt->fetch(PDO::FETCH_NUM);
+                $dbrow              	= self::$initRow;
+                $dbrow['idir']      	= $idir;
+                $dbrow['idtype']    	= $idtype;
+                $dbrow['pictype']   	= $pictype;
+                $dbrow['picorder']  	= $ctrow[0];
+                $this->row          	= $dbrow;
                 $this->splitUrl('picture', $picnameurl);
-                $dbrow              = $this->row;
-                $needInsert         = true;
-            }       // success
+                $dbrow              	= $this->row;
+                $needInsert         	= true;
+            }                       // success
             else
-            {       // error performing query
-                throw new Exception('Picture::__construct: ' .
-                                "'$queryText', " . 
-                                print_r($stmt->errorInfo(),true));
-            }       // error performing query
+            {                       // error performing query
+                $this->msg          .= 'Picture::__construct: ' .
+                    "'$queryText', " .
+                    print_r($stmt->errorInfo(),true) . "\n";
+                return;
+            }                       // error performing query
+        }
+        else
+        {
+            $this->msg              .= 'Picture::__construct: ' .
+                                        ' invalid parameters: ' .
+                                        var_export($parms,true) . "\n";
+            return;
         }
 
         // invoke constructor of base class
         parent::__construct($dbrow,
                             'tblBR');
-        $this->needInsert   = $needInsert;
+        $this->needInsert               = $needInsert;
 
         foreach($parms as $field => $value)
-        {
+        {                           // fill in any other field values
             $fieldLc                    = strtolower($field);
             if (array_key_exists($fieldLc, self::$translate))
                 $fieldLc                = self::$translate[$fieldLc];
@@ -495,10 +514,8 @@ class Picture extends Record
                 case 'idtype':
                 case 'pictype':
                 case 'idir':
-                case 'picorder':
-                {               // already handled
+                case 'picorder':    // already handled
                     break;
-                }               // already handled
 
                 case 'picnameurl':
                 case 'picname':
@@ -515,13 +532,11 @@ class Picture extends Record
                 case 'used':
                 case 'picpref':
                 case 'filingref':
-                {           // not keys
                     parent::set($fieldLc, $value);
                     break;
-                }           // not keys
 
-            }               // act on specific fields
-        }                   // initialize other fields
+            }                       // act on specific fields
+        }                           // initialize other fields
 
         // diagnostic output if debug is set
         $this->dump('Picture Record constructed:');
@@ -757,13 +772,29 @@ class Picture extends Record
             else
             {       // error performing query
                 throw new Exception('Picture::getName: ' . __LINE__ . '"' .
-                                $queryText . '", ' . 
+                                $queryText . '", ' .
                                 print_r($stmt->errorInfo(),true));
             }       // error performing query
         }       // get web site name from table tblBP
 
         return $website . $this->row['picnameurl'] . $this->row['picname'];
     }       // Picture::getURL
+
+    /********************************************************************
+     *  function Picture::getName                                       *
+     *                                                                  *
+     *  Retrieve the 'name' of this object.  This overrides the default *
+     *  implementation for this class, which would return the numeric   *
+     *  key.  Instead this returns the complete URL identifying the     *
+     *  associated "picture" document.                                  *
+     *                                                                  *
+     *  Returns:                                                        *
+     *      A string containing a description of the record.            *
+     ********************************************************************/
+    function getName()
+    {
+        return $this->getURL();
+    }       // function Picture::getName
 
     /********************************************************************
      *  function Picture::getCaption                                    *
@@ -862,7 +893,7 @@ class Picture extends Record
             }       // success
             else
             {       // error performing query
-                throw new Exception("Picture::getSoundURL: '$queryText', " . 
+                throw new Exception("Picture::getSoundURL: '$queryText', " .
                                 print_r($stmt->errorInfo(),true));
             }       // error performing query
         }       // get web site name from table tblBP
@@ -988,7 +1019,7 @@ class Picture extends Record
                 }       // success
                 else
                 {       // error performing exec
-                    throw new Exception("Picture::setOrder: '$reorderText', " . 
+                    throw new Exception("Picture::setOrder: '$reorderText', " .
                                     print_r($stmt->errorInfo(),true));
                 }       // error performing query
             }       // valid numeric order
@@ -999,7 +1030,7 @@ class Picture extends Record
         else
         {       // error performing query
             throw new Exception('Picture::setOrder: "' .
-                            "'$queryText', " . 
+                            "'$queryText', " .
                             print_r($stmt->errorInfo(),true));
         }       // error performing query
     }       // Picture::setOrder
@@ -1018,7 +1049,7 @@ class Picture extends Record
      *                                                                  *
      *  Side Effects:                                                   *
      *      $this->row['idbppic']       = $IDBP;                        *
-     *      $this->row['picnameurl']        = $path;                    *
+     *      $this->row['picnameurl']    = $path;                        *
      *      $this->row['picname']       = $filename;                    *
      *      or                                                          *
      *      $this->row['idbpsound']     = $IDBP;                        *
@@ -1051,7 +1082,7 @@ class Picture extends Record
             $prc        = preg_match("#[^/]*$#", $path, $matches);
             $filename       = $matches[0];
 print "<p>Picture.inc: " . __LINE__ . "path='$path', filename='$filename'</p>\n";
-            $path       = substr($path, 0, 
+            $path       = substr($path, 0,
                                  strlen($path) - strlen($filename));
 print "<p>Picture.inc: " . __LINE__ . "path='$path', filename='$filename'</p>\n";
             $filename       = $filename;
@@ -1100,7 +1131,7 @@ print "<p>Picture.inc: " . __LINE__ . "path='$path', filename='$filename'</p>\n"
                         else
                         {       // error performing insert
                             throw new Exception("Picture::splitUrl: '" .
-                                    $insertText . "', " . 
+                                    $insertText . "', " .
                                     print_r($stmt->errorInfo(),true));
                         }       // error performing insert
                     }       // create new website entry
@@ -1132,7 +1163,7 @@ print "<p>Picture.inc: " . __LINE__ . "path='$path', filename='$filename'</p>\n"
             }
         }
         else
-        {   
+        {
             if (count($this->row) == 0)
             {
                 $this->row['idbpsound']     = $IDBP;
@@ -1146,7 +1177,7 @@ print "<p>Picture.inc: " . __LINE__ . "path='$path', filename='$filename'</p>\n"
                 $this->set('picsoundname',  $filename);
             }
         }
-    }           // Picture::splitUrl
+    }           // function Picture::splitUrl
 
     /********************************************************************
      *  function Picture::setURL                                        *
@@ -1307,7 +1338,7 @@ print "<p>Picture.inc: " . __LINE__ . "path='$path', filename='$filename'</p>\n"
             }       // success
             else
             {       // error performing query
-                throw new Exception("Picture::setPref: '$clear', " . 
+                throw new Exception("Picture::setPref: '$clear', " .
                                 print_r($stmt->errorInfo(),true));
             }       // error performing update
         }       // clear all flags except this one
@@ -1350,6 +1381,8 @@ print "<p>Picture.inc: " . __LINE__ . "path='$path', filename='$filename'</p>\n"
      ********************************************************************/
     function get($field)
     {
+        if ($this->row === null)
+            return null;
         $fieldLc    = strtolower($field);
         if (array_key_exists($fieldLc, self::$translate))
             $fieldLc    = self::$translate[$fieldLc];
@@ -1414,99 +1447,74 @@ print "<p>Picture.inc: " . __LINE__ . "path='$path', filename='$filename'</p>\n"
      ********************************************************************/
     function set($field, $value)
     {
+        if ($this->row === null)
+            return null;
         $fieldLc    = strtolower($field);
         if (array_key_exists($fieldLc, self::$translate))
             $fieldLc    = self::$translate[$fieldLc];
         switch($fieldLc)
         {       // act on specific field names
-            case 'picdate':
-            {       // legacy internal date format
+            case 'picdate': // convert to Legacy internal date format
                 return $this->setDate(' ' . $value);
-            }       // legacy internal date format
 
             case 'picorder':
-            {       // field specific action
                 return $this->setOrder($value);
                 break;
-            }       // field specific action
 
             case 'picnameurl':
-            {       // field specific action
                 return $this->setURL($value);
                 break;
-            }       // field specific action
 
             case 'piccaption':
-            {       // field specific action
                 return $this->setCaption($value);
                 break;
-            }       // field specific action
 
 
             case 'picdesc':
-            {       // field specific action
                 return $this->setDesc($value);
                 break;
-            }       // field specific action
 
             case 'picprint':
-            {       // field specific action
                 return $this->setPrint($value);
                 break;
-            }       // field specific action
 
             case 'picsoundnameurl':
-            {       // field specific action
                 return $this->setSoundURL($value);
                 break;
-            }       // field specific action
 
             case 'used':
-            {       // field specific action
                 return $this->setUsed($value);
                 break;
-            }       // field specific action
 
             case 'picpref':
-            {       // field specific action
                 return $this->setPref($value);
                 break;
-            }       // field specific action
 
             case 'filingref':
-            {       // field specific action
                 return $this->setFilingRef($value);
                 break;
-            }       // field specific action
 
             case 'pictype':
-            {       // field specific action
                 return parent::set('pictype', $value);
                 break;
-            }       // field specific action
 
             case 'picname':
-            {       // field specific action
                 return parent::set('picname', $value);
                 break;
-            }       // field specific action
 
             case 'idbr':
             case 'idir':
             case 'idbppic':
             case 'idbpsound':
             case 'idtype':
-            {       // no special action
                 return parent::set($field, $value);
                 break;
-            }       // no special action
 
             default:
-            {       // unsupported
                 return parent::set($field, $value);
-            }       // unsupported
+
         }       // act on specific field names
-    }           // Picture::set
+    }           // function Picture::set
 
     /********************************************************************
      *  function Picture::postUpdate                                    *
@@ -1642,17 +1650,17 @@ print "<p>Picture.inc: " . __LINE__ . "path='$path', filename='$filename'</p>\n"
         }       // true
 
         // get the key of the records in tblBP referenced by this record
-        $idbppic    = $this->row['idbppic'];
-        $idbpsound  = $this->row['idbpsound'];
+        $idbppic        = $this->row['idbppic'];
+        $idbpsound      = $this->row['idbpsound'];
 
         // invoke Record::delete to delete the record from the database
         $rc = parent::delete($xml);
 
         // check to see if the tblBP records referenced by this instance
-        // are still in use, and clear the 'Used' flag if not 
+        // are still in use, and clear the 'Used' flag if not
         if ($idbppic > 0)
-        {       // if required update tblBP
-            $update = 'UPDATE tblBP SET Used=0 ' . 
+        {           // if required update tblBP
+            $update = 'UPDATE tblBP SET Used=0 ' .
                         'WHERE IDBP=:idbppic AND ' .
                                 'NOT EXISTS (SELECT * FROM tblBR ' .
                         'WHERE IDBPPic=:idbppic OR IDBPSound=:idbppic)';
@@ -1664,20 +1672,20 @@ print "<p>Picture.inc: " . __LINE__ . "path='$path', filename='$filename'</p>\n"
             if ($stmt->execute($sqlParms))
             {       // success
                 $this->lastSqlCmd   .= $updateText;
-                $result     = $stmt->rowCount();
+                $result             = $stmt->rowCount();
                 if ($xml && $result > 0)
                     print "<$tagname result='$result'>$updateText</$tagname>\n";
             }       // success
             else
             {       // error performing query
                 throw new Exception('Picture::delete: "' .
-                                $updateText . '", ' . 
+                                $updateText . '", ' .
                                 print_r($stmt->errorInfo(),true));
             }       // error performing query
-        }       // if required update tblBP
+        }           // if required update tblBP
 
         if ($idbpsound > 0)
-        {       // if required update tblBP
+        {           // if required update tblBP
             $update = 'UPDATE tblBP SET Used=0 ' .
                     'WHERE IDBP=:idbpsound AND ' .
                             'NOT EXISTS (SELECT * FROM tblBR ' .
@@ -1696,10 +1704,10 @@ print "<p>Picture.inc: " . __LINE__ . "path='$path', filename='$filename'</p>\n"
             }       // success
             else
             {       // error performing query
-                throw new Exception('Picture::delete: \'$updateText\', ' . 
+                throw new Exception('Picture::delete: \'$updateText\', ' .
                                 print_r($stmt->errorInfo(),true));
             }       // error performing query
-        }       // if required update tblBP
+        }           // if required update tblBP
 
     }       // Picture::delete
 
@@ -1804,4 +1812,4 @@ print "<p>Picture.inc: " . __LINE__ . "path='$path', filename='$filename'</p>\n"
         return $result;
     }       // Picture::toHtml
 
-}       // class Picture 
+}       // class Picture

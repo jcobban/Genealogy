@@ -71,7 +71,13 @@ if (isset($_GET) && count($_GET) > 0)
                                     "<th class='colhead'>value</th></tr>\n";
     foreach($_GET as $name => $value)
     {
-        $safevalue          = htmlspecialchars($value);
+        if (is_string($value))
+            $safevalue      = htmlspecialchars($value);
+        else
+        {
+            $safevalue      = htmlspecialchars(var_export($value, true));
+            error_log("contactAuthor.php: $name=$safevalue");
+        }
         $parmsText          .= "<tr><th class='detlabel'>$name</th>" .
                                 "<td class='white left'>" .
                                 "$safevalue</td></tr>\n"; 

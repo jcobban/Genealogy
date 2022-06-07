@@ -1,47 +1,48 @@
 <!--*********************************************************************
- *  Registeren.html														*
+ *  Registerde.html														*
  *																		*
  *  This template provides a common interface for registering as an		*
  *  authorized user of the web site.									*
  *																		*
  *  History:															*
- *		2018/02/05		Created											*
- *		2018/02/28		add "Generate Password" button					*
+ *		2022/05/29		Created											*
  *																		*
- *  Copyright &copy; 2018 James A. Cobban								*
+ *  Copyright &copy; 20ww James A. Cobban								*
  **********************************************************************-->
   <div id='breadcrumbs' style='hidden'>
-    <a href="/genealogy.php?lang=$LANG">Genealogy</a>:
+      <a href="/genealogy.php?lang=de">
+        Stammbaumforschung
+      </a>:
   </div>
   <div class='body'>
     <h1>
       $TITLE
       <span class='right'>
-		<a href='RegisterHelpen.html' target='help'>? Help</a>
+		<a href='RegisterHelpen.html' target='help'>? Hilfe</a>
       </span>
       <div style='clear: both;'></div>
     </h1>
       <span id="titleNew" class="hidden">
-		    Register a New User
+		    Registrieren Sie einen neuen Benutzer
       </span>
       <span id="titleComplete" class="hidden">
-		    Registration Complete
+		    Registrierung abgeschlossen 
       </span>
       <span id="titleAlready" class="hidden">
-		    Already Registered
+		    Bereits registriert
       </span>
     $TRACE
     $MSG
-    <p>By registering you are agreeing to accept the use of "cookies"
-		that are used to keep track of your session and validate your
-		authorization to access services which are only available to
-		registered users.
+    <p>Durch die Registrierung stimmen Sie der Verwendung von "Cookies" zu,
+      die verwendet werden, um Ihre Sitzung zu verfolgen und 
+      Ihre Autorisierung für den Zugriff auf Dienste zu validieren, 
+      die nur registrierten Benutzern zur Verfügung stehen.
     </p>
     <p id='okmsgRespond' class='label'> 
-		Respond to the e-mail which is sent to you to confirm this registration.
+		Antworten Sie auf die E-Mail, die Ihnen zur Bestätigung dieser Registrierung zugesandt wird.
     </p>
     <p id='okmsgAlready' class='label'> 
-		You are already registered with this user name and E-mail address.
+		Mit diesem Benutzernamen und dieser E-Mail-Adresse sind Sie bereits registriert.
     </p>
 
     <form action='Register.php'
@@ -49,14 +50,14 @@
 		  method='post'  
 		  enctype='multipart/form-data'>
 		<p class='clear' id='emailRow'>
-		    <label class='label' for='email'>E-mail Address:
+		    <label class='label' for='email'>E-Mail-Addresse:
 		    </label>
 		    <input type='text' size='64' name='email' id='email'
 					class='black white leftnc'
 					value='$EMAIL'>
 		</p>
 		<p class='clear' id='useridRow'>
-		    <label class='label' for='userid'>User Identifier:
+		    <label class='label' for='userid'>Benutzerkennung:
 		    </label>
 		    <input type='text' size='32' maxlength='64'
 					name='userid' id='userid' autocomplete='off' 
@@ -64,45 +65,45 @@
 					value='$NEWUSERID'>
 		</p>
 		<p class='clear' id='passRow'>
-		    <label class='label' for='password'>Password:
+		    <label class='label' for='password'>Passwort:
 		    </label>
 		    <input type='password' size='32' name='password' id='password'
 					class='white leftnc'
 					autocomplete='off'>
 		    <span id='passwordPoor' style='color:#e00000; display:none'>
-			Your password is poor.
+			Ihr Passwort ist schlecht.
 		    </span>
 		    <span id='passwordWeak' style='color:#a89800; display:none'>
-			Your password is weak.
+			Ihr Passwort ist schwach.
 		    </span>
 		    <span id='passwordGood' style='color:#60d800; display:none'>
-			Your password is good.
+			Ihr Passwort ist gut.
 		    </span>
 		    <span id='passwordStrong' style='color:#11ff10; display:none'>
-			Your password is strong.
+			Ihr Passwort ist sicher.
 		    </span>
 		</p>
 		<p class='clear' id='pass2Row'>
-		    <label class='label' for='password2'>Repeat Password:
+		    <label class='label' for='password2'>Passwort wiederholen:
 		    </label>
 		    <input type='password' size='32' name='password2' id='password2'
 					class='black white leftnc'
 					autocomplete='off'>
 		    <button type="button" id="generatePassword">
-			Generate Random Password
+			Zufälliges Passwort generieren
 		    </button>
 		    <input type="text" size="32" value=""
 			name="randomPassword" id="randomPassword"
 			class="white leftnc" readonly="readonly">
 	    </p>
 		<p class='clear' id='useEmailRow'>
-		    <label class='label' for='usemail'>Send Notices to E-mail:
+		    <label class='label' for='usemail'>Benachrichtigungen per E-Mail senden:
 		    </label>
 		    <input type='checkbox' name='usemail' id='usemail'
 				$CHKUSEMAIl>
 		</p>
 		<p class='clear' id='noHelpRow'>
-		    <label class='label' for='nohelp'>Suppress Help Popups:
+		    <label class='label' for='nohelp'>Hilfe-Popups unterdrücken:
 		    </label>
 		    <input type='checkbox' name='nohelp' id='nohelp'
 				$CHKNOHELP>
@@ -112,22 +113,22 @@
 		<input type='hidden' name='lang' value='$LANG'>
 		<span class='pad'>
 		    <button type='submit' id='register'>
-			<u>R</u>egister
+			<u>R</u>egistrieren
 		    </button>
 		</span>
         <span class='pad'>
             <button type='button' id='ForgotPassword' accesskey='F'>
-            <u>F</u>orgot My Password
+            Ich habe mein Passwort vergesse
             </button>
         </span>
 		<span class='pad'>
 		    <button type='button' id='close'>
-			<u>C</u>lose
-		    </button>
+			 S<u>c</u>hließen		    
+            </button>
 		</span>
 		<span class='button'>
 		  <a href='ContactAuthor.php?subject=Register'>
-			Contact Administrator</a>
+			Verwalter kontaktieren</a>
 		</span>
       </p>
     </form>
@@ -135,49 +136,52 @@
   </div>
   <div class='hidden'>
     <span id="emailSubject">
-		[JamesCobban.net] Thank You for Registering as User '$newuserid'
+		[JamesCobban.net] Vielen Dank für die Registrierung als Benutzer '$newuserid'
     </span>
     <span id="emailBody">
-		Please complete your registration for user name '$newuserid'
-		by verifying your e-mail address by clicking on the following link:  .
-		<a href="https://$servername/ConfirmEmail.php?userid=$newuserid&id=$id&confirmid=$confirmid">Confirm</a>
-		Thank you.
+		Bitte schließen Sie Ihre Registrierung für den Benutzernamen
+        „$newuserid“ ab, indem Sie Ihre E-Mail-Adresse bestätigen, 
+        indem Sie auf den folgenden Link klicken:
+		<a href="https://$servername/ConfirmEmail.php?userid=$newuserid&id=$id&confirmid=$confirmid">Bestätigen</a>
+		Danke.
 		<br>
-		<i>Administrator</i>
+		<i>Verwalter</i>
     </span>
     <!-- error messages -->
     <span id="shortUsername" >
-		User identifier must be at least 6 characters long.
+		Die Benutzerkennung muss mindestens 6 Zeichen lang sein.
     </span>
     <span id="badUsername" >
-		User identifier '$newuserid' may not contain '&lt;', '&gt;', '@', or '&amp;'.
+		Die Benutzerkennung '$newuserid' darf kein '&lt;', '&gt;', '@', oder '&amp;' enthalten.
     </span>
     <span id="shortPassword" >
-		Password must be at least 6 characters long.
+		Das Passwort muss mindestens 6 Zeichen lang sein.
     </span>
     <span id="passMismatch" >
-		Passwords do not match.
+		Passwörter stimmen nicht überein.
     </span>
     <span id="badEmail" >
-		A valid e-mail address is required for registration.
+		Für die Registrierung ist eine gültige E-Mail-Adresse erforderlich.
     </span>
     <p id="initialPrompt" >
-		Enter registration.
+		Registrierung eingeben.
     </p>
     <span id="emailInUse" >
-		Requested email '$email' already in use for userid.
+		Die angeforderte E-Mail-Adresse „$email“ wird bereits 
+        für die Benutzer-ID verwendet.
     </span>
     <span id="useridUsed" >
-		Requested userid '$newuserid' already in use.  Try something different.
+		Angeforderte Benutzer-ID '$newuserid' wird bereits verwendet. 
+        Versuchen Sie etwas anderes.
     </span>
 
   </div>
   <div class='balloon' id='matchDiv'>
       <form name='matchForm' id='matchForm'>
-		<p class='message'>The two password values must match</p>
+		<p class='message'>Die beiden Kennwortwerte müssen übereinstimmen</p>
 		<p>
 		  <button type='button' id='closeDlgMatch'>
-    	OK
+    	    Bestätigen
 		  </button>
 		</p>
       </form>

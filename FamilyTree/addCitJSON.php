@@ -341,7 +341,7 @@ function censusCitation($year, $page, $idir, $type)
     					$line->set('idir', $idir);
                         $result		= $line->save();
                         print ",\n    \"sqlcmd" . __LINE__ . "\" : " .
-                                    json_encode($sqlcmd);
+                                    json_encode($line->getLastSqlCmd());
     			    }		// unique match
     			}		    // found matches in census
     	    }		        // select succeeded

@@ -46,8 +46,10 @@ use \Templating\Template;
  *		                there were no surname matches                   *
  *      2020/12/05      correct XSS vulnerabilities                     *
  *      2021/09/15      automatically delete unused entries             *
+ *      2022/06/04      use negative lookahead REGEX syntax             *
+ *                      hide "Wifeof" surname entries                   *
  *																		*
- *  Copyright &copy; 2020 James A. Cobban								*
+ *  Copyright &copy; 2022 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/Surname.inc';
 require_once __NAMESPACE__ . '/Language.inc';
@@ -82,7 +84,12 @@ foreach($_GET as $key => $value)
 			else
 			if ($initial == 'M')
             {               // exclude "Mc" names
-			    $getParms['surname']	= "^M[^c]";
+			    $getParms['surname']	= "^M(?!c)";
+			}               // exclude "Mc" names
+			else
+			if ($initial == 'W')
+            {               // exclude "Mc" names
+			    $getParms['surname']	= "^W(?!ifeof)";
 			}               // exclude "Mc" names
 			else
 			if (preg_match('/^\w/u', $initial))
@@ -180,6 +187,41 @@ $template->set('MAXCOLS',           $maxcols);
 
 if ($count > 0)
 {                   // display the results
+    if ($count > 1000)
+    {
+        $warn           .= "<p>count=$count, command={$info['query']}</p>\n";
+        $query          = "SELECT (LEFT(`surname`,2)) as `leading`,count(*) FROM tblNR WHERE LEFT(`surname`,1)='$initial' GROUP BY `leading`";
+        if ($stmt = $connection->query($query))
+        {
+            $warn       .= "<p>'$query'</p>\n";
+            $results    = $stmt->fetchAll();
+            foreach($results as $row)
+            {
+                $leading        = $row[0];
+                $lcount         = $row[1];
+                $warn   .= "<p>'$leading' $lcount</p>\n";
+                if ($lcount > 1000)
+                {
+                    $query2          = "SELECT (LEFT(`surname`,3)) as `leading`,count(*) FROM tblNR WHERE LEFT(`surname`,2)='$leading' GROUP BY `leading`";
+                    if ($stmt2 = $connection->query($query2))
+                    {
+                        $warn       .= "<p style=\"padding-left: 5px\">'$query2'</p>\n";
+                        $results2   = $stmt2->fetchAll();
+            foreach($results2 as $row)
+            {
+                $leading        = $row[0];
+                $l2count        = $row[1];
+                $warn   .= "<p style=\"padding-left: 5px\">'$leading' $l2count</p>\n";
+            }
+                    }
+                }
+            }
+        }
+        else
+        {
+            $msg   .= "'$query' failed " . print_r($connection->errorInfo(), true) . ".\n";
+        }
+    }
     $cell                   = $template['asurname'];
     $cellHtml               = str_replace('id="asurname"', '', $cell->outerHTML());
     $data                   = '';

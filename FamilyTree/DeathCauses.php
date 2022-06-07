@@ -104,6 +104,16 @@ for ($i = 1; $i <= count($deathcause); $i++)
                 break;
             }
 
+            case 'anemia':
+            case 'anaemia':
+            {
+?>
+            "anaemia": a deficiency in the number or quality
+            of red blood cells in your body.
+<?php
+                break;
+            }
+
             case 'apoplexy':
             {
 ?>
@@ -229,8 +239,18 @@ for ($i = 1; $i <= count($deathcause); $i++)
             case 'carcinoma':
             {
 ?>
-            "carcinoma": a type of cancer that develops from epithelial cells
-                that line the inner or outer surfaces of the body.
+            "carcinoma": a type of cancer that develops from epithelial
+                cells that line the inner or outer surfaces of the body.
+<?php
+                break;
+            }
+
+            case 'carcinomatosis':
+            {
+?>
+            "carcinomatosis": is a rare condition that means cancer in 
+                one part of your body has spread, creating several tumors 
+                in another part of your body.
 <?php
                 break;
             }

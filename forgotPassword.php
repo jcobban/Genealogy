@@ -19,8 +19,9 @@ use \Exception;
  *      2021/01/03      correct XSS vulnerability                       *
  *                      improve support for multiple languages          *
  *      2021/04/25      correct debug output                            *
+ *      2022/06/03      missing parameter issue error message           *
  *                                                                      *
- *  Copyright &copy; 2021 James A. Cobban                               *
+ *  Copyright &copy; 2022 James A. Cobban                               *
  ************************************************************************/
 require_once __NAMESPACE__ . '/User.inc';
 require_once __NAMESPACE__ . '/FtTemplate.inc';
@@ -95,7 +96,7 @@ if (is_string($username))
     else
     {
         $text   = $template['noAccountUser']->innerHTML;
-        $msg    .= str_replace('$username', htmlspecialchars($username));
+        $msg    .= str_replace('$username', htmlspecialchars($username),$text);
     }
 }
 else

@@ -55,7 +55,7 @@ $censusYear				= null;
 $cc			            = 'CA';
 $countryName			= 'Canada';
 $lang                   = 'en';
-$langText               = null;
+$langtext               = null;
 
 // get parameter values into local variables
 // validate all parameters passed to the server

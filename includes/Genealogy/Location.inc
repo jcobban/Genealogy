@@ -375,14 +375,14 @@ class Location extends RecordPic
 
         // validate field names in parameter array
         foreach($parms as $fldname => $value)
-        {       // validate field names in parms
+        {           // validate field names in parms
             if (!is_array($value))
             {       // simple value
                 $fldnameLc  = strtolower($fldname);
                 if (!array_key_exists($fldnameLc, self::$initRow))
                     $warn   .= "<p>Location::__construct: Unknown field name '$fldname'</p>\n";
             }       // simple value
-        }       // validate field names in parms
+        }           // validate field names in parms
 
         if (count($parms) >= count(self::$initRow))
         {           // full row from database supplied
@@ -390,7 +390,7 @@ class Location extends RecordPic
             $needInsert                 = $dbrow['idlr'] == 0;
         }           // full row from database supplied
         else
-        {           // search parameters
+        {                           // search parameters
             $dbrow                      = null;
             $where                      = '';
             $and                        = 'WHERE ';
@@ -398,12 +398,12 @@ class Location extends RecordPic
             $idlr                       = null;
             $location                   = null;
             foreach($parms as $fldname => $value)
-            {               // loop through parameters
+            {                       // loop through parameters
                 $fldnameLc              = strtolower($fldname);
                 if (is_array($value))
-                {           // combine by OR
+                {                   // combine by OR
                     if (count($value) > 0)
-                    {       // not empty
+                    {               // not empty
                         $where          .= $and;
                         $or             = '(';
                         foreach($value as $orfield => $orvalue)
@@ -422,11 +422,11 @@ class Location extends RecordPic
                         }
                         $where          .= ')';
                         $and            = ' AND ';
-                    }       // not empty
-                }           // combine by OR
+                    }               // not empty
+                }                   // combine by OR
                 else
                 switch($fldnameLc)
-                {       // act on specific field names
+                {                   // act on specific field names
                     case 'idlr':
                     {
                         $where          .= "$and`$fldname`=?";
@@ -445,12 +445,12 @@ class Location extends RecordPic
                         $and            = ' AND ';
                         break;
                     }
-                }       // act on specific field names
-            }           // loop through parameters
+                }                   // act on specific field names
+            }                       // loop through parameters
 
             // query the database
             if (strlen($where) > 0)
-            {           // have where expression
+            {                       // have where expression
                 $query                  = "SELECT * FROM tblLR $where";
                 $stmt                   = $connection->prepare($query);
                 $queryText              = debugPrepQuery($query, $sqlParms);
@@ -463,51 +463,40 @@ class Location extends RecordPic
                                             __LINE__ . " $queryText</p>\n";
 
                     if (count($result) == 0)
-                    {   // no location matches parameters, create new
+                    {               // no location matches parameters
                         $dbrow          = self::$initRow;   // defaults
                         $needInsert     = true;
 
                         if (is_string($location))
-                        {       // update fields based upon new location name
+                        {           // update fields
                             $dbrow['location']  = $location;
-
-                            // calculate initial value of zoom level
-                            // for displaying map
-                            $locationLc = strtolower($location);
-                            if (strpos($locationLc,' st,') > 0 ||
-                                strpos($locationLc,' ave,') > 0 ||
-                                strpos($locationLc,' rd,') > 0)
-                                $depth  = 15;
-                            else
-                                $depth  = 6 + 2 * substr_count($location, ',');
-                            $dbrow['zoom']  = $depth;
-                        }       // update fields based upon new location name
+                        }           // update fields 
                         else
                         if ($idlr)
-                        {       // update fields based upon IDLR
+                        {           // update fields based upon IDLR
                             $tempname               = 'Lost Location ' . $idlr;
                             $dbrow['location']      = $tempname;
                             $dbrow['sortedlocation']= $tempname;
                             $dbrow['shortname']     = $tempname;
-                        }       // update fields based upon IDLR
-                    }       // no location matches parameters
+                        }           // update fields based upon IDLR
+                    }               // no location matches parameters
                     else
-                    {       // existing row
-                        $dbrow      = $result[0];
-                        $needInsert     = false;
-                    }       // existing row
-                }           // successful query
+                    {               // existing row
+                        $dbrow              = $result[0];
+                        $needInsert         = false;
+                    }               // existing row
+                }                   // successful query
                 else
-                {           // error issuing query
+                {                   // error issuing query
                     $this->msg      .= "Location::__construct: " .
                                         "'$queryText' " .
                                         print_r($stmt->errorInfo(),true) . '. ';
-                }           // error issuing query
-            }           // have where expression
+                }                   // error issuing query
+            }                       // have where expression
             else
-                $this->msg      .= "Location::__construct: " .
+                $this->msg          .= "Location::__construct: " .
                                     "No IDLR Parameter Specified. ";
-        }           // search parameters
+        }                           // search parameters
 
         // invoke constructor of base class
         parent::__construct($dbrow,
@@ -517,34 +506,34 @@ class Location extends RecordPic
         // save a reference to existing record
         $location           = $this->row['location'];
         if ($needInsert)
-        {                   // new record
+        {                           // new record
             if (is_string($location))
                 $this->setName($location);  // side effects of name
-        }                   // new record
+        }                           // new record
         else
-        {                   // existing record
+        {                           // existing record
             $idlr           = $this->row['idlr'];
             if ($idlr > 0)
-            {               // have key
+            {                       // have key
                 if (!array_key_exists($idlr, self::$locationIndex))
-                {           // not already saved
+                {                   // not already saved
                     self::$locationIndex[$idlr]     = $this;
                     self::$locationNames[$location] = $this;
-                }           // not already saved
-            }               // have key
-        }                   // existing record
+                }                   // not already saved
+            }                       // have key
+        }                           // existing record
 
         // use any other parameters to modify fields
         if (count($parms) < count(self::$initRow))
         {
             foreach($parms as $fldname => $value)
-            {       // loop through parameters
+            {                       // loop through parameters
                 $fldnameLc              = strtolower($fldname);
                 if ($fldnameLc != 'idlr' &&
                     $fldnameLc != 'location' &&
                     !is_array($value))
                     $this->set($fldname, $value);
-            }       // loop through parameters
+            }                       // loop through parameters
         }
 
         $this->set('searchname', $this->getSearchName());
@@ -1021,32 +1010,32 @@ class Location extends RecordPic
         // for lot locations, whether on urban streets or in rural concessions
         // set the sort value so that all locations on the same street or
         // concession sort together in order by lot number
-        $rgxres = preg_match(self::$namePattern,
-                             $newName,
-                             $matches);
+        $rgxres             = preg_match(self::$namePattern,
+                                         $newName,
+                                         $matches);
         if ($rgxres > 0)
         {       // street address
-            $lotnum     = $matches[2];
+            $lotnum         = $matches[2];
             if (strlen($lotnum) > 5)
-                $lot6   = substr($lotnum, 5, 1);
+                $lot6       = substr($lotnum, 5, 1);
             else
-                $lot6   = '';
-            $con        = $matches[4];
+                $lot6       = '';
+            $con            = $matches[4];
             if (preg_match('/^con\s+[0-9]\s/', $con))
-                $con    = 'con 0' . substr($con, 4);
+                $con        = 'con 0' . substr($con, 4);
             if (preg_match('/^lot\s+([0-9]+)(\s.*|)$/', $lotnum, $lmatch))
             {       // rural lot < 10
-                $num    = $lmatch[1];
-                $rest   = $lmatch[2];
+                $num        = $lmatch[1];
+                $rest       = $lmatch[2];
                 if (strlen($num) < 2)
                     $lotnum = 'lot 0' . $num . $rest;
             }       // rural lot < 10
             else
             if (ctype_digit($lotnum) && strlen($lotnum) < 3)
-                $lotnum = substr('000' . $lotnum, strlen($lotnum));
+                $lotnum     = substr('000' . $lotnum, strlen($lotnum));
 
             $sortedlocation = $con . $matches[5] . ', ' .
-                $lotnum . ' ' . $matches[1];
+                                $lotnum . ' ' . $matches[1];
             parent::set('sortedlocation',$sortedlocation);
         }       // street address
         else

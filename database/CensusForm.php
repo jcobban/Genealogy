@@ -87,8 +87,9 @@ use \Templating\Template;
  *      2021/04/16      handle subdistrict id with colon better         *
  *      2021/04/25      add autofill parameter                          *
  *      2021/07/26      support displaying message if no image for page *
+ *      2022/05/05      get error message texts from template           *
  *                                                                      *
- *  Copyright &copy; 2021 James A. Cobban                               *
+ *  Copyright &copy; 2022 James A. Cobban                               *
  ************************************************************************/
 require_once __NAMESPACE__ . '/FtTemplate.inc';
 require_once __NAMESPACE__ . '/Language.inc';
@@ -186,7 +187,7 @@ if (isset($_GET) && count($_GET) > 0)
                 if (preg_match('/^[a-zA-Z]{2,4}[0-9]{4}$/', $value))
                     $censusId       = strtoupper($value);
                 else
-                    $censusIdText   = $savevalue;
+                    $censusIdText   = $safevalue;
                 break;
             }           // Census Identifier
 
@@ -305,19 +306,57 @@ if (isset($_GET) && count($_GET) > 0)
 }                       // invoked by URL to display current status of account
 
 // manage transcriber and proofreader status
-$transcriber                    = '';
-$proofreader                    = '';
-$image                          = '';
+$transcriber                = null;
+$proofreader                = null;
+
+if (is_string($censusId) &&
+    is_string($distID) && is_string($subDistID) && is_string($division))
+{
+    $census                 = new Census(array('censusid' => $censusId));
+    if ($census->isExisting())
+    {
+        $censusYear         = $census->get('year');
+        if ($census['collective'])
+        {
+            if (is_null($province))
+            {
+                $censusId   = 'CW' . $censusYear;
+                $msg    .= $template['missingProv']->innerHTML;
+            }
+            else
+                $censusId   = $province . $censusYear;
+            $census         = new Census(array('censusid' => $censusId));
+        }
+        if (strlen($province) == 0)
+            $province       = $census->get('province');
+        $getParms['censusid']   = $censusId;
+
+        // get information about the sub-district
+        $parms  = array('sd_census' => $census, 
+                        'sd_distid' => $distID, 
+                        'sd_id'     => $subDistID,
+                        'sd_div'    => $division);
+    
+        $subDistrict    = new SubDistrict($parms);
+        $pageRec        = new Page($subDistrict, $page);
+    
+        if ($pageRec->isExisting())
+        {
+            $transcriber        = $pageRec['transcriber'];
+            $proofreader        = $pageRec['proofreader'];
+        }
+    }
+}
+
 if (canUser('all'))
 {
-    if (strlen($transcriber) == 0)
-        $transcriber            = $userid;
     $action                     = 'Update';
 }
 else
 if (canUser('edit'))
 {
-    if (strlen($transcriber) == 0 || $userid == $transcriber)
+    if (is_string($transcriber) && (strlen($transcriber) == 0 || 
+        $userid == $transcriber))
         $action                 = 'Update';
     else
         $action                 = 'Proofread';
@@ -327,45 +366,24 @@ else
 
 // get template
 $warn           .= ob_get_clean();  // ensure previous output in page
-if (is_string($censusId))
-{
-    $census                 = new Census(array('censusid' => $censusId));
-    $censusYear             = $census->get('year');
-}
 $template       = new FtTemplate("CensusForm$censusYear$action$lang.html");
 $translate      = $template->getTranslate();
 $t              = $translate['tranTab'];
+$popups         = "CensusFormPopups$lang.html";
+$template->includeSub($popups,
+                      'POPUPS');
 
 // validate parameters 
-if (is_string($censusId))
+if (is_object($census))
 {
-    $census                 = new Census(array('censusid' => $censusId));
-    if ($census->isExisting())
-    {
-        $censusYear         = $census->get('year');
-        if ($censusYear < 1867 && substr($censusId, 0, 2) == 'CA')
-        {
-            if (is_null($province))
-            {
-                $censusId   = 'CW' . $censusYear;
-                $msg    .= 'Missing mandatory parameter Province. ';
-            }
-            else
-                $censusId   = $province . $censusYear;
-            $census         = new Census(array('censusid' => $censusId));
-        }
-        if (strlen($province) == 0)
-            $province       = $census->get('province');
-        $getParms['censusid']   = $censusId;
-    }
-    else
-        $msg        .= "Census='$censusId' invalid. ";
+    if (!$census->isExisting())
+        $msg        .= $template['invalidCensus']->replace('$censusId', $censusId);
 }
 else
 if (is_string($censusIdText))
-    $msg            .= "Census='$censusIdText' invalid. ";
+    $msg            .= $template['invalidCensus']->replace('$censusId', $censusIdText);
 else
-    $msg    .= 'Missing mandatory parameter Census. ';
+    $msg            .= $template['missingCensus']->innerHTML;
 
 if (is_string($province))
 {
@@ -374,7 +392,7 @@ if (is_string($province))
 }
 
 if (is_string($distIDtext))
-    $msg    .= "Invalid value of District='$distIDtext'. ";
+    $msg        .= $template['invalidDistrict']->replace('$distID', $distIDtext);
 else
 if (is_string($distID))
 {
@@ -387,12 +405,12 @@ if (is_string($distID))
 }
 else
 {       // missing mandatory parameter
-    $msg    .= 'Missing mandatory parameter District. ';
+    $msg        .= $template['missingDistrict']->innerHTML;
 }       // missing mandatory parameter
 
 if (!is_string($subDistID) || strlen($subDistID) == 0)
 {       // missing mandatory parameter
-    $msg    .= 'Missing mandatory parameter SubDistrict. ';
+    $msg        .= $template['missingSubDistrict']->innerHTML;
 }       // missing mandatory parameter
 else
 if (strlen($distID) > 0)
@@ -421,28 +439,43 @@ if (strlen($distID) > 0)
 }
 
 if (is_string($pagetext))
-    $msg            .= "Invalid value of Page='$pagetext'. ";
+    $msg        .= $template['invalidPage']->replace('$page', $pagetext);
 else
 if (strlen($page) == 0)
 {       // missing mandatory parameter
-    $msg            .= 'Missing mandatory parameter Page. ';
+    $msg        .= $template['missingPage']->innerHTML;
 }       // missing mandatory parameter
 
 if (strlen($msg) == 0)
 {       // no messages, do search
-    $page1              = $subDistrict->get('sd_page1');
-    $imageBase          = $subDistrict->get('sd_imagebase');
-    $relFrame           = $subDistrict->get('sd_relframe');
-    $pages              = $subDistrict->get('sd_pages');
-    $bypage             = $subDistrict->get('sd_bypage');
+    $page1              = $subDistrict['sd_page1'];
+    $imageBase          = $subDistrict['sd_imagebase'];
+    $relFrame           = $subDistrict['sd_relframe'];
+    $pages              = $subDistrict['sd_pages'];
+    $bypage             = $subDistrict['sd_bypage'];
 
     // obtain information about the page
     $pageRec            = new Page($subDistrict, $page);
 
-    $image              = $pageRec->get('image');
-    $numLines           = $pageRec->get('population');
-    $transcriber        = $pageRec->get('transcriber');
-    $proofreader        = $pageRec->get('proofreader');
+    $image              = $pageRec['image'];
+    $numLines           = $pageRec['population'];
+    $transcriber        = $pageRec['transcriber'];
+    $proofreader        = $pageRec['proofreader'];
+    if (canUser('all'))
+    {
+        if (strlen($transcriber) == 0)
+            $transcriber            = $userid;
+    }
+    else
+    if (canUser('edit'))
+    {
+        if (strlen($transcriber) == 0 || $userid == $transcriber)
+            $action                 = 'Update';
+        else
+            $action                 = 'Proofread';
+    }
+    else
+        $action                     = 'Display';
 
     if ($page > $page1)
     {           // not the first page in the division
@@ -478,9 +511,6 @@ else
 {
 }
 
-$popups             = "CensusFormPopups$lang.html";
-$template->includeSub($popups,
-                      'POPUPS');
 $template->set('CENSUSYEAR',        $censusYear);
 $template->set('COUNTRYNAME',       $countryName);
 $template->set('CENSUSID',          $censusId);

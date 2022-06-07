@@ -262,7 +262,7 @@ if (isset($_POST) && count($_POST) > 0)
 
 		    case 'lang':
 		    {
-				$lang	    = FtTemplate::validateLand($value);
+				$lang	    = FtTemplate::validateLang($value);
 				break;
 		    }	                // presentation language
 

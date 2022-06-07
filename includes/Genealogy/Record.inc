@@ -995,6 +995,7 @@ class Record implements Iterator, ArrayAccess
      *  function Record::debugBacktrace                                 *
      *                                                                  *
      *  Get a string containing a caller backtrace.                     *
+     *  Wrapper to permit calling as a method.                          *
      *                                                                  *
      *  Input:                                                          *
      *      $depth      maximum number of call backs to analyze         *
@@ -1003,6 +1004,22 @@ class Record implements Iterator, ArrayAccess
      *      string                                                      *
      ********************************************************************/
     protected function debugBacktrace($depth = 5)
+    {
+        return self::staticBacktrace($depth);
+    }       // protected function Record::debugBacktrace()
+
+    /********************************************************************
+     *  function Record::staticBacktrace                                *
+     *                                                                  *
+     *  Get a string containing a caller backtrace.                     *
+     *                                                                  *
+     *  Input:                                                          *
+     *      $depth      maximum number of call backs to analyze         *
+     *                                                                  *
+     *  Returns:                                                        *
+     *      string                                                      *
+     ********************************************************************/
+    static function staticBacktrace($depth = 5)
     {
         $trace          = debug_backtrace(DEBUG_BACKTRACE_PROVIDE_OBJECT, 
                                           $depth);
@@ -1017,7 +1034,9 @@ class Record implements Iterator, ArrayAccess
             else
                 $classRef               = '';
             $function                   = $call['function'];
-            if ($function == 'constDebug' || $function == 'debugBacktrace')
+            if ($function == 'constDebug' ||
+                $function == 'debugBacktrace' ||
+                $function == 'staticBacktrace')
                 continue;
             $retval     .= "$comma $level function=$classRef$function" .
                                 " called by line=" . $call['line'] .
@@ -1026,7 +1045,7 @@ class Record implements Iterator, ArrayAccess
             $level++;
         }
         return htmlspecialchars($retval);
-    }       // protected function Record::debugBacktrace()
+    }       // protected function Record::staticBacktrace()
 
     /********************************************************************
      *  function Record::getId                                          *
@@ -1380,9 +1399,9 @@ class Record implements Iterator, ArrayAccess
         else
         {
             $srvmg          = false;
-            debug_print_backtrace();
             $this->msg      .= "Record::save: " . __LINE__ .
-                    " no description of table `$table` defined";
+                " no description of table `$table` defined. " .
+                $this->debugBacktrace();
         }
 
         // report errors detected by constructor and suppress update
@@ -2273,9 +2292,7 @@ class Record implements Iterator, ArrayAccess
             $msg            .= "Record::set('$field', '" .
                                 htmlspecialchars($value) . 
                                 "') called with \$this->row null. ";
-            ob_start();
-            debug_backtrace();
-            $msg    .= ob_get_clean();
+            $msg    .= $this->debugBacktrace() . ". ";
             return null;
         }
 
@@ -2557,8 +2574,9 @@ class Record implements Iterator, ArrayAccess
 
         if ($tableName == 'Census1901S2')
         {
-            debug_print_backtrace();
-            exit;
+            error_log("Record::getInformation('$tableName') " .
+                    __LINE__ . ' ' . self::staticBacktrace() . "</p>\n");
+            return array('table' => $tableName);
         }
         if ($tableName == '')
         {
@@ -2675,6 +2693,10 @@ class Record implements Iterator, ArrayAccess
                 include $incname;
             else
             {
+                error_log("Record::getInformation: " . __LINE__ .
+            " returns null because unable to load class $className");
+                error_log("Record::getInformation: " . __LINE__ . ' ' .
+                            self::staticBacktrace());
                 if ($debug)
                     $warn   .= "<p>Record::getInformation: " . __LINE__ .
                                 " returns null because unable to load class $className</p>\n";
@@ -3449,9 +3471,8 @@ class Record implements Iterator, ArrayAccess
         if (!$ok && $debug)
         {
             $warn           .= "<p>Record::offsetExists('$field') returns false for table='" . $this->table . "'</p>\n";
-            ob_start();
-            debug_print_backtrace();
-            $warn           .= "<div>" . ob_get_clean() . "</div>\n";
+            $warn           .= "<div>" . $this->debugBacktrace() .
+                                "</div>\n";
         }
         return $ok;
     }       // public function offsetExists($field)
@@ -3635,12 +3656,10 @@ function debugPrepQuery($query, $sqlParms, $escape = true)
 
                 if (preg_match('/^(\w+)(.*)$/s', $text, $matches) == 0)
                 {
-                    ob_start();
-                    debug_print_backtrace();
                     $warn       .= "<p>Record.inc: " . __LINE__ . ' ' .
-                                   ob_get_clean() . "</p>\n";
-                    throw new Exception('debugPrepQuery parse failed for \'' .
-                                $text . "' in '$query'");
+                        " '$text' does not match pattern /^(\w+)(.*)$/s" . 
+                        /* $this->debugBacktrace() . */ "</p>\n";
+                    return '';
                 }
                 $index          = $matches[1];
                 $text           = $matches[2];
@@ -3664,9 +3683,8 @@ function debugPrepQuery($query, $sqlParms, $escape = true)
                 if (is_array($val))
                 {
                     $queryText  .= print_r($val,true) . $text;
-                    ob_start();
-                    debug_print_backtrace();
-                    $warn       .= "<p>" . ob_get_clean() . "</p>\n";
+                    $warn       .= "<p>Record::debugPrepQuery: " . 
+                        __LINE__ . /*' ' . $this->debugBacktrace() .*/ "</p>\n";
                     // query will fail
                 }
                 else

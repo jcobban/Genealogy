@@ -375,8 +375,11 @@ if (!is_null($subDistObj))
         $pagetext       = htmlspecialchars($page);
         $text           = $template['invalidPage']->replace('$value',
                                                             $pagetext);
+        $lastLine       = 55;
 	}
 }               // subDistrict is specified
+else
+    $lastLine           = 55;
 
 // validate line
 if (is_null($line))

@@ -19,6 +19,7 @@ use \Exception;
  *  History:                                                            *
  *      2021/06/18      created                                         *
  *      2022/02/01      remove non-error logging                        *
+ *      2022/06/03      truncate long agent values                      *
  *                                                                      *
  *  Copyright &copy; 2022 James A. Cobban                               *
  ************************************************************************/
@@ -139,7 +140,10 @@ class UserAgent extends Record
                     {
                         if (is_string($value))
                         {
-                            $agent             = $value;
+                            if (strlen($value) > 255)
+                                $agent          = substr($value, 0, 255);
+                            else
+                                $agent          = $value;
                             $where              .= $and . "`agent`=:agent";
                             $sqlParms['agent'] = $agent;
                             break 2;
@@ -147,7 +151,8 @@ class UserAgent extends Record
                         else
                         {
                             $value              = htmlspecialchars($value);
-                            $this->msg          .= "UserAgent::__construct: " .
+                            $this->msg          .=
+                                "UserAgent::__construct: " .
                                 "`agent` value '$value' invalid. ";
                             $agent             = '';
                         }
@@ -416,7 +421,10 @@ class UserAgent extends Record
                 {           // act on field name
                     case 'agent':
                     {       // primary key
-                        $agent                  = $value;
+                        if (strlen($value) > 255)
+                            $agent              = substr($value, 0, 255);
+                        else
+                            $agent              = $value;
                         $fldnames               .= "$comma`$field`";
                         $values                 .= "$comma:$field";
                         $sqlParms[$field]       = $value;

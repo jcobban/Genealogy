@@ -308,6 +308,7 @@ class Event extends RecordPic
      *  Event::eventText and translations in the context specific       *
      *  templates                                                       *
      ********************************************************************/
+    const ET_UNDEF                      =  0;
     const ET_NULL                       =  1;
     const ET_ADOPTION                   =  2;
     const ET_BIRTH                      =  3;
@@ -1346,13 +1347,10 @@ class Event extends RecordPic
 
         if (is_null($this->associatedRecord))
         {           // not initialized yet
-            $idime  = $this->row['idir'];
+            $idime          = $this->row['idir'];
             if ($idime == 0)
             {
-                $debug  = true;
-                $this->dump('Field idir is zero');
-                throw new Exception("Event::getAssociatedRecord: " .
-                                "field idir is zero");
+                $warn       .= $this->dump('Field idir is zero');
             }
             switch($this->row['idtype'])
             {

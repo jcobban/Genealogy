@@ -21,97 +21,57 @@ use \Exception;
  *																		*
  *  Copyright &copy; 2018 James A. Cobban								*
  ************************************************************************/
+require_once __NAMESPACE__ . '/FtTemplate.inc';
 require_once __NAMESPACE__ . '/common.inc';
 
-    // default title
-    $title		= 'Upload GEDCOM File';
+// safely get parameter values
+$lang                       = 'en';
+$langtext                   = null;
 
-    // safely get parameter values
-    // defaults
-
-    if (!canUser('edit'))
-		$msg	.= 'You must be signed on with authority to update the database to use this feature. ';
-
+if (isset($_GET) && count($_GET) > 0)
+{                       // invoked by method=get
+    $parmsText              = "<p class='label'>\$_GET</p>\n" .
+                               "<table class='summary'>\n" .
+                                  "<tr><th class='colhead'>key</th>" .
+                                    "<th class='colhead'>value</th></tr>\n";
     foreach($_GET as $key => $value)
-    {
+    {		            // loop through all parameters
+        $safevalue          = htmlspecialchars($value);
+        $parmsText          .= "<tr><th class='detlabel'>$key</th>" .
+                                "<td class='white left'>" .
+                                "$safevalue</td></tr>\n"; 
 		switch(strtolower($key))
-		{
+		{	            // switch on parameter name
 		    case 'debug':
-		    {		// handled by common.inc
+		    case 'userid':
+		    {		    // handled by common.inc
 				break;
-		    }		// handled by common.inc
+		    }		    // handled by common.inc
+
+            case 'lang':
+            {
+                $lang       = FtTemplate::validateLang($value, $langtext);
+                break;
+            }
 
 		    default:
 		    {
-                $msg	.= "Unexpected parameter $key='" .
-                            htmlspecialchars($value) . "'";
+                $warn	    .= "Unexpected parameter $key='$safevalue'";
 				break;
 		    }
-		}	// switch
-    }		// loop through all parameters
+		}	            // switch on parameter name
+    }		            // loop through all parameters
+}                       // invoked by method=get
 
-    htmlHeader($title,
-				array(  '/jscripts/CommonForm.js',
-						'/jscripts/js20/http.js',
-						'/jscripts/util.js',
-						'GedcomUpload.js'));
-?>
-<body>
-<?php
-    pageTop(array('/genealogy.php'		=> 'Genealogy',
-				  '/FamilyTree/Services.php'	=> 'Services'));
-?>
-  <div class="body">
-  <div class="fullwidth">
-      <span class="h1">
-		<?php print $title; ?> 
-      </span>
-      <span class="right">
-		<a href="GedcomUploadHelpen.html" target="help">? Help</a>
-      </span>
-      <div style="clear: both;"></div>
-  </div>
-<?php
-    if (strlen($msg) > 0)
-    {		// errors
-?>
-    <p class="message">
-		<?php print $msg; ?> 
-    </p>
-<?php
-    }		// errors
-    else
-    {		// no errors
-?>
-<form name="fileForm" action="GedcomUpdate.php" method="post"
-		enctype="multipart/form-data">
-<p>
-    <!-- MAX_FILE_SIZE must precede the file input field -->
-    <input type="hidden" name="MAX_FILE_SIZE" value="1500000" />
-    <!-- Name of input element determines name in $_FILES array -->
-    <span class="label">Send this file:</span> 
-    <input name="userfile" type="file"
-				size="64"
-				accept="application/x-gedcom"/>
-</p>
-<p>
-  <button type="submit" id="submit">
-		<u>U</u>pload
-  </button>
-</p>
-</form>
-<?php
-    }		// no errors
-?>
-</div>
-<?php
-    pageBot();
-?>
-<div class="balloon" id="Helpsubmit">
-<p>Clicking on this button applies all of the changes made to this fact
-or picture and closes the dialog.  Note that pressing the Enter key while
-editting any text field in this dialog also performs this function.
-</p>
-</div>
-</body>
-</html>
+$template       = new FtTemplate("GedcomUpload$lang.html");
+
+if (!canUser('edit'))
+    $msg	.= $template['notAuth']->innerHTML;
+
+$template->set('LANG',      $lang);
+
+if (strlen($msg) > 0)
+    $template['fileForm']->update();
+
+$template->display();
+

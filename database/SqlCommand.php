@@ -67,6 +67,7 @@ use \Exception;
  *                      CREATE                                          *
  *      2021/10/17      format large numbers with separators            *
  *      2022/03/20      accept INSERT IGNORE                            *
+ *      2022/05/29      SELECT failed if only one fieldname in SELECT   *
  *                                                                      *
  *  Copyright &copy; 2022 James A. Cobban                               *
  ************************************************************************/
@@ -1988,9 +1989,18 @@ if (strlen($msg) == 0 && $sqlCommand && strlen($sqlCommand) > 0)
 
             case 'SELECT':
             {
+                $result             = preg_match("/^(.*)\s+FROM\s+(.*)$/u", $therest, $matches);
+                if ($result)
+                {
+                    $parms              = explode(',', $matches[1]);
+                    $therest            = 'FROM ' . $matches[2];
+                }
+                else
+                {
+                    $parms              = explode(',', $therest);
+                    $therest            = '';
+                }
                 $operands           = '';
-                $parms              = explode(',', $therest);
-                $therest            = '';
                 $comma              = '';
                 $accum              = '';
                 $afterexpr          = false;
@@ -2666,6 +2676,7 @@ if (strlen($msg) == 0 && $sqlCommand && strlen($sqlCommand) > 0)
                 }
                 else
                     $sresult[]      = array('line' => '', 'cmd' => "$command Unsupported", 'error' => 'Y');
+                set_time_limit(30);     // restart after issuing command
             }
             else
             if ($sqlCommand == '' || substr($sqlCommand, 0, 2) == '--')

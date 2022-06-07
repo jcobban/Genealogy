@@ -356,7 +356,7 @@ if (strlen($msg) == 0)
     }                   // get subject from first line of message
 
     // test if required to also send by e-mail
-    if ($table == 'Users')
+    if ($table == 'Users' && $user->canUser('admin'))
     {                   // send to user
         if (strlen($email) == 0)
         {

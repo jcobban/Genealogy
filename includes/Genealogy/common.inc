@@ -225,6 +225,7 @@ use \Templating\Template;
  *                      authorization and options from that userid      *
  *                      ignoring session and cookie values              *
  *      2022/03/22      remove xmlentities                              *
+ *      2022/04/27      remove language support from function htmlHeader*
  *                                                                      *
  *  Copyright &copy; 2022 James A. Cobban                               *
  ************************************************************************/
@@ -692,7 +693,7 @@ set_exception_handler('Genealogy\globalExpHandler');
  ************************************************************************/
 function canUser($function)
 {
-    global  $authorized;        // $user->get('auth') comma-separated tokens
+    global  $authorized;        // $user->get('auth') comma-sep'd tokens
     return (($authorized == 'yes') || ($authorized == 'all') ||
             (preg_match("/\b$function\b/i", $authorized) == 1));
 }       // canUser
@@ -756,20 +757,6 @@ function htmlHeader($title,
 
     // check for language support
     $lang               = 'en';
-    if (array_key_exists("lang", $_REQUEST))
-    {
-        $lang           = strtolower($_REQUEST['lang']);
-        if ($lang != 'en')
-        {
-            $language       = new Language(array('code' => $lang));
-            $langName       = $language->get('name');
-            $nativeName     = $language->get('nativename');
-            $sorry          = $language->getSorry();
-            $warn           .= str_replace(array('$langName','$nativeName'),
-                                           array($langName, $nativeName),
-                                           $sorry);
-        }
-    }
     $template->set('LANG',      $lang);
 
     // support passing debug flag to subsequent pages
@@ -1122,65 +1109,6 @@ function dialogBot()
 }       // dialogBot
 
 /************************************************************************
- *  function isFirstVowel                                               *
- *                                                                      *
- *  If the first character in a string is a vowel return true.          *
- *                                                                      *
- *  Parameter:                                                          *
- *      $text   a string conceptually containing language text          *
- *                                                                      *
- *  Returns:                                                            *
- *      true if the first character in the string is a vowel (AEIOU)    *
- *      otherwise false.                                                *
- ************************************************************************/
-$letters    = array(
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,     // 0x0
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,     // 0x1
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,     // 0x2
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,     // 0x3
-    0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1,     // 0x4
-    0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,     // 0x5
-    0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1,     // 0x6
-    0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);    // 0x7
-
-function isFirstVowel($text)
-{
-    global $letters;
-
-    $code   = ord($text);
-    if ($code < 0 || $code > 127)
-        return false;
-    else
-        return $letters[$code];
-}       // isFirstVowel
-
-/************************************************************************
- *  function translateWords                                             *
- *                                                                      *
- *  Translate each word of the supplied string using a global translate *
- *  table for internationalization.                                     *
- *                                                                      *
- *  Parameters:                                                         *
- *      $input          string to be translated                         *
- *                                                                      *
- *  Returns:                                                            *
- *      String with each word translated if there is a translation in   *
- *      the translate table for the current context.                    *
- ************************************************************************/
-function translateWords($input)
-{
-    global $tranTab;
-
-    $words  = explode(' ', $input);
-    for($i = 0; $i < count($words); $i++)
-    {
-        if (array_key_exists($words[$i], $tranTab))
-                $words[$i]  = $tranTab[$words[$i]];
-    }       // loop through all words
-    return implode(' ', $words);
-}       // translateWords
-
-/************************************************************************
  *  function pctClass                                                   *
  *                                                                      *
  *  Return the appropriate class for displaying a particular percentage *
@@ -1246,55 +1174,6 @@ function pctClass($pct, $border=true)
 }       // pctClass
 
 /************************************************************************
- *  function curPageURL                                                 *
- *                                                                      *
- *  Get the current page URL.                                           *
- *                                                                      *
- *  Returns:                                                            *
- *      a string that can be used for redirect                          *
- ************************************************************************/
-function curPageURL()
-{
-    if (array_key_exists("HTTPS", $_SERVER) && $_SERVER["HTTPS"] == "on")
-        $pageURL    = "https";
-    else
-        $pageURL    = 'http';
-    $pageURL        .= "://" . $_SERVER["SERVER_NAME"];
-    if ($_SERVER["SERVER_PORT"] != "80")
-        $pageURL    .= ":" .  $_SERVER["SERVER_PORT"];
-    $pageURL        .= $_SERVER["REQUEST_URI"];
-    return $pageURL;
-}       // function curPageURL
-
-function display_xml_error($error, $xml)
-{
-    $return         = $xml[$error->line - 1] . "\n";
-    $return         .= str_repeat('-', $error->column) . "^\n";
-
-    switch ($error->level) {
-        case LIBXML_ERR_WARNING:
-            $return .= "Warning $error->code: ";
-            break;
-        case LIBXML_ERR_ERROR:
-            $return .= "Error $error->code: ";
-            break;
-        case LIBXML_ERR_FATAL:
-            $return .= "Fatal Error $error->code: ";
-            break;
-    }
-
-    $return .= trim($error->message) .
-               "\n  Line: $error->line" .
-               "\n  Column: $error->column";
-
-    if ($error->file) {
-        $return .= "\n  File: $error->file";
-    }
-
-    return "$return\n\n--------------------------------------------\n\n";
-}       // function display_xml_error
-
-/************************************************************************
  *  function showTrace                                                  *
  *                                                                      *
  *  Display the accumulated trace information.                          *
@@ -1339,54 +1218,83 @@ function showTrace()
 }       // function showTrace
 
 /************************************************************************
- *  function debugParm                                                  *
+ *  function arrayToXML                                                 *
  *                                                                      *
- *  For generating a debug trace of the parameters passed to a script   *
- *  by either method=get or method=post translate the parameter value   *
- *  to a string that can be included in the debugging output.           *
+ *  Given a PHP array return a representation in XML.                   *
  *                                                                      *
  *  Parameter:                                                          *
- *      $value      parameter value                                     *
+ *      $struct         an instance of array or object                  *
+ *      $options        an array of options                             *
  *                                                                      *
  *  Returns:                                                            *
  *      string                                                          *
  ************************************************************************/
-function debugParm($value)
+function arrayToXML($struct, $options = null)
 {
-    if (is_array($value))
+    $nodename   = "main";
+    $indent     = '';
+
+    if (is_array($options))
+    {                   // options passed
+        foreach($options as $name => $value)
+        {               // loop through options
+            switch (strtolower($name))
+            {           // act on specific option
+                case 'nodename':
+                    $nodename       = $value;
+                    break;
+
+                case 'indent':
+                    $indent         = $value;
+                    break;
+            }           // act on specific option
+        }               // loop through options
+    }                   // options passed
+
+    if ($indent == '')
     {
-        $valueText  = 'array(';
-        $comma      = '';
-        foreach($value as $id => $val)
-        {
-            $valueText      .= $comma;
-            if (is_string($id))
-                $valueText  .= "'$id' => ";
-            if (is_string($val))
-                $valueText  .= "'$val'";
-            else
-            if (is_numeric($val))
-                $valueText  .= $val;
-            else
-                $valueText  .= print_r($val, true);
-            $comma          = ',';
-        }
-        $valueText  .= ')';
+        header("Content-Type: text/xml");
+        $retval     = "<?xml version='1.0' encoding='UTF-8'?".">\n";
     }
     else
-    if (is_null($value))
-        $valueText  = 'NULL';
+        $retval     = '';
+    $retval     .= "$indent<$nodename>\n";
+    if (is_array($struct) || is_object($struct))
+    {
+        foreach ($struct as $name => $value)
+        {               // loop through members
+            if (is_int($name) || ctype_digit($name))
+            {           // numeric
+                if (is_array($value) && count($value) == 1)
+                {       // named value
+                    foreach ($value as $label => $contents)
+                    {
+                        $options    = array('nodename'  => $label,
+                                            'indent'    => "$indent    ");
+                        $ree    .= "\n$indent    " .
+                                        arrayToXml($contents, $options);
+                    }
+                }       // named value
+            }           // numeric
+            else
+            {
+                $options    = array('nodename'  => $name,
+                                    'indent'    => "$indent    ");
+                $retval     .= "\n$indent    " .
+                                arrayToXML($value, $options);
+            }
+        }               // loop through members
+    }
     else
-    if ($value === false)
-        $valueText  = 'FALSE';
+    if (is_string($struct))
+    {
+        $retval     .= "\n$indent    " .
+                        htmlentities($struct, ENT_XML1);
+    }
     else
-    if ($value === true)
-        $valueText  = 'TRUE';
-    else
-    if (is_string($value))
-        $valueText  = "'$value'";
-    else
-        $valueText  = $value;
+        $retval     .= "\n$indent    " .
+                        htmlentities(print_r($struct, true), ENT_XML1);
 
-    return $valueText;
-}       // function debugParm
+    $retval         .= "\n$indent</$nodename>\n";
+    return $retval;
+}       // function arrayToXml

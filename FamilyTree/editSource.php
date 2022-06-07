@@ -66,8 +66,10 @@ use \Templating\Template;
  *      2020/06/14      correct error handling and                      *
  *                      support i18n for error and warn messages        *
  *		2020/12/05      correct XSS vulnerabilities                     *
+ *		2022/06/01      do not display trace for list of repositories   *
+ *		                and list of authors                             *
  *                                                                      *
- *  Copyright &copy; 2020 James A. Cobban                               *
+ *  Copyright &copy; 2022 James A. Cobban                               *
  ************************************************************************/
 require_once __NAMESPACE__ . '/Source.inc';
 require_once __NAMESPACE__ . '/RecordSet.inc';
@@ -147,7 +149,7 @@ if (!is_null($idsr))
     {               // IDSR is an integer
         if ($idsr > 0)
         {           // IDSR is greater than 0
-            $source              = new Source(array('idsr' => $idsr));
+            $source             = new Source(array('idsr' => $idsr));
             if ($source->isExisting())
             {
                 if (canUser('edit'))
@@ -190,8 +192,8 @@ if (!is_null($idsr))
 else
 if (!is_null($name))
 {                   // Name specified
-    $source                     = new Source(array('srcname' => $name));
-    $srcname                    = $source->get('srcname');
+    $source                 = new Source(array('srcname' => $name));
+    $srcname                = $source->get('srcname');
     if ($source->isExisting())
     {
         $idsr               = $source->get('idsr');
@@ -207,7 +209,7 @@ else
 {                   // neither IDSR nor Name specified
     $warn                   .= "<p>" . $template['noParms']->innerHTML() .
                                 "</p>\n";
-    $source                  = new Source();
+    $source                 = new Source();
     $idsr                   = 'Failed';
 }                   // neither IDSR nor Name specified
 
@@ -229,19 +231,20 @@ $stSet[$idst]['selected']   = 'selected="selected"';
 if (strlen($msg) == 0)
 {
     if ($idsr !== '')
-        $idsr              = (int)$idsr;
+        $idsr               = (int)$idsr;
 
     // get all repository address records to create selection list
-    $repoSet              = new RecordSet('tblAR',
+    $repoSet                = new RecordSet('tblAR',
                                             array('Kind'	=> 2,
                                                   'Order'	=> 'AddrName'));
 
     // get all names of authors as an array of strings for selection list
     $sourceSet              = new RecordSet('tblSR');
-    $authorResult          = $sourceSet->getDistinct('SrcAuthor');
+    $authorResult           = $sourceSet->getDistinct('SrcAuthor');
+    $debug                  = $saveDebug;
 }
 else
-    $idsr                  = 'Failed';
+    $idsr                   = 'Failed';
 
 $srcname                    = $source->get('srcname');
 $template->set('LANG',          $lang);
@@ -271,6 +274,8 @@ $template->set('AUTHOR',        $author);
 $optionElt                  = $template['author$i'];
 $optionText                 = $optionElt->outerHTML();
 $data                       = '';
+$saveDebug                  = $debug;
+$debug                      = false;
 foreach($authorResult as $i => $srcauthor)
 {
     $optionTemplate         = new Template($optionText);
@@ -282,16 +287,20 @@ foreach($authorResult as $i => $srcauthor)
         $optionTemplate->set('selected',    '');
     $data                   .= $optionTemplate->compile();
 }
+$debug                      = $saveDebug;
 $optionElt->update($data);
 //
 $template->set('SRCPUBLISHER',      $source->get('srcpubl'));
 $template->set('SRCTEXT',           htmlspecialchars($source->get('srctext')));
 $template->set('SRCNOTE',           htmlspecialchars($source->get('srcnote')));
-// repository part
+
+// repository list
 $idar                       = $source->get('idar');
 $optionElt                  = $template['IDAROption$idar'];
 $optionText                 = $optionElt->outerHTML();
 $data                       = '';
+$saveDebug                  = $debug;
+$debug                      = false;
 foreach($repoSet as $idari => $instance)
 {
     $optionTemplate         = new Template($optionText);
@@ -303,6 +312,7 @@ foreach($repoSet as $idari => $instance)
         $optionTemplate->set('selected',    '');
     $data                   .= $optionTemplate->compile();
 }
+$debug                      = $saveDebug;
 $optionElt->update($data);
 //
 $template->set('SRCCALLNUM',        $source->get('srccallnum'));

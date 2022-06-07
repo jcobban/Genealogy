@@ -176,13 +176,14 @@
       </form> <!-- end of CreateTreeTemplate -->
     </div> <!-- id="templates" -->
     <div class="balloon" id="HelpName">
-      <p>Type a name, starting with the surname, a comma, and the given names.  
-        As you type the text you have entered is used to select the individuals to list,
-        starting with the first individual whose name begins with the text
-        you have entered.  For example if you enter "Smith, Ma" the listing will 
-        begin with the first individual with surname Smith and a given name starting
-        with "Ma" and continuing through the Smiths, and any subsequent surnames if
-        required, until 50 names have been displayed.
+      <p>Type a name, starting with the surname, a comma, and the given
+        names.  As you type the text you have entered is used to select
+        the individuals to list, starting with the first individual whose 
+        name begins with the text you have entered.  For example if you 
+        enter "Smith, Ma" the listing will begin with the first individual 
+        with surname Smith and a given name starting with "Ma" and 
+        continuing through the Smiths, and any subsequent surnames if 
+        required, until 50 names have been displayed.  
       </p>
       <p>If you enter more than one value for given name, for example "Mary Jane",
         then, for the supplied surname, only individuals who match <em>both</em>
@@ -249,8 +250,14 @@
         The original family tree database is for families of
         South-Western Ontario.
     </div>
+    <div id="HelpnewTreeName" class="balloon">
+        Use this input field to add a new family tree to the site.
+    </div>
     <div class="popup" id="loading">
         Loading...
     </div>
+    <script src="/jscripts/tinymce/js/tinymce/tinymce.js"
+            type="application/javascript">
+    </script>
     <script src="/FamilyTree/nominalIndex.js" type="module">
     </script>

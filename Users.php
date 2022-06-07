@@ -61,6 +61,7 @@ use \Exception;
  *  Copyright &copy; 2019 James A. Cobban                               *
  ************************************************************************/
 require_once __NAMESPACE__ . '/User.inc';
+require_once __NAMESPACE__ . '/UserSet.inc';
 require_once __NAMESPACE__ . '/Language.inc';
 require_once __NAMESPACE__ . '/FtTemplate.inc';
 require_once __NAMESPACE__ . '/common.inc';
@@ -73,7 +74,7 @@ $offset             = 0;
 $limit              = 20;
 $id                 = '';
 $mainParms          = array();
-$bccParms           = array('options'   => "&1");
+$bccParms           = array('options'   => "1");
 
 if (isset($_GET) && count($_GET) > 0)
 {                   // invoked by method=get
@@ -103,6 +104,7 @@ if (isset($_GET) && count($_GET) > 0)
                     $pattern        = $value;
                     $mainParms['username']  = $pattern;
                     $bccParms['username']   = $pattern;
+                        $warn   .= "<p>" . __LINE__ . " \$bccParms['username']='" . $bccParms['username'] . "'</p>\n";
                 }
                 break;
             }
@@ -201,6 +203,7 @@ if (canUser('all'))
                         $pattern        = $value;
                         $mainParms['username']  = $pattern;
                         $bccParms['username']   = $pattern;
+                        $warn   .= "<p>" . __LINE__ . " \$bccParms['username']='" . $bccParms['username'] . "'</p>\n";
                     }
                     break;
                 }
@@ -284,64 +287,32 @@ if (canUser('all'))
     }
     $mainParms['limit']         = $limit;
     $mainParms['offset']        = $offset;
+    $bccParms['auth']           = 'blog';
 
     $prevoffset                 = $offset - $limit;
     $nextoffset                 = $offset + $limit;
 
 
     // construct the blind carbon copy (BCC) list for bulk mailing
-    $users                      = new RecordSet('Users', $bccParms);
-   
-    $bcclist                    = '';
-    $bcomma                     = '';
+    $users                      = new UserSet($bccParms);
+    $bcclist                    = $users->getMaillist();
     $pendlist                   = '';
     $pcomma                     = '';
     $tolist                     = '';
     $tcomma                     = '';
-    foreach($users as $id => $user)
-    {       // assemble bulk mailing list
-        $email                  = $user->get('email');
-        $auth                   = $user->get('auth');
-
-        // administrators are listed in the to: attribute of the message
-        // clients are listed in the bcc: attribute of the message
-        $pos                    = strpos($auth, 'yes');
-        // stupid return value from PHP's strpos function
-        if ($pos === false)
-        {                   // contributor
-            $bcclist            .= $bcomma . urlencode($email);
-            $bcomma             = ',';
-            if ($auth == 'pending')
-            {
-                $pendlist       .= $pcomma . urlencode($email);
-                $pcomma         = ',';
-            }
-        }                   // contributor
-        else
-        {                   // administrator
-            if ($tcomma == '')
-                $tolist         .= $tcomma .
-                                urlencode("Family Tree Mailing List <$email>");
-            else
-                $tolist         .= urlencode($email);
-            $tcomma             = ',';
-        }                   // administrator
-    }                       // assemble bulk mailing list
+    $visitors                   = new UserSet(array('username' => '^Visitor'));
+    $vislist                    = $visitors->getMaillist();
+    $admins                     = new UserSet(array('auth' => 'yes'));
+    $tolist                     = $admins->getMaillist();
+    $pending                    = new UserSet(array('auth' => 'pending'));
+    $pendlist                   = $pending->getMaillist();
 
     // construct the blind carbon copy (BCC) list for users with
     // insecure passwords
     $insecureParms              = array('password' => 'length>0');
-    $insecure                   = new RecordSet('Users', $insecureParms);
+    $insecure                   = new UserSet($insecureParms);
    
-    $inslist                    = '';
-    $bcomma                     = '';
-    foreach($insecure as $id => $user)
-    {       // assemble bulk mailing list
-        $email                  = $user->get('email');
-
-        $inslist                .= $bcomma . urlencode($email);
-        $bcomma                 = ',';
-    }                       // assemble bulk mailing list
+    $inslist                    = $insecure->getMaillist();
 
     // then query the database for matches to the request
     $users                      = new RecordSet('Users', $mainParms);
@@ -365,6 +336,7 @@ if (canUser('all'))
     $template->set('BCCLIST',                   $bcclist);
     $template->set('INSLIST',                   $inslist);
     $template->set('PENDLIST',                  $pendlist);
+    $template->set('VISLIST',                   $vislist);
     $template->set('TOLIST',                    $tolist);
     $template->set('PATTERN',                   $pattern);
     $template->set('AUTHPATTERN',               $authPattern);

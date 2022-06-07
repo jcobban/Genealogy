@@ -23,8 +23,10 @@
  *		2020/02/17      hide right column                               *
  *		2020/12/28      use updateNameJson.php to apply changes         *
  *      2021/01/16      use XMLSerializer for diagnostic output         *
+ *      2022/05/21      do not reload invoking dialog to pass name      *
+ *                      updates back.  Update individual fields.        *
  *																		*
- *  Copyright &copy; 2021 James A. Cobban								*
+ *  Copyright &copy; 2022 James A. Cobban								*
  ************************************************************************/
 
 window.onload	= loadEdit;
@@ -358,13 +360,58 @@ function gotName(jsonObj)
 		else
 		    opener	    = window.opener;
 		if (opener)
-		{		            // invoked from an existing window
-		    opener.location.reload();// refresh opener
-		    closeFrame();	// close this window
-		}		            // invoked from an existing window
+		{		                    // invoked from dialog
+            let doc                     = opener.document;
+            let forms                   = doc.forms;
+            let indForm                 = forms['indForm'];
+            if (indForm) {
+                let elements            = indForm.elements;
+                let record              = jsonObj.record;
+                let elementNames        = '';
+                let comma               = '';
+                for (let i = 0; i < elements.length; i++)
+                {
+                    let input           = elements[i];
+                    if (input.nodeName === 'INPUT' &&
+                        input.type === 'text') {
+                        elementNames    += comma + elements[i].name +
+                                            '=' + elements[i].value;
+                        comma           = ', ';
+                        switch(input.name.toLowerCase()) {
+                            case 'surname':
+                                input.value     = record.surname;
+                                elementNames    += '<=' + input.value;
+                                break;
+
+                            case 'givenname':
+                                input.value     = record.givenname;
+                                elementNames    += '<=' + input.value;
+                                break;
+
+                            case 'prefix':
+                                input.value     = record.prefix;
+                                elementNames    += '<=' + input.value;
+                                break;
+
+                            case 'title':
+                                input.value     = record.title;
+                                elementNames    += '<=' + input.value;
+                                break;
+
+                            case 'userref':
+                                input.value     = record.userref;
+                                elementNames    += '<=' + input.value;
+                                break;
+                        
+                        }           // switch on input name
+                    }               // input field
+                }                   // loop through form elements
+            }                       // <form name='indForm' ...
+		    closeFrame();	        // close this window
+		}		                    // invoked from dialog
 		else
-		    alert("editName.js: gotName: Not invoked as a dialog");
-    }                   // have JSON object
+		    alert("editName.js: gotName: Not invoked from a dialog");
+    }                               // have JSON object
     else
     {
 		alert("editName.js: gotName: jsonObj is undefined!");

@@ -132,13 +132,13 @@ print("<?xml version='1.0' encoding='UTF-8'?>\n");
 // top node of XML result
 print("<select Census='" . htmlspecialchars($census) . 
             "' District='" . htmlspecialchars($distList) . "'>\n");
-print "<parms>" . htmlspecialchars($parmList, ENT_XML1) . "</parms>\n";
+print "<parms>" . htmlentities($parmList, ENT_XML1) . "</parms>\n";
 
 if (strlen($msg) == 0)
 {		// no errors
     $information	= $result->getInformation();
     $query		= $information['query'];
-    print "<query>" . xmlEntities($query) . "</query>\n";
+    print "<query>" . htmlentities($query, ENT_XML1) . "</query>\n";
 
     $oldId	= "";
     if (count($result) > 0)

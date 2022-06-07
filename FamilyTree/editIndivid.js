@@ -576,7 +576,7 @@ function loadEdit()
     // loop through arguments passed to script
     for(let key in args)
     {                   // loop through all arguments
-        let value   = args[key];
+        let value               = args[key];
         switch(key.toLowerCase())
         {
             case 'id':
@@ -611,7 +611,7 @@ function loadEdit()
                 if (marriagesButton)
                     marriagesButton.disabled    = true;
                 if (parentsButton)
-                    parentsButton.disabled  = true;
+                    parentsButton.disabled      = true;
                 break;
             }           // request to add a new child
 
@@ -620,7 +620,8 @@ function loadEdit()
             {           // debug by submitting request rather than using AJAX
                 if (value.toUpperCase() == 'Y')
                 {
-                    testSubmit  = true;
+                    testSubmit                  = true;
+                    debug                       = 'Y';
                     alert('editIndivid.js: loadEdit: ' +
                           'testSubmit set to true for ' + key + '=' + value);
                 }

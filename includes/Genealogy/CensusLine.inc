@@ -806,7 +806,7 @@ class CensusLine extends Record
             showTrace();
             $this->msg              .= "new CensusLine: Missing parameter Census. ";
             error_log("new Census_Line(" . 
-                        htmlspecialchars(print_r($parms, true)) . ")");
+                        htmlspecialchars(print_r($parms, true)) . ") missing Census");
         }
 
         if (is_array($line))
@@ -1344,8 +1344,10 @@ class CensusLine extends Record
                 {
                     if (strlen($value) > 1)
                     {
-                        error_log("CensusLine::set('$field','$value')\n");
+                        error_log("CensusLine::set('$field','$value') length greater than 1\n");
                         $value          = substr($value, 0, 1);
+                        if ($value == '&')
+                            $value      = ' ';
                     }
                     if (($value <= ' ') || ($value > '}'))
                         $value          = '';
@@ -1353,7 +1355,7 @@ class CensusLine extends Record
                 else
                 {
                     error_log("CensusLine::set('$field'," . 
-                                var_export($value) . ")\n");
+                                var_export($value) . ") value is not string\n");
                     $value              = '';
                 }
                 return parent::set($field, $value);
@@ -1365,14 +1367,14 @@ class CensusLine extends Record
                 {
                     if (strlen($value) > 2)
                     {
-                        error_log("CensusLine::set('$field','$value')\n");
+                        error_log("CensusLine::set('$field','$value') length greater than 2\n");
                         $value          = substr($value, 0, 2);
                     }
                 }
                 else
                 {
                     error_log("CensusLine::set('$field'," . 
-                                var_export($value) . ")\n");
+                                var_export($value) . ") is not string\n");
                     $value              = null;
                 }
                 return parent::set($field, $value);
@@ -1386,7 +1388,7 @@ class CensusLine extends Record
                 {
                     if ($value > 999999)
                     {
-                        error_log("CensusLine::set('$field','$value')\n");
+                        error_log("CensusLine::set('$field','$value') greater than 6 characters\n");
                         $value          = $value % 1000000;
                     }
                 }
@@ -1396,14 +1398,14 @@ class CensusLine extends Record
                     if (strlen($value) > 6)
                     {
                         if ($value != '[blank]')
-                        error_log("CensusLine::set('$field','$value')\n");
+                        error_log("CensusLine::set('$field','$value') greater than 6 characters\n");
                         $value          = substr($value, 0, 6);
                     }
                 }
                 else
                 {
                     error_log("CensusLine::set('$field'," . 
-                                var_export($value) . ")\n");
+                                var_export($value) . ") is not string\n");
                     $value              = null;
                 }
                 return parent::set($field, $value);
@@ -1415,14 +1417,14 @@ class CensusLine extends Record
                 {
                     if (strlen($value) > 8)
                     {
-                        error_log("CensusLine::set('$field','$value')\n");
+                        error_log("CensusLine::set('$field','$value') greater than 8 characters\n");
                         $value          = substr($value, 0, 8);
                     }
                 }
                 else
                 {
                     error_log("CensusLine::set('$field'," . 
-                                var_export($value) . ")\n");
+                                var_export($value) . ") is not string\n");
                     $value              = null;
                 }
                 return parent::set($field, $value);
@@ -1438,14 +1440,14 @@ class CensusLine extends Record
                 {
                     if (strlen($value) > 32)
                     {
-                        error_log("CensusLine::set('$field','$value')\n");
+                        error_log("CensusLine::set('$field','$value') greater than 32 characters\n");
                         $value          = substr($value, 0, 32);
                     }
                 }
                 else
                 {
                     error_log("CensusLine::set('$field'," . 
-                                var_export($value) . ")\n");
+                                var_export($value) . ") is not string\n");
                     $value              = null;
                 }
                 return parent::set($field, $value);
@@ -1457,14 +1459,14 @@ class CensusLine extends Record
                 {
                     if (strlen($value) > 50)
                     {
-                        error_log("CensusLine::set('$field','$value')\n");
+                        error_log("CensusLine::set('$field','$value') is greater than 50 characters\n");
                         $value          = substr($value, 0, 50);
                     }
                 }
                 else
                 {
                     error_log("CensusLine::set('$field'," . 
-                                var_export($value) . ")\n");
+                                var_export($value) . ") is not string\n");
                     $value              = null;
                 }
                 return parent::set($field, $value);

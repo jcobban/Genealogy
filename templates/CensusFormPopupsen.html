@@ -1,26 +1,26 @@
 <!--*********************************************************************
- *  CensusFormPopupsen.html				        						*
- *																		*
- *  The English language version of the common popups used by Census	*
- *  forms to provide help and diagnostic information to the user.		*
- *																		*
- *  History:															*
- *		2012/04/13		created											*
- *		2013/02/09		credit LAC for images							*
- *		2013/06/21		remove support for renamed field 'NoFamilies'	*
- *		2013/06/23		change button text on chooseIdir panel			*
- *		2014/04/26		document new function in family, flag,			*
- *						and age columns									*
- *						add help popups for the Find/Show/Clear buttons	*
- *		2014/07/15		support for popupAlert moved to common code		*
- *		2015/01/13		Add copyright notice for census image			*
- *						remove obsolete error message popups			*
- *		2016/12/13		add columns for the 1911 census					*
- *		2017/08/16		script legacyIndivid.php renamed to Person.php	*
- *		2018/01/11		renamed to CensusFormPopupsen.html and		    *
- *						moved to templates directory					*
- *																		*
- *  Copyright &copy; 2018 James A. Cobban								*
+ *  CensusFormPopupsen.html                                             *
+ *                                                                      *
+ *  The English language version of the common popups used by Census    *
+ *  forms to provide help and diagnostic information to the user.       *
+ *                                                                      *
+ *  History:                                                            *
+ *      2012/04/13      created                                         *
+ *      2013/02/09      credit LAC for images                           *
+ *      2013/06/21      remove support for renamed field 'NoFamilies'   *
+ *      2013/06/23      change button text on chooseIdir panel          *
+ *      2014/04/26      document new function in family, flag,          *
+ *                      and age columns                                 *
+ *                      add help popups for the Find/Show/Clear buttons *
+ *      2014/07/15      support for popupAlert moved to common code     *
+ *      2015/01/13      Add copyright notice for census image           *
+ *                      remove obsolete error message popups            *
+ *      2016/12/13      add columns for the 1911 census                 *
+ *      2017/08/16      script legacyIndivid.php renamed to Person.php  *
+ *      2018/01/11      renamed to CensusFormPopupsen.html and          *
+ *                      moved to templates directory                    *
+ *                                                                      *
+ *  Copyright &copy; 2018 James A. Cobban                               *
  **********************************************************************-->
   <!-- balloons to pop up when mouse moves over forward and back links -->
   <div class="popup" id="mouseprenpprev">
@@ -180,7 +180,8 @@
       Indicate whether the individual is a French-Canadian.  
       The enumerator generally entered
       a stroke which can be entered as '1'.
-      Anything other than 0 or the letter 'N' is converted to 'Y'.
+      The application replaces anything other than 0 or the letter 'N'
+      with the Sex column.
     </div>
     <div class="balloon" id="HelpOrigin">
       Specify the ethnic origin of the individual.
@@ -197,44 +198,49 @@
       Indicate whether the individual is a Negro (African descent).
       The enumerator generally entered
       a stroke which can be entered as '1'.
-      The application replaces 0 or the letter 'N' with a space.  Any other
-      character is replaced by the gender.
+      The application replaces 0 or the letter 'N' with a space.  
+      The application replaces anything other than 0 or the letter 'N'
+      with the Sex column.
     </div>
     <div class="balloon" id="HelpNegro">
       Indicates whether the individual is a Negro (African descent).
       The enumerator generally entered
       a stroke which can be entered as '1'.
-      The application replaces 0 or the letter 'N' with a space.  Any other
-      character is replaced by the gender.
+      The application replaces 0 or the letter 'N' with a space. 
+      The application replaces anything other than 0 or the letter 'N'
+      with the Sex column.
     </div>
     <div class="balloon" id="HelpIndian">
       Indicate whether the individual is a Indian (Native).
       The enumerator generally entered
       a stroke which can be entered as '1'.
-      The application replaces 0 or the letter 'N' with a space.  Any other
-      character is replaced by the gender.
+      The application replaces 0 or the letter 'N' with a space. 
+      The application replaces anything other than 0 or the letter 'N'
+      with the Sex column.
     </div>
     <div class="balloon" id="HelpMember">
       Indicate whether the individual is a member of the primary family
       in this household.
       The enumerator generally entered a stroke which can be entered as '1'.
-      The application replaces 0 or the letter 'N' with a space.  Any other
-      character is replaced by the gender.
+      The application replaces 0 or the letter 'N' with a space. 
+      The application replaces anything other than 0 or the letter 'N'
+      with the Sex column.
     </div>
     <div class="balloon" id="HelpNotMember">
       Explicit indication that the individual is <b>not</b> a member of
       the primary family in this household.
       The enumerator generally entered a stroke which can be entered as '1'.
-      The application replaces 0 or the letter 'N' with a space.  Any other
-      character causes the 'Member' column to be cleared and this column
-      is replaced by the gender.
+      The application replaces 0 or the letter 'N' with a space.
+      The application replaces anything other than 0 or the letter 'N'
+      with the Sex column and clears the 'Member' column.
     </div>
     <div class="balloon" id="HelpAbsent">
       Indicate whether the individual was a member of the primary
       family who was absent at the time of the enumeration.
       The enumerator generally entered a stroke which can be entered as '1'.
-      The application replaces 0 or the letter 'N' with a space.  Any other
-      character is replaced by the gender.
+      The application replaces 0 or the letter 'N' with a space. 
+      The application replaces anything other than 0 or the letter 'N'
+      with the Sex column.
     </div>
     <div class="balloon" id="HelpNationality">
       Specify the nationality (citizenship) of the individual.
@@ -273,6 +279,7 @@
       enter the digit 1, which is replaced by 'Y'.  Note that 'y' is 
       the abbreviation for the month of May, so you should not enter 
       that unless the original indicates the individual was married in
+      May.
     </div>
     <div class="balloon" id="HelpRelation">
       The relation of the individual to the head of household field.
@@ -310,7 +317,7 @@
     </div>
     <div class="balloon" id="HelpOccupation">
       The primary occupation of the individual as specified in the
-      original image.  You may expand abbreviations.
+      original image.  You may expand abbreviations while transcribing.
     </div>
     <div class="balloon" id="HelpOccOther">
       A secondary occupation of the individual.
@@ -319,20 +326,23 @@
       Indicator of whether the individual is an employer.
       This may be entered as a letter 'Y', or 'N', or as a stroke which can be
       entered as a '1'.
-      Anything other than 0 or the letter 'N' is converted to 'Y'.
+      The application replaces anything other than 0 or the letter 'N'
+      with the Sex column.
     </div>
     <div class="balloon" id="HelpEmployee">
       Indicator of whether the individual is an employee.
       This may be entered as a letter 'Y', or 'N', or as a stroke which can be
       entered as a '1'. 
-      Anything other than 0 or the letter 'N' is converted to 'Y'.
+      The application replaces anything other than 0 or the letter 'N'
+      with the Sex column.
     </div>
     <div class="balloon" id="HelpUnemployed">
       If this field is non-blank then the individual was unemployed during
       the week preceding the enumeration.
       The enumerator generally wrote a stroke so enter something that looks
       like a stroke, for example the digit '1'.
-      Anything other than 0 or the letter 'N' is converted to 'Y'.
+      The application replaces anything other than 0 or the letter 'N'
+      with the Sex column.
     </div>
     <div class="balloon" id="HelpNumHands">
       If this field is non-blank and not zero then it contains the number of 
@@ -342,15 +352,17 @@
     </div>
     <div class="balloon" id="HelpOwnAcct">
       Indicator of whether the individual is self-employed.
-      This may be entered as a letter 'Y', or 'N', or as a stroke which can be
-      entered as a '1'.
-      Anything other than 0 or the letter 'N' is converted to 'Y'.
+      This may be entered as a letter 'Y', or 'N', or as a stroke
+      which can be entered as a '1'.
+      The application replaces anything other than 0 or the letter 'N'
+      with the Sex column.
     </div>
     <div class="balloon" id="HelpOwnMeans">
       Indicator of whether the individual is self-employed.
-      This may be entered as a letter 'Y', or 'N', or as a stroke which can be
-      entered as a '1'.
-      Anything other than 0 or the letter 'N' is converted to 'Y'.
+      This may be entered as a letter 'Y', or 'N', or as a stroke
+      which can be entered as a '1'.
+      The application replaces anything other than 0 or the letter 'N'
+      with the  Sex column.
     </div>
     <div class="balloon" id="HelpEmpWhere">
       Specifies where the person worked, if they were an employee.
@@ -398,17 +410,19 @@
     </div>
     <div class="balloon" id="HelpEmpType">
       Indicator of whether the individual is an employer, an employee, or
-      working on his own account.  Note that in English, though not in French, 
-      the abbreviation 'E' is ambiguous.  If an Anglophone enumerator filled this
-      in with 'E' for employer, replace it with 'R', as described in the column
-      heading in the original form image.
+      working on his own account.  Note that in English,
+      though not in French, 
+      the abbreviation 'E' is ambiguous.  If an Anglophone enumerator
+      filled this in with 'E' for employer, replace it with 'R',
+      as described in the column heading in the original form image.
     </div>
     <div class="balloon" id="HelpEmpWhere">
       Specifies where the person worked.
     </div>
     <div class="balloon" id="HelpMilitary">
-      For members of a household who were away on military posting, there was a
-      war going on, this column specifies where they were posted.
+      For members of a household who were away on military posting,
+      there was a war going on, this column specifies where
+      they were posted.
     </div>
     <div class="balloon" id="HelpAddrTwp">
       Enter the township number portion of the address.
@@ -435,8 +449,8 @@
       Enter the number of the range relative to the meridian.
     </div>
     <div class="balloon" id="HelpAddrMdn">
-      Enter the identifier of the meridian with respect to which the range is
-      specified.
+      Enter the identifier of the meridian with respect to which
+      the range is specified for properties on the Prairies.
     </div>
     <div class="balloon" id="HelpHorses">
       Enter the number of horses of all ages on the property.
@@ -445,7 +459,8 @@
       Enter the number of milch cows on the property.
     </div>
     <div class="balloon" id="HelpCattle">
-      Enter the number of other cattle or other horned animals on the property.
+      Enter the number of other cattle or other horned animals
+      on the property.
     </div>
     <div class="balloon" id="HelpSheep">
       Enter the number of sheep on the property.
@@ -457,13 +472,15 @@
       Indicate whether the individual can speak English.
       The enumerator generally entered
       a stroke which can be entered as '1'.
-      Anything other than 0 or the letter 'N' is converted to 'Y'.
+      The application replaces anything other than 0 or the letter 'N'
+      with the  Sex column.
     </div>
     <div class="balloon" id="HelpSpkFrench">
       Indicate whether the individual can speak French.
       The enumerator generally entered
       a stroke which can be entered as '1'.
-      Anything other than 0 or the letter 'N' is converted to 'Y'.
+      The application replaces anything other than 0 or the letter 'N'
+      with the  Sex column.
     </div>
     <div class="balloon" id="HelpMotherTongue">
       Specify the mother tongue of the individual.
@@ -472,70 +489,74 @@
       Specify the any infirmities the individual has, such as deaf or blind.
     </div>
     <div class="balloon" id="HelpLifeInsurance">
-      The 1911 census was particular concerned with the state of the insurance
-      industry, so individuals who had life insurance were asked to enter
-      the benefit amount.
+      The 1911 census was particular concerned with the state of the
+      insurance industry, so individuals who had life insurance were
+      asked to enter the benefit amount.
     </div>
     <div class="balloon" id="HelpAccInsurance">
-      The 1911 census was particular concerned with the state of the insurance
-      industry, so individuals who had health or accident insurance were asked
-      to enter the benefit amount.
+      The 1911 census was particular concerned with the state of the
+      insurance industry, so individuals who had health or accident
+      insurance were asked to enter the benefit amount.
     </div>
     <div class="balloon" id="HelpCostInsurance">
-      The 1911 census was particular concerned with the state of the insurance
-      industry, so individuals who had insurance were asked to enter
-      the how much it cost per year.
+      The 1911 census was particular concerned with the state of the
+      insurance industry, so individuals who had insurance were asked
+      to enter the how much it cost per year.
     </div>
     <div class="balloon" id="HelpCanRead">
       Indicate whether the individual can read.
-      The enumerator generally entered
-      a stroke which can be entered as '1'.
-      Anything other than 0 or the letter 'N' is converted to 'Y'.
+      The enumerator generally entered a stroke which can be entered as '1'.
+      The application replaces anything other than 0 or the letter 'N'
+      with the  Sex column.
     </div>
     <div class="balloon" id="HelpCanWrite">
       Indicate whether the individual can write.
       The enumerator generally entered
       a stroke which can be entered as '1'.
-      Anything other than 0 or the letter 'N' is converted to 'Y'.
+      The application replaces anything other than 0 or the letter 'N'
+      with the  Sex column.
     </div>
     <div class="balloon" id="HelpCantRead"> 
       Indicates whether the individual even though an adult, cannot read.
-      Any non-blank value is interpreted as true.  The original form generally
-      just has a stroke that can be interpreted as a "1".
-      Anything other than 0 or the letter 'N' is converted to 'Y'.
+      Any non-blank value is interpreted as true.  The original form
+      generally just has a stroke that can be entered as a "1".
+      The application replaces anything other than 0 or the letter 'N'
+      with the  Sex column.
     </div>
     <div class="balloon" id="HelpCantWrite"> 
       Indicates whether the individual even though an adult, cannot write.
-      Any non-blank value is interpreted as true.  The original form generally
-      just has a stroke that can be interpreted as a "1".
-      Anything other than 0 or the letter 'N' is converted to 'Y'.
+      Any non-blank value is interpreted as true.  The original form
+      generally just has a stroke that can be entered as a "1".
+      The application replaces anything other than 0 or the letter 'N'
+      with the  Sex column.
     </div>
     <div class="balloon" id="HelpIlliterate">
       Indicates whether the individual was illiterate.
-      The enumerator generally entered
-      a stroke which can be entered as '1'.
+      The enumerator generally entered a stroke which can be entered as 
+      '1'. The application replaces anything other than 0 or the letter 'N'
+      with the  Sex column.
     </div>
     <div class="balloon" id="HelpBirth">
-      Indicates whether the individual was born within the preceding 12 months
-      and the sex of the individual.
+      Indicates whether the individual was born within the preceding 12
+      months and the sex of the individual.
       Expected values 'M', 'F', or blank.
     </div>
     <div class="balloon" id="HelpDeathSex">
       Indicates whether an individual member of the household 
       died within the preceding 12 months, and the sex of that individual.
       Expected values 'M', 'F', or blank.
-      Note that this information does <b>not</b> refer to the individual described
-      by the other fields in this line of the form.
+      Note that this information does <b>not</b> refer to the individual
+      described by the other fields in this line of the form.
     </div>
     <div class="balloon" id="HelpAgeAtDeath">
       Indicates the age of the deceased individual at the time of death.
-      Note that this information does <b>not</b> refer to the individual described
-      by the other fields in this line of the form.
+      Note that this information does <b>not</b> refer to the individual
+      described by the other fields in this line of the form.
     </div>
     <div class="balloon" id="HelpCauseOfDeath">
       Indicates the cause of death.
-      Note that this information does <b>not</b> refer to the individual described
-      by the other fields in this line of the form.
+      Note that this information does <b>not</b> refer to the individual
+      described by the other fields in this line of the form.
     </div>
     <div class="balloon" id="HelpResType">
       Indicates the type of residence: Log Cabin, Shanty, and Brick are the
@@ -548,44 +569,47 @@
       Indicates the number of families sharing this residence.
     </div>
     <div class="balloon" id="HelpLanguage">
-      In this column the enumerator was requested to enter the primary language
-      spoken.
+      In this column the enumerator was requested to enter the primary 
+      language spoken.
     </div>
     <div class="balloon" id="HelpSpkOther">
       If the individual can speak a language other than French or English
-      this column identifies the language.  If the enumerator filled this column
-      in with 'English', 'French', 'Anglais', or 'Français', leave the column blank
+      this column identifies the language.  If the enumerator filled this
+      column in with 'English', 'French', 'Anglais', or 'Français',
+      leave the column blank
       because there are separate columns for that information.
     </div>
     <div class="balloon" id="HelpSchool"> 
-      Indicate whether the individual is attending school.
+      This field indicates whether the individual is attending school.
       The enumerator generally entered a stroke which can be entered as '1'.
-      Anything other than 0 or the letter 'N' is converted to 'Y'.
+      Anything other than 0 or the letter 'N' is replaced by the value 
+      of the Sex column.  This is because in the pre-Confederation censuses
+      the form counted male and female students separately.
     </div>
     <div class="balloon" id="HelpDeaf">
       If this field is non-blank then the individual is deaf.
       The enumerator generally wrote a stroke so enter the digit '1'.
       The application replaces anything other than 0 or the letter 'N'
-      with the gender.
+      with the  Sex column.
     </div>
     <div class="balloon" id="HelpBlind">
       If this field is non-blank then the individual is blind.
       The enumerator generally wrote a stroke so enter the digit '1'.
       The application replaces anything other than 0 or the letter 'N'
-      with the gender.
+      with the  Sex column.
     </div>
     <div class="balloon" id="HelpInsane">
       If this field is non-blank then the individual is of unsound mind.
       The enumerator generally wrote a stroke so enter the digit '1'.
       The application replaces anything other than 0 or the letter 'N'
-      with the gender.
+      with the  Sex column.
     </div>
     <div class="balloon" id="HelpIdiot">
       If this field is non-blank then the individual is "an idiot or silly."
       In modern parlance developmentally delayed.
       The enumerator generally wrote a stroke so enter the digit '1'.
       The application replaces anything other than 0 or the letter 'N'
-      with the gender.
+      with the  Sex column.
     </div>
     <div class="balloon" id="HelpLunatic">
       Indicates whether the individual was mentally incapacitated.
@@ -597,7 +621,7 @@
       Indicates whether the individual was mentally incapacitated.
       The enumerator generally entered a stroke so enter the digit '1'.
       The application replaces anything other than 0 or the letter 'N'
-      with the gender.
+      with the Sex column.
     </div>
     <div class="balloon" id="HelpOwnerTenant">
       Enter the letter 'O' if the householder owns the property, or 
@@ -705,7 +729,7 @@
     </div>
     <div class="balloon" id="HelpcorrectImage">
       If after clicking on the 
-	  <span class="button">Display&nbsp;Original&nbsp;Census&nbsp;Image</span>
+      <span class="button">Display&nbsp;Original&nbsp;Census&nbsp;Image</span>
       button you determine that the incorrect image has been specified,
       and you have determined through browsing the web what the correct
       URL should be,
@@ -734,10 +758,34 @@
   </div>
   <div class="hidden" id="templates">
     <!-- the following are language specific error messages -->
+    <span id="missingProv">
+        Missing mandatory parameter Province.
+    </span>
+    <span id="invalidCensus">
+        Census='$censusId' invalid. 
+    </span>
+    <span id="missingCensus">
+        Missing mandatory parameter Census.
+    </span>
+    <span id="invalidDistrict">
+        Invalid value of District='$distID'. 
+    </span>
+    <span id="missingDistrict">
+        Missing mandatory parameter District. 
+    </span>
+    <span id="missingSubDistrict">
+        Missing mandatory parameter SubDistrict. 
+    </span>
+    <span id="invalidPage">
+        Invalid value of Page='$page'. 
+    </span>
+    <span id="missingPage">
+        Missing mandatory parameter Page. 
+    </span>
     <span class="note" id="imageCopyrightNote">
-  	Image provided courtesy of 
-  	<a href="http://www.bac-lac.gc.ca/eng/Pages/home.aspx">
-  	Library and Archives Canada</a>.
+      Image provided courtesy of 
+      <a href="http://www.bac-lac.gc.ca/eng/Pages/home.aspx">
+        Library and Archives Canada</a>.
     </span>
     <!-- language specific ignore errors button -->
     <p id="errorPrompt">
@@ -757,7 +805,7 @@
     <!-- no matching names dialog -->
     <form name="idirNullForm$sub" id="idirNullForm$sub">
       <p class="label">
-	$surname, $givenname born $birthyear
+    $surname, $givenname born $birthyear
       </p>
       <p class="message">
       No individuals match
@@ -771,19 +819,19 @@
     <form name="FamilyEntryForm$sub" id="FamilyEntryForm$sub">
       <p class="label">
       Matches to Family $family in Census $census dist $district 
-  	sub-dist $subDistrict-$division
+    sub-dist $subDistrict-$division
       </p>
       <p id="FamilyButtonLine$sub">
-	<button type="button" id="closeFam$sub">
-	    Apply All Checked Entries
-	</button>
+    <button type="button" id="closeFam$sub">
+        Apply All Checked Entries
+    </button>
       </p>
     </form>
     <p id="Match$idir">
       Page $page Line $line Matches
       <input type="checkbox" name="Confirm$idir" checked=checked>
       <a href="/FamilyTree/Person.php?idir=$idir">$surname,
-  	$givenname ($birthd-$deathd)</a>
+    $givenname ($birthd-$deathd)</a>
     </p>
     <p id="NoMatch$sub">
       Page $page Line $line does not match any member of family.

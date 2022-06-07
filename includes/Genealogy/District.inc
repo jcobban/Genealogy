@@ -270,7 +270,7 @@ class District extends Record
             else
             {           // query failed
                 $this->msg  .= "District::__construct: '$queryText' " .
-                                print_r($stmt->errorInfo(),true);
+                                print_r($stmt->errorInfo(),true) . '. ';
             }           // query failed
         }           // complete row from database
 
@@ -335,7 +335,7 @@ class District extends Record
                                 $trace  = debug_backtrace();
                                 foreach($trace as $entry)
                                 {
-                                    $this->msg  .= ", " . $entry['file'] . ":" . $entry['line'];
+                                    $this->msg  .= ", " . $entry['file'] . ":" . $entry['line'] . '. ';
                                 }
                             }
                         }
@@ -348,7 +348,7 @@ class District extends Record
             // check if district id was provided
             if ($distId == 0)
                 $this->msg  .= "District::__construct: " . __LINE__ .
-                                " Missing District Id value";
+                                " Missing District Id value. ";
 
             // construct the query to look for an existing record
             // query the database for district information
@@ -413,7 +413,7 @@ class District extends Record
             else
             {                   // error performing query
                 $this->msg      .= "District::__construct: '$queryText' " .
-                                print_r($stmt->errorInfo(),true);
+                                print_r($stmt->errorInfo(),true) . '. ';
             }                   // error performing query
         }                       // parameters for creating row
 

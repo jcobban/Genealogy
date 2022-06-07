@@ -174,7 +174,7 @@ foreach($_POST as $key => $value)
 {       // loop through all parameters
     $xmlkey         = str_replace("$","_",$key);
     print "\t<$xmlkey>" . htmlspecialchars($value,ENT_XML1) . "</$xmlkey>\n";
-    error_log("updateEvent.php: $xmlkey='$value'");
+    error_log("updateEvent.php: " . __LINE__ . " $xmlkey='$value'");
 
     switch($key)
     {   // act on specific keys
@@ -188,7 +188,7 @@ foreach($_POST as $key => $value)
                     $msg    .= "User not authorized to update individual $idir. ";
             }
             else
-                error_log("updateEvent.php: idir='$value'");
+                error_log("updateEvent.php: " . __LINE__ . " idir not numeric");
             break;
         }       // idir of individual to be updated
 
@@ -198,7 +198,7 @@ foreach($_POST as $key => $value)
             if (ctype_digit($idmr))
                 $family                 = new Family(array('idmr' => $idmr));
             else
-                error_log("updateEvent.php: idmr='$value'");
+                error_log("updateEvent.php: " . __LINE__ . " idmr not numeric");
             break;
         }       // idmr of family to be updated
 
@@ -210,7 +210,7 @@ foreach($_POST as $key => $value)
                 $event                  = new Event(array('ider' => $ider));
             }
             else
-                error_log("updateEvent.php: ider='$value'");
+                error_log("updateEvent.php: " . __LINE__ . " ider not numeric");
             break;
         }       // ider to be updated
 
@@ -229,7 +229,7 @@ foreach($_POST as $key => $value)
                 $family             = new Family(array('idmr' => $idmr));
             }
             else
-                error_log("updateEvent.php: idcr='$value'");
+                error_log("updateEvent.php: " . __LINE__ . "idcr not numeric");
             break;
         }       // idcr to be updated
 
@@ -439,11 +439,10 @@ foreach($_POST as $key => $value)
 
 print "    </parms>\n";
 } catch (Exception $e) {
-error_log("updateEvent.php: " . __LINE__ . ': ' .$e->getMessage() . ': ' . $e->gettraceAsString() ."\n",3,$document_root . "/logs/updateEvent.txt");
+    error_log("updateEvent.php: " . __LINE__ . ': ' .$e->getMessage() . ': ' . $e->gettraceAsString() ."\n",3,$document_root . "/logs/updateEvent.txt");
 }
 // close root node of XML output
 
-error_log("updateEvent.php: " . __LINE__ . " </parms>\n",3,$document_root . "/logs/updateEvent.txt");
 if (!canUser('edit'))
 {
     $msg    .= 'User not authorized to update the database. ';
@@ -587,7 +586,6 @@ switch($type)
 
     case Citation::STYPE_DEATH:     // 4;
     {
-error_log("updateEvent.php: " . __LINE__ . "\n",3,$document_root . "/logs/updateEvent.txt");
         if (is_null($idir))
         {
             $msg    .= "idir value not specified. ";
@@ -697,7 +695,6 @@ error_log("updateEvent.php: " . __LINE__ . "\n",3,$document_root . "/logs/update
 
     case Citation::STYPE_DEATHCAUSE:        // 9;
     {
-error_log("updateEvent.php: " . __LINE__ . "\n",3,$document_root . "/logs/updateEvent.txt");
         if (is_null($idir))
         {
             $msg    .= "idir value not specified. ";

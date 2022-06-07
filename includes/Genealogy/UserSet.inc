@@ -1,5 +1,6 @@
 <?php
 namespace Genealogy;
+use \PDO;
 /************************************************************************
  *  UserSet.inc                                                         *
  *                                                                      *
@@ -85,9 +86,8 @@ class UserSet extends RecordSet
         {
             $fieldLc    = User::getRealFieldName($fldname);
             switch($fieldLc)
-            {       // act on specific field name
+            {                       // act on specific field name
                 case 'username':
-                {
                     if (is_string($value))
                         $usernames      = array($value);
                     else
@@ -131,6 +131,19 @@ class UserSet extends RecordSet
                             $close              = ')';
                         }               // inclusion specific username
                         else
+                        if (strlen($value) > 1 &&
+                            substr($value,0,1) == '^')
+                        {               // inclusion specific username
+                            $prefix             = substr($value, 1);
+                            $where              .= $or . 
+                                "LEFT(`UserName`," .
+                                strlen($prefix) . ")=:username$iu";
+                            $this->sqlParms["username$iu"] = $prefix;
+                            $or                 = ' OR ';
+                            $and                = ') AND ';
+                            $close              = ')';
+                        }               // inclusion specific username
+                        else
                         if (strlen($value) > 0)
                         {               // inclusion pattern
                             $where              .= $or . 
@@ -139,7 +152,7 @@ class UserSet extends RecordSet
                                                 = $value;
                             $or                 = ' OR ';
                             $and                = ') AND ';
-                            $close              = ')';
+                            $close              = '';
                         }               // inclusion pattern
 
                         if ($iu == '')
@@ -148,24 +161,43 @@ class UserSet extends RecordSet
                             $iu++;
                     }                   // loop through supplied values
                     $where                      .= $close;
-                    break;
-                }
+                    break;              // username
 
                 case 'email':
-                {
                     if (is_string($value))
                     {
-                        $where          .= $and . "LOCATE(:email,`Email`) > 0 ";
+                        if (substr($value, 0, 1) == '^')
+                        {
+                            if (substr($value, -1, 1) == '$')
+                            {
+                                $len            = strlen($value) - 2;
+                                $where          .= "$and`Email`=:email";
+                                $value          = substr($value, 1, $len);
+                            }
+                            else
+                            {
+                                $len            = strlen($value) - 1;
+                                $where          .= "$and LEFT(`Email`,$len)=:email";
+                                $value          = substr($value, 1, $len);
+                            }
+                        }
+                        else
+                        if (substr($value, -1, 1) == '$')
+                        {
+                            $len            = strlen($value) - 1;
+                            $where          .= "$and RIGHT(`Email`,$len)=:email";
+                            $value          = substr($value, 0, $len);
+                        }
+                        else
+                            $where          .= "$and LOCATE(:email,`Email`) > 0";
                         $this->sqlParms['email']    = $value;
                         $and            = ' AND ';
                     }
                     else
                         $this->msg      .= "Unsupported value for 'email'. ";
-                    break;
-                }
+                    break;                  // e-mail address
 
                 case 'auth':
-                {
                     if (is_string($value))
                     {
                         if (strtolower($value) == 'pending')
@@ -181,11 +213,9 @@ class UserSet extends RecordSet
                     }
                     else
                         $this->msg      .= "Unsupported value for 'auth'. ";
-                    break;
-                }
+                    break;              // authorizations
 
                 case 'options':
-                {
                     if (is_int($value) || ctype_digit($value))
                     {
                         $where      .= $and . "(`Options` & :options) > 0";
@@ -194,33 +224,33 @@ class UserSet extends RecordSet
                     }
                     else
                         $this->msg      .= "Unsupported value for 'options'. ";
-                    break;
-                }
+                    break;              // user set options
 
-                case 'recordid':
-                {                       // search RecOwners table
+                case 'recordid':        // search RecOwners table
                     if (is_int($value) ||
                         (is_string($value) && ctype_digit($value)))
                         $recordid   = intval($value);
-                    break;
-                }                       // search RecOwners table
+                    break;              // search RecOwners table
 
-                case 'table':
-                {                       // search RecOwners table
+                case 'table':           // search RecOwners table
                     // can be an alternate table name
                     $info           = Record::getInformation($value);
                     if ($info)
                         $table      = $info['table'];
                     else
                         $table      = 'Users';
+                    break;              // search RecOwners table
+
+                case 'password':
+                    $where          .= $and .
+                                       $this->getWhereCommon($fieldLc,
+                                                             $value,
+                                                             'password');
                     break;
-                }                       // search RecOwners table
 
                 default:
-                {
                     $this->msg      .= "Unsupported '$fldname' => $value. ";
                     break;
-                }
             }                   // act on specific field name
         }                       // loop through all parameters
 
@@ -236,5 +266,63 @@ class UserSet extends RecordSet
 
         return $where;
     }       // UserSet::getWhere
+
+    /********************************************************************
+     *  function UserSet::getMaillist                                   *
+     *                                                                  *
+     *  Obtain a string of e-mail addresses suitable for insertion      *
+     *  into a mail request.                                            *
+     *                                                                  *
+     *  Returns:                                                        *
+     *      String containing list of mail addresses                    *
+     ********************************************************************/
+    function getMaillist()
+    {
+        global  $debug;
+        global  $warn;
+        global  $connection;
+
+        $list                   = '';
+        $comma                  = '';
+        $query                  = "SELECT `Email` FROM Users {$this->where}";
+                // add the LIMIT clause
+        if ($this->limit < PHP_INT_MAX)
+           $query               .= " LIMIT " . $this->limit;
+
+        // add the OFFSET clause
+        if ($this->offset > 0)
+           $query               .= " OFFSET " . $this->offset;
+
+        $stmt                   = $connection->prepare($query);
+        $queryText              = debugPrepQuery($query, $this->sqlParms);
+        if ($stmt->execute($this->sqlParms))
+        {
+            $this->lastSqlCmd   = $queryText;
+            $emails             = $stmt->fetchAll(PDO::FETCH_COLUMN, 0);
+	        foreach($emails as $email)
+	        {                       // assemble bulk mailing list
+	            if (filter_var($email, FILTER_VALIDATE_EMAIL))
+	            {                   // valid e-mail
+	                $list       .= $comma . $email;
+	                $comma      = ',';
+	            }                   // valid e-mail
+		        else
+		        {
+                    error_log("'$email' is not a valid e-mail address. Record deleted.");
+                    $baduser    = new User(array('email' => $email));
+                    $baduser->delete();
+                }
+            }                       // assemble bulk mailing list
+        }                           // query succeeded
+        else
+        {           // error performing query
+            $this->msg  .= "<p class='error'>RecordSet::__construct: " .
+                            __LINE__ .
+                            " \"$queryText\"" .
+                    "<br>parms=" . var_export($this->sqlParms,true) . 
+                    "<br>errors=" . var_export($stmt->errorInfo(),true);
+        }           // error performing query
+        return $list;
+    }       // UserSet::getMailList
 
 }       // class UserSet

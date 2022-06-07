@@ -2117,8 +2117,8 @@ function confirmDelete(ev)
     let rownum      = form.elements['rownum' + idsx].value;
     let formname    = form.elements['formname' + idsx].value;
 
-    let parms       = {"idsx"   : idsx,
-                       "rownum" : idsx,
+    let parms       = {"idsx"       : idsx,
+                       "rownum"     : idsx,
                        "formname"   : formname}; 
 
     if (debug.toLowerCase() == 'y')
@@ -2166,14 +2166,21 @@ function gotDeleteCit(xmlDoc)
             }       // only examine elements at this level
         }           // loop through immediate children of root
         let row     = document.getElementById("sourceRow" + rownum);
+        let rowDc   = document.getElementById("sourceRowDc" + rownum);
         if (row)
         {
             let sect    = row.parentNode;
             sect.removeChild(row);
         }
         else
+        if (rowDc)
         {
-            alert("cannot find sourceRow" + rownum);
+            let sect    = rowDc.parentNode;
+            sect.removeChild(rowDc);
+        }
+        else
+        {
+            alert("editEvent.js: gotDeleteCit: cannot find sourceRow" + rownum);
         }
     }               // valid XML response
     else

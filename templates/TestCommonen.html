@@ -1,0 +1,38 @@
+<!--*********************************************************************
+ *  TestCommonen.html                                                   *
+ *                                                                      *
+ *  Display a web page that performs a regression test.                 *
+ *                                                                      *
+ *  History:                                                            *
+ *      2022/04/20      created                                         *
+ *                                                                      *
+ *  Copyright &copy; 2022 James A. Cobban                               *
+ **********************************************************************-->
+      <div id="breadcrumbs" class="hidden">
+        <a href="/genealogy.php?lang=$LANG">Genealogy</a>:
+        <a href="/FamilyTree/Services.php?lang=$LANG">Services</a>:
+        <a href="$DIRECTORY/testscripts/Menu.php?lang=$LANG">Menu of Tests</a>:
+      </div>
+      <div class="body">
+        <h1>
+          <span class="right">
+        <a href="/TestCommonHelpen.html" target="help">? Help</a>
+          </span>
+        Test $SUBJECT
+        </h1>
+        $MSG
+        $TRACE
+        $TESTBODY
+      </div> <!-- class='body' -->
+      <div class="balloon" id="HelpSubmit">
+        Clicking on this button causes the database to be updated to
+        reflect the changes you have made to this record.
+      </div>
+      <span id="adminOnly" class="hidden">
+          Only administrators can run this script.
+      </span>
+      <script src="/jscripts/tinymce/js/tinymce/tinymce.js" type="application/javascript">
+      </script>
+      <script src="/jscripts/js20/http.js" type="text/javascript"></script>
+      <script src="/jscripts/CommonForm.js" type="text/javascript"></script>
+      <script src="/jscripts/util.js" type="text/javascript"></script>

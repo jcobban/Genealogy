@@ -306,7 +306,7 @@ if (isset($_GET) && count($_GET) > 0)
     
             case 'division':
             {   // division identifier
-                if (preg_match("/^[a-zA-Z0-9]+$/", $value))
+                if (preg_match("/^[a-zA-Z0-9]*$/", $value))
                     $division           = $value;
                 else
                     $divisiontext       = $safevalue;

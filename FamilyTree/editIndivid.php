@@ -612,8 +612,6 @@ else
 
 // now have enough information to select template file
 $template                   = new FtTemplate("editIndivid$action$lang.html");
-if ($debug)
-    $warn .= "<p>\$template = new FtTemplate(\"editIndivid$action$lang.html\");</p>\n";
 $translate                  = $template->getTranslate();
 $t                          = $translate['tranTab'];
 $template['otherStylesheets']->update(array('filename'  => 'editIndivid'));
@@ -1289,14 +1287,22 @@ $nameset                    = new RecordSet('tblNX',
                                             'type'    => '>0'));
 $nametext                   = '';
 $ntemplate                  = $template['altNameRow'];
-$nttext                     = $ntemplate->outerHTML;
-foreach($nameset as $altidnx => $altname)
-{                       // loop through alternate names
-    $nametext   .= str_replace(array('$ALTNAME','$IDNX'),
-                               array( $altname->getName(), $altidnx),
-                               $nttext);
-}                       // loop through alternate names
-$ntemplate->update($nametext);
+if ($ntemplate)
+{
+    $nttext                     = $ntemplate->outerHTML;
+    foreach($nameset as $altidnx => $altname)
+    {                       // loop through alternate names
+        $nametext   .= str_replace(array('$ALTNAME','$IDNX'),
+                                   array( $altname->getName(), $altidnx),
+                                   $nttext);
+    }                       // loop through alternate names
+    $ntemplate->update($nametext);
+}
+else
+{
+    $warn .= "<p>\$template = new FtTemplate(\"editIndivid$action$lang.html\");</p>\n";
+    $warn .= "<p>cannot find altNameRow</p>\n";
+}
 
 $template->set('NAMEURI',           $nameuri);
 $template->set('SURNAME',           $surname);

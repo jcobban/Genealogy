@@ -25,96 +25,86 @@ use \Exception;
  *  Copyright &copy; 2021 James A. Cobban                               *
  ************************************************************************/
 require_once __NAMESPACE__ . '/FieldComment.inc';
+require_once __NAMESPACE__ . '/Census.inc';
+require_once __NAMESPACE__ . '/District.inc';
 require_once __NAMESPACE__ . '/FtTemplate.inc';
 require_once __NAMESPACE__ . '/common.inc';
 
 // open code
-$cc     = 'CA';
-$countryName    = 'Canada';
-$lang       = 'en';
-$province   = '';
-$division   = '';
+$censusID           = null;
+$distID             = null;
+$subDistID          = null;
+$cc                 = 'CA';
+$countryName        = 'Canada';
+$lang               = 'en';
+$province           = null;
+$division           = null;
 
 // process all of the input 
-$oldrownum  = '';
+$oldrownum          = '';
 
 foreach($_POST as $key => $value)
 {
-    $rownum     = substr($key, strlen($key) - 2);
+    if (preg_match('/^([a-zA-Z$_]+)(\d*)$/', $key, $matches))
+    {
+        $key                = strtolower($matches[1]);
+        $rownum             = $matches[2];
 
-    // ignore the common fields, already processed above
-    if (ctype_digit($rownum))
-    {           // field in individual record
-        if ($rownum != $oldrownum)
-        { 
-            if ($comment && canUser('edit'))
-                $comment->save();
-            if (strlen($msg) == 0)
-                $comment    = new FieldComment(array(
-                                'fc_census'     => $census,
-                                'fc_distid'     => $distID,
-                                'fc_sdid'       => $subDistID,
-                                'fc_div'        => $division,
-                                'fc_page'       => $page,
-                                'fc_userid'     => $userid));
-        }       // update database
-        $oldrownum  = $rownum;
-
-        // the first part of the key is the column name
-        $fld    = strtolower(substr($key, 0, strlen($key) - 2));
-        $comment->set($fld, $value);
-    }           // field in individual record
-    else
-    {           // global field
-        switch(strtolower($key))
-        {       // act on specific parameters
-            case 'cc':
-            {
-                $cc     = $value;
+        switch($key)
+        {
+            case "census":
+                $censusID   = $value;
                 break;
-            }
 
-            case 'census':
-            {
-                $census     = $value;
-                break;
-            }
-
-            case 'province':
-            {
+            case "province":
                 $province   = $value;
                 break;
-            }
 
-            case 'district':
-            {
+            case "district":
                 $distID     = $value;
                 break;
-            }
 
-            case 'subdistrict':
-            {
+            case "subdistrict":
                 $subDistID  = $value;
                 break;
-            }
 
-            case 'division':
-            {
+            case "division":
                 $division   = $value;
                 break;
-            }
 
-            case 'page':
-            {
+            case "page":
                 $page       = $value;
                 break;
-            }
 
-            case 'userid':
-            {
-                $userid     = $value;
+            case 'line':
+                $line       = $value;
+                $comment    = new FieldComment(array(
+                                        'fc_census'     => $censusID,
+                                        'fc_distid'     => $distID,
+                                        'fc_sdid'       => $subDistID,
+                                        'fc_div'        => $division,
+                                        'fc_page'       => $page,
+                                        'fc_userid'     => $userid,
+                                        'fc_line'       => $line));
                 break;
-            }
+
+            case 'fldname':
+                $comment['fldname']     = $value;
+                break;
+
+            case 'oldvalue':
+                $comment['oldvalue']    = $value;
+                break;
+
+            case 'newvalue':
+                $comment['newvalue']    = $value;
+                break;
+
+            case 'comment':
+                $comment['comment']     = $value;
+                $comment->save();
+                $comment                = null;
+                break;
 
             case 'lang':
             {
@@ -123,49 +113,57 @@ foreach($_POST as $key => $value)
             }
 
         }       // act on specific parameters
-    }           // global field
-}           // loop through all parameters
+    }           // parse field name
+}               // loop through all parameters
 
-$country    = new Country(array('cc'    => $cc));
-$countryName    = $country->getName($lang);
-if (isset($census))
+if (is_string($censusID))
 {
-    $censusObj  = new Census(array('censusid' => $census));
+    $censusObj  = new Census(array('censusid' => $censusID));
 }
 else
 {
     $msg    .= "Census parameter not specified. ";
 }
-if (isset($distID))
+
+if (is_string($distID))
 {
     $districtObj    = new District(array('census'   => $censusObj,
                                          'id'   => $distID));
-    $districtName   = $districtObj->getName($lang);
+    $districtName   = $districtObj['name'];
 }
 else
 {
     $msg    .= "District parameter not specified. ";
 }
-if (isset($subDistID))
+
+if (is_string($subDistID))
 {
+    if (isset($division))
+    $subDistrictObj     = new SubDistrict(array('census'    => $censusObj,
+                                                'distid'    => $districtObj,
+                                                'id'        => $subDistID,
+                                                'division'  => $division));
+    else
     $subDistrictObj     = new SubDistrict(array('census'    => $censusObj,
                                                 'distid'    => $districtObj,
                                                 'id'        => $subDistID));
-    $subDistrictName    = $subDistrictObj->getName();
-    $bypage             = $subDistrictObj->get('bypage');
+    $subDistrictName    = $subDistrictObj['name'];
+    $bypage             = $subDistrictObj['bypage'];
 }
 else
 {
     $msg    .= "SubDistrict parameter not specified. ";
 }
-if (isset($page))
+
+if (is_string($page))
 {
 }
 else
 {
     $msg    .= "Page parameter not specified. ";
 }
-if (isset($userid))
+
+if (is_string($userid))
 {
 }
 else
@@ -180,12 +178,12 @@ if (!canUser('edit'))
             Sign in and then refresh this page to apply the changes.";
 }
 
-$template       = new FtTemplate("CensusUpdate$lang.html");
+$template       = new FtTemplate("CensusProofUpdate$lang.html");
 
 $template->set('CENSUSYEAR',        $censusYear);
 $template->set('CC',                $cc);
 $template->set('COUNTRYNAME',       $countryName);
-$template->set('CENSUSID',          $censusId);
+$template->set('CENSUSID',          $censusID);
 $template->set('PROVINCE',          $province);
 $template->set('PROVINCENAME',      $provinceName);
 $template->set('LANG',              $lang);
@@ -203,25 +201,6 @@ $template->set('CONTACTSUBJECT',    '[FamilyTree]' .
                                     urlencode($_SERVER['REQUEST_URI']));
 $template->set('IMAGE',             $image);
 
-if (strlen($province) == 0)
-{
-    $template->updateTag('frontProv', null);
-    $template->updateTag('backProv', null);
-}
-if (strlen($division) == 0)
-{
-    $template->updateTag('nextPageDivision', null);
-    $template->updateTag('prevPageDivision', null);
-    $template->updateTag('resultsDivision', null);
-}
-if ($nextPage == 0)
-    $template->updateTag('nextPagePara', null);
-if ($prevPage == 0)
-    $template->updateTag('prevPagePara', null);
-$promptTag  = $template->getElementById('ImagePrompt');
-if (strlen($image) == 0)
-    $template->updateTag('ImageButton', null); // hide
-else
 if ($promptTag)
     $promptTag->update(null); // hide
 

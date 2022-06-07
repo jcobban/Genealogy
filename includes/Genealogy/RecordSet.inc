@@ -793,7 +793,7 @@ class RecordSet implements Iterator, Countable, ArrayAccess
             else
             {           // error performing query
                 $this->msg  .= "<p class='error'>RecordSet::__construct: " . __LINE__ .
-                    " \"$countQuery\"" .
+                    " \"$queryText\"" .
                     "<br>parms=" . var_export($this->sqlParms,true) . 
                     "<br>errors=" . var_export($stmt->errorInfo(),true);
                 $this->information['count'] = 0;
@@ -1621,182 +1621,208 @@ class RecordSet implements Iterator, Countable, ArrayAccess
                 //$warn   .= "<p>" . __LINE__ . " pattern='$pattern'</p>\n";
                 //$warn   .= "<p>" . __LINE__ . " frstch='$frstch', body='$body', rest='$rest', lastch='$lastch'</p>\n";
     
-            if (strlen($pattern) > 5 &&
-                strtoupper(substr($pattern, 0, 5) == 'LIKE '))
-            {               // portable pattern matching
-                $value          = trim(substr($pattern, 5));
-                if (substr($value,0,1) == "'" &&
-                    substr($value,-1) == "'")
-                    $value      = substr($value, 1, strlen($value)-2);
+                if (strlen($pattern) > 5 &&
+                    strtoupper(substr($pattern, 0, 5) == 'LIKE '))
+                {               // portable pattern matching
+                    $value          = trim(substr($pattern, 5));
+                    if (substr($value,0,1) == "'" &&
+                        substr($value,-1) == "'")
+                        $value      = substr($value, 1, strlen($value)-2);
+                    else
+                    if (substr($value,0,1) == '"' &&
+                        substr($value,-1) == '"')
+                        $value      = substr($value, 1, strlen($value)-2);
+                    $value          = stripcslashes($value);
+                    if (is_string($refname))
+                    {
+                        $where          .= $or . "$fldname LIKE :$refname$i";
+                        $this->sqlParms["$refname$i"]   = $value;
+                        $i++;
+                    }
+                    else
+                    {
+                        $where          .= $or . "$fldname LIKE ?";
+                        $this->sqlParms[]   = $val;
+                    }
+                    $or                 = ' OR ';
+                    $this->sqlParms[]   = $value;
+                }               // portable pattern matching
                 else
-                if (substr($value,0,1) == '"' &&
-                    substr($value,-1) == '"')
-                    $value      = substr($value, 1, strlen($value)-2);
-                $value          = stripcslashes($value);
-                if (is_string($refname))
-                {
-                    $where          .= $or . "$fldname LIKE :$refname$i";
-                    $this->sqlParms["$refname$i"]   = $value;
-                    $i++;
-                }
+                if ($frstch == '^' &&
+                    $lastch == '$' &&
+                    strlen($rest) == 0)
+                {               // special pattern to match whole value
+                    if (is_string($refname))
+                    {
+                        $where              .= $or . "$fldname=:$refname$i";
+                        $this->sqlParms["$refname$i"]   = $body;
+                        $i++;
+                    }
+                    else
+                    {
+                        $where              .= $or . "$fldname=?";
+                        $this->sqlParms[]   = $body;
+                    }
+                }               // match whole value
                 else
-                {
-                    $where          .= $or . "$fldname LIKE ?";
-                    $this->sqlParms[]   = $val;
-                }
-                $or                 = ' OR ';
-                $this->sqlParms[]   = $value;
-            }               // portable pattern matching
-            else
-            if ($frstch == '^' &&
-                $lastch == '$' &&
-                strlen($rest) == 0)
-            {               // special pattern to match whole value
-                if (is_string($refname))
-                {
-                    $where              .= $or . "$fldname=:$refname$i";
-                    $this->sqlParms["$refname$i"]   = $body;
-                    $i++;
-                }
+                if ($frstch == '^' &&
+                    strlen($body) > 0 &&
+                    strlen($rest) == 0)
+                {               // match at beginning
+                    $vlen           = mb_strlen($body);
+                    $value          = $body;
+    
+                    if (is_string($refname))
+                    {
+                        $where      .= $or . "LEFT($fldname, $vlen)=:$refname$i";
+                        $this->sqlParms["$refname$i"]   = $value;
+                        $i++;
+                    }
+                    else
+                    {
+                        $where      .= $or . "LEFT($fldname, $vlen)=?";
+                        $this->sqlParms[]   = $value;
+                    }
+                }               // match at beginning
                 else
-                {
-                    $where              .= $or . "$fldname=?";
-                    $this->sqlParms[]   = $body;
-                }
-            }               // match whole value
-            else
-            if ($frstch == '^' &&
-                strlen($body) > 0 &&
-                strlen($rest) == 0)
-            {               // match at beginning
-                $vlen           = mb_strlen($body);
-                $value          = $body;
+                if ($lastch == '$' &&
+                    strlen($rest) == 0)
+                {               // match at end of string
+                    $vlen           = strlen($body);
+                    $value          = $body;
+                    if (is_string($refname))
+                    {
+                        $where      .= $or . "RIGHT($fldname, $vlen)=:$refname$i";
+                        $this->sqlParms["$refname$i"]   = $value;
+                        $i++;
+                    }
+                    else
+                    {
+                        $where      .= $or . "RIGHT($fldname, $vlen)=?";
+                        $this->sqlParms[]   = $value;
+                    }
+                }               // match at end of string
+                else
+                if (strlen($rest) > 0)
+                {               // value is a REGEXP pattern
+                    $leading            = null;
+                    $leadingl           = 0;
+                    if ($frstch == '^')
+                    {
+                        $leadingl       = strlen($body);
+                        $leading        = $body;
+                        $frest          = substr($rest, 0, 1);
+                        if ($frest == '*' || 
+                            $frest == '+' || 
+                            $frest == '?' ||
+                            $frest == '{')
+                        {
+                            $leadingl--;
+                            $leading    = substr($body, 0, $leadingl);
+                            $rest       = substr($body, $leadingl, 1) .
+                                          $rest;
+                        }
+                    }
 
-                if (is_string($refname))
-                {
-                    $where      .= $or . "LEFT($fldname, $vlen)=:$refname$i";
-                    $this->sqlParms["$refname$i"]   = $value;
-                    $i++;
-                }
-                else
-                {
-                    $where      .= $or . "LEFT($fldname, $vlen)=?";
-                    $this->sqlParms[]   = $value;
-                }
-            }               // match at beginning
-            else
-            if ($lastch == '$' &&
-                strlen($rest) == 0)
-            {               // match at end of string
-                $vlen           = strlen($body);
-                $value          = $body;
-                if (is_string($refname))
-                {
-                    $where      .= $or . "RIGHT($fldname, $vlen)=:$refname$i";
-                    $this->sqlParms["$refname$i"]   = $value;
-                    $i++;
-                }
-                else
-                {
-                    $where      .= $or . "RIGHT($fldname, $vlen)=?";
-                    $this->sqlParms[]   = $value;
-                }
-            }               // match at end of string
-            else
-            if (strlen($rest) > 0)
-            {               // value is a REGEXP pattern
-                $leading            = null;
-                $leadingl           = 0;
-                if ($frstch == '^')
-                {
-                    $leadingl       = strlen($body);
-                    $leading        = $body;
-                    $frest          = substr($rest, 0, 1);
-                    if ($frest == '*' || 
-                        $frest == '+' || 
-                        $frest == '?' ||
-                        $frest == '{')
+//                    $warn    .= "<p>RecordSet::getWherePattern: " . __LINE__ . " \$frstch='$frstch', \$rest='$rest', \$leading='$leading', \$body='$body'</p>\n"; 
+                    if (is_string($refname))
                     {
-                        $leadingl--;
-                        $leading    = substr($body, 0, $leadingl);
+                        if ($leadingl)
+                        {
+                            $where      .= "(LEFT($fldname,$leadingl)=:l$refname$i AND ";
+                            $this->sqlParms["l$refname$i"]   = $leading;
+                        }
+                        $where          .= "$fldname REGEXP :$refname$i";
+                        $this->sqlParms["$refname$i"]   = $pattern;
+                        $i++;
                     }
-                }
-
-                $where          .= $or;
-                if (is_string($refname))
-                {
+                    else
+                    {
+                        if ($leadingl)
+                        {
+                            $where          .= 
+                                        "(LEFT($fldname,$leadingl)=? AND ";
+                            $this->sqlParms[]   = $leading;
+                        }
+                        $startpos           = $leadingl + 1;
+                        if (substr($rest, 0, 2) == '[^')
+                        {
+                            $clbr           = strpos($rest, ']');
+                            $neglen         = $clbr - 2;
+                            $negpat         = substr($rest, 2, $neglen);
+                            $where          .=
+                        "SUBSTRING($fldname,$startpos,$neglen) != ?";
+                            $this->sqlParms[]   = $negpat;
+                        }
+                        if (substr($rest, 0, 3) == '(?!')
+                        {
+                            $clbr           = strpos($rest, ')');
+                            $neglen         = $clbr - 3;
+                            $negpat         = substr($rest, 3, $neglen);
+                            $where          .=
+                        "SUBSTRING($fldname,$startpos,$neglen) != ?";
+                            $this->sqlParms[]   = $negpat;
+                        }
+                        else
+                        {
+                            $where          .= 
+                                "SUBSTRING($fldname,$startpos) REGEXP ?";
+                            $this->sqlParms[]   = $rest;
+                        }
+                    }
                     if ($leadingl)
+                        $where          .= ')';
+                }               // value is a REGEXP pattern
+                else
+                if ($frstch == '!')
+                {               // value is a string to exclude from results
+                    $value          = substr($pattern,1);
+                    if (is_string($refname))
                     {
-                        $where      .= "(LEFT($fldname,$leadingl)=:l$refname$i AND ";
-                        $this->sqlParms["l$refname$i"]   = $leading;
+                        $where          .= $or . "$fldname!=:$refname$i";
+                        $this->sqlParms["$refname$i"]   = $value;
+                        $i++;
                     }
-                    $where          .= "$fldname REGEXP :$refname$i";
-                    $this->sqlParms["$refname$i"]   = $pattern;
-                    $i++;
-                }
-                else
-                {
-                    if ($leadingl)
+                    else
                     {
-                        $where      .= "(LEFT($fldname,$leadingl)=? AND ";
-                        $this->sqlParms[]   = $leading;
+                        $where          .= $or . "$fldname!=?";
+                        $this->sqlParms[]   = $value;
                     }
-                    $where          .= "$fldname REGEXP ?";
-                    $this->sqlParms[]   = $pattern;
-                }
-                if ($leadingl)
-                    $where          .= ')';
-            }               // value is a REGEXP pattern
-            else
-            if ($frstch == '!')
-            {               // value is a string to exclude from results
-                $value          = substr($pattern,1);
-                if (is_string($refname))
+                }               // value is a string to exclude from results
+                else
+                if (strtolower(substr($pattern,0,7)) == 'length=')
                 {
-                    $where          .= $or . "$fldname!=:$refname$i";
-                    $this->sqlParms["$refname$i"]   = $value;
-                    $i++;
+                    $where              .= "LENGTH($fldname)=$submark";
+                    $value                  = substr($pattern, 7);
+                    if ($subindex)
+                        $this->sqlParms[$subindex]  = $value;
+                    else
+                        $this->sqlParms[]   = $value;
                 }
                 else
+                if (strtolower(substr($pattern,0,7)) == 'length>')
                 {
-                    $where          .= $or . "$fldname!=?";
-                    $this->sqlParms[]   = $value;
-                }
-            }               // value is a string to exclude from results
-            else
-            if (strtolower(substr($pattern,0,7)) == 'length=')
-            {
-                $where              .= "LENGTH($fldname)=$submark";
-                $value                  = substr($pattern, 7);
-                if ($subindex)
-                    $this->sqlParms[$subindex]  = $value;
-                else
-                    $this->sqlParms[]   = $value;
-            }
-            else
-            if (strtolower(substr($pattern,0,7)) == 'length>')
-            {
-                $where              .= "LENGTH($fldname)>$submark";
-                $value              = substr($pattern, 7);
-                if ($subindex)
-                    $this->sqlParms[$subindex]  = $value;
-                else
-                    $this->sqlParms[]   = $value;
-            }
-            else
-            {               // value is a string to find
-                if (is_string($refname))
-                {
-                    $where      .= $or . "LOCATE(:$refname$i, $fldname) > 0";
-                    $this->sqlParms["$refname$i"]   = $pattern;
-                    $i++;
+                    $where              .= "LENGTH($fldname)>$submark";
+                    $value              = substr($pattern, 7);
+                    if ($subindex)
+                        $this->sqlParms[$subindex]  = $value;
+                    else
+                        $this->sqlParms[]   = $value;
                 }
                 else
-                {
-                    $where      .= $or . "LOCATE(?, $fldname) > 0";
-                    $this->sqlParms[]   = $pattern;
-                }
-            }               // value is a string to find
+                {               // value is a string to find
+                    if (is_string($refname))
+                    {
+                        $where      .= $or . "LOCATE(:$refname$i, $fldname) > 0";
+                        $this->sqlParms["$refname$i"]   = $pattern;
+                        $i++;
+                    }
+                    else
+                    {
+                        $where      .= $or . "LOCATE(?, $fldname) > 0";
+                        $this->sqlParms[]   = $pattern;
+                    }
+                }               // value is a string to find
             }               // string
             $or     = ' OR ';
         }                   // loop through patterns
@@ -2032,8 +2058,6 @@ require_once __NAMESPACE__ . '/Surname.inc';
                 $orExpression   = '';
                 foreach($value as $fld2 => $val2)
                 {
-                    $warn       .= "<p>RecordSet::getWhere: " . __LINE__ .
-                " '$fld2' => " . var_export($val2,true) . "</p>\n";
                     $fieldLc    = $nsclass::getRealFieldName($fld2);
                     if (is_null($fieldLc))
                     {

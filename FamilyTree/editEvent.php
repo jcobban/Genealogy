@@ -272,6 +272,7 @@ use \Templating\Template;
  *      2020/03/13      use FtTemplate::validateLang                    *
  *      2020/12/05      correct XSS vulnerabilities                     *
  *      2022/04/16      use all of FtTemplate                           *
+ *      2022/05/16      default IDET to Event::ET_UNDEF                 *
  *                                                                      *
  *  Copyright &copy; 2022 James A. Cobban                               *
  ************************************************************************/
@@ -958,7 +959,7 @@ if (strlen($msg) == 0)
     if ($ider === 0)
     {                   // create new Event
         if (is_null($idet))
-            $idet           = Event::ET_NULL;
+            $idet           = Event::ET_UNDEF;
         $event              = new Event(array('ider'            => 0,
                                               'idet'            => $idet,
                                               'idir'            => $idir));
@@ -1021,7 +1022,7 @@ if (strlen($msg) == 0)
                 $msg        .= $template['missingIDIME']->innerHTML;
             }
             $etype          = '';
-            $idet           = 1;
+            $idet           = Event::ET_UNDEF;
             break;
         }   // type not determined yet
 
@@ -1813,8 +1814,8 @@ $template->set('TYPE', $stype);              // event type parameter
 
 if (strlen($msg) == 0)
 {       // no errors
-    if ($idet == 1)
-        $idet           = 0;
+    if ($idet == Event::ET_NULL)
+        $idet           = Event::ET_UNDEF;
 
     // display a selection list of event types if supported by the
     // event

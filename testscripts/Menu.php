@@ -33,10 +33,10 @@ if (strlen($msg) == 0)
     {       // found directory
         while (($filename = readdir($dh)) !== false)
         {       // loop through files
-        if (strlen($filename) > 4 &&
-            substr($filename, strlen($filename) - 4) == '.php' &&
-            $filename != 'Menu.php')
-            $scripts[]  = $filename;
+            if (strlen($filename) > 4 &&
+                substr($filename, strlen($filename) - 4) == '.php' &&
+                $filename != 'Menu.php')
+                $scripts[]  = $filename;
         }       // loop through files
         sort($scripts);
     }       // found Newsletters directory

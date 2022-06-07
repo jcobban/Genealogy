@@ -1,10 +1,12 @@
 <!--*********************************************************************
- *  CensusProofUpdateen.html                                            *
+ *  CensusProofreaden.html                                              *
  *                                                                      *
- *  Record the results of proofreading a census page.                   *
+ *  Report results of recording the results of proofreading a           *
+ *  census page.                                                        *
  *                                                                      *
  *  History:                                                            *
- *      2022/05/04      created                                         *
+ *      2018/01/27      created                                         *
+ *      2022/05/04      complete implementation                         *
  *                                                                      *
  *  Copyright &copy; 2022 James A. Cobban                               *
  **********************************************************************-->
@@ -21,16 +23,16 @@
     <a href="/database/CensusUpdateStatusDist.php?Census=$CENSUSID&amp;Province=$PROVINCE&amp;District=$DISTRICT&amp;lang=$LANG">
         District $DISTRICT $DISTRICTNAME Summary
     </a>:
-    <a href="/database/CensusUpdateStatusDetails.php?Census=$CENSUSID&amp;Province=$PROVINCE&amp;District=$DISTRICT&amp;SubDistrict=$SUBDISTRICT&amp;Division=$DIVISION&lang=$LANG" id="divdetails">
+    <a href="/database/CensusUpdateStatusDetails.php?Census=$CENSUSID&amp;Province=$PROVINCE&amp;District=$DISTRICT&amp;SubDistrict=$SUBDISTRICT&amp;Division=$DIVISION&lang=$LANG">
     Division Details
     </a>:   
   </div>
   <div id="transcription" style="overflow: auto; overflow-x: scroll">
     <div class="body">
       <h1>
-      $COUNTRYNAME: $CENSUSYEAR Census Proofread Recorded
+      $COUNTRYNAME: $CENSUSYEAR Census Proofread Changes
     <span class="right">
-      <a href="/database/CensusProofUpdateHelpen.html" target="help">? Help</a>
+      <a href="/database/CensusProofreadHelpen.html" target="help">? Help</a>
     </span>
     <div style="clear: both;"></div>
       </h1>
@@ -38,13 +40,14 @@
       $TRACE
       $MSG
     <p class="label" id="results">
-      Updated District $DISTRICT $DISTRICTNAME
-      SubDistrict  $SUBDISTRICT $SUBDISTRICTNAME,
+    Updated District $DISTRICT $DISTRICTNAME
+    SubDistrict  $SUBDISTRICT $SUBDISTRICTNAME,
       <span id="resultsDivision">Division $DIVISION </span>
     Page $PAGE.
     </p>
-    <form action="CensusUpdateStatusDetails.php" method="get"
-            name="proofForm" id="proofForm">
+    <form action="CensusProofUpdate.php" method="post"
+            name="proofForm" id="proofForm"
+            enctype="multipart/form-data">
       <div class="hidden">
         <input type="hidden" name="Census" id="Census"
             value="$CENSUSID">
@@ -65,11 +68,85 @@
         <input type="hidden" name="Image" id="Image"
             value="$IMAGE">
       </div>
+      <p class="label" id="nextPagePara">
+        <a class="button" id="nextPageButton" 
+            href="/database/CensusForm.php?Census=$CENSUSID&amp;Province=$PROVINCE&amp;District=$DISTRICT&amp;SubDistrict=$SUBDISTRICT&amp;Division=$DIVISION&Page=$NEXTPAGE&lang=$LANG" accessKey="N">
+            Update <u>N</u>ext Page $NEXTPAGE in $SUBDISTRICTNAME
+          <span id="nextPageDivision">Division $DIVISION </span>
+        </a>
+      </p>
+      <p class="label" id="prevPagePara">
+        <a class="button" id="prevPageButton"
+            href="/database/CensusForm.php?Census=$CENSUSID&amp;Province=$PROVINCE&amp;District=$DISTRICT&amp;SubDistrict=$SUBDISTRICT&amp;Division=$DIVISION&Page=$PREVPAGE&lang=$LANG" accessKey="P">
+            Update <u>P</u>revious Page $PREVPAGE in $SUBDISTRICTNAME
+          <span id="prevPageDivision">Division $DIVISION </span>
+        </a>
+      </p>
       <p class="label">
-        <button type="submit" id="close" accessKey="C">
+        <button type="submit" id="update" accessKey="U">
+          <u>U</u>pdate
+        </button>
+      </p>
+      <p class="label">
+        <button type="button" id="close" accessKey="C">
           <u>C</u>lose
         </button>
       </p>
+      <table id="proofTable">
+        <thead>
+          <tr>
+            <th class="colhead">
+                Line
+            </th>
+            <th class="colhead">
+                Field
+            </th>
+            <th class="colhead">
+                Old&nbsp;Value
+            </th>
+            <th class="colhead">
+                New&nbsp;Value
+            </th>
+            <th class="colhead">
+                Explanation
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr id="dataRow$line">
+            <td>
+              <input type='text' size='2'
+                        name='Line$line' id='Line$line'
+                        readonly='readonly' class='ina label'
+                        value='$rownum'>
+            </td>
+            <td>
+              <input type='text' size='14' 
+                        name='FldName$line' id='FldName$line'
+                        readonly='readonly' class='ina label'
+                        value='$fldname'>
+            </td>
+            <td>
+              <input type='text' size='32' 
+                        name='OldValue$line' id='OldValue$line'
+                        readonly='readonly' class='ina left'
+                        value='$oldvalue'>
+            </td>
+            <td>
+              <input type='text' size='32' 
+                        name='NewValue$line' id='NewValue$line'
+                        readonly='readonly' class='ina left'
+                        value='$value'>
+            </td>
+            <td>
+              <input type='text' size='40' 
+                        name='Comment$line' id='Comment$line'
+                        class='white leftnc'
+                        value='$notes'>
+            </td>
+          </tr>
+        </tbody>
+      </table>
     </form>
 
     </div> <!-- class="body" -->

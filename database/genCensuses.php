@@ -162,6 +162,8 @@ $update             = canUser('edit');
 // get statistics
 $cenpop             = array();
 $cendone            = array();
+$totalTranscribed   = 0;
+$totalPopulation    = 0;
 $getParms           = array('countrycode'   => $cc,
                             'collective'    => 0);
 $censuses           = new CensusSet($getParms);
@@ -193,6 +195,8 @@ if ($stmt->execute($sqlParms))
             $cenpop[$cenyear]   += $row['population'];
         else
             $cenpop[$cenyear]   = $row['population'];
+        $totalTranscribed       += $row['transcribed'];
+        $totalPopulation        += $row['population'];
     }       // success
 }       // loop through each census
 else
@@ -207,6 +211,8 @@ foreach($cendone as $year => $value)
     $template->set('CENDONE' . $year, $formatter->format(floatval($value)));
 foreach($cenpop as $year => $value)
     $template->set('CENPOP' . $year, $formatter->format(floatval($value)));
+$template->set('TOTALTRANSCRIBED',  $formatter->format(floatval($totalTranscribed)));
+$template->set('TOTALPOPULATION',   $formatter->format(floatval($totalPopulation)));
 $template->set('TITLE',             $title);
 $template->set('COUNTRYNAME',       $countryName);
 $template->set('ARTICLE',           $article);

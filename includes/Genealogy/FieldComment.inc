@@ -37,8 +37,9 @@ use \Iterator;
  *      2018/01/18      created                                         *
  *      2019/01/06      move to namespace Genealogy                     *
  *      2019/04/09      add ability to update existing comment          *
+ *      2022/05/04      correct where expression in constructor         *
  *                                                                      *
- *  Copyright &copy; 2019 James A. Cobban                               *
+ *  Copyright &copy; 2022 James A. Cobban                               *
  ************************************************************************/
 require_once __NAMESPACE__ . '/Record.inc';
 
@@ -142,7 +143,7 @@ class FieldComment extends Record
                     {           // act on key fields
                         case 'fc_index':
                         {       // unique record index
-                            $where              = $and . '$key=:$fieldLc';
+                            $where              .= $and . "$key=:$fieldLc";
                             $sqlParms[$fieldLc] = $value;
                             $and                = ' AND ';
                             break 2;    // only key
@@ -157,7 +158,7 @@ class FieldComment extends Record
                         case 'fc_fldname':
                         case 'fc_userid':
                         {       // other keys
-                            $where              = $and . '$key=:$fieldLc';
+                            $where              .= $and . "$key=:$fieldLc";
                             $sqlParms[$fieldLc] = $value;
                             $and                = ' AND ';
                             break;
@@ -224,7 +225,7 @@ class FieldComment extends Record
             $fieldLc        = strtolower($key);
             if (array_key_exists($fieldLc, self::$translate))
                 $fieldLc    = self::$translate[$fieldLc];
-            switch(strtolower($key))
+            switch($fieldLc)
             {                   // act on fields
                 case 'fc_index':
                 case 'fc_census':

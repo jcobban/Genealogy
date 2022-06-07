@@ -1,23 +1,23 @@
 <!--*********************************************************************
- *  Accounten.html														*
- *																		*
- *  French language template for the Account management page			*
- *																		*
- *  History:															*
- *		2017/11/15		Created											*
- *		2018/01/04		remove Template from template file names		*
- *		2018/02/28		add "Generate Password" button					*
+ *  Accounten.html                                                      *
+ *                                                                      *
+ *  French language template for the Account management page            *
+ *                                                                      *
+ *  History:                                                            *
+ *      2017/11/15      Created                                         *
+ *      2018/01/04      remove Template from template file names        *
+ *      2018/02/28      add "Generate Password" button                  *
  *      2020/01/17      add support for Advertiser                      *
- *																		*
- *  Copyright &copy; 2020 James A. Cobban								*
+ *                                                                      *
+ *  Copyright &copy; 2020 James A. Cobban                               *
  **********************************************************************-->
     <div id="breadcrumbs" class="hidden">
       <a href="/genealogy.php?lang=fr">Généalogie</a>:
-    </div>	
+    </div>  
     <div class="body">
       <h1 class="clear">Gestion de la Compte
         <span class="right">
-		  <a href="/AccountHelpfr.html" target="help">?&nbsp;Aide</a>
+          <a href="/AccountHelpfr.html" target="help">?&nbsp;Aide</a>
         </span>
       </h1>
       $TRACE
@@ -25,104 +25,104 @@
       <p class="label" id="okmsg">$OKMSG</p>
       <div id="update">
         <form action="Account.php"
-		    name="accountForm" id="accountForm"
-		    method="post"  
-		    enctype="multipart/form-data">
+            name="accountForm" id="accountForm"
+            method="post"  
+            enctype="multipart/form-data">
           <p id="useridRow" class="clear">
-		    <label class="label" for="userid">
-		      Identifiant de l'Utilisateur:
-		    </label>
-		    <input type="text" size="32" maxlength="64"
-			    class="white leftnc" name="userid" id="userid"
-			    autocomplete="off" readonly="readonly"
-			    value="$USERID"/>
+            <label class="label" for="userid">
+              Identifiant de l'Utilisateur:
+            </label>
+            <input type="text" size="32" maxlength="64"
+                class="white leftnc" name="userid" id="userid"
+                autocomplete="off" readonly="readonly"
+                value="$USERID"/>
             Mandatoire
           </p>
           <p id="passRow" class="clear">
-		    <label class="label" for="password">
-		      Mot de Passe Actuel:
-		    </label>
-		    <input type="password" size="32" maxlength="64"
-			    name="password" id="password"
-			    class="white leftnc" autocomplete="off"/>
+            <label class="label" for="password">
+              Mot de Passe Actuel:
+            </label>
+            <input type="password" size="32" maxlength="64"
+                name="password" id="password"
+                class="white leftnc" autocomplete="off"/>
           </p>
           <p id="newPassRow" class="clear">
-		    <label class="label" for="newPassword">
-		      Mot de Passe Neuf:
-		    </label>
-		    <input type="password" size="16"  maxlength="64"
-			    name="newPassword" id="newPassword" class="white leftnc"
-			    autocomplete="off"/>
-		        <span id='passwordPoor' style='color:#e00000; display:none'>
-			    Votre mot de passe neuf est pauvre.
-		        </span>
-		        <span id='passwordWeak' style='color:#a89800; display:none'>
-			    Votre mot de passe neuf est faible.
-		        </span>
-		        <span id='passwordGood' style='color:#60d800; display:none'>
-			    Votre mot de passe neuf est bon.
-		        </span>
-		        <span id='passwordStrong' style='color:#11ff10; display:none'>
-			    Votre mot de passe neuf est fort.
-		        </span>
+            <label class="label" for="newPassword">
+              Mot de Passe Neuf:
+            </label>
+            <input type="password" size="16"  maxlength="64"
+                name="newPassword" id="newPassword" class="white leftnc"
+                autocomplete="off"/>
+                <span id='passwordPoor' style='color:#e00000; display:none'>
+                Votre mot de passe neuf est pauvre.
+                </span>
+                <span id='passwordWeak' style='color:#a89800; display:none'>
+                Votre mot de passe neuf est faible.
+                </span>
+                <span id='passwordGood' style='color:#60d800; display:none'>
+                Votre mot de passe neuf est bon.
+                </span>
+                <span id='passwordStrong' style='color:#11ff10; display:none'>
+                Votre mot de passe neuf est fort.
+                </span>
           </p>
           <p id="newPass2Row" class="clear">
-		    <label class="label" for="newPassword2">
-		      Répéter le Mot de Passe Neuf:
-		    </label>
-		    <input type="password" size="16" maxlength="64"
-			    name="newPassword2" id="newPassword2" class="white leftnc"
-			    autocomplete="off"/>
-		    <button type="button" id="generatePassword">
-			    Générer un mot de passe au hasard
-		    </button>
-		    <input type="text" size="32" value=""
-			    name="randomPassword" id="randomPassword"
-			    class="white leftnc" readonly="readonly">
+            <label class="label" for="newPassword2">
+              Répéter le Mot de Passe Neuf:
+            </label>
+            <input type="password" size="16" maxlength="64"
+                name="newPassword2" id="newPassword2" class="white leftnc"
+                autocomplete="off"/>
+            <button type="button" id="generatePassword">
+                Générer un mot de passe au hasard
+            </button>
+            <input type="text" size="32" value=""
+                name="randomPassword" id="randomPassword"
+                class="white leftnc" readonly="readonly">
           </p>
           <p id="emailRow" class="clear">
-		    <label class="label" for="email">
-		      Addresse du Courriel:
-		    </label>
-		    <input type="text" size="64" name="email" id="email"
-			    class="white leftnc" autocomplete="off"
-			    value="$EMAIL"/>
+            <label class="label" for="email">
+              Addresse du Courriel:
+            </label>
+            <input type="text" size="64" name="email" id="email"
+                class="white leftnc" autocomplete="off"
+                value="$EMAIL"/>
             Mandatoire pour régistration
           </p>
           <p id="useEmailRow" class="clear">
-		    <label class="label" for="usemail">
-		      Envoyer des avis par courrier électronique:
-		    </label>
-		    <input type="checkbox" name="usemail" id="usemail"
-				    $chkusemail/>
+            <label class="label" for="usemail">
+              Envoyer des avis par courrier électronique:
+            </label>
+            <input type="checkbox" name="usemail" id="usemail"
+                    $chkusemail/>
           </p>
-	      <p id="cellphoneRow" class="clear">
-			<label class="label" for="cellphone">
-    		  Numéro de téléphone portable:
-			</label>
-			<input type="text" size="32" name="cellphone" id="email"
-        			class="white leftnc" autocomplete="off"
-        			value="$CELLPHONE"/>
+          <p id="cellphoneRow" class="clear">
+            <label class="label" for="cellphone">
+              Numéro de téléphone portable:
+            </label>
+            <input type="text" size="32" name="cellphone" id="email"
+                    class="white leftnc" autocomplete="off"
+                    value="$CELLPHONE"/>
             Optional
-	      </p>
-	      <p id="usetextRow" class="clear">
-			<label class="label" for="usetext">
-    		  Envoyer des avis par Texte:
-			</label>
-			<input type="checkbox" name="usetext" id="usetext"
-    				$chkusetext/>
-	      </p>
-          <p id="nohelpRow" class="clear">
-		    <label class="label" for="nohelp">
-		      Supprimer de l'Aide Contextuelle:
-		    </label>
-		    <input type="checkbox" name="nohelp" id="nohelp"
-				    $chknohelp/>
           </p>
-	      <p id="languageRow" class="clear">
-			<label class="label" for="language">
-    		  Langue Préférée:
-			</label>
+          <p id="usetextRow" class="clear">
+            <label class="label" for="usetext">
+              Envoyer des avis par Texte:
+            </label>
+            <input type="checkbox" name="usetext" id="usetext"
+                    $chkusetext/>
+          </p>
+          <p id="nohelpRow" class="clear">
+            <label class="label" for="nohelp">
+              Supprimer de l'Aide Contextuelle:
+            </label>
+            <input type="checkbox" name="nohelp" id="nohelp"
+                    $chknohelp/>
+          </p>
+          <p id="languageRow" class="clear">
+            <label class="label" for="language">
+              Langue Préférée:
+            </label>
             <input type="hidden" id="accountLang" name="accountLang"
                     value="$LANGUAGE">
             <select name="language" id="language">
@@ -131,37 +131,37 @@
                 <option value='de'>Deutsche</option>
                 <option value='es'>Español</option>
             </select>
-	      </p>
+          </p>
     
           <p class="clear">
-		    <span class="pad">
-		      <button type="submit" id="Submit"> 
-		        <u>A</u>ppliquer les modifications
-		      </button>
-		    </span>
-		    <span class="pad">
-		      <button type="button" id="Signoff"> 
-		        Terminer
-		      </button>
-		    </span>
-		    <span class="pad">
-		      <button type="button" id="Close">
-		        Fermer
-		      </button>
-		    </span>
-		    <span class="pad">
-		      <a href="/contactAuthor.php?subject=Gestion de la Compte" class="button">
-			    Communiquer a l'Administrateur</a>
-		    </span>
-    		<span class="pad" id="advertiserLink">
-    		  <a href="/Advertiser.php?lang=$LANG" 
+            <span class="pad">
+              <button type="submit" id="Submit"> 
+                <u>A</u>ppliquer les modifications
+              </button>
+            </span>
+            <span class="pad">
+              <button type="button" id="Signoff"> 
+                Terminer
+              </button>
+            </span>
+            <span class="pad">
+              <button type="button" id="Close">
+                Fermer
+              </button>
+            </span>
+            <span class="pad">
+              <a href="/contactAuthor.php?subject=Gestion de la Compte" class="button">
+                Communiquer a l'Administrateur</a>
+            </span>
+            <span class="pad" id="advertiserLink">
+              <a href="/Advertiser.php?lang=$LANG" 
                     class="button">
-    			Gérer votre compte publicitaire
+                Gérer votre compte publicitaire
              </a>
-		</span>
-		    <input type="hidden" name="act" id="act" value="">
-		    <input type="hidden" name="debug" id="debug" value="$DEBUG">
-		    <input type="hidden" name="lang" id="lang" value="$LANG">
+        </span>
+            <input type="hidden" name="act" id="act" value="">
+            <input type="hidden" name="debug" id="debug" value="$DEBUG">
+            <input type="hidden" name="lang" id="lang" value="$LANG">
           </p>
         </form>
       </div><!--id="update"-->
@@ -169,26 +169,26 @@
       <form name="blogForm" id="blogform">
         <div id="blog$blid">
           <p class="label">
-		    A $datetime usager '$username' 
-		    a écrit:
+            A $datetime usager '$username' 
+            a écrit:
          </p>
          <p>
-		    $text 
+            $text 
           </p>
           <p>
-		    <!-- Note that any characters that occur between the opening and
-		         closing textarea tags become part of the value of the tag-->
-		    <textarea name="message$blid"
-			    rows="5" cols="80"></textarea>
+            <!-- Note that any characters that occur between the opening and
+                 closing textarea tags become part of the value of the tag-->
+            <textarea name="message$blid"
+                rows="5" cols="80"></textarea>
           </p>
           <p>
-		    <button type="button" id="Delete$blid">
-		      Écraser Blog
-		    </button>
-		    &nbsp;
-		    <button type="button" id="Reply$blid">
-		      Répondre 
-		    </button>
+            <button type="button" id="Delete$blid">
+              Écraser Blog
+            </button>
+            &nbsp;
+            <button type="button" id="Reply$blid">
+              Répondre 
+            </button>
           </p>
         </div>
       </form>
@@ -216,72 +216,72 @@
       </span>
     </div>
     <div class="balloon" id="Helpuserid">
-	  Cet champ montre l'identificateur unique de l'usager actuel pour lequel 
-	  les fonctions de gestion du compte peut être faites.
+      Cet champ montre l'identificateur unique de l'usager actuel pour lequel 
+      les fonctions de gestion du compte peut être faites.
     </div>
     <div class="balloon" id="Helppassword">
-	  Entrer le mot de passe actuel for cet compte pour autorizer la modification du
-	  compte.  Le valeur du mote de passe n'est pas montré.
+      Entrer le mot de passe actuel for cet compte pour autorizer la modification du
+      compte.  Le valeur du mote de passe n'est pas montré.
     </div>
     <div class="balloon" id="HelpnewPassword">
-	  Si vous souhaitez changer le mot de passe sur ce compte, entrez-le ici.
-	  La valeur du mot de passe neuf n'est pas affichée.
-	  Le mot de passe peut être
-	  jusqu'à 64 caractères et peut contenir n'importe quel caractère que vous pouvez entrer.
+      Si vous souhaitez changer le mot de passe sur ce compte, entrez-le ici.
+      La valeur du mot de passe neuf n'est pas affichée.
+      Le mot de passe peut être
+      jusqu'à 64 caractères et peut contenir n'importe quel caractère que vous pouvez entrer.
     </div>
     <div class="balloon" id="HelpgeneratePassword">
-	  Cliquez sur ce bouton pour générer un mot de passe aléatoire
-	  construit à partir du 95 caractères ASCII imprimables,
-	  y compris l'espace.
-	  La valeur de ce mot de passe généré est affichée dans le
-	  champ suivant de que vous pouvez copier dans
-	  les champs mot de passe euf et répéter le mot de passe neuf.
+      Cliquez sur ce bouton pour générer un mot de passe aléatoire
+      construit à partir du 95 caractères ASCII imprimables,
+      y compris l'espace.
+      La valeur de ce mot de passe généré est affichée dans le
+      champ suivant de que vous pouvez copier dans
+      les champs mot de passe euf et répéter le mot de passe neuf.
     </div>
     <div class="balloon" id="HelprandomPassword">
-	  This is where the Generate Password button displays the generated
-	  password which you can copy to the New and Repeat New Password fields.
+      This is where the Generate Password button displays the generated
+      password which you can copy to the New and Repeat New Password fields.
     </div>
     <div class="balloon" id="HelpnewPassword2">
-	  Si vous souhaitez changer le mot de passe sur ce compte, 
-	  vous devez l'entrer
-	  deux fois pour éviter d'éventuelles fautes de frappe qui rendraient le compte
-	  inaccessible.
-	  La valeur du mot de passe neuf n'est pas affichée.
+      Si vous souhaitez changer le mot de passe sur ce compte, 
+      vous devez l'entrer
+      deux fois pour éviter d'éventuelles fautes de frappe qui rendraient le compte
+      inaccessible.
+      La valeur du mot de passe neuf n'est pas affichée.
     </div>
     <div class="balloon" id="Helpemail">
-	  This is the e-mail address associated with the account.
+      This is the e-mail address associated with the account.
       This e-mail address is used for authorization verification and
       with your permission may also be used for notification messages
       related to the operation of the site.  This address will not be 
       shared with any other organization
     </div>
     <div class="balloon" id="Helpusemail">
-	  If this is checked then messages will be sent to the associated e-mail
-	  address regarding changes in the web-site such as new features
+      If this is checked then messages will be sent to the associated e-mail
+      address regarding changes in the web-site such as new features
       and capabilities.
-	  Generally this will be no more frequently than once a month.
-	  These notices will also be posted to the web-site.
-	  If you clear this checkbox then the only e-mail you will receive
+      Generally this will be no more frequently than once a month.
+      These notices will also be posted to the web-site.
+      If you clear this checkbox then the only e-mail you will receive
       will be the
-	  one used to verify the existence of your e-mail address.
+      one used to verify the existence of your e-mail address.
     </div>
     <div class="balloon" id="Helpcellphone">
-	  This is the mobile telephone number associated with the account.
-	  This number may be used for text notifications if you permit.
+      This is the mobile telephone number associated with the account.
+      This number may be used for text notifications if you permit.
       This number will not be shared with any other organization.
     </div>
     <div class="balloon" id="Helpusetext">
-	  If this is checked then text messages may be sent to the associated
+      If this is checked then text messages may be sent to the associated
       mobile phone number
-	  regarding changes in the web-site such as new features
+      regarding changes in the web-site such as new features
       and capabilities.
-	  Generally this will be no more frequently than once a month.
-	  These notices will also be posted to the web-site.
+      Generally this will be no more frequently than once a month.
+      These notices will also be posted to the web-site.
     </div>
     <div class="balloon" id="Helpnohelp">
-	  If this option is checked then the feature to pop up element specific
-	  help if the mouse if held over a button or input field for more than 2
-	  seconds is turned off.
+      If this option is checked then the feature to pop up element specific
+      help if the mouse if held over a button or input field for more than 2
+      seconds is turned off.
     </div>
     <div class="balloon" id="Helplanguage">
       This selection list is used to specify your preferred language
@@ -291,32 +291,35 @@
       you choose to use for viewing the contents of the web-site.
     </div>
     <div class="balloon" id="HelpSubmit">
-	  Clicking on this button with the mouse applies the changes to the account.
-	  You may also apply the changes by pressing the Enter key while the focus is
-	  in any input text field in the form, or by pressing the key combinations
-	  ctrl-S or alt-A.
+      Clicking on this button with the mouse applies the changes to the account.
+      You may also apply the changes by pressing the Enter key while the focus is
+      in any input text field in the form, or by pressing the key combinations
+      ctrl-S or alt-A.
     </div>
     <div class="balloon" id="HelpSignoff">
-	  Clicking on this button with the mouse signs the current user off
-	  the application so extended capabilities are disables
-	  As a short-cut you may also signoff by pressing the
-	  key combination alt-S.
+      Clicking on this button with the mouse signs the current user off
+      the application so extended capabilities are disables
+      As a short-cut you may also signoff by pressing the
+      key combination alt-S.
     </div>
     <div class="balloon" id="HelpClose">
-	  Clicking on this button with the mouse closes the dialog without making
-	  any changes to the account.
-	  As a short-cut you may also close the dialog by pressing the
-	  key combination alt-C.
+      Clicking on this button with the mouse closes the dialog without making
+      any changes to the account.
+      As a short-cut you may also close the dialog by pressing the
+      key combination alt-C.
     </div>
     <div id="Helpmessage" class="balloon">
-	  Use this text area to enter a reply to the blog, and then click on the
-	  Reply button.
+      Use this text area to enter a reply to the blog, and then click on the
+      Reply button.
     </div>
     <div id="HelpDelete" class="balloon">
-	  Click on this button to delete the blog.
+      Click on this button to delete the blog.
     </div>
     <div id="HelpReply" class="balloon">
-	  Click on this button to reply to the blog.
+      Click on this button to reply to the blog.
     </div>
+    <script src="/jscripts/tinymce/js/tinymce/tinymce.js"
+            type="application/javascript">
+    </script>
     <script src="/Account.js" type="module">
     </script>

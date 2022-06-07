@@ -1515,6 +1515,7 @@ $template->set('TREENAME',      $treeName);
 $template->set('CONTACTSUBJECT',urlencode($_SERVER['REQUEST_URI']));
 $template->set('CONTACTTABLE',  'tblIR');
 $template->set('CONTACTKEY',    $idir);
+$template->set('KEYWORDS',      ", family tree $surname");
 
 // update tags
 if (strlen($treeName) > 0)

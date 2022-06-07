@@ -1090,6 +1090,8 @@ function createWife(e)
     	                      '&treeName=' +
                                         encodeURIComponent(treename) +
                               '&lang=' + lang;
+    if (debug.toLowerCase() == 'y')
+        script              += '&debug=y';
     var childWindow	        = openFrame("wifeFrame",
 						                script,
 						                "left");

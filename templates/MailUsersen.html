@@ -1,0 +1,85 @@
+<!--*********************************************************************
+ *  MailUsersen.html													*
+ *																		*
+ *  Template for a sending message to a large number of users.          *
+ *																		*
+ *  History:															*
+ *		2022/05/29		created											*
+ *																		*
+ *  Copyright &copy; 2022 James A. Cobban								*
+ **********************************************************************-->
+    <div id="breadcrumbs" class="hidden">
+      <a href="/genealogy.php?lang=$LANG">
+  		Genealogy
+      </a>:
+      <a href="/FamilyTree/Services.php?lang=$LANG">
+  		Services
+      </a>:
+      <a href="/FamilyTree/Users.php?lang=$LANG">
+  		User Administration
+      </a>:
+    </div>	
+    <div class="body">
+	  <h1>
+	      <span class="right">
+			<a href="/MailUsersHelpen.html" target="help">? Help</a>
+	      </span>
+			Send Bulk E-mail to $COUNT Users
+	  </h1>
+	    $TRACE
+	    $MSG
+	    <p class="message" id="notadmin">
+			Only an administrator can use this application
+	    </p>
+	    <form id="locForm" name="locForm" action="MailUsers.php" method="post">
+			<input type="hidden" name="pattern" id="pattern"
+				    value="$PATTERN">
+			<input type="hidden" name="authPattern" id="authPattern"
+				    value="$AUTHPATTERN">
+			<input type="hidden" name="mailPattern" id="mailPattern"
+				value="$MAILPATTERN">
+			<input type="hidden" name="options" id="options"
+				value="$OPTIONS">
+			<input type="hidden" name="subject" id="subject"
+				value="$SUBJECT">
+			<input type="hidden" name="password" id="password"
+				value="$PASSWORD">
+			<input type="hidden" name="limit" id="limit"
+				value="$LIMIT">
+			<input type="hidden" name="offset" id="offset"
+				value="$OFFSET">
+			<input type="hidden" name="count" id="count"
+				value="$COUNT">
+	        <input type="hidden" name="Debug" id="Debug" value="$DEBUG">
+	        <input type="hidden" name="Debug" id="Debug" value="$DEBUG">
+	        <input type="hidden" name="lang" id="lang" value="$LANG">
+	      <div class="row">
+			<label class="label" for="body" style="width: 12em;">
+			    Message Body:
+			</label>
+			<textarea name="body" id="body"  cols="64" rows="4"
+				class="white leftnc">$BODY</textarea>
+	      </div>
+	      <div class="row" style="margin-left: 3em; margin-top: 3px;"
+              id="sendrow">
+	        <button type="button" id="Send">
+	          <span style="display: inline;">
+			    Send
+	          </span>
+	        </button>
+	      </div>
+  </form>
+  </div> <!-- class="body" -->
+    <div class="balloon" id="Helpbody">
+      Enter the rich text of the message you wish to send to the
+      selected subscribers.
+    </div>
+    <div class="balloon" id="HelpSend">
+      Click on this button to initiate sending the message to the
+      selected subscribers.
+    </div>
+    <script src="/jscripts/tinymce/js/tinymce/tinymce.js"
+            type="application/javascript">
+    </script>
+    <script src="MailUsers.js" type="module">
+    </script>

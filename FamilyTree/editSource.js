@@ -38,8 +38,9 @@
  *		                return to Sources menu.                         *
  *		2019/02/10      no longer need to call pageInit                 *
  *		2020/02/17      hide right column                               *
+ *		2022/06/01      get HTML from tinyMCE editors                   *
  *																		*
- *  Copyright &copy; 2020 James A. Cobban								*
+ *  Copyright &copy; 2022 James A. Cobban								*
  ************************************************************************/
 
 /************************************************************************
@@ -185,9 +186,15 @@ function updSource()
     for (var i = 0; i < form.elements.length; i++)
     {		// loop through all form elements
 		var	element	= form.elements[i];
-		if ((element.tagName == 'INPUT') || (element.tagName == 'TEXTAREA'))
+		if (element.tagName == 'INPUT')
 		{		// text input field
 		    parms[element.name]	= element.value;
+		}		// text input field
+		else
+		if (element.tagName == 'TEXTAREA')
+		{		// text input field
+		    let mceElt	        = tinyMCE.get(element.name);
+		    parms[element.name]	= mceElt.getContent();
 		}		// text input field
 		else
 		if (element.tagName == 'SELECT')
@@ -225,6 +232,7 @@ function gotSource(xmlDoc)
 {
     var	srcForm	= document.evtForm;
     var	root	= xmlDoc.documentElement;
+    let s       = new XMLSerializer();
     if (root.nodeName == 'update')
     {				// database updated
 		var	sourceRecords	= root.getElementsByTagName('source');

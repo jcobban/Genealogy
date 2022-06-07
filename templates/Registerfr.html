@@ -23,7 +23,7 @@
       <div style="clear: both;"></div>
     </h1>
       <span id="titleNew" class="hidden">
-		    Enregistrer un nouvel utilisateur
+		    Enregistrer un Utilisateur Nouveau 
       </span>
       <span id="titleComplete" class="hidden">
 		    Inscription complète
@@ -32,6 +32,7 @@
 		    Déjà enregistré
       </span>
     $TRACE
+    $MSG
     <p>En vous inscrivant, vous acceptez l'utilisation de "cookies"
         permettant de suivre votre session et de valider votre autorisation 
         d'accéder à des services uniquement accessibles 
@@ -46,37 +47,17 @@
         adresse courriel.
     </p>
 
-    <!-- error messages -->
-    <span id="shortUsername" class="message">
-		L'identifiant de l'utilisateur doit comporter au moins 6 caractères.
-    </span>
-    <span id="badUsername" class="message">
-		L'identifiant '$newuserid' ne doit pas contenir '&lt;', '&gt;', '@', or '&amp;'.
-    </span>
-    <span id="shortPassword" class="message">
-		Le mot de passe doit contenir au moins 6 caractères..
-    </span>
-    <span id="passwordMismatch" class="message">
-		Les mots de passe ne correspondent pas.
-    </span>
-    <span id="badEmail" class="message">
-		Une adresse courriel valide est requise pour l'inscription.
-    </span>
-    <span id="initialPrompt" class="warning">
-		Entrez votre inscription.
-    </span>
-    <span id="emailInUse" class="message">
-		L'adresse courriel demandé '$email' est déjà utilisé par un autre utilisateur.
-    </span>
-    <span id="useridInUse" class="message">
-		L'identifiant de l'utilisateur demandé '$newuserid' est déjà
-        utilisé. Essayez quelque chose de différent.
-    </span>
-
     <form action="Register.php"
 		  name="signonForm" id="signonForm"
 		  method="post"  
 		  enctype="multipart/form-data">
+		<p class="clear" id="emailRow">
+		    <label class="label" for="email">Addresse du courriel:
+		    </label>
+		    <input type="text" size="64" name="email" id="email"
+					class="black white leftnc"
+					value="$EMAIL">
+		</p>
 		<p class="clear" id="useridRow">
 		    <label class="label" for="userid">Identifiant de l'Utilisateur:
 		    </label>
@@ -110,20 +91,13 @@
 		    <input type="password" size="32" name="password2" id="password2"
 					class="black white leftnc"
 					autocomplete="off">
-		    <button type="button" id="generatePasword">
+		    <button type="button" id="generatePassword">
 			    Générer un Mot de passe au hasard
 		    </button>
 		    <input type="text" size="32" value=""
 			name="randomMot de passe" id="randomPassword"
 			class="white leftnc" readonly="readonly">
 		    </p>
-		<p class="clear" id="emailRow">
-		    <label class="label" for="email">Addresse du courriel:
-		    </label>
-		    <input type="text" size="64" name="email" id="email"
-					class="black white leftnc"
-					value="$EMAIL">
-		</p>
 		<p class="clear" id="useEmailRow">
 		    <label class="label" for="usemail">
                 Envoyer des avis par courrier électronique:
@@ -141,8 +115,13 @@
 		<input type="hidden" name="debug" value="$DEBUG">
 		<input type="hidden" name="lang" value="fr">
 		<span class="pad">
-		    <button type="submit" id="submit">
+		    <button type="submit" id="register">
 			En<u>R</u>egistrer
+		    </button>
+		</span>
+		<span class="pad">
+		    <button type="button" id="ForgotPassword" accesskey="F">
+			J'ai oublié mon mot de passe
 		    </button>
 		</span>
 		<span class="pad">
@@ -151,13 +130,12 @@
 		    </button>
 		</span>
 		<span class="pad">
-		  <a href="ContactAuthor.php?subject=Sign On" class="button">
+		  <a href="ContactAuthor.php?subject=Register" class="button">
 			Contacter l'Administrateur</a>
 		</span>
       </p>
     </form>
 		
-    $MSG
   </div>
   <div class="hidden">
     <span id="emailSubject">
@@ -171,7 +149,35 @@
 		<br>
 		<i>l'Administratreur</i>
     </span>
+
+    <!-- error messages -->
+    <span id="shortUsername">
+		L'identifiant de l'utilisateur doit comporter au moins 6 caractères.
+    </span>
+    <span id="badUsername">
+		L'identifiant '$newuserid' ne doit pas contenir '&lt;', '&gt;', '@', or '&amp;'.
+    </span>
+    <span id="shortPassword">
+		Le mot de passe doit contenir au moins 6 caractères..
+    </span>
+    <span id="passMismatch">
+		Les mots de passe ne correspondent pas.
+    </span>
+    <span id="badEmail">
+		Une adresse courriel valide est requise pour l'inscription.
+    </span>
+    <p id="initialPrompt">
+		Entrez votre inscription.
+    </p>
+    <span id="emailInUse">
+		L'adresse courriel demandé '$email' est déjà utilisé par un autre utilisateur.
+    </span>
+    <span id="useridUsed">
+		L'identifiant de l'utilisateur demandé '$newuserid' est déjà
+        utilisé. Essayez quelque chose de différent.
+    </span>
   </div>
+
   <div class="balloon" id="matchDiv">
       <form name="matchForm" id="matchForm">
 		<p class="message">The two mot de passe values must match</p>
@@ -193,11 +199,11 @@
 		It may not contain  '&lt;', '&gt;', '@', or '&amp;'.
 		It may contain any other characters including spaces.  Spaces
 		entered at the beginning or end of the user name are ignored.
-		For example "Αλεξανδρος Μεγαλος" est a valid user name
-		as est "Ива́н Гро́зный"
+		Par example "Αλεξανδρος Μεγαλος" est un nom valid
+		et aussi "Ива́н Гро́зный"
     </p>
   </div>
-  <div class="balloon" id="Helpmot de passe">
+  <div class="balloon" id="Helppassword">
     <p>
 		Enter the mot de passe you wish to use to verify your identity when you
 		sign on to contribute to the web site.  This should be something that it
@@ -213,7 +219,7 @@
 		The value of the mot de passe est not affiché.
     </p>
   </div>
-  <div class="balloon" id="Helpmot de passe2">
+  <div class="balloon" id="Helppassword2">
     <p>
 		You must enter the mot de passe for the user name
 		twice to avoid possible typing errors which would make the user name
@@ -221,7 +227,7 @@
 		The value of the new mot de passe est not affiché.
     </p>
   </div>
- <div class="balloon" id="HelpproduireMot de passe">
+ <div class="balloon" id="HelpGeneratePassword">
     <p>
 		Click on this button to produire a random mot de passe constructed from the
 		95 printable ASCII characters including space.
@@ -230,12 +236,18 @@
 		which you can copy it to the New and Repeat New Mot de passe fields.
     </p>
  </div>
- <div class="balloon" id="HelprandomMot de passe">
+ <div class="balloon" id="HelprandomPassword">
     <p>
 		This est where the Produire Mot de passe button displays the généré
 		mot de passe which you can copy to the New and Repeat New Mot de passe fields.
     </p>
  </div>
+  <div class="balloon" id="HelpForgotPassword">
+	    Click on this button, or use the keyboard short-cut Alt-F, if you have
+	    forgotten either your password or your userid.  If you have forgotten your
+	    password enter your password.  If you have forgotten your userid enter the
+	    electronic mail address that you used when you first registered.
+  </div>
   <div class="balloon" id="Helpemail">
     <p>
 		Specify the e-mail address associated with the account.
@@ -266,12 +278,19 @@
 		seconds est turned off.
     </p>
   </div>
-  <div class="balloon" id="Helpsubmit">
+  <div class="balloon" id="Helpregister">
     <p>
 		Clicking on this button with the mouse registers the new account.
 		You may also apply the changes by pressing the Enter key while the
-		focus est in any input text field in the form,
+		focus is in any input text field in the form,
 		or by pressing the key combinations ctrl-S or alt-R.
+    </p>
+  </div>
+  <div class='balloon' id='HelpForgotPassword'>
+    <p>Click on this button, or use the keyboard short-cut Alt-F, if you have
+      forgotten either your password or your userid.  If you have forgotten your
+      password enter your password.  If you have forgotten your userid enter the
+      electronic mail address that you used when you first registered.
     </p>
   </div>
   <div class="balloon" id="Helpclose">
