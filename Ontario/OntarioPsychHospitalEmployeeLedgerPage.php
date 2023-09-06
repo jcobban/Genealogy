@@ -307,7 +307,7 @@ foreach($employees as $row)
         $rowClass           = 'odd';
 }               // continue until finished
 if ($prevPage < 1)
-    $template['topPrev']->update(null);
+    $template['topPrev']->update('&nbsp;');
 $rowElement->update($rowData);
 
 $formatter->setAttribute(NumberFormatter::FRACTION_DIGITS, 0);

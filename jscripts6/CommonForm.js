@@ -259,6 +259,8 @@ export const  BpAbbrs = {
                 "Ab"        : "Alberta",
                 "Au"        : "Australia",
                 "Bc"        : "British Columbia",
+                "Be"        : "Belgium",
+                "C"         : "Canada",
                 "Ca"        : "Canada",
                 "Ce"        : "Canada East",
                 "Ci"        : "Channel Isles",
@@ -375,6 +377,7 @@ export const  LocAbbrs = {
                 "Et"        : "et",
                 "For"       : "for",
                 "From"      : "from",
+                "I"         : "Ireland",
                 "In"        : "in",
                 "Lc"        : "Lower Canada",
                 "Lmt"       : "Lambton", 
@@ -757,8 +760,9 @@ export const  MonthAbbrs = {
  ************************************************************************/
 export const  ResTypeAbbrs = {
                 "B"         : "Brick",
-                "Bv"        : "B Veneer",
+                "Bv"        : "Bk Veneer",
                 "C"         : "Concrete",
+                "Cb"        : "Conc Blk",
                 "F"         : "Frame",
                 "L"         : "Log",
                 "S"         : "Shanty",
@@ -1002,45 +1006,69 @@ export const  monTab  = {
                 "jan"       : 1,
                 "jany"      : 1,
                 "january"   : 1,
+                "janv"      : 1,
+                "janvier"   : 1,
                 "fe"        : 2,
                 "feb"       : 2,
                 "feby"      : 2,
                 "february"  : 2,
+                "fev"       : 2,
+                "fevy"      : 2,
+                "fevrier"   : 2,
+                "février"   : 2,
                 "mr"        : 3,
                 "mar"       : 3,
+                "mars"      : 3,
                 "march"     : 3,
                 "al"        : 4,
                 "apr"       : 4,
                 "aprl"      : 4,
                 "april"     : 4,
+                "avr"       : 4,
+                "avrl"      : 4,
+                "avril"     : 4,
                 "ma"        : 5,
+                "mai"       : 5,
                 "may"       : 5,
                 "jn"        : 6,
                 "jun"       : 6,
+                "juin"      : 6,
                 "june"      : 6,
                 "jl"        : 7,
                 "jul"       : 7,
                 "july"      : 7,
+                "juil"      : 7,
+                "juillet"   : 7,
                 "au"        : 8,
                 "aug"       : 8,
                 "augt"      : 8,
                 "august"    : 8,
+                "aout"      : 8,
+                "août"      : 8,
                 "se"        : 9,
                 "sep"       : 9,
                 "sept"      : 9,
                 "september" : 9,
+                "septembre" : 9,
                 "oc"        : 10,
                 "oct"       : 10,
                 "octr"      : 10,
                 "october"   : 10,
+                "octobre"   : 10,
                 "no"        : 11,
                 "nov"       : 11,
                 "novr"      : 11,
                 "november"  : 11,
+                "novembre"  : 11,
                 "de"        : 12,
                 "dec"       : 12,
                 "decr"      : 12,
-                "december"  : 12 };
+                "december"  : 12,
+                "décembre"  : 12,
+                "decembre"  : 12 };
+
+const monLen    = [0, 31, 29, 31, 30, 31, 30,
+                      31, 31, 30, 31, 30, 31];
 
 /************************************************************************
  *  preTab                                                              *
@@ -1051,22 +1079,30 @@ export const  preTab  = {
                 ""              : 0,
                 'in'            : '0',
                 'on'            : '0',
+                'le'            : '0',
                 'abt'           : '1',
                 'about'         : '1',
+                'env'           : '1',
+                'environ'       : '1',
                 'cir'           : '2',
                 'circa'         : '2',
                 'bef'           : '3',
                 'before'        : '3',
+                'avant'         : '3',
                 'aft'           : '4',
                 'after'         : '4',
+                'apres'         : '4',
                 'between'       : '5',
                 'bet'           : '5',
+                'entre'         : '5',
                 'wft est'       : '8',
                 'est'           : 'g',
                 'cal'           : 'h',
                 'calculated'    : 'h',
                 'from'          : 'F',
+                'de'            : 'F',
                 'to'            : 'T',
+                'a'             : 'T',
                 'q'             : 'Q'
                 };
 
@@ -1568,15 +1604,19 @@ export function checkDate()
     let result          = re.exec(date);
     let matched         = (typeof result === 'object') &&
                               (result instanceof Array);
-    let l0, n1, l2, l3, n3, pi, mi;
+    let n1, l2, l3, n3, pi, mi;
     if (matched)
     {
         //console.log('matched: ' + result.toString());
         let pref        = result[1].toLowerCase();  // prefix on date or month
-        l0              = pref.length;
+        //l0            = pref.length;
         pi              = preTab[pref];
         if (pi === undefined)
-            pi          = monTab[pref];
+        {
+            mi          = monTab[pref];             // month index
+            if (mi !== undefined)
+                pi      = 0;
+        }
 
         let fstnum      = result[2];
         if (fstnum.length > 0)
@@ -1591,19 +1631,17 @@ export function checkDate()
             l2              = 1;
         }
         else
-        {
-            let month       = result[3].toLowerCase();
-            l2              = month.length;
-            if (l2 == 0)
-                mi          = pi;
-            else
-                mi          = monTab[month];
-        }
+        {           // check 3rd matched word
+            var month   = result[3].toLowerCase();
+            l2          = month.length;
+            if (l2 > 0 && (mi === undefined  || mi == 0))
+                mi      = monTab[month];
+        }           // check 3rd matched word
 
-        let sndnum      = result[4];
-        l3              = sndnum.length;
+        var secnum      = result[4];
+        l3              = secnum.length;
         if (l3 > 0)
-            n3          = sndnum - 0;
+            n3          = secnum - 0;
         else
             n3          = 0;
     }
@@ -1611,16 +1649,18 @@ export function checkDate()
     if (matched)
     {
         //console.log('checkDate: l0=' + l0 + ', n1=' + n1 + ', l2=' + l2 + ', l3=' + l3 + ', n3=' + n3 + ', pi=' + pi + ', mi=' + mi);
-        matched = (((n1 > 31 && n1 < 2030 && l2 > 0 && n3 <= 31) ||  // yyyy mmm [dd]
-                  (n1 <= 31 && l2 > 0 && n3 > 1000 && n3 < 2030) ||     // [dd] mmmm yyyy
-                  (n1 <= 31 && l2 > 0 && l3 == 0) ||    // [dd] mmmm
-                  (n1 == 0 && l0 > 0 && n3 <= 31) ||    // mmmm dd
-                  (n1 == 0 && l0 > 0 && n3 == 0) ||     // mmmm
-                  (n1 > 1000 && n1 < 2030 && l2 == 0 && n3 == 0)) &&    // yyyy
-                  pi !== undefined &&
-                  mi !== undefined) ||
-                  pi == '5' ||
-                  pi == 'F';
+        matched = pi !== undefined &&
+                  (
+                    (pi !== 0 && n1 > 0) ||
+                    (
+                     (n1 > 31 && n1 < 2030 && mi > 0 && n3 <= monLen[mi]) || // yyyy mmm [dd]
+                     (mi > 0 && n1 <= monLen[mi] &&
+                         ((n3 > 31 && n3 < 2030) ||      // [dd] mmmm yyyy
+                          (l3 == 0))) ||                 // [dd] mmmm
+                     (n1 == 0 && mi > 0 && n3 <= monLen[mi]) ||// mmmm dd
+                     (n1 > 31 && n1 < 2030 && l2 == 0 && n3 == 0) // yyyy
+                    )
+                  );
     }
 
     setErrorFlag(element, matched);
@@ -2530,15 +2570,15 @@ export function linkMouseOver(ev)
     if (msgDiv)
     {       // support for dynamic display of messages
         // display the messages balloon in an appropriate place on the page
-        let leftOffset      = getOffsetLeft(this);
+        let leftOffset          = getOffsetLeft(this);
         if (leftOffset > 500)
-            leftOffset  -= 200;
-        msgDiv.style.left   = leftOffset + "px";
-        msgDiv.style.top    = (getOffsetTop(this) - 60) + 'px';
+            leftOffset          -= 200;
+        msgDiv.style.left       = leftOffset + "px";
+        msgDiv.style.top        = (getOffsetTop(this) - 60) + 'px';
         msgDiv.style.display    = 'block';
 
         // so key strokes will close window
-        msgDiv.onkeydown   = tableKeyDown;
+        msgDiv.onkeydown        = tableKeyDown;
         eltMouseOver.call(this, ev, msgDiv);
     }       // support for dynamic display of messages
 }       // function linkMouseOver

@@ -34,6 +34,7 @@ use \Exception;
  *      2021/04/04      escape CONTACTSUBJECT                           *
  *      2022/03/09      avoid Creating default object from empty value  *
  *                      issue warning for unsupported language          *
+ *      2022/07/09      support display: flex                           *
  *                                                                      *
  *  Copyright &copy; 2022 James A. Cobban                               *
  ************************************************************************/
@@ -435,7 +436,7 @@ if (strlen($msg) == 0)
                                    'offset' => $offset - $limit,
                                    'limit'  => $limit));
     else
-        $template->updateTag('topPrev', null);
+        $template->updateTag('topPrev', '&nbsp;');
             
     if (($offset + $limit) < $totcount)
         $template->updateTag('topNext',
@@ -445,7 +446,7 @@ if (strlen($msg) == 0)
                                    'offset' => $offset + $limit,
                                    'limit'  => $limit));
     else
-        $template->updateTag('topNext', null);
+        $template->updateTag('topNext', '&nbsp;');
     
     $template->updateTag('respdescrows',
                          array('first'      => $offset + 1,

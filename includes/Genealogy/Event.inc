@@ -265,8 +265,10 @@ use \Exception;
  *      2022/01/22      support HTML in extended notes                  *
  *                      send warning about non-empty death description  *
  *                      to error log instead of user                    *
+ *      2022/06/10      do not save record when IDIR is zero            *
+ *      2023/08/16      change variable with reference to Person        *
  *                                                                      *
- *  Copyright &copy; 2022 James A. Cobban                               *
+ *  Copyright &copy; 2023 James A. Cobban                               *
  ************************************************************************/
 require_once __NAMESPACE__ . '/RecordPic.inc';
 require_once __NAMESPACE__ . '/LegacyDate.inc';
@@ -1832,7 +1834,7 @@ class Event extends RecordPic
             $idtype     = $this->row['idtype'];
             if ($idtype == self::IDTYPE_INDIV)
             {           // store into appropriate fields of Person
-                $indiv  = $this->getAssociatedRecord();
+                $person  = $this->getAssociatedRecord();
 
                 // values of date are updated in Person to support
                 // sorting by birth and death date without joining tables
@@ -1840,13 +1842,13 @@ class Event extends RecordPic
                 {       // act on specific event types
                     case self::ET_BIRTH:
                     {       // birth date
-                        $indiv->set('birthsd', $date->getSortDate());
+                        $person->set('birthsd', $date->getSortDate());
                         break;
                     }       // birth date
 
                     case self::ET_DEATH:
                     {       // death date
-                        $indiv->set('deathsd', $date->getSortDate());
+                        $person->set('deathsd', $date->getSortDate());
                         break;
                     }       // death date
                 }       // act on specific event types
@@ -1895,12 +1897,17 @@ class Event extends RecordPic
      ********************************************************************/
     function compare($other)
     {
+        global $warn;
+
         if ($other instanceof Event)
         {           // comparing two events
             if ($this->row['idet'] == Event::ET_BIRTH)
                 $diff           = -99999999;
             else
                 $diff   = $this->row['eventsd'] - $other->row['eventsd'];
+//            $warn       .= "<p>\$diff=$diff, \$this->row['eventsd'] =" .
+//                $this->row['eventsd'] . ", \$other->row['eventsd'] = " .
+//                $other->row['eventsd'] . "</p>\n";
             return $diff;
         }           // comparing two events
         else
@@ -2172,10 +2179,13 @@ class Event extends RecordPic
      ********************************************************************/
     const   TOJSON_INCLUDE_CITATIONS    = 1;
 
-    function toJson($print      = true,
+    function toJson($parms      = true,
                     $options    = 0)
     {
-        if (is_array($print))
+        if (is_bool($parms))
+            $print              = $parms;
+        else
+        if (is_array($parms))
         {               // additional parameters to include
             $print              = true;
             foreach($parms as $field => $value)
@@ -2353,6 +2363,8 @@ class Event extends RecordPic
                 $retval .= "\n}\n";
 
             }       // found at least one citation record
+            else
+                $retval .= $comma . "\t\"nocitations\" : true";
         }       // include citations in the output
 
         // close off the JSON document
@@ -2675,7 +2687,7 @@ class Event extends RecordPic
 
         // the associated record is identified appropriately to make
         // the code easy to understand
-        $indiv              = $this->associatedRecord;
+        $person              = $this->associatedRecord;
         $idir               = intval($this->row['idir']);
         $idtype             = intval($this->row['idtype']);
         $idet               = intval($this->row['idet']);
@@ -2684,7 +2696,7 @@ class Event extends RecordPic
         {
             $birthsd        = $this->row['eventsd'];
         }
-        if ($indiv)
+        if ($person)
             $indivset       = 'Indiv is set';
         else
             $indivset       = 'Indiv is not set';
@@ -2697,9 +2709,23 @@ class Event extends RecordPic
         if ($this->row['eventd'] == '' &&
             $this->row['idlrevent'] == 1 &&
             $this->row['description'] == '')
+        {
+            $this->msg      .= "Event is empty. ";
             return false;
+        }
+
+        if ($idir == 0)
+        {
+            $this->msg      .= "IDIR is zero. ";
+            error_log("Event::save: IDIR is zero: " .
+                                print_r($this->row, true));
+            error_log("Event::save: " . $this->debugBacktrace());
+            return false;
+        }
+
         if ($this->row['idet'] <= 1)
         {
+            $this->msg      .= "Event type is zero. ";
             error_log("Event::save: NULL event: " .
                                 print_r($this->row, true));
             error_log("Event::save: " . $this->debugBacktrace());
@@ -2707,6 +2733,12 @@ class Event extends RecordPic
         }
 
         // migrate events from associated record to Event record
+        $logtext    = "Event::save: " . __LINE__ .
+            " \$this->needInsert=" . var_export($this->needInsert, true) .
+            " \$preferred=$preferred" .
+            " \$ider=" . $this->row['ider'];
+        if ($debug)
+            $warn   .= "<p>$logtext</p>\n";
         if ($this->needInsert && $preferred)
         {       // new preferred event
             if ($debug)
@@ -2714,86 +2746,79 @@ class Event extends RecordPic
                                        "idir=$idir, idet=$idet</p>\n";
 
             // ensure that event information is removed from old location
-            if ($indiv)
+            if ($person)
             {       // have former base record
                 switch($idet)
                 {   // act on specific event types
                     case Event::ET_BIRTH:
                     {
                         $birthsd    = $this->row['eventsd'];
-                        $indiv->clearEvent('birth');
+                        $person->clearEvent('birth');
                         // restore birthsd which is used for sorting
-                        $indiv->set('birthsd',
+                        $person->set('birthsd',
                                     $birthsd);
                         break;
                     }
 
                     case Event::ET_BURIAL:
                     {
-                        $indiv->clearEvent('buried');
+                        $person->clearEvent('buried');
                         break;
                     }
 
                     case Event::ET_CHRISTENING:
                     {
-                        $indiv->clearEvent('chris');
+                        $person->clearEvent('chris');
                         break;
                     }
 
                     case Event::ET_DEATH:
                     {
-                        $indiv->clearEvent('death');
-                        if ($this->row['description'] != '')
-                        {
-                            error_log("Event::save: " .
-                            "Description='" . $this->row['description'] .
-                            "' when saving death event");
-                            $this->row['description']   = '';
-                        }
+                        $person->clearEvent('death');
                         break;
                     }
 
                     case Event::ET_LDS_BAPTISM:
                     {
-                        $indiv->clearEvent('baptism');
+                        $person->clearEvent('baptism');
                         break;
                     }
 
                     case Event::ET_LDS_CONFIRMATION:
                     {
-                        $indiv->clearEvent('confirmation');
+                        $person->clearEvent('confirmation');
                         break;
                     }
 
                     case Event::ET_LDS_ENDOWED:
                     {
-                        $indiv->clearEvent('endow');
+                        $person->clearEvent('endow');
                         break;
                     }
 
                     case Event::ET_LDS_INITIATORY:
                     {
-                        $indiv->clearEvent('initiatory');
+                        $person->clearEvent('initiatory');
                         break;
                     }
 
                     case Event::ET_MARRIAGE:
                     {
-                        $family     = $indiv;
+                        $family     = $person;
                         $family->clearEvent('mar');
                         break;
                     }
 
                     case Event::ET_LDS_SEALED:
                     {
-                        $childr     = $indiv;
+                        $childr     = $person;
                         $childr->clearEvent('parseal');
                         break;
                     }
 
                     case Event::ET_MARRIAGE_END:
                     {
-                        $family     = $indiv;
+                        $family     = $person;
                         $family->clearEvent('marend');
                         break;
                     }
@@ -2812,8 +2837,8 @@ class Event extends RecordPic
 
             // ensure only one preferred event for type
             $query          = 'SELECT COUNT(*) FROM tblER ' .
-                                  "WHERE IDIR=$idir AND IDType=$idtype AND " .
-                                    "IDET=$idet AND Preferred=1";
+                                  "WHERE IDIR=:idir AND IDType=:idtype AND " .
+                                    "IDET=:idet AND Preferred=1";
             $sqlParms       = array('idir'      => $idir,
                                     'idtype'    => $idtype,
                                     'idet'      => $idet);
@@ -2821,13 +2846,13 @@ class Event extends RecordPic
             $queryText      = debugPrepQuery($query, $sqlParms);
             if ($stmt->execute($sqlParms))
             {       // success
-                if ($debug)
-                    $warn   .= "<p>Event::save: " . __LINE__ .
-                                " '$queryText'</p>\n";
-
                 // have a result set, fetch row
                 $row        = $stmt->fetch(PDO::FETCH_NUM);
                 $count      = $row[0];
+                if ($debug)
+                    $warn   .= "<p>Event::save: " . __LINE__ .
+                                " '$queryText' returns $count</p>\n";
+
                 if ($count > 0)
                 {
                     $warn   .= "<p>Event::save: " . __LINE__ .
@@ -2838,6 +2863,12 @@ class Event extends RecordPic
             }       // success
             else
             {       // error performing query
+                $this->msg      .= "Event::save: '$queryText': " .
+                    print_r($stmt->errorInfo(), true) . '; ';
+                $this->msg      .= "Event::save: \$query=" .
+                                    "'$query'" . '; ';
+                $this->msg      .= "Event::save: \$sqlParms=" .
+                                    print_r($sqlParms, true) . '; ';
                 error_log("Event::save: '$queryText': " .
                                     print_r($stmt->errorInfo(), true));
                 error_log("Event::save: " . $this->debugBacktrace());
@@ -2845,6 +2876,8 @@ class Event extends RecordPic
             }       // error performing query
         }           // new preferred event
 
+        if ($debug)
+            $warn   .= "<p>Event::save: " . __LINE__ . " \$idet=$idet \$preferred=$preferred</p>\n";
         // for some events information is also stored in the
         // associated record and in tblNX to save a JOIN
         if ($preferred &&
@@ -2853,8 +2886,8 @@ class Event extends RecordPic
             if (!$this->recordSetByConstructor)
             {
                 if ($debug)
-                    $warn   .= "<p>Event::save: \$indiv->save($xmltext)</p>\n";
-                $indiv->save($output);
+                    $warn   .= "<p>Event::save: \$person->save($xmltext)</p>\n";
+                $person->save($output);
             }
 
             // also update name index entries
@@ -2868,9 +2901,15 @@ class Event extends RecordPic
 
         // invoke parent's implementation to complete update
         $oldider        = intval($this->row['ider']);
+        if ($debug)
+            $warn   .= "<p>Event::save: " . __LINE__ . " \$idet=$idet \$oldider=$oldider</p>\n";
         $count          = parent::save($output);
+        if ($debug && $count == 0)
+            $warn       .= "<p>Event::save: " . __LINE__ .
+                " parent::save($output)=$count, errors=" . $this->msg . " </p>\n";
         if ($debug && $oldider == 0)
-            $warn       .= "<p>Event::save: new event IDER=" .
+            $warn       .= "<p>Event::save: " . __LINE__ . 
+                " new event IDER=" .
                                     $this->row['ider'] . "</p>\n";
 
         // also apply any changes made to migrate citations
@@ -3081,8 +3120,8 @@ class Event extends RecordPic
                 {
                     $oldidime   = $citation->get('idime');
                     $oldstype   = $citation->get('stype');
-                    error_log("Event::getCitations: " . __LINE__ . 
-                            " merge Citation($idsx) oldidime=$oldidime, oldtype=$oldstype");
+                    //error_log("Event::getCitations: " . __LINE__ . 
+                    //        " merge Citation($idsx) oldidime=$oldidime, oldtype=$oldstype");
                     $citations[$idsx]   = $citation;
                 }
         }           // have an actual record in tblER

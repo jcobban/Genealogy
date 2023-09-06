@@ -89,7 +89,11 @@
       expanded to '[blank]' to indicate that the enumerator erroneously
       failed to fill in this mandatory field.
       You can enter an age in months as, for example: '3m', 'm3', or
-      '3/12'.  These are all converted to a common form '3m'.  If the form
+      '3/12'.  These are all converted to a common form '3m'.  You can
+      enter any fraction, for example '3/4' or '2/3' and if the result
+      is less than 1 it will be converted to a number of months, and if
+      greater than or equal to 1 to a number of years.
+      If the age is less than 1 year and the form
       also includes a month of birth field, that is initialized with
       the most probable month, assuming the census enumeration took
       place in April as it did until 1901.  From 1911 on enumeration
@@ -633,7 +637,7 @@
       This is specified only on the head of household.
     </div>
     <div class="balloon" id="HelpHouseRent">
-      In the 1921 census if the householder is a tenant,
+      In the 1921 or 1931 census if the householder is a tenant,
       specify the monthly rent in dollars.
     </div>
     <div class="balloon" id="HelpHouseclass">
@@ -649,9 +653,40 @@
       Note that enumerators frequently entered the total number of rooms
       in the house, which the clerks in Ottawa reduced to 6.
     </div>
+    <div class="balloon" id="HelpRadio">
+      This field is 'Y' if the household owns a radio.  Entering '1' sets
+      the value to 'Y'.
+    </div>
+    <div class="balloon" id="HelpEarnings">
+      This field contains the total earnings from employment.
+    </div>
+    <div class="balloon" id="HelpEmployed">
+      For an employee this is 'Y' if the individual was employed on 
+      Monday, 1st June 1931, otherwise it is empty.
+    </div>
+    <div class="balloon" id="HelpUnempWhy">
+      This field contains the reason why the individual was unemployed
+      on Monday, 1st June 1931.
+    </div>
+    <div class="balloon" id="HelpWeeksNoJob">
+      Specify the number of weeks during the last 12 months that the
+      individual was unemployed because of lack of a job.
+    </div>
+    <div class="balloon" id="HelpWeeksAccident">
+      Specify the number of weeks during the last 12 months that the
+      individual was unemployed because of an accident.
+    </div>
+    <div class="balloon" id="HelpWeeksStrike">
+      Specify the number of weeks during the last 12 months that the
+      individual was unemployed because of a strike.
+    </div>
+    <div class="balloon" id="HelpWeeksLayoff">
+      Specify the number of weeks during the last 12 months that the
+      individual was unemployed because of a layoff.
+    </div>
     <div class="balloon" id="HelpWeeksUnemp">
       Specify the number of weeks during the last 12 months that the
-      individual was unemployed
+      individual was unemployed.
     </div>
     <div class="balloon" id="HelpWeeksIll">
       Specify the number of weeks during the last 12 months that the
@@ -751,6 +786,15 @@
       text <span class="button">Find</span> and clicking on it pops up a 
       dialog to search the family tree for individuals with a similar name
       and year of birth.
+    </div>
+    <div class="balloon" id="HelpchooseIdir">
+        Choose one of the suggested individuals from the Family Tree.
+    </div>
+    <div class="balloon" id="Helpchoose">
+        I don't know where this is invoked.
+    </div>
+    <div class="balloon" id="HelpcloseFam">
+        Click on this button to apply all of the Family members.
     </div>
   </div> <!-- id="popups" -->
   <!-- popup to display dialog for IDIR -->

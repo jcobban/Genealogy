@@ -28,21 +28,19 @@
 		    <a href='VitalRegResponseHelpen.html' target='_blank'>Help?</a>
 		</span>
 		$domainName: Vital Statistics Registration Query
-		<div style='clear: both;'></div>
 	  </h1>
 	  $TRACE
 	  $MSG
 	  <!--- Put out a line with links to previous and next section of table -->
-	  <div class="center" id="topBrowse">
-	    <span class='left'>
-	      <a href='$npuri.$npand.$npprev'>&lt;---</a>
-	    </span>
-	    <span class='right'>
-	      <a href='$npuri.$npand.$npnext'>---&gt;</a>
+	  <div class="spaceBetween" id="topBrowse">
+	    <span>
+	      <a href='$npuri.$npand.$npprev'><img src="/Images/ArrowLeft.svg"></a>
 	    </span>
 	    displaying rows $offset+1 to
 	    $offset + $numRows of $totalrows
-	    <div style='clear: both;'></div>
+	    <span>
+	      <a href='$npuri.$npand.$npnext'><img src="/Images/ArrowRight.svg"></a>
+	    </span>
 	  </div>
 	  <!--- Put out the response as a table -->
 	  <form id='respform'>
@@ -110,16 +108,14 @@
 		</table>
 	  </form>
 	  <!--- Put out a line with links to previous and next section of response -->
-      <div class="center" id="botBrowse">
-        <span class='left' id="botPrev">
-          <a href='$npuri.$npand.$npprev'>&lt;---</a>
+      <div class="spaceBetween" id="botBrowse">
+        <span id="botPrev">
+          <a href='$npuri.$npand.$npprev'><img src="/Images/ArrowLeft.svg"></a>
         </span>
-        <span class='right' id="botNext">
-          <a href='$npuri.$npand.$npnext'>---&gt;
+        <span id="botNext">
+          <a href='$npuri.$npand.$npnext'><img src="/Images/ArrowRight.svg">
           </a>
         </span>
-          &nbsp;
-        <div style='clear: both;'></div>
       </div>
     </div> <!-- end of <div id='body'> -->
     <div id='messages' class='hidden'>

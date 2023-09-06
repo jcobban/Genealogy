@@ -4,6 +4,7 @@
     <title>
 	$TITLE
     </title>
+    <meta charset='utf-8'>
 <!--*********************************************************************
  *  pagefr.html															*
  *																		*
@@ -18,12 +19,12 @@
  *		2020/02/16      add right hand notification column              *
  *      2020/03/31      change advert iframe to div                     *
  *      2021/03/19      drop support for alignment in tinyMCE           *
+ *      2023/01/13      add Aria support for page menu                  *
  *																		*
- *  Copyright &copy; 2021 James A. Cobban								*
+ *  Copyright &copy; 2023 James A. Cobban								*
  **********************************************************************-->
-    <meta charset='utf-8'>
     <meta name='author' content='James A. Cobban'>
-    <meta name='copyright' content='&copy; 2021 James A. Cobban'>
+    <meta name='copyright' content='&copy; 2023 James A. Cobban'>
     <meta name='keywords' content='genealogy, family, tree, ontario, canada $KEYWORDS'>
     <meta name="viewport" content="width=device-width; initial-scale=1.0">
     <link rel='stylesheet' type='text/css' href='/styles.css'>
@@ -49,22 +50,24 @@
 
     <header id="headSection">
       <div class="topcrumbs"> <!-- start of page header -->
-    	<img src="/logo70.gif" id="logo" class="right"
-                height="70" width="70" alt="James Cobban Logo">
-          &nbsp;
-        <span class="advert" id="advertSpan">
-          <div id="advertFrame" class="advert" data-load="$ADURL">
-          </div>
-        </span>
-        <span id="menuButton" class="left">
+        <button id="menuButton" class="left"
+            title="Menu de la page" 
+            aria-haspopup="menu"
+            aria-label="Ouvrir le menu" aria-expanded="false">
           <div class="menuicon"></div>
           <div class="menuicon"></div>
           <div class="menuicon"></div>
-        </span>
+        </button>
         <div class="menu" id="menu">
           $BREADCRUMBS
         </div>
-        <div style='clear: both;'></div>
+        <div style="display: flex;">
+	        <div id="advertFrame" class="advert" data-load="$ADURL">
+            </div>
+	          &nbsp;
+	        <img src="/logo70.gif" id="logo"
+                    height="70" width="70" alt="James Cobban Logo">
+        </div>
       </div> <!-- end of page header -->
     </header>
     <main id="mainSection">
@@ -81,13 +84,7 @@
     <div id="rightColumn" class="rightCol">
         <p id="userWelcome">
           <b>Bienvenu $USERID</b>
-        </p>Vous pouvez publier votre arbre généalogique sur ce site 
-        dans un style qui ressemble à un livre traditionnel, 
-        mais en ajoutant toutes les capacités dynamiques du Web et 
-        protège votre famille contre le vol d'identité en s'assurant 
-        que seules les personnes que vous autorisez peuvent 
-        voir les détails de toute personne de moins de 105 ans.
-        <p>
+          $RIGHTCOL
         </p>
     </div>
     <footer id="footSection">
@@ -95,7 +92,6 @@
   	    <a href='/contactAuthor.php?lang=fr&idir=$CONTACTKEY&amp;tableName=$CONTACTTABLE&amp;subject=$CONTACTSUBJECT' target='_blank'>
   	      Contacter l'auteur</a>
   	    <br>
-        <div style='clear: both;'></div>
       </div> <!-- end of page footer -->
     </footer>
     <div class='hidden' id='UserInfo'>
@@ -130,12 +126,26 @@
       <span id="abbrMessage">
           Les abréviations suivantes sont développées:
       </span>
+      <span id="displayTheMenu">
+          Ouvrir le menu
+      </span>
+      <span id="closeTheMenu">
+          Fermer le menu
+      </span>
+      <p id="rightCol">
+        Vous pouvez publier votre arbre généalogique sur ce site 
+        dans un style qui ressemble à un livre traditionnel, 
+        mais en ajoutant toutes les capacités dynamiques du Web et 
+        protège votre famille contre le vol d'identité en s'assurant 
+        que seules les personnes que vous autorisez peuvent 
+        voir les détails de toute personne de moins de 105 ans.
+      </p>
     </div>
                 
     <div id='hideMsgTemplate' class='hidden'>
       <!-- template for customized alerts -->
-      <form name='Msg\$template' id='Msg\$template'>
-	    <p class='message'>\$msg</p>
+      <form name='Msg$template' id='Msg$template'>
+	    <p class='message'>$msg</p>
 	    <p>
 	      <button type='button' id='closeDlg\$template'>
         	d'Accord

@@ -11,7 +11,7 @@
  *  Copyright &copy; 2019 James A. Cobban								*
  **********************************************************************-->
     <div id="breadcrumbs" class="hidden">
-	  <a href="/index.html">Accueil</a>:
+	  <a href="/home.html">Accueil</a>:
       <a href="/genealogy.php?lang=fr">
 	    Généalogie
       </a>:
@@ -52,20 +52,20 @@
             <a href='MarriageRegResponseHelpen.html' target='_blank'>Help?</a>
         </span>
         $DOMAINNAME: Enregistrement des Mariages $ACTION
-        <div style='clear: both;'></div>
       </h1>
       $TRACE
       $MSG
       <!--- Put out a line with links to previous and next section of table -->
-      <div class="center" id="topBrowse">
-        <span class="left" id="topPrev">
-            <a href='MarriageRegResponse.php$NPURI&offset=$PREVOFFSET'>&lt;---</a>
-         </span>
-        <span class='right' id="topNext">
-            <a href='MarriageRegResponse.php$NPURI&offset=$NEXTOFFSET'>---&gt;</a>
+      <div class="spaceBetween" id="topBrowse">
+        <span id="topPrev">
+            <a href='MarriageRegResponse.php$NPURI&offset=$PREVOFFSET'><img src="/Images/ArrowLeft.svg"></a>
         </span>
-        montrer rangs $FIRSTOFFSET
-        à $LASTOFFSET de $TOTALROWS 
+        <span>
+        montrer rangs $FIRSTOFFSET à $LASTOFFSET de $TOTALROWS 
+        </span>
+        <span id="topNext">
+            <a href='MarriageRegResponse.php$NPURI&offset=$NEXTOFFSET'><img src="/Images/ArrowRight.svg"></a>
+        </span>
       </div>
       <!--- Put out the response as a table -->
       <form id='respform'>
@@ -159,15 +159,16 @@
         </table>
       </form>
     <!--- Put out a line with links to previous and next section of response -->
-      <div class="center" id="botBrowse">
-        <span class="left" id="botPrev">
-            <a href='MarriageRegResponse.php$NPURI&offset=$PREVOFFSET'>&lt;---</a>
-         </span>
-        <span class='right' id="botNext">
-            <a href='MarriageRegResponse.php$NPURI&offset=$NEXTOFFSET'>---&gt;</a>
+      <div class="spaceBetween" id="botBrowse">
+        <span  id="botPrev">
+            <a href='MarriageRegResponse.php$NPURI&offset=$PREVOFFSET'><img src="/Images/ArrowLeft.svg"></a>
         </span>
-        montrer rangs $FIRSTOFFSET
-        à $LASTOFFSET de $TOTALROWS 
+        <span>
+        montrer rangs $FIRSTOFFSET à $LASTOFFSET de $TOTALROWS 
+        </span>
+        <span id="botNext">
+            <a href='MarriageRegResponse.php$NPURI&offset=$NEXTOFFSET'><img src="/Images/ArrowRight.svg"></a>
+        </span>
       </div> <!-- class="center" -->
     </div> <!-- class="body" -->
     <div id='templates' class='hidden'>

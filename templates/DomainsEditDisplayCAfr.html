@@ -1,18 +1,18 @@
 <!--*********************************************************************
- *  DomainsEditDisplayfr.html											*
- *																		*
- *  Display form for displaying information about administrative		*
- *  domains for managing vital statistics records.						*
- *																		*
- *  History:															*
- *		2017/10/28		created											*
- *		2018/01/04		remove Template from template file names		*
+ *  DomainsEditDisplayfr.html                                           *
+ *                                                                      *
+ *  Display form for displaying information about administrative        *
+ *  domains for managing vital statistics records.                      *
+ *                                                                      *
+ *  History:                                                            *
+ *      2017/10/28      created                                         *
+ *      2018/01/04      remove Template from template file names        *
  *      2019/02/21      support resizing scrolling row and PgUp/Dn      *
  *      2019/12/02      add partof                                      *
  *      2019/12/05      add category                                    *
  *      2022/03/09      add language validation                         *
- *																		*
- *  Copyright &copy; 2022 James A. Cobban								*
+ *                                                                      *
+ *  Copyright &copy; 2022 James A. Cobban                               *
  **********************************************************************-->
     <div id="breadcrumbs" class="hidden">
       <a href="/genealogy.php?lang=fr">
@@ -31,7 +31,6 @@
         <a href="/Canada/DomainsEditHelpfr.html" target="help">? Aide</a>
         </span>
         $COUNTRYNAME: Montrer la Table des {$DOMAINTYPE}s
-        <div style="clear: both;"></div>
       </h1>
     $TRACE
     $MSG
@@ -41,22 +40,21 @@
          class="button">inscrivez-vous</a>
         pour mise a jour la base des données.
       </p>
-      <!--- Put out a line with links to previous and next section of table -->
-      <div class="center" id="topBrowse">
-        <span class="left" id="topPrev">
-        <a href="/Canada/DomainsEdit.php?lang=$lang&amp;cc=$cc&amp;partof=$partof&amp;offset=$offset&amp;limit=$limit" id="prenpprev">
-        &lt;---
-        </a>
+      <!--- Put out a line with links to previous and next section -->
+      <div class="spaceBetween" id="topBrowse">
+        <span  id="topPrev">
+          <a href="/Canada/DomainsEdit.php?lang=$lang&amp;cc=$cc&amp;partof=$partof&amp;offset=$offset&amp;limit=$limit" id="prenpprev">
+          <img src="/Images/ArrowLeft.svg">
+          </a>
         </span>
-        <span class="right" id="topNext">
-        <a href="/Canada/DomainsEdit.php?lang=$lang&amp;cc=$cc&amp;partof=$partof&amp;offset=$offset&amp;limit=$limit" id="prenpnext">
-            ---&gt;
-        </a>
+        <span  id="respdescrows">
+            montrer rangs $first à $last de $totalrows
         </span>
-          <span id="respdescrows">
-        montrer rangs $first a $last de $totalrows
-          </span>
-        <div style="clear: both;"></div>
+        <span  id="topNext">
+          <a href="/Canada/DomainsEdit.php?lang=$lang&amp;cc=$cc&amp;partof=$partof&amp;offset=$offset&amp;limit=$limit" id="prenpnext">
+              <img src="/Images/ArrowRight.svg">
+          </a>
+        </span>
       </div> <!-- left and right arrow links -->
       <!--- Put out the response as a table -->
       <form name="domainForm" id="domainForm"
@@ -76,7 +74,6 @@
                 $name
             </option>
           </select>
-          <div style="clear: both;"></div>
         </div>
         <table class="form" id="dataTable">
           <!--- Put out the column headers -->
@@ -121,20 +118,20 @@
                     class="ina left" readonly="readonly"
                     size="26" maxlength="255">
               </td>
-	          <td class="left">
-	            <input type="text"
-	                name="Partof$code" id="Partof$code" 
-	                value="$partof" 
-	                class="ina left" readonly="readonly"
-	                size="6" maxlength="16">
-	          </td>
-	          <td class="left">
-	              <input type="text"
-	                  name="Category$code" id="Category$code" 
-	                  value="$category" 
-	                  class="ina left" readonly="readonly"
-	                  size="11" maxlength="32">
-	          </td>
+              <td class="left">
+                <input type="text"
+                    name="Partof$code" id="Partof$code" 
+                    value="$partof" 
+                    class="ina left" readonly="readonly"
+                    size="6" maxlength="16">
+              </td>
+              <td class="left">
+                  <input type="text"
+                      name="Category$code" id="Category$code" 
+                      value="$category" 
+                      class="ina left" readonly="readonly"
+                      size="11" maxlength="32">
+              </td>
               <td class="center">
                 <button type="button" id="EditCounties$code">
                   Comtés
@@ -212,9 +209,9 @@
         Click on this button to update the database to include the changes you
         have made to the domains list.
     </div>
-	<div class="balloon" id="HelpClose">
-	    Click on this button to close the dialog without updating the database.
-	</div>
+    <div class="balloon" id="HelpClose">
+        Click on this button to close the dialog without updating the database.
+    </div>
     <script src="/jscripts/CommonForm.js" type="text/javascript">
     </script>
     <script src="/jscripts/util.js" type="text/javascript">

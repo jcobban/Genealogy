@@ -13,7 +13,7 @@
  *  Copyright &copy; 2021 James A. Cobban								*
  **********************************************************************-->
 	<div id='breadcrumbs' class='hidden'>
-      <a href="/index.html">Home</a>:
+      <a href="/home.html">Home</a>:
 	    <a href="/genealogy.php?lang=$LANG">
 		Genealogy
 	    </a>:
@@ -27,7 +27,6 @@
 		<a href='/Canada/CountriesEditHelpen.html' target='help'>? Help</a>
 	    </span>
 		Country Table Update
-	    <div style='clear: both;'></div>
 	  </h1>
 	  $TRACE
 	  $MSG
@@ -42,28 +41,26 @@
 	        <input type='hidden' name='offset' value='$offset'>
 	        <input type='hidden' name='limit' value='$limit'>
 	      <!--- Put out a line with links to previous and next section of table -->
-	      <div class="center" id="topBrowse">
-	        <span class='left' id='topPrev'>
+	      <div class="spaceBetween" id="topBrowse">
+	        <span class='bold' id='topPrev'>
 		        <a href='/Canada/CountriesEdit.php?lang=$LANG$npPrev' id='prenpprev'>
-		        &lt;---
+		        <img src="/Images/ArrowLeft.svg">
 		        </a>
 	        </span>
-	        <span class='right' id='topNext'>
-		        <a href='/Canada/CountriesEdit.php?lang=$LANG$npNext' id='prenpnext'>
-		            ---&gt;
-		        </a>
-	        </span>
-	          <span id='respdescrows'>
+	        <span id='respdescrows'>
 		        returned rows $first to $last of $totalrows
-	          </span>
-	        <div style='clear: both;'></div>
+	        </span>
+	        <span class='bold' id='topNext'>
+		        <a href='/Canada/CountriesEdit.php?lang=$LANG$npNext' id='prenpnext'>
+		            <img src="/Images/ArrowRight.svg">
+		        </a>
+	        </span>
 	      </div> <!-- left and right arrow links -->
 	      <div class="row">
 	        <label class='label' for='pattern' style='width: 10em;'>Pattern:</label>
 	        <input type='text' id='pattern' name='pattern' 
 					value='$PATTERN'
 					class='white leftnc' size=24' maxlength='256'>
-	        <div style='clear: both;'></div>
           </div>
 	      <table class='form' id='dataTable'>
 	        <!--- Put out the column headers -->

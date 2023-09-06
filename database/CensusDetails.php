@@ -70,6 +70,7 @@ use \Exception;
  *																		*
  *  Copyright &copy; 2021 James A. Cobban								*
  ************************************************************************/
+require_once __NAMESPACE__ . '/common.inc';
 require_once __NAMESPACE__ . '/Domain.inc';
 require_once __NAMESPACE__ . '/Census.inc';
 require_once __NAMESPACE__ . '/District.inc';
@@ -77,7 +78,6 @@ require_once __NAMESPACE__ . '/SubDistrict.inc';
 require_once __NAMESPACE__ . '/CensusLine.inc';
 require_once __NAMESPACE__ . '/Language.inc';
 require_once __NAMESPACE__ . '/FtTemplate.inc';
-require_once __NAMESPACE__ . '/common.inc';
 
 // initial values
 $censusId			= null;
@@ -352,9 +352,10 @@ if (!is_null($distObj))
 	}			// valid value
 	else
 	{
+        $subDistText                = htmlspecialchars($subDistId);
 	    $msg    .= $template['invalidSubdistId']->replace(
-	                                array('$value', '$div'), 
-	                                array(htmlspecialchars($subDistId)));
+	                                array('$value', '$div', '$distId'), 
+                                    array($subDistText, $division, $distId));
         $subDistObj                 = null;
 	}
 }               // district is specified
@@ -371,10 +372,12 @@ if (!is_null($subDistObj))
 	    $lastLine       = $pageObj->get('population');
 	}
 	else
-	{
+    {
         $pagetext       = htmlspecialchars($page);
-        $text           = $template['invalidPage']->replace('$value',
-                                                            $pagetext);
+        $subDistText    = htmlspecialchars($subDistId);
+        $msg            = $template['invalidPage']->replace(
+	                array('$value', '$subDistId', '$div', '$distId'), 
+                    array($pagetext, $subDistText, $division, $distId));
         $lastLine       = 55;
 	}
 }               // subDistrict is specified
@@ -438,11 +441,11 @@ if (strlen($msg) == 0)
     if ($line > 1)
         $template->set('PREVLINE',			$line - 1);
     else
-        $template->updateTag('topPrev',    null);
+        $template->updateTag('topPrev',    '&nbsp;');
     if ($line < $lastLine)
 	    $template->set('NEXTLINE',			$line + 1);
     else
-        $template->updateTag('topNext',    null);
+        $template->updateTag('topNext',    '&nbsp;');
 
     $censusLine                         = $pageObj->getLine($line);
     if ($censusLine instanceof CensusLine && $censusLine->isExisting())

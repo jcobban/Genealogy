@@ -10,7 +10,7 @@
  *  Copyright &copy; 2019 James A. Cobban								*
  **********************************************************************-->
     <div id="breadcrumbs" class="hidden">
-	<a href="/index.html">Accueil</a>:
+	<a href="/home.html">Accueil</a>:
     <a href="/genealogy.php?lang=fr">
 	    Généalogie
     </a>:
@@ -39,18 +39,17 @@
 	  </h1>
 	  $TRACE
 	  $MSG
-	  <div class='center' id="topBrowse">
-	    <div class='left' id="topPrev">
+	  <div class="spaceBetween" id="topBrowse">
+	    <div id="topPrev">
 	      <a href='MarriageRegYearStats.php?regdomain=$DOMAIN&amp;regyear=$PREVYEAR&amp;lang=fr' id='toPrevYear'>
-		    &lt;--- $PREVYEAR 
+		    <img src="/Images/ArrowLeft.svg"> $PREVYEAR 
 		  </a>
 	    </div>
-	    <div class='right' id="topNext">
+	    <div id="topNext">
 		  <a href='MarriageRegYearStats.php?regdomain=$DOMAIN&amp;regyear=$NEXTYEAR&amp;lang=fr' id='toNextYear'>
-		    $NEXTYEAR ---&gt;
+		    $NEXTYEAR <img src="/Images/ArrowRight.svg">
 		  </a>
 	    </div>
-	    <div style='clear: both;'></div>
 	  </div>
 	  <form id='display' action='donothing.php' method='get'>
 	    <input type='hidden' id='RegYear' 

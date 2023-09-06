@@ -976,7 +976,10 @@ foreach ($_POST as $key => $value)
 			// get the row identifier within the table in the web page
 			if ((is_int($value) || ctype_digit($value)) && $value >= 0)
 			    $rownum	    = $value;
-			else
+            else
+            if ($value == 'A')
+                $rownum	    = $value;
+            else
 			if (strlen($value))
 			    $msg	    .= "Invalid value of row=" . 
                                     htmlspecialchars($value) . ". "; 

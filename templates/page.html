@@ -4,6 +4,7 @@
     <title>
 	$TITLE
     </title>
+    <meta charset='utf-8'>
 <!--*********************************************************************
  *  page.html															*
  *																		*
@@ -22,7 +23,6 @@
  *																		*
  *  Copyright &copy; 2021 James A. Cobban								*
  **********************************************************************-->
-    <meta charset='utf-8'>
     <meta name='author' content='James A. Cobban'>
     <meta name='copyright' content='&copy; 2021 James A. Cobban'>
     <meta name='keywords' content='genealogy, family, tree, ontario, canada $KEYWORDS'>
@@ -48,22 +48,21 @@
 </script>
     <header id="headSection">
       <div class="topcrumbs"> <!-- start of page header -->
-    	<img src="/logo70.gif" id="logo" class="right"
-                height="70" width="70" alt="James Cobban Logo">
-          &nbsp;
-        <span class="right" style="width: 500px;" id="advertSpan">
-          <div id="advertFrame" class="advert" data-load="$ADURL">
-          </div>
-        </span>
-        <span id="menuButton" class="left">
+        <div id="menuButton" class="left">
           <div class="menuicon"></div>
           <div class="menuicon"></div>
           <div class="menuicon"></div>
-        </span>
+        </div>
         <div class="menu" id="menu">
             $BREADCRUMBS
         </div>
-        <div style='clear: both;'></div>
+        <div style="display: flex;">
+	        <div id="advertFrame" class="advert" data-load="$ADURL">
+            </div>
+	          &nbsp;
+	        <img src="/logo70.gif" id="logo"
+                    height="70" width="70" alt="James Cobban Logo">
+        </div>
       </div> <!-- end of page header -->
     </header>
     <main id="mainSection">
@@ -81,7 +80,6 @@
       <div class='botcrumbs'>
       	<a href='/contactAuthor.php?idir=$CONTACTKEY&amp;tableName=$CONTACTTABLE&amp;subject=$CONTACTSUBJECT' target='_blank'>
       	    Contact Author</a>
-        <div style='clear: both;'></div>
       </div> <!-- end of page footer -->
     </footer>
     <div class='hidden' id='UserInfo'>
@@ -120,10 +118,10 @@
                 
     <div id='hideMsgTemplate' class='hidden'>
       <!-- template for customized alerts -->
-      <form name='Msg\$template' id='Msg\$template'>
-	<p class='message'>\$msg</p>
+      <form name='Msg$template' id='Msg$template'>
+	<p class='message'>$msg</p>
 	<p>
-	  <button type='button' id='closeDlg\$template'>
+	  <button type='button' id='closeDlg$template'>
     	OK
 	  </button>
 	</p>

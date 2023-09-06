@@ -30,7 +30,7 @@ $idsrtext           = null;
 $parmsText          = '';
 
 // emit the XML header
-print "<?xml version='1.0' encoding='UTF-8'?>\n";
+print "<?xml version='1.0' encoding='UTF-8'?" . ">\n";
 print "<deleted>\n";
 if (isset($_POST) && count($_POST) > 0)
 {		                        // parameters passed by method=post

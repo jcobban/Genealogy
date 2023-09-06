@@ -124,13 +124,13 @@ function responses($id  , $indent)
  ************************************************************************/
 
 // process input parameters
-$id                 		= 0;
-$keyvalue           		= 0;
-$lang               		= 'en';
-$table              		= 'Blogs';
-$keyname            		= 'blogid';
-$edit               		= false;
-$update             		= false;
+$id                         = 0;
+$keyvalue                   = 0;
+$lang                       = 'en';
+$table                      = 'Blogs';
+$keyname                    = 'blogid';
+$edit                       = false;
+$update                     = false;
 
 if (isset($_GET) && count($_GET) > 0)
 {                       // invoked to display message form
@@ -359,9 +359,9 @@ else
 if (isset($_POST) && count($_POST) > 0)
 {                       // invoked to update database
     $parmsText          = "<p class='label'>\$_POST</p>\n" .
-		                  "<table class='summary'>\n" .
-		                  "<tr><th class='colhead'>key</th>" .
-		                      "<th class='colhead'>value</th></tr>\n";
+                          "<table class='summary'>\n" .
+                          "<tr><th class='colhead'>key</th>" .
+                              "<th class='colhead'>value</th></tr>\n";
     foreach($_POST as $key => $value)
     {                   // loop through all parameters
         $safevalue          = htmlspecialchars($value);
@@ -500,156 +500,165 @@ else
 
 // table name
 $name                           = '';
-$tableInfo                      = Record::getInformation($table);
-if ($tableInfo)
+if (!ctype_alpha(substr($table, 0, 1)))
 {
-    if ($table != 'Users')
-    {
-        $matches                = array();
-        if (is_string($id) &&
-            preg_match('/\d+/', $id, $matches) == 1)
-        {           // numeric id somewhere in string
-            $id                 = (int)$matches[0];
-        }           // numeric id somewhere in string
-        else
-        if (ctype_digit($id))
-            $id                 = (int)$id;
-        else
-            $msg                .= "Invalid $keyname=$id. ";
-    }
-
-    $template['badTable']->update(null);        // remove error message
-    $className                  = $tableInfo['classname'];
-    if (!class_exists(__NAMESPACE__ . "\\$className"))
-    {
-        require __NAMESPACE__ . "/$className.inc";
-    }
-    $keyname                    = $tableInfo['prime'];
-    if ((is_int($id) && $id > 0) ||
-        (strlen($id) > 0 && $id != '0'))
-    {
-        $qualName               = __NAMESPACE__ . "\\$className";
-        $instance               = new $qualName(array($keyname  => $id));
-        if ($instance->isExisting())
-        {
-            $name               = $instance->getName();
-            if ($className == 'User')
-                $id             = $instance['id'];
-        }
-        else
-        {
-            $warn               .= "<p>BlogPost.php: " . __LINE__ .
-        " Instance of $className with $keyname='$id' does not exist</p>\n";
-        }
-    }
+    $msg    .= "Invalid table='$table'. ";
+    error_log("BlogPost.php: Invalid table=\'$table\'\n" .
+                $parmsText);
 }
-else
-{                           // unsupported table
-    $template['badTable']->update(array('table' => $table));
-    $className                  = $table;
-    $keyname                    = null;
-}                           // unsupported table
-
-$template->set('NAME',              $name);
-$template->set('CLASS',             $className);
-$template->set('CONTACTTABLE',      $table);
-$template->set('TABLE',             $table);
-$template->set('KEYNAME',           $keyname);
-
-// other parameters
-$template->set('CONTACTKEY',        $id);
-$template->set('userid',            $userid);
-if ($edit)
-{
-    $template->set('blogid',        $id);
-    $template->set('keyvalue',      $keyvalue);
-}
-else
-{
-    $template->set('blogid',        0);
-    $template->set('keyvalue',      $id);
-}
-$template->set('margin',            '');
-$template->set('LANG',              $lang);
-if ($debug)
-    $template->set('debug',         'Y');
-else
-    $template->set('debug',         'N');
-
-if ($id > 0 && $table == 'Blogs')
-{
-    $blog               = new Blog(array('id'       => $id));
-    $subject            = $blog->get('subject');
-    if (strlen($subject) == 0)
-        $subject        = $id;
-    $template->set('BLOGTITLE',     $subject);
-
-    if ($blog->isExisting())
-    {                   // key of existing Blog record
-        $parentblogid           = $blog->get('keyvalue');
-        $template->set('parentblogid',$parentblogid);
-        if ($parentblogid == 0)
-            $template['parentBlog']->update( null);
-        else
-            $template['parentBlog']->update(
-                                 array('parentblogid' => $parentblogid));
-
-        if ($edit)
+if (strlen($msg) == 0)
+{                           // no errors detected
+    $tableInfo                      = Record::getInformation($table);
+    if ($tableInfo)
+    {
+        if ($table != 'Users')
         {
-            $template->set('POSTS',         '');
-            $template->set('posttext',      $blog->get('text'));
-            $username           = $blog->get('username');
-            $owner              = new User(array('username' => $username));
-            $template->set('EMAIL',     $owner->get('email'));
-            $h1tag              = $template['EditBlog'];
-            $template->set('TITLE',
-                      str_replace('$BLOGTITLE', $subject, $h1tag->innerHTML()));
-            $template['Response']->update(  null);
-            $template['NewPost']->update(   null);
+            $matches                = array();
+            if (is_string($id) &&
+                preg_match('/\d+/', $id, $matches) == 1)
+            {           // numeric id somewhere in string
+                $id                 = (int)$matches[0];
+            }           // numeric id somewhere in string
+            else
+            if (ctype_digit($id))
+                $id                 = (int)$id;
+            else
+                $msg                .= "Invalid $keyname=$id. ";
         }
-        else
+    
+        $template['badTable']->update(null);        // remove error message
+        $className                  = $tableInfo['classname'];
+        if (!class_exists(__NAMESPACE__ . "\\$className"))
         {
-            $template->set('POSTS',         responses($id, 0));
-            $template->set('posttext',      '');
-            $h1tag              = $template['AddBlog'];
-            $template->set('TITLE',
-                          str_replace('$BLOGTITLE', $subject, $h1tag->innerHTML()));
-            $template['Edit']->update(  null);
-            $template['NewPost']->update(   null);
+            require __NAMESPACE__ . "/$className.inc";
         }
-    }           // key of existing Blog record
+        $keyname                    = $tableInfo['prime'];
+        if ((is_int($id) && $id > 0) ||
+            (strlen($id) > 0 && $id != '0'))
+        {
+            $qualName               = __NAMESPACE__ . "\\$className";
+            $instance               = new $qualName(array($keyname  => $id));
+            if ($instance->isExisting())
+            {
+                $name               = $instance->getName();
+                if ($className == 'User')
+                    $id             = $instance['id'];
+            }
+            else
+            {
+                $warn               .= "<p>BlogPost.php: " . __LINE__ .
+            " Instance of $className with $keyname='$id' does not exist</p>\n";
+            }
+        }
+    }
     else
-    {           // new Blog record
-        $template->set('POSTS',         '');
-        $template->set('posttext',      '');
-        $template->set('parentblogid',  '');
-        $h1tag          = $template['AddBlog'];
+    {                           // unsupported table
+        $template['badTable']->update(array('table' => $table));
+        $className                  = $table;
+        $keyname                    = null;
+    }                           // unsupported table
+    
+    $template->set('NAME',              $name);
+    $template->set('CLASS',             $className);
+    $template->set('CONTACTTABLE',      $table);
+    $template->set('TABLE',             $table);
+    $template->set('KEYNAME',           $keyname);
+    
+    // other parameters
+    $template->set('CONTACTKEY',        $id);
+    $template->set('userid',            $userid);
+    if ($edit)
+    {
+        $template->set('blogid',        $id);
+        $template->set('keyvalue',      $keyvalue);
+    }
+    else
+    {
+        $template->set('blogid',        0);
+        $template->set('keyvalue',      $id);
+    }
+    $template->set('margin',            '');
+    $template->set('LANG',              $lang);
+    if ($debug)
+        $template->set('debug',         'Y');
+    else
+        $template->set('debug',         'N');
+    
+    if ($id > 0 && $table == 'Blogs')
+    {
+        $blog               = new Blog(array('id'       => $id));
+        $subject            = $blog->get('subject');
+        if (strlen($subject) == 0)
+            $subject        = $id;
+        $template->set('BLOGTITLE',     $subject);
+    
+        if ($blog->isExisting())
+        {                   // key of existing Blog record
+            $parentblogid           = $blog->get('keyvalue');
+            $template->set('parentblogid',$parentblogid);
+            if ($parentblogid == 0)
+                $template['parentBlog']->update( null);
+            else
+                $template['parentBlog']->update(
+                                     array('parentblogid' => $parentblogid));
+    
+            if ($edit)
+            {
+                $template->set('POSTS',         '');
+                $template->set('posttext',      $blog->get('text'));
+                $username           = $blog->get('username');
+                $owner              = new User(array('username' => $username));
+                $template->set('EMAIL',     $owner->get('email'));
+                $h1tag              = $template['EditBlog'];
+                $template->set('TITLE',
+                          str_replace('$BLOGTITLE', $subject, $h1tag->innerHTML()));
+                $template['Response']->update(  null);
+                $template['NewPost']->update(   null);
+            }
+            else
+            {
+                $template->set('POSTS',         responses($id, 0));
+                $template->set('posttext',      '');
+                $h1tag              = $template['AddBlog'];
+                $template->set('TITLE',
+                              str_replace('$BLOGTITLE', $subject, $h1tag->innerHTML()));
+                $template['Edit']->update(  null);
+                $template['NewPost']->update(   null);
+            }
+        }           // key of existing Blog record
+        else
+        {           // new Blog record
+            $template->set('POSTS',         '');
+            $template->set('posttext',      '');
+            $template->set('parentblogid',  '');
+            $h1tag          = $template['AddBlog'];
+            $template->set('TITLE',
+                           str_replace('$BLOGTITLE', $subject, $h1tag->innerHTML()));
+            $template['Edit']->update(      null);
+            $template['Response']->update(  null);
+        }
+    }
+    else
+    {
+        $template->set('POSTS',             '');
+        $template->set('posttext',          '');
+        $template->set('BLOGTITLE',         '');
+        $template['parentBlog']->update(  null);
+        if ($table == 'Blogs')
+            $h1tag              = $template['NewBlog'];
+        else
+        if ((is_int($id) && $id > 0) ||
+            (strlen($id) > 0 && $id != '0'))
+            $h1tag              = $template['NewSpecific'];
+        else
+            $h1tag              = $template['NewMessage'];
         $template->set('TITLE',
-                       str_replace('$BLOGTITLE', $subject, $h1tag->innerHTML()));
+                       str_replace(array('$CLASS', '$NAME'),
+                                   array($className, $name), 
+                                   $h1tag->innerHTML()));
         $template['Edit']->update(      null);
         $template['Response']->update(  null);
     }
-}
-else
-{
-    $template->set('POSTS',             '');
-    $template->set('posttext',          '');
-    $template->set('BLOGTITLE',         '');
-    $template['parentBlog']->update(  null);
-    if ($table == 'Blogs')
-        $h1tag              = $template['NewBlog'];
-    else
-    if ((is_int($id) && $id > 0) ||
-        (strlen($id) > 0 && $id != '0'))
-        $h1tag              = $template['NewSpecific'];
-    else
-        $h1tag              = $template['NewMessage'];
-    $template->set('TITLE',
-                   str_replace(array('$CLASS', '$NAME'),
-                               array($className, $name), 
-                               $h1tag->innerHTML()));
-    $template['Edit']->update(      null);
-    $template['Response']->update(  null);
 }
 
 $template->display();

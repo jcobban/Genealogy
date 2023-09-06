@@ -43,15 +43,14 @@
         Search
           </button>
         </p>
-        <div class="center" id="topBrowse">
-          <div class="left" id="topPrev">
-            <a href="/FamilyTree/Nicknames.php?pattern=$PATTERN&amp;lang=$LANG&amp;limit=$LIMIT&amp;offset=$PREVOFFSET">&lt;---</a>
-          </div>
-          <div class="right" id="topNext"> 
-          <a href="/FamilyTree/Nicknames.php?pattern=$PATTERN&amp;lang=$LANG&amp;limit=$LIMIT&amp;offset=$NEXTOFFSET">---&gt;</a>
+        <div class="spaceBetween" id="topBrowse">
+          <div id="topPrev">
+            <a href="/FamilyTree/Nicknames.php?pattern=$PATTERN&amp;lang=$LANG&amp;limit=$LIMIT&amp;offset=$PREVOFFSET"><img src="/Images/ArrowLeft.svg"></a>
           </div>
           rows $FIRST to $LAST of $COUNT 
-          <div style="clear: both;"></div>
+          <div id="topNext"> 
+          <a href="/FamilyTree/Nicknames.php?pattern=$PATTERN&amp;lang=$LANG&amp;limit=$LIMIT&amp;offset=$NEXTOFFSET"><img src="/Images/ArrowRight.svg"></a>
+          </div>
         </div>
         <!--- Put out the response as a table -->
         <table class="details" id="dataTable">

@@ -10,8 +10,9 @@ use \Exception;
  *                                                                      *
  *  History:                                                            *
  *      2021/05/16      created                                         *
+ *      2023/01/19      protect against script insertion                *
  *                                                                      *
- *  Copyright &copy; 2021 James A. Cobban                               *
+ *  Copyright &copy; 2023 James A. Cobban                               *
  ************************************************************************/
 require_once __NAMESPACE__ . "/Book.inc";
 require_once __NAMESPACE__ . "/Language.inc";
@@ -21,8 +22,11 @@ require_once __NAMESPACE__ . '/common.inc';
 
 // validate parameters
 $getParms           = array();
+$isbn               = null;
+$isbntext           = null;
 $pattern            = '';
 $lang               = 'en';
+$langtext           = null;
 $offset             = 0;
 $offsettext         = null;
 $limit              = 20;
@@ -38,20 +42,22 @@ if (isset($_GET) && count($_GET) > 0)
                       "<th class='colhead'>value</th></tr>\n";
     foreach($_GET as $key => $value)
     {           // loop through parameters
+        $safevalue  = htmlspecialchars($value);
         $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
-                        "<td class='white left'>$value</td></tr>\n"; 
+                        "<td class='white left'>$safevalue</td></tr>\n"; 
         switch(strtolower($key))
         {
             case 'lang':
             {
-                $lang               = FtTemplate::validateLang($value);
+                $lang               = FtTemplate::validateLang($value,
+                                                               $langtext);
                 break;
             }       // language
 
             case 'pattern':
             {
-                $pattern            = $value;
-                $getParms['title']  = $value;
+                $pattern            = $safevalue;
+                $getParms['title']  = $safevalue;
                 break;
             }       // pattern match
 
@@ -60,7 +66,7 @@ if (isset($_GET) && count($_GET) > 0)
                 if (is_numeric($value) || ctype_digit($value))
                     $offset         = $value;
                 else
-                    $offsettext     = htmlspecialchars($value);
+                    $offsettext     = $safevalue;
                 break;
             }
 
@@ -69,7 +75,7 @@ if (isset($_GET) && count($_GET) > 0)
                 if (is_numeric($value) || ctype_digit($value))
                     $limit          = $value;
                 else
-                    $limittext      = htmlspecialchars($value);
+                    $limittext      = $safevalue;
                 break;
             }
         }       // act on specific parameters
@@ -87,8 +93,9 @@ if (isset($_POST) && count($_POST) > 0)
     $book       = null;
     foreach($_POST as $key => $value)
     {
+        $safevalue  = htmlspecialchars($value);
         $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
-                        "<td class='white left'>$value</td></tr>\n"; 
+                        "<td class='white left'>$savevalue</td></tr>\n"; 
         $matches    = array();
         $pres       = preg_match("/^(\w+)([0-9]{10,13})$/", $key, $matches);
         if ($pres)
@@ -105,7 +112,8 @@ if (isset($_POST) && count($_POST) > 0)
         {                   // act on specific column titles
             case 'lang':
             {
-                $lang           = FtTemplate::validateLang($value);
+                $lang           = FtTemplate::validateLang($value,
+                                                           $langtext);
                 break;
             }               // language
 
@@ -117,16 +125,22 @@ if (isset($_POST) && count($_POST) > 0)
                     if ($count > 0)
                         $warn   .= "<p>" . $book->getLastSqlCmd() ."</p>\n";
                 }
-                $book           = new Book(array('code' => $isbn));
-                $messages       = $book->getErrors();
-                if (strlen($messages) > 0)
-                    $warn       .= "<p>new Book(array('isbn'    => $isbn)) constructor failed $messages</p>\n";
+                if (preg_match('/[a-zA-Z 0-9:-/', $value))
+                {
+                    $isbn           = $value;
+                    $book           = new Book(array('code' => $isbn));
+                    $messages       = $book->getErrors();
+                    if (strlen($messages) > 0)
+                        $warn       .= "<p>new Book(array('isbn'    => $isbn)) constructor failed $messages</p>\n";
+                }
+                else
+                    $isbntext       = $safevalue;
                 break;
             }
 
             case 'title':
             {
-                $book->set('title', $value);
+                $book->set('title', $safevalue);
                 break;
             }
 
@@ -138,8 +152,8 @@ if (isset($_POST) && count($_POST) > 0)
 
             case 'pattern':
             {
-                $pattern            = $value;
-                $getParms['title']  = $value;
+                $pattern            = $safevalue;
+                $getParms['title']  = $safevalue;
                 break;
             }       // pattern match
 
@@ -148,7 +162,7 @@ if (isset($_POST) && count($_POST) > 0)
                 if (is_numeric($value) || ctype_digit($value))
                     $offset         = $value;
                 else
-                    $offsettext     = htmlspecialchars($value);
+                    $offsettext     = $safevalue;
                 break;
             }
 
@@ -157,7 +171,7 @@ if (isset($_POST) && count($_POST) > 0)
                 if (is_numeric($value) || ctype_digit($value))
                     $limit          = $value;
                 else
-                    $limittext      = htmlspecialchars($value);
+                    $limittext      = $safevalue;
                 break;
             }
 

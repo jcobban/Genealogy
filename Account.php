@@ -69,9 +69,15 @@ require_once __NAMESPACE__ . '/User.inc';
 require_once __NAMESPACE__ . '/FtTemplate.inc';
 require_once __NAMESPACE__ . '/common.inc';
 
+// validate
+$uidPattern                 = '#^[a-zA-Z0-9._\-$ ]{6,}$#';
+$emailPattern               = '/^([a-zA-Z0-9._\-$]+)@([a-zA-Z0-9_\-.]+)\.([a-zA-Z]{2,5})/';
+
 // default values of parameters
 $okmsg                      = '';       // positive notices
 $lang                       = 'en';
+$newuserid                  = null;
+$newuseridtext              = null;
 $newPassword                = '';
 $newPassword2               = '';
 $password                   = '';
@@ -123,9 +129,14 @@ if (count($_POST) > 0)
         switch(strtolower($key))
         {           // act on specific parameter
             case 'userid':
-            {       // userid cannot change and is identifier
-                break;
-            }       // userid
+                break;          // userid
+
+            case 'newuserid':
+                if (preg_match($uidPattern,$value))
+                    $newuserid      = $value;
+                else
+                    $newuseridtext  = $safevalue;
+                break;          // newuserid
 
             case 'password':
             {
@@ -230,6 +241,21 @@ else
 }
 
 // validate changes
+if (is_string($newuseridtext))
+    $msg           .= $template['badUsername']->replace('$newuserid',
+                                                        $newuseridtext);
+if (is_string($newuserid) && $newuserid != $userid)
+{
+    $user2          = new User(array("username" => $newuserid));
+    if ($user2->isExisting())
+    {           // new user name already in use
+        $msg        .= $template['dupUsername']->replace('$newuserid',
+                                                         htmlspecialchars($newuserid));
+    }           // new user name already in use
+    else
+        $user['username']   = $newuserid;
+}               // request to change user name
+
 if (strlen($password) > 0 && !$user->chkPassword($password)) 
 {               // old password doesn't match
      $msg           .= $template['badPassword']->innerHTML;
@@ -295,9 +321,9 @@ if (strlen($newPassword) > 0)
 
 if (count($_POST) > 0 && strlen($msg) == 0)
 {               // apply changes
-    $user->save();
-    if ($debug)
-        $warn   .= "<p>" . $user->getLastSqlCmd() . "</p>\n";
+    $count      = $user->save();
+    //if ($debug)
+        $warn   .= "<p>" . $user->getLastSqlCmd() . ", count=$count</p>\n";
     $okmsg          = $template['okmsg']->innerHTML;
 }               // apply changes
 

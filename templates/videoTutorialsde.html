@@ -1,0 +1,52 @@
+<!--*********************************************************************
+ *  videoTutorialsde.html                                               *
+ *                                                                      *
+ *  This template provides access to a selection of video tutorials.    *
+ *                                                                      *
+ *    History:                                                          *
+ *      2018/01/29      Created                                         *
+ *                                                                      *
+ *  Copyright &copy; 2018 James A. Cobban                               *
+ **********************************************************************-->
+    <div id="breadcrumbs" class="hidden">
+      <a href="/genealogy.php?lang=$LANG">
+		Stammbaumforschung
+    </a>:
+    </div>    
+    <div class="body">
+      <h1>
+        <span class="right">
+            <a href="/videoTutorialsHelpen.html" target="help">? Hilfe</a>
+        </span>
+            Videoanleitungen
+      </h1>
+      <div class="row">
+        <a href="https://www.youtube.com/channel/UCRlV8grtf_3ZCB4bFvcXtgw">
+          <img src="Images/icons8-youtube-48.png">
+          YouTube Kanal
+        </a>
+      </div>
+      <ul id="listOfVideos">
+        <li id="$filename">
+          <span style="text-decoration: underline; color: blue;">
+              <span id="Show$filename">Zeigen</span>
+              <span id="Hide$filename" style="display: none">Verbergen</span>
+              $description
+          </span>
+          <div class="hidden" id="display$filename">
+            <video controls>
+              <source src="/Videos/$filename.webm" type="video/webm">
+              <source src="/Videos/$filename.mp4" type="video/mp4">
+                Entschuldigung, Ihr Browser unterstützt keine eingebetteten
+                Videos, aber keine Sorge, Sie können 
+                <a href="/Videos/$filename.webm">es herunterladen</a>
+                und mit Ihrem bevorzugten Videoplayer ansehen!
+            </video>
+          </div>
+        </li>
+      </ul>
+    </div> <!-- body -->
+    <script src="/jscripts6/util.js" type="module">
+    </script>
+    <script src="/videoTutorials.js" type="text/javaScript">
+    </script>

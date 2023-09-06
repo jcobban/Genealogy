@@ -60,8 +60,10 @@ use \NumberFormatter;
  *						Province parameter								*
  *		2019/11/26      use Template                                    *
  *		2020/01/22      internationalize numbers                        *
+ *		2023/06/12      internationalize census names                   *
+ *		2023/07/17      missing census year from title                  *
  *																		*
- *  Copyright &copy; 2020 James A. Cobban								*
+ *  Copyright &copy; 2023 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/Census.inc';
 require_once __NAMESPACE__ . '/District.inc';
@@ -72,17 +74,21 @@ require_once __NAMESPACE__ . '/common.inc';
 $cc						        = 'CA';
 $countryName                    = 'Canada';
 $censusId						= '';
+$censusIdText					= null;
 $censusYear						= null;
 $censusName						= '';
 $distId		    				= '';
+$distIdText	    				= null;
 $distName		    			= '';
 $province						= 'ON';
+$provincetext					= null;
 $provinceName					= 'Ontario';
 $lang		    				= 'en';
+$langtext					    = null;
 $unexpected                     = array();
 
 // process parameters passed by method=get
-if (count($_GET) > 0)
+if (isset($_GET) && count($_GET) > 0)
 {	        	        // invoked by URL
     $parmsText  = "<p class='label'>\$_GET</p>\n" .
                   "<table class='summary'>\n" .
@@ -90,33 +96,41 @@ if (count($_GET) > 0)
                       "<th class='colhead'>value</th></tr>\n";
 	// validate parameters
 	foreach ($_GET as $key => $value)
-	{			        // loop through all parameters
+    {			        // loop through all parameters
+        $value                      = trim($value);
+        $safevalue                  = htmlspecialchars($value);
         $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
-                        "<td class='white left'>$value</td></tr>\n"; 
+                        "<td class='white left'>$safevalue</td></tr>\n"; 
 		switch(strtolower($key))
 		{		        // act on parameter name
 		    case 'census':
 		    case 'censusid':
-		    {		    // Census identifier
-				$censusId	    = $value;
+                if (preg_match('/^[a-zA-Z]{2,4}[0-9]{4}$/', $value))
+                    $censusId       = strtoupper($value);
+                else
+                    $censusIdText   = $safevalue;
 				break;
-		    }		    // Census identifier
 	
-		    case 'district':
-		    {		    // district number
-				$distId		    = $value;
+            case 'district':
+                if (preg_match('/^\d+(.5|)$/', $value))
+				    $distId		    = $value;
+                else
+                    $distIdText     = $safevalue;
 				break;
-		    }		    // District number
 	
 		    case 'province':
 		    {		    // province code deprecated
-				$province	    = strtoupper($value);
+                if (preg_match('/^\w\w$/', $value))
+				    $province	        = strtoupper($value);
+                else
+                    $provinceText       = $safevalue;
 				break;
 		    }		    // province code 
 	
 		    case 'lang':
 		    {		    // language
-				$lang	        = FtTemplate::validateLang($value);
+                $lang	        = FtTemplate::validateLang($value,
+                                                           $langtext);
 				break;
 		    }		    // language
 	
@@ -127,7 +141,7 @@ if (count($_GET) > 0)
 	
 		    default:
 		    {	        // unexpected parameter
-				$unexpected[$key]   = $value;
+				$unexpected[$key]   = $safevalue;
 				break;
 		    }	        // unexpected parameter
 		}	            // act on parameter name
@@ -143,9 +157,15 @@ else
 	$action		            = 'Display';
 
 $template               = new FtTemplate("CensusStatusDist$action$lang.html");
+$t                          = $template->getTranslate()['tranTab'];
 $formatter                  = $template->getFormatter();
 
 // check for missing parameters
+if (is_string($censusIdText))
+{
+    $msg                    .= "Census value '$censusIdText' is not syntactically valid. ";
+}
+else
 if (is_null($censusId))
 {		            // Census missing
 	$censusId	            = '';
@@ -156,7 +176,6 @@ else
 	$censusRec	            = new Census(array('censusid'	=> $censusId));
 	if ($censusRec->isExisting())
     {
-        $censusName         = $censusRec['name'];
 		$censusYear	        = intval(substr($censusId, 2));
         if ($censusYear < 1867)
         {
@@ -173,6 +192,7 @@ else
         $cc                 = $censusRec['cc'];
         $country            = new Country(array('code'  => $cc));
         $countryName        = $country->getName($lang);
+        $censusName         = "$censusYear " . $t['Census'] . ' ' . $t['of'] . ' ' . $countryName;
 	}
 	else
     {
@@ -193,6 +213,11 @@ else
     }               // collective census must be qualified by province
 }                   // census specified
 
+if (is_string($distIdText))
+{
+    $msg                   .= "District value '$distIdText' is not syntactically valid. ";
+}
+else
 if ($distId == '')
 {		            // District missing
     $msg		            .= $template['districtMissing']->innerHTML;
@@ -201,7 +226,7 @@ if ($distId == '')
 else
 {                   // district specified
 	$result		            = array();
-    if (preg_match("/^([0-9]+)(\.[05])?$/", $distId, $result) != 1)
+    if (preg_match("/^[0-9]+(\.[05]|)$/", $distId, $result) != 1)
     {
         $text               = $template['districtInvalid']->innerHTML;
         $msg                .= str_replace('$DISTID', $distId, $text);
@@ -248,8 +273,8 @@ if (strlen($msg) == 0)
     }
     else
     {
-        $template['topPrev']->update(null);
-        $template['botPrev']->update(null);
+        $template['topPrev']->update('&nbsp;');
+        $template['botPrev']->update('&nbsp;');
     }
 
     $nextDistrict		    = $district->getNext();
@@ -264,8 +289,8 @@ if (strlen($msg) == 0)
     }
     else
     {
-        $template['topNext']->update(null);
-        $template['botNext']->update(null);
+        $template['topNext']->update('&nbsp;');
+        $template['botNext']->update('&nbsp;');
     }
 
     $pop		    	    = $district->get('d_population');

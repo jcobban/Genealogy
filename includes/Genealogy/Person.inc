@@ -551,8 +551,12 @@ use \Exception;
  *      2021/02/18      do not create instance of Event                 *
  *                      in getBirthEvent if no information in Person    *
  *      2021/06/18      fix getNames(1)                                 *
+ *      2022/08/17      getLastSqlCmd after save did not include        *
+ *                      INSERT INTO tblIR command                       *
+ *      2023/08/16      improve implementation of getDeathEvent         *
+ *                      improve implementation of getBirthEvent         *
  *                                                                      *
- *  Copyright &copy; 2021 James A. Cobban                               *
+ *  Copyright &copy; 2023 James A. Cobban                               *
  ************************************************************************/
 require_once __NAMESPACE__ . '/RecordPic.inc';
 require_once __NAMESPACE__ . '/Family.inc';
@@ -1071,11 +1075,12 @@ class Person extends RecordPic
             if (strlen($where) > 0)
             {               // search database
                 // construct the query of the Person table
-                $query                      = "SELECT * FROM tblIR $where";
+                $query              = "SELECT * FROM tblIR $where";
 
                 // query the database
-                $stmt                       = $connection->prepare($query);
-                $queryText                  = debugPrepQuery($query, $sqlParms);
+                $stmt               = $connection->prepare($query);
+                $queryText          = debugPrepQuery($query, $sqlParms);
+                $this->lastSqlCmd   = $queryText;
                 if ($stmt->execute($sqlParms))
                 {           // valid query
                     if ($debug)
@@ -1209,34 +1214,34 @@ class Person extends RecordPic
         global $warn;
         global $connection;
 
-        $indent             = '';
-        $xmlparms           = '';
+        $indent                     = '';
+        $xmlparms                   = '';
         if (is_string($xml))
         {       // string tag name
-            $matches        = array();
+            $matches                = array();
             if (preg_match('/^(\s*)(\w*)(.*)/', $xml, $matches))
             {
-                $indent     = $matches[1];
-                $xml        = $matches[2];
-                $xmlparms   = $matches[3];
+                $indent             = $matches[1];
+                $xml                = $matches[2];
+                $xmlparms           = $matches[3];
             }
-            $tagname        = $xml;
-            $xml            = true;
+            $tagname                = $xml;
+            $xml                    = true;
         }       // string tag name
         else
         if ($xml)
         {       // true
-            $indent         = '    ';
-            $tagname        = 'cmd';
+            $indent                 = '    ';
+            $tagname                = 'cmd';
         }       // true
 
-        $counts = array();
-        $counts['altNameCount'] = 0;
-        $counts['citCount']     = 0;
-        $counts['eventCount']   = 0;
-        $counts['indivCount']   = 0;
+        $counts                     = array();
+        $counts['altNameCount']     = 0;
+        $counts['citCount']         = 0;
+        $counts['eventCount']       = 0;
+        $counts['indivCount']       = 0;
 
-        $idir   = $this->getIdir();
+        $idir                       = $this->getIdir();
 
         if (count($this->getParents()) > 0 ||
             count($this->getFamilies()) > 0)
@@ -1247,24 +1252,26 @@ class Person extends RecordPic
         }       // Person is connected to any others
 
         // delete associated name records
-        $nameSet    = new RecordSet('Names', array('idir' => $idir));
-        $altCount   = $nameSet->delete($xml);
-        $counts['altNameCount'] = $altCount;
+        $nameSet                    = new RecordSet('Names', 
+                                                   array('idir' => $idir));
+        $altCount                   = $nameSet->delete($xml);
+        $counts['altNameCount']     = $altCount;
 
         // delete citations associated with the main record
-        $citCount   = 0;
+        $citCount                   = 0;
 
         // update the database
         // delete citations associated with events in the base record
-        $citationSet    = new CitationSet(array('idir'  => $idir));
-        $result     = $citationSet->delete($xml);
-        $citCount   += $result;
+        $citationSet                = new CitationSet(
+                                                array('idir'  => $idir));
+        $result                     = $citationSet->delete($xml);
+        $citCount                   += $result;
 
         // delete citations associated with event records
-        $events     = $this->getEvents();
+        $events                     = $this->getEvents();
         if (count($events) > 0)
         {
-            $idimeList  = array();
+            $idimeList              = array();
             foreach($events as $ider => $event)
             {
                 if (is_numeric($ider))
@@ -1272,55 +1279,55 @@ class Person extends RecordPic
             }
             if (count($idimeList) > 0)
             {
-                $citationSet    = new RecordSet('Citations',
+                $citationSet        = new RecordSet('Citations',
                                             array('idime'   => $idimeList,
                                                   'type'    => 30));
-                $result         = $citationSet->delete($xml);
-                $citCount       += $result;
+                $result             = $citationSet->delete($xml);
+                $citCount           += $result;
             }
         }
         else
-            $citCount   = 0;
+            $citCount               = 0;
 
         // return statistics
-        $counts['citCount'] = $citCount;
+        $counts['citCount']         = $citCount;
 
         // delete any events associated with this Person
-        $eventSet   = new RecordSet('Events',
-                                        array('idir'    => $idir,
-                                              'idtype'  => 0));
-        $count      = $eventSet->delete($xml);
+        $eventSet                   = new RecordSet('Events',
+                                                array('idir'    => $idir,
+                                                      'idtype'  => 0));
+        $count                      = $eventSet->delete($xml);
 
         // return statistics
-        $counts['eventCount']   = $count;
+        $counts['eventCount']       = $count;
 
         // delete any associated blog messages
-        $blogSet    = new RecordSet('Blogs',
+        $blogSet                    = new RecordSet('Blogs',
                                         array('table'       => '^tblIR$',
                                               'keyvalue'    => $idir));
-        $result     = $blogSet->delete($xml);
-        $counts['blogCount']    = $result;
+        $result                     = $blogSet->delete($xml);
+        $counts['blogCount']        = $result;
 
         // finally delete the Person record itself
-        $oldJson            = $this->toJson(false);
-        $delIndiv           = "DELETE FROM tblIR WHERE IDIR=:idir";
-        $sqlParms           = array('idir'      => $idir);
+        $oldJson                    = $this->toJson(false);
+        $delIndiv                   = "DELETE FROM tblIR WHERE IDIR=:idir";
+        $sqlParms                   = array('idir'      => $idir);
 
         // update the database
-        $stmt               = $connection->prepare($delIndiv);
-        $deleteText         = debugPrepQuery($delIndiv, $sqlParms);
-        $this->lastSqlCmd   = $deleteText;
+        $stmt                       = $connection->prepare($delIndiv);
+        $deleteText                 = debugPrepQuery($delIndiv, $sqlParms);
+        $this->lastSqlCmd           = $deleteText;
         if ($stmt->execute($sqlParms))
         {           // success
-            $result         = $stmt->rowCount();
+            $result                 = $stmt->rowCount();
             if ($result > 0)
             {           // Person record was deleted
                 if ($xml)
                     print "$indent<$tagname count='$result'>$deleteText</$tagname>\n";
                 else
                 if ($debug)
-                    $warn   .= "<p>Person.inc: " . __LINE__ .
-                                        " '$deleteText'</p>\n";
+                    $warn           .= "<p>Person.inc: " . __LINE__ .
+                                            " '$deleteText'</p>\n";
 
                 logSqlUpdate($delIndiv,
                              $sqlParms,
@@ -1332,18 +1339,19 @@ class Person extends RecordPic
                 $counts['indivCount']   = $result;
 
                 // record the deleted IDIR in tblXI
-                $addXI      = "INSERT INTO tblXI VALUE(:idir)";
-                $sqlParms   = array('idir'      => $idir);
+                $addXI              = "INSERT INTO tblXI VALUE(:idir)";
+                $sqlParms           = array('idir'      => $idir);
 
                 // update the database
-                $stmt       = $connection->prepare($addXI);
-                $addText    = debugPrepQuery($addXI, $sqlParms);
+                $stmt               = $connection->prepare($addXI);
+                $addText            = debugPrepQuery($addXI, $sqlParms);
+                $this->lastSqlCmd   .= ";$addText";
                 if ($stmt->execute($sqlParms))
                 {       // success
                     if ($xml)
                         print "$indent<$tagname>$addText</$tagname>\n";
                     if ($debug)
-                        $warn   .= "<p>Person.inc: " . __LINE__ .
+                        $warn       .= "<p>Person.inc: " . __LINE__ .
                                         " '$addText'</p>\n";
                     logSqlUpdate($addXI,
                                  $sqlParms,
@@ -1352,11 +1360,11 @@ class Person extends RecordPic
                                  json_encode(array($idir)));
                 }       // success
                 else
-                {       // error performing query
-                    $info   = $stmt->errorInfo();
-                    $errorInfo  = print_r($info, true);
+                {               // error performing query
+                    $info           = $stmt->errorInfo();
+                    $errorInfo      = print_r($info, true);
                     if ($info[0] != '23000')
-                    {       // ignore duplicates error
+                    {           // ignore duplicates error
                         if ($xml)
                         {
                             print "$intent<msg>" . htmlentities($errorInfo,ENT_XML1) .
@@ -1365,12 +1373,12 @@ class Person extends RecordPic
                         $warn   .= "<p>Person::delete: " .
                                         "'$addText', " . $errorInfo .
                                     "</p>\n";
-                    }       // ignore duplicates
-                }       // error performing query
-            }           // Person record was deleted
-        }           // success
+                    }           // ignore duplicates
+                }               // error performing query
+            }                   // Person record was deleted
+        }                       // success
         else
-        {           // error performing deletion
+        {                       // error performing deletion
             if ($xml)
             {
                 print "$indent<$tagname>$deleteText" .
@@ -1399,7 +1407,7 @@ class Person extends RecordPic
     {
         if ($this->needInsert)
             $this->save();
-        $idir       = $this->row['idir'];
+        $idir                   = $this->row['idir'];
         return $idir;
     }       // Person::getIdir
 
@@ -1508,7 +1516,7 @@ class Person extends RecordPic
         global  $warn;
 
         if (is_string($value) && ctype_digit($value))
-            $value  = intval($value);
+            $value              = intval($value);
         if (is_int($value) &&
             $value >= Person::MALE &&
             $value <= Person::UNKNOWN)
@@ -1628,7 +1636,7 @@ class Person extends RecordPic
         }               // loop through all alternate name records
 
         // ensure given name changed in all families
-        $families       = $this->getFamilies();
+        $families                   = $this->getFamilies();
         foreach($families as $idmr => $family)
             $family->setName($this);
 
@@ -1658,18 +1666,18 @@ class Person extends RecordPic
         global  $warn;
 
         if (is_int($options))
-            $parmText           = $options;
+            $parmText               = $options;
         else
-            $parmText           = '$tranTab';
+            $parmText               = '$tranTab';
 
         $idir                       = $this->row['idir'];
         if ($debug)
         {
-            $warn               .= "<p>Person(IDIR=" . $idir .
+            $warn                   .= "<p>Person(IDIR=" . $idir .
                                         ")->getName($parmText)</p>\n";
         }
 
-        $priName                = $this->getPriName();
+        $priName                    = $this->getPriName();
 
         return  $priName->getName($options);
     }       // function Person::getName
@@ -1810,7 +1818,7 @@ class Person extends RecordPic
             {           // IDIR
                 if (is_string($value))
                 {       // support for loading GEDCOM
-                    $oldvalue       = $this->row['idir'];
+                    $oldvalue           = $this->row['idir'];
                     $this->row['idir']  = $value;
                     return $oldvalue;
                 }       // support for loading GEDCOM
@@ -1845,11 +1853,11 @@ class Person extends RecordPic
 
             case 'birthd':
             {       // birth date
-                $date       = self::needDateObj($field, $value);
-                $sdname     = 'birthsd';
+                $date               = self::needDateObj($field, $value);
+                $sdname             = 'birthsd';
                 parent::set($sdname, $date->getSortDate());
                 parent::set($field, $date->getDate());
-                $event      = $this->getBirthEvent(true);
+                $event              = $this->getBirthEvent(true);
                 return $event->setDate($date, true);
             }       // birth date
 
@@ -1864,60 +1872,60 @@ class Person extends RecordPic
 
             case 'chrisd':
             {       // christening date
-                $date       = self::needDateObj($field, $value);
-                $event      = $this->getChristeningEvent(true);
+                $date               = self::needDateObj($field, $value);
+                $event              = $this->getChristeningEvent(true);
                 return $event->setDate($date);
             }       // christening date
 
             case 'deathd':
             {       // Death date
-                $date       = self::needDateObj($field, $value);
-                $sdname     = 'deathsd';
+                $date               = self::needDateObj($field, $value);
+                $sdname             = 'deathsd';
                 parent::set($sdname, $date->getSortDate());
                 parent::set($field, $date->getDate());
-                $event      = $this->getDeathEvent(true);
+                $event              = $this->getDeathEvent(true);
                 return $event->setDate($date, true);
             }       // Death date
 
             case 'buriedd':
             {       // Buried date
-                $date       = self::needDateObj($field, $value);
-                $event      = $this->getBuriedEvent(true);
+                $date               = self::needDateObj($field, $value);
+                $event              = $this->getBuriedEvent(true);
                 return $event->setDate($date);
             }       // Buried date
 
             case 'baptismd':
             {       // Baptism date
-                $date       = self::needDateObj($field, $value);
-                $event      = $this->getBaptismEvent(true);
+                $date               = self::needDateObj($field, $value);
+                $event              = $this->getBaptismEvent(true);
                 return $event->setDate($date);
             }       // Baptism date
 
             case 'endowd':
             {       // Endow date
-                $date       = self::needDateObj($field, $value);
-                $event      = $this->getEndowEvent(true);
+                $date               = self::needDateObj($field, $value);
+                $event              = $this->getEndowEvent(true);
                 return $event->setDate($date);
             }       // Endow date
 
             case 'confirmationd':
             {       // Initiatory date
-                $date       = self::needDateObj($field, $value);
-                $event      = $this->getConfirmationEvent(true);
+                $date               = self::needDateObj($field, $value);
+                $event              = $this->getConfirmationEvent(true);
                 return $event->setDate($date);
             }       //Initiatory date
 
             case 'initiatoryd':
             {       // Initiatory date
-                $date       = self::needDateObj($field, $value);
-                $event      = $this->getInitiatoryEvent(true);
+                $date               = self::needDateObj($field, $value);
+                $event              = $this->getInitiatoryEvent(true);
                 return $event->setDate($date);
             }       // Initiatory date
 
             case 'idlrbirth':
             {       // Birth Location
-                $tmp        = self::needLocationObj($field, $value);
-                $event      = $this->getBirthEvent(true);
+                $tmp                = self::needLocationObj($field, $value);
+                $event              = $this->getBirthEvent(true);
                 if ($event)
                     return $event->set('idlrevent', $value);
                 else
@@ -1926,8 +1934,8 @@ class Person extends RecordPic
 
             case 'idlrchris':
             {       // Christening Location
-                $tmp        = self::needLocationObj($field, $value);
-                $event      = $this->getChristeningEvent(true);
+                $tmp                = self::needLocationObj($field, $value);
+                $event              = $this->getChristeningEvent(true);
                 if ($event)
                     return $event->set('idlrevent', $value);
                 else
@@ -1936,8 +1944,8 @@ class Person extends RecordPic
 
             case 'idlrdeath':
             {       // Death Location
-                $tmp        = self::needLocationObj($field, $value);
-                $event      = $this->getDeathEvent(true);
+                $tmp                = self::needLocationObj($field, $value);
+                $event              = $this->getDeathEvent(true);
                 if ($event)
                     return $event->set('idlrevent', $value);
                 else
@@ -1946,8 +1954,8 @@ class Person extends RecordPic
 
             case 'idlrburied':
             {       // Buried Location
-                $tmp        = self::needLocationObj($field, $value);
-                $event      = $this->getBuriedEvent(true);
+                $tmp                = self::needLocationObj($field, $value);
+                $event              = $this->getBuriedEvent(true);
                 if ($event)
                     return $event->set('idlrevent', $value);
                 else
@@ -1956,7 +1964,7 @@ class Person extends RecordPic
 
             case 'idtrbaptism':
             {       // Baptism location
-                $event      = $this->getBaptismEvent(true);
+                $event              = $this->getBaptismEvent(true);
                 if ($event)
                     return $event->set('idlrevent', $value);
                 else
@@ -1965,25 +1973,25 @@ class Person extends RecordPic
 
             case 'idtrendow':
             {       // Endow location
-                $event      = $this->getEndowEvent(true);
+                $event              = $this->getEndowEvent(true);
                 return $event->set('idlrevent', $value);
             }       // Endow location
 
             case 'idtrconfirmation':
             {       // Confirmation location
-                $event      = $this->getConfirmationEvent(true);
+                $event              = $this->getConfirmationEvent(true);
                 return $event->set('idlrevent', $value);
             }       // Confirmation location
 
             case 'idtrinitiatory';
             {       // Initiatory location
-                $event      = $this->getInitiatoryEvent(true);
+                $event              = $this->getInitiatoryEvent(true);
                 return $event->set('idlrevent', $value);
             }       // Initiatory location
 
             case 'idarbirth':
             {       // Birth IDAR
-                $event      = $this->getBirthEvent(true);
+                $event              = $this->getBirthEvent(true);
                 if ($event)
                     return $event->set('idar', $value);
                 else
@@ -1992,7 +2000,7 @@ class Person extends RecordPic
 
             case 'idarchris':
             {       // Christening IDAR
-                $event      = $this->getChristeningEvent(true);
+                $event              = $this->getChristeningEvent(true);
                 if ($event)
                     return $event->set('idar', $value);
                 else
@@ -2001,7 +2009,7 @@ class Person extends RecordPic
 
             case 'idardeath':
             {       // Death IDAR
-                $event      = $this->getDeathEvent(true);
+                $event              = $this->getDeathEvent(true);
                 if ($event)
                     return $event->set('idar', $value);
                 else
@@ -2010,7 +2018,7 @@ class Person extends RecordPic
 
             case 'idarburied':
             {       // Buried IDAR
-                $event      = $this->getBuriedEvent(true);
+                $event              = $this->getBuriedEvent(true);
                 if ($event)
                     return $event->set('idar', $value);
                 else
@@ -2055,7 +2063,7 @@ class Person extends RecordPic
                 if (is_string($value))
                 {       // string value
                     if (ctype_digit($value))
-                        $value  = intval($value);
+                        $value      = intval($value);
                     else
                     {       // not numeric
                         if (strtoupper($value) == 'Y')
@@ -2066,7 +2074,7 @@ class Person extends RecordPic
                 }       // string value
                 else
                 if (is_null($value))
-                    $value      = 0;
+                    $value          = 0;
 
                 if (is_int($value) && ($value == 0 || $value == 1))
                 {
@@ -2085,7 +2093,7 @@ class Person extends RecordPic
 //      2=right green arrow, left red arrow
 //      3=right red arrow, left green arrow
                 if (is_string($value) && ctype_digit($value))
-                    $value  = intval($value);
+                    $value          = intval($value);
                 if (is_int($value) && $value >= 0 && $value <= 3)
                 {
                     return parent::set($field, $value);
@@ -2543,75 +2551,25 @@ class Person extends RecordPic
         global  $debug;
         global  $warn;
 
-        $idir                   = $this->row['idir'];
-        if (is_bool($create))
-        {
-            if ($create)
-                $createStr  = 'true';
-            else
-                $createStr  = 'false';
-        }
-        else
-            $createStr      = "'$create'";
-        if ($debug)
-            $warn               .=
-                "<p>Person(IDIR=$idir)->getBirthEvent($createStr)</p>\n";
-
         // ensure that the events table is initialized
         if (is_null($this->pevents))
         {
-            $events         = $this->getEvents();
+            $this->getEvents();
         }
-        $event              = $this->birthEvent;
-        $chrisEvent         = $this->chrisEvent;
-        if (is_null($event))
-        {                       // not initialized
-            if (count($this->pevents) > 0 && $create)
-                error_log("Person(IDIR=$idir)->getBirthEvent($createStr) ".
-                            "and no existing entry in tblER\n" .
-                            $this->debugBacktrace());
-            $birthd         = $this['birthd'];
-            $birthsd        = $this['birthsd'];
-            if ($create ||
-                $birthd != '' ||
-                $this['idlrbirth'] > 1 ||
-                $this['idarbirth'] > 1 ||
-                $this['birthnote'] != '')
-            {                   // create birth event from Person
-                if ($birthd == '')
-                    $birthsd        = -99999999;
-                if ($chrisEvent)
-                {
-                    $chrissd        = $chrisEvent['eventsd'];
-                    if ($birthsd > $chrissd)
-                        $birthsd    = $chrissd - 1;
-                }
-                $trow       = array('idir'      => $this,
-                                    'idtype'    => Event::IDTYPE_INDIV,
-                                    'idet'      => Event::ET_BIRTH,
-                                    'eventd'    => $birthd,
-                                    'eventsd'   => $birthsd,
-                                    'idlrevent' => $this['idlrbirth'],
-                                    'idar'      => $this['idarbirth'],
-                                    'desc'      => $this['birthnote'],
-                                    'preferred' => 1,
-                                    'order'     => -2);
-                $event                      = new Event($trow);
-                $this->birthEvent           = $event;
-            }                   // create birth event from Person
-            else
-                $event          =  null;
-        }                       // not initialized
-        else
-        {                       // have existing event
-            $birthsd            = $event['eventsd'];
+
+        // get existing event
+        $event                      = $this->birthEvent;
+        if (!is_null($event))
+        {
+            $birthsd                = $event['eventsd'];
             if ($this['birthsd'] == -99999999 &&
                 $birthsd != -99999999)
             {                   // correct bad sort date in Person
                 $this->set('birthsd', $birthsd);
                 $this->save();
             }                   // correct bad sort date in Person
-            $chrisEvent         = $this->chrisEvent;
+ 
+            $chrisEvent             = $this->chrisEvent;
             if ($chrisEvent)
             {
                 $chrissd            = $chrisEvent['eventsd'];
@@ -2620,14 +2578,43 @@ class Person extends RecordPic
                     $event->adjustSortDate($chrissd - 1);
                 }
             }
-            $event['idir']      = $this->row['idir'];
-        }                       // have existing event
+            $event['idir']          = $this->row['idir'];
+            return $event;
+        }
 
-        if ($event)
-            $event->dump("getBirthEvent: " . __LINE__ . " returns:");
+        // create from Person object
+        $birthd                 = $this['birthd'];
+        $birthsd                = $this['birthsd'];
+        if ($create ||
+            $birthd != '' ||
+            $this['idlrbirth'] > 1 ||
+            $this['idarbirth'] > 1 ||
+            $this['birthnote'] != '')
+        {                   // create birth event from Person
+            if ($birthd == '')
+                $birthsd        = -99999999;
+            $chrisEvent             = $this->chrisEvent;
+            if ($chrisEvent)
+            {
+                $chrissd        = $chrisEvent['eventsd'];
+                if ($birthsd > $chrissd)
+                    $birthsd    = $chrissd - 1;
+            }
+            $trow       = array('idir'      => $this,
+                                'idtype'    => Event::IDTYPE_INDIV,
+                                'idet'      => Event::ET_BIRTH,
+                                'eventd'    => $birthd,
+                                'eventsd'   => $birthsd,
+                                'idlrevent' => $this['idlrbirth'],
+                                'idar'      => $this['idarbirth'],
+                                'desc'      => $this['birthnote'],
+                                'preferred' => 1,
+                                'order'     => -2);
+            $event                      = new Event($trow);
+            $this->birthEvent           = $event;
+        }                   // create birth event from Person
         else
-        if ($debug)
-            $warn   .= "<p>Person::getBirthEvent: " . __LINE__ . " returns null</p>\n";
+            $event          =  null;
 
         return $event;
     }       // Person::getBirthEvent
@@ -2736,38 +2723,49 @@ class Person extends RecordPic
         {
             $events         = $this->getEvents();
         }
+
         $event              = $this->deathEvent;
-        if (is_null($event))
-        {       // not initialized
-            $eventd                     = $this['deathd'];
-            if ($eventd == '')
-                $eventsd                = 99999998;
-            else
-                $eventsd                = $this['deathsd'];
-            if ($create ||
-                $eventd != '' ||
-                $this['idlrdeath'] > 1 ||
-                $this['idardeath'] > 1 ||
-                $this['deathnote'] != '')
-            {                   // create death event from Person
-                $trow   = array('idir'          => $this,
-                                'idtype'        => Event::IDTYPE_INDIV,
-                                'idet'          => Event::ET_DEATH,
-                                'eventd'        => $eventd,
-                                'eventsd'       => $eventsd,
-                                'idlrevent'     => $this['idlrdeath'],
-                                'idar'          => $this['idardeath'],
-                                'desc'          => $this['deathnote'],
-                                'description'   => $this['deathcause'],
-                                'preferred'     => 1,
-                                'order'         => (1 << 15) - 3);
-                $event                      = new Event($trow);
-                $this->deathEvent           = $event;
-                $this->pevents['death']     = $event;
-            }                   // create death event from Person
-            else
-                $event          =  null;
-        }       // not initialized
+        if (!is_null($event))
+            return $event;      // already exists
+                              
+        // create a death event from information in the Person object
+        $eventd                         = $this['deathd'];
+        if ($eventd == '')
+            $eventsd                    = 99999998;
+        else
+            $eventsd                    = $this['deathsd'];
+        if ($create ||
+            $eventd != '' ||
+            $this['idlrdeath'] > 1 ||
+            $this['idardeath'] > 1 ||
+            $this['deathnote'] != '')
+        {                       // create death event from Person
+            $trow   = array('idir'          => $this,
+                            'idtype'        => Event::IDTYPE_INDIV,
+                            'idet'          => Event::ET_DEATH,
+                            'eventd'        => $eventd,
+                            'eventsd'       => $eventsd,
+                            'idlrevent'     => $this['idlrdeath'],
+                            'idar'          => $this['idardeath'],
+                            'desc'          => $this['deathnote'],
+                            'description'   => $this['deathcause'],
+                            'preferred'     => 1,
+                            'order'         => (1 << 15) - 3);
+            $event                      = new Event($trow);
+
+            // remove the death event from Person
+//            $event->save(false);
+//            $ider                       = $event['ider'];
+//            $this->pevents[$ider]       = $event;
+//            $this['deathd']             = '';
+//            $this['idlrdeath']          = 0;
+//            $this['idardeath']          = 0;
+//            $this['deathnote']          = '';
+//            $this['deathcause']         = '';
+            $this->deathEvent           = $event;
+        }                       // create death event from Person
+        else
+            $event          =  null;
         return $event;
     }       // Person::getDeathEvent
 
@@ -3107,7 +3105,8 @@ class Person extends RecordPic
                 // Person.  Each record represents an event or fact
                 // in the life of the Person
                 $parms          = array('idir'      => $idir,
-                                        'idtype'    => Event::IDTYPE_INDIV);
+                                        'idtype'    => Event::IDTYPE_INDIV,
+                                        'order'     => "`order`, eventsd");
                 $tevents        = new RecordSet('Events', $parms);
                 // ensure that methods getXxxxEvent return the same
                 // instances as getEvents
@@ -3228,14 +3227,14 @@ class Person extends RecordPic
             // check to see if the death and/or buried events are
             // still in their old locations in tblIR
             // and append them to the back of the list
-            $tevent     = $this->getDeathEvent(true);
+            $tevent     = $this->getDeathEvent(false);
             if ($tevent && $tevent->get('ider') == 0)
             {
                 $tevent->set('order',       ++$maxorder);
                 $this->pevents['death']     = $tevent;
             }
 
-            $tevent     = $this->getBuriedEvent(true);
+            $tevent     = $this->getBuriedEvent(false);
             if ($tevent && $tevent->get('ider') == 0)
             {
                 $tevent->set('order',       ++$maxorder);
@@ -4305,7 +4304,7 @@ class Person extends RecordPic
                     {               // concatenate if present in both
                         $this->set($field, $value . "\n" . $value2);
                         $retval[]     = array('field'   => $field,
-                                              'value'   => "$value1\\n$value2");
+                                              'value'   => "$value\\n$value2");
                     }               // concatenate if present in both
                     break;
                 }                   // textual notes
@@ -4522,6 +4521,7 @@ class Person extends RecordPic
         global  $familyTreeCookie;
 
         $retval                 = 0;
+        $this->lastSqlCmd       = "";
         if ($debug && canUser('all'))
         {
             $backtrace          = debug_backtrace();
@@ -4540,7 +4540,7 @@ class Person extends RecordPic
             $this->dump("Person::save " . __LINE__);
             if (count($backtrace) > 12)
             {
-                showTrace();
+                showTrace();        // in common.inc
                 exit;
             }
         }
@@ -4717,6 +4717,7 @@ class Person extends RecordPic
                 $refParms           = array('id'    => $id);
                 $stmt               = $connection->prepare($query);
                 $queryText          = debugPrepQuery($query, $refParms);
+                $this->lastSqlCmd   .= $queryText;
                 if ($stmt->execute($refParms))
                 {               // success
                     $this->row      = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -4829,6 +4830,8 @@ class Person extends RecordPic
                 $cmd                        = $priName->getLastSqlCmd();
                 if (strlen($cmd) > 0)
                     $this->lastSqlCmd       .= ";$cmd";
+                else
+                    $this->lastSqlCmd       = "$cmd";
 
                 // ensure that the alternate name entries for all of the
                 // families this Person is a spouse in exist

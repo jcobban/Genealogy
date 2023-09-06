@@ -264,9 +264,9 @@ else
 if ($count > 0)
 {		// query issued and retrieved some records
 	if ($prevoffset < 0)
-	    $template['topPrev']->update(null);
+        $template['topPrev']->update('&nbsp;');
 	if ($nextoffset >= $totalcount)
-	    $template['topNext']->update(null);
+        $template['topNext']->update('&nbsp;');
     $last           	= min($nextoffset, $totalcount);
     $template->set('FIRST',         $offset + 1);
     $template->set('LAST',          $last);

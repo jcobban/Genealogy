@@ -245,7 +245,7 @@ HTTP.post = function(url,
                      errorHandler,
                      feedbackParm) 
 {
-    console.log("HTTP.post('" + url + "',values=" + JSON.stringify(values));
+    //console.log("HTTP.post('" + url + "',values=" + JSON.stringify(values));
     if (values.length == 0)
         console.log("HTTP.post: no values passed" + new Error().stack);
     if (callback == 0)
@@ -339,7 +339,7 @@ HTTP._getResponse = function(request)
     
         case "text/json":
         case "application/json": 
-            console.log("HTTP._getResponse: 311 type='" + type + "' text='" + request.responseText + "'");
+            //console.log("HTTP._getResponse: 311 type='" + type + "' text='" + request.responseText + "'");
             // If the response is a JSON-encoded value,
             return JSON.parse(request.responseText);
     

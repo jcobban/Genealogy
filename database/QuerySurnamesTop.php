@@ -68,6 +68,7 @@ $orderby				= 'ORDER BY Surname ASC';
 $count					= 20;
 $offset					= 0;
 $npuri                  = $_SERVER['QUERY_STRING'];
+$result                 = null;
 
 // process parameters
 foreach ($_GET as $key => $value)

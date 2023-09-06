@@ -46,8 +46,9 @@ use \Exception;
  *		2021/01/16      report and ignore invalid input                 *
  *		                protect against XSS attacks                     *
  *		2021/04/04      escape CONTACTSUBJECT                           *
+ *		2023/08/03      warn for unsupported language                   *
  *																		*
- *  Copyright &copy; 2021 James A. Cobban								*
+ *  Copyright &copy; 2023 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/Domain.inc';
 require_once __NAMESPACE__ . '/Country.inc';
@@ -72,6 +73,7 @@ $domaintext     = null;
 $domainName		= 'Canada: Ontario:';	// domain name
 $stateName		= 'Ontario';        	// state/province name
 $lang		    = 'en';	                // language code
+$langtext       = null;                 // invalid language code
 
 // if invoked by method=get process the parameters
 if (isset($_GET) && count($_GET) > 0)
@@ -111,7 +113,8 @@ if (isset($_GET) && count($_GET) > 0)
 	
 		    case 'lang':
 		    {		        // language code
-                $lang           = FtTemplate::validateLang($value);
+                $lang           = FtTemplate::validateLang($value,
+                                                           $langtext);
 				break;
 		    }		        // language code
 		}		            // act on specific parameters
@@ -122,10 +125,6 @@ if (isset($_GET) && count($_GET) > 0)
 
 $tempBase		    = $document_root . '/templates/';
 $includeSub		    = "genProvince$domain$lang.html";
-if (!file_exists($tempBase . "genProvince{$domain}en.html"))
-{                       // domain code not supported
-    $includeSub     = "genProvince$lang.html";
-}                       // domain code not supported
 
 if (!file_exists($tempBase . $includeSub))
 {	    		            // no template for domain in chosen language
@@ -133,14 +132,6 @@ if (!file_exists($tempBase . $includeSub))
 	if (!file_exists($tempBase . $includeSub))
 	{	    	            // no template for domain in English
 	    $includeSub	        = "genProvince$cc$lang.html";
-	    if (!file_exists($tempBase . $includeSub))
-	    {		            // no template for country in chosen language
-			$includeSub	    = "genProvince{$cc}en.html";
-			if (!file_exists($tempBase . $includeSub))
-			{	            // no template for country in English
-			    $includeSub	= "genProvince$lang.html";
-			}	            // no template for country in English
-	    }	    	        // no template for country in chosen language
 	}	    	            // no template for domain in English
 }			                // no template for domain in chosen language
 
@@ -150,6 +141,8 @@ if (is_string($domaintext))
     $warn       .= "<p>Invalid Domain identifier '$domaintext' ignored.</p>\n";
 if (is_string($codetext))
     $warn       .= "<p>Invalid province code identifier '$codetext' ignored.</p>\n";
+if (is_string($langtext))
+    $warn           .= "<p>lang='$langtext' is not supported BCP47 syntax</p>\n";
 
 $domainObj		= new Domain(array('domain'	    => $domain,
 								   'language'	=> $lang));

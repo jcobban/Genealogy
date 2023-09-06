@@ -38,8 +38,10 @@ require_once __NAMESPACE__ . "/common.inc";
 
 // validate parameters
 $src                    = '';
+$srcText                = null;
 $lang                   = 'en';
 $fldName                = 'Image';
+$fldNameText            = null;
 $title                  = '';
 $credit                 = '';
 
@@ -52,26 +54,30 @@ if (isset($_GET) && count($_GET) > 0)
                                     "<th class='colhead'>value</th></tr>\n";
     foreach($_GET as $key => $value)
     {                   // loop through all input parameters
+        $safevalue          = htmlspecialchars($value);
         $parmsText          .= "<tr><th class='detlabel'>$key</th>" .
                                 "<td class='white left'>" .
-                                htmlspecialchars($value) . "</td></tr>\n";
+                                "$safevalue</td></tr>\n";
         switch(strtolower($key))
         {               // process specific named parameters
             case 'src':
             {
-                $src        = urldecode($value);
+                $src                = urldecode($value);
                 break;
             }           // URL of image
 
             case 'fldname':
             {           // field name to update in invoking dialog
-                $fldName    = $value;
+                if (preg_match('/^[a-zA-Z_]+$/', $value))
+                    $fldName        = $value;
+                else
+                    $fldNameText    = $safevalue;
                 break;
             }           // field name to update in invoking dialog
 
             case 'lang':
             {           // preferred language
-                $lang       = FtTemplate::validateLang($value);
+                $lang               = FtTemplate::validateLang($value);
                 break;
             }           // preferred language
         }               // process specific named parameters
@@ -85,6 +91,8 @@ $template           = new FtTemplate("DisplayImage$lang.html", true);
 $template->updateTag('otherStylesheets',    
     array('filename'   => '/DisplayImage'));
 
+if (is_string($fldNameText))
+    $msg            .= "Field name '$fldNameText' is invalid. ";
 if ($src == '')
 {
     $msg            .= "URL of image omitted. ";
@@ -121,9 +129,9 @@ if (strlen($msg) == 0)
         $imageName              = substr($imageName, $lastsep + 1);
     }
 
-    $urldirname                 = $dirname . '/';
     if ($protocol == '' || $protocol == 'file:')
     {                   // protocol supported by opendir
+        $urldirname             = $dirname;
         $credit                 = $template['creditOA']->innerHTML;
         // open the image directory
         if (substr($dirname,0,1) == '/')
@@ -139,7 +147,9 @@ if (strlen($msg) == 0)
         else
             $dirname            = "./$dirname";
         $dh                     = opendir($dirname);
-        $dirname                = "$dirname/";
+        $last                   = substr($dirname, -1,1);
+        if ($last != '/')
+            $dirname            = "$dirname/";
         if ($dh)
         {               // found images directory
             while (($filename = readdir($dh)) !== false)

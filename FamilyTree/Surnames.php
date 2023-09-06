@@ -75,16 +75,26 @@ foreach($_GET as $key => $value)
 	{	            // take action depending upon name of parameter
 	    case 'initial':
 	    {		    // initial= specified
-            $initial	                = mb_strtoupper(mb_substr($value,0,1));
+            $initial	                = mb_strtoupper(mb_substr($value,0,1)) . mb_substr($value, 1);
 			if (strlen($initial) == 0)
 			{
 			    $msg	.= "Invalid zero length surname prefix.";
 			    $getParms['surname']	= '';
 			}
 			else
+			if ($initial == 'F')
+            {               // exclude "Mc" names
+			    $getParms['surname']	= "^F(?!irstwifeof)";
+			}               // exclude "Mc" names
+			else
 			if ($initial == 'M')
             {               // exclude "Mc" names
-			    $getParms['surname']	= "^M(?!c)";
+			    $getParms['surname']	= "^M(?!(c|ac))";
+			}               // exclude "Mc" names
+			else
+			if ($initial == 'Mc')
+            {               // exclude "Mc" names
+			    $getParms['surname']	= "^M(c|ac)";
 			}               // exclude "Mc" names
 			else
 			if ($initial == 'W')
@@ -180,26 +190,32 @@ else
 $template->set('TITLE',     $title);
 
 // get the matches
+if ($debug)
+    $warn           .= "<p>\$getParms=" . var_export($getParms, true);
 $surnames	                = new RecordSet('Surnames', $getParms);
 $info   	                = $surnames->getInformation();
 $count	                    = $info['count'];
 $template->set('MAXCOLS',           $maxcols);
+if ($debug)
+    $warn           .= "<p>count=$count, command={$info['query']}</p>\n";
 
 if ($count > 0)
 {                   // display the results
-    if ($count > 1000)
+    if ($count > 500)
     {
-        $warn           .= "<p>count=$count, command={$info['query']}</p>\n";
-        $query          = "SELECT (LEFT(`surname`,2)) as `leading`,count(*) FROM tblNR WHERE LEFT(`surname`,1)='$initial' GROUP BY `leading`";
+        preg_match('/(WHERE .*) ORDER/', $info['query'], $matches);
+        $where          = $matches[1];
+        $query          = "SELECT (LEFT(`surname`,2)) as `leading`,count(*) FROM tblNR $where GROUP BY `leading`";
         if ($stmt = $connection->query($query))
         {
-            $warn       .= "<p>'$query'</p>\n";
+            if ($debug)
+                $warn       .= "<p>'$query'</p>\n";
             $results    = $stmt->fetchAll();
             foreach($results as $row)
             {
                 $leading        = $row[0];
                 $lcount         = $row[1];
-                $warn   .= "<p>'$leading' $lcount</p>\n";
+                $warn   .= "<p><a href='/FamilyTree/Surnames.php?initial=$leading'>Surnames starting with '$leading' $lcount</a></p>\n";
                 if ($lcount > 1000)
                 {
                     $query2          = "SELECT (LEFT(`surname`,3)) as `leading`,count(*) FROM tblNR WHERE LEFT(`surname`,2)='$leading' GROUP BY `leading`";
@@ -211,7 +227,7 @@ if ($count > 0)
             {
                 $leading        = $row[0];
                 $l2count        = $row[1];
-                $warn   .= "<p style=\"padding-left: 5px\">'$leading' $l2count</p>\n";
+                $warn   .= "<p style=\"padding-left: 5px\"><a href='/FamilyTree/Surnames.php?initial=$leading'>Surnames starting with '$leading' $l2count</a></p>\n";
             }
                     }
                 }

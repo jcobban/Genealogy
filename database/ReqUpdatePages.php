@@ -37,30 +37,31 @@ require_once __NAMESPACE__ . '/Country.inc';
 require_once __NAMESPACE__ . '/FtTemplate.inc';
 require_once __NAMESPACE__ . '/common.inc';
 
-$censusId		= '';
-$cc			    = 'CA';
-$countryName	= 'Canada';
-$censusYear		= '';
-$provinceCode	= '';
-$distId		    = '';
-$subdistId		= '';
-$division		= '';
-$search         = '';
-$conj           = '?';
-$lang           = 'en';
-$selected	    = array(0	=> ' selected="selected"',
-                        'QC'	=> array(1831	=> ''),
-                        'CA'	=> array(1851	=> '',
-                                         1861	=> '',
-                                         1871	=> '',
-                                         1881	=> '',
-                                         1891	=> '',
-                                         1901	=> '',
-                                         1906	=> '',
-                                         1911	=> '',
-                                         1916	=> '',
-                                         1921	=> '')
-                        );
+$censusId               = null;
+$censusIdText           = null;
+$cc                     = 'CA';
+$countryName            = 'Canada';
+$censusYear             = '';
+$provinceCode           = '';
+$distId                 = '';
+$subdistId              = '';
+$division               = '';
+$search                 = '';
+$conj                   = '?';
+$lang                   = 'en';
+$selected               = array(0   => ' selected="selected"',
+                                'QC'    => array(1831   => ''),
+                                'CA'    => array(1851   => '',
+                                                 1861   => '',
+                                                 1871   => '',
+                                                 1881   => '',
+                                                 1891   => '',
+                                                 1901   => '',
+                                                 1906   => '',
+                                                 1911   => '',
+                                                 1916   => '',
+                                                 1921   => '')
+                                );
 
 if (isset($_GET) && count($_GET) > 0)
 {                       // invoked by method=get
@@ -70,40 +71,28 @@ if (isset($_GET) && count($_GET) > 0)
                       "<th class='colhead'>value</th></tr>\n";
     foreach($_GET as $key => $value)
     {
-        $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
-                        "<td class='white left'>$value</td></tr>\n"; 
+        $safevalue      = htmlspecialchars($value);
+        $parmsText      .= "<tr><th class='detlabel'>$key</th>" .
+            "<td class='white left'>$safevalue</td></tr>\n";
+
         switch(strtolower($key))
-        {		// act on specific keys
+        {       // act on specific keys
             case 'census':
             case 'censusid':
             {
                 $search             = "$conj$key=$value";
                 $conj               = '&';
-                if (strlen($value) == 4)
-                {		// old format only includes year
-                    $censusYear		= intval($value);	// census year
-                    $censusId		= 'CA' . $censusYear;
-                    $cc			    = 'CA';
-                }		// old format only includes year
+                if (preg_match('/^[0-9]{4}$/', $value))
+                {               // old format only includes year
+                    $censusId       = 'CA' . $censusYear;
+                }       // old format only includes year
                 else
-                {		// CCYYYY
-                    $censusId		= strtoupper($value);
-                    $censusYear		= intval(substr($censusId, 2));
-                    $cc			    = substr($censusId, 0, 2);
-                }		// CCYYYY
-
-                $census	        = new Census(array('censusid'	=> $censusId));
-                $partof         = $census->get('partof');
-                if (strlen($partof) == 2)
-                {
-                    $cc		        = $census->get('partof');
-                    $provinceCode	= substr($value,0,2);
-                }
-                $selected[0]	    = '';
-                $selected[$cc][$censusYear]	= ' selected="selected"';
-
-                $countryObj		    = new Country(array('code' => $cc));
-                $countryName		= $countryObj->getName();
+                if (preg_match('/^[a-zA-Z]{2,5}[0-9]{4}$/', $value))
+                {       // CCYYYY
+                    $censusId       = strtoupper($value);
+                }       // CCYYYY
+                else
+                    $censusIdText   = $safevalue;
                 break;
             }
 
@@ -111,7 +100,7 @@ if (isset($_GET) && count($_GET) > 0)
             {
                 $search             = "$conj$key=$value";
                 $conj               = '&';
-                $provinceCode	    = $value;
+                $provinceCode       = $value;
                 break;
             }
 
@@ -119,7 +108,7 @@ if (isset($_GET) && count($_GET) > 0)
             {
                 $search             = "$conj$key=$value";
                 $conj               = '&';
-                $distid	            = $value;
+                $distid             = $value;
                 break;
             }
 
@@ -127,7 +116,7 @@ if (isset($_GET) && count($_GET) > 0)
             {
                 $search             = "$conj$key=$value";
                 $conj               = '&';
-                $subdistid  	    = $value;
+                $subdistid          = $value;
                 break;
             }
 
@@ -135,7 +124,7 @@ if (isset($_GET) && count($_GET) > 0)
             {
                 $search             = "$conj$key=$value";
                 $conj               = '&';
-                $division	        = $value;
+                $division           = $value;
                 break;
             }
 
@@ -145,11 +134,11 @@ if (isset($_GET) && count($_GET) > 0)
                 break;
             }
 
-        }		// act on specific keys
+        }       // act on specific keys
     }
     if ($debug)
         $warn       .= $parmsText . "</table>\n";
-}	                // invoked by URL to display current status of account
+}                   // invoked by URL to display current status of account
 
 $template                   = new FtTemplate("ReqUpdatePages$lang.html");
 $translate                  = $template->getTranslate();
@@ -159,23 +148,57 @@ $t                          = $translate['tranTab'];
 if (canUser('edit'))
     $action                 = $t["Update"];
 else
-    $action	                = $t["Display"];
+    $action                 = $t["Display"];
 
-$template->updateTag('otherStylesheets',	
+$template->updateTag('otherStylesheets',    
                      array('filename'   => 'ReqUpdatePages'));
 
-$template->set('CENSUSID',			$censusId);
-$template->set('CC',			    $cc);
-$template->set('COUNTRYNAME',		$countryName);
-$template->set('CENSUSYEAR',		$censusYear);
-$template->set('PROVINCECODE',		$provinceCode);
-$template->set('PROVINCE',		    $provinceCode);
-$template->set('DISTID',			$distId);
-$template->set('SUBDISTID',			$subdistId);
-$template->set('DIVISION',			$division);
-$template->set('SELECTED',			$selected);
-$template->set('ACTION',			$action);
+if (is_string($censusIdText))
+{
+    $msg            .= $template['censusInvalid']->replace('$censusid', $censusIdText);
+}
+else
+if (is_string($censusId))
+{
+    $census             = new Census(array('censusid'   => $censusId));
+    if (!$census->isExisting())
+        $msg            .= $template['censusUnsupported']->replace('$censusid', $censusId);
+    $cc                 = $census->get('cc');
+    $censusYear         = $census->get('year');
+    $partof             = $census->get('partof');
+    $provinceCode       = $census->get('province');
+    $selected[0]        = '';
+    $selected[$cc][$censusYear] = ' selected="selected"';
+}
+else
+{
+    $msg            .= $template['censusUndefined']->innerHTML;
+    $censusYear     = '';
+}
+
+$template->set('ACTION',                $action);
+$countryObj                 = new Country(array('code' => $cc));
+$countryName                = $countryObj->getName();
+$template->set('CC',                $cc);
+$template->set('COUNTRYNAME',       $countryName);
 $search                     .= $conj;
-$template->set('SEARCH',			$search);
+$template->set('SEARCH',            $search);
+
+if (strlen($msg) == 0)
+{
+    $template->set('CENSUSID',          $censusId);
+    $template->set('CENSUSYEAR',        $censusYear);
+    $template->set('PROVINCECODE',      $provinceCode);
+    $template->set('PROVINCE',          $provinceCode);
+    $template->set('DISTID',            $distId);
+    $template->set('SUBDISTID',         $subdistId);
+    $template->set('DIVISION',          $division);
+    $template->set('SELECTED',          $selected);
+}
+else
+{
+    $template->set('CENSUSYEAR',        $censusYear);
+    $template['distForm']->update(null);
+}
 
 $template->display();

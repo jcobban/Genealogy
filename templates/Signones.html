@@ -20,15 +20,9 @@
         <span class='right'>
         <a href='/SignonHelpen.html' target='help'>? Ayuda</a>
         </span>
-        <div style='clear: both;'></div>
       </h1>
       $TRACE
       $MSG 
-      <p>Puede contribuir a este sitio web agregando transcripciones
-        de páginas del censo, registros de nacimiento / matrimonio / 
-        defunción, o agregando información sobre su familia al árbol 
-        genealógico.
-      </p>
       <p>De acuerdo con las regulaciones de la Unión Europea,
         tenga en cuenta que al registrarse, acepta que el sitio puede 
         usar cookies para rastrear su uso del sitio.
@@ -46,6 +40,8 @@
                 class='white leftnc' value='$USERID'/>
         <input type='hidden' name='debug' id='debug' value='$DEBUG'>
         <input type='hidden' name='lang' id='lang' value='$LANG'>
+        <input type='hidden' name='validToken' id='validToken' 
+                value='$VALIDTOKEN'>
         </p>
         <p class='clear' id='passRow'>
         <label class='label' for='password'>
@@ -105,76 +101,92 @@
         </p>
       </form>
     </div>
-    <div class="hidden" id='signedoff'>Firmado.</div>
-    <div class="hidden" id='specify'>
-            Por favor especifique su nombre de usuario y contraseña.</div>
-    <div class="hidden" id='enterpassword'>
-            Por favor, introduzca su contraseña.</div>
-    <div class="hidden" id='incorrect'>
-            Nombre de usuario y/o contraseña incorrectos.</div>
+    <div class="hidden" id='messages'>
+      <span class="message" id='signedoff'>Firmado.</span>
+      <span class="message" id='specify'>
+            Por favor especifique su nombre de usuario y contraseña.</span>
+      <span class="message" id='enterpassword'>
+            Por favor, introduzca su contraseña.</span>
+      <span class="message" id='incorrect'>
+            Nombre de usuario y/o contraseña incorrectos.</span>
+      <div id="rightCol1">
+        <p>
+          Si no puede recordar su nombre de usuario, ingrese su dirección 
+          de correo electrónico y el servicio buscará su cuenta.
+        </p>
+        <p>Puede contribuir a este sitio web agregando transcripciones
+          de páginas del censo, registros de nacimiento / matrimonio / 
+          defunción, o agregando información sobre su familia al árbol 
+          genealógico.
+        </p>
+      </div>
+      <p id='respond'>Responda al correo electrónico enviado a '$EMAIL'.</p>
+      <p id='failed' class="warning">Unable to send e-mail to '$EMAIL'</p>
+      <div id='emailsubject'>
+        [JamesCobban.net] Nombre de usuario o contraseña perdidos
+      </div> <!-- id="emailsubject" -->
+      <div id='emailfrom'>
+        Administrator &lt;webmaster@$serverName&gt;
+      </div> <!-- id="emailfrom" -->
+      <div class='hidden' id='emailbody'>
+        <p>Su nombre de usuario es '$username'. Se ha realizado una 
+        solicitud para restablecer su contraseña. Si hiciste esta solicitud 
+         <a href="$proto://$serverName/resetPassword.php?username=$username&validate=$validToken&lang=es">
+             pincha aquí para restaurar tu contraseña</a>.
+        </p>
+      </div>
+    </div><!-- id="messages" --!>
     <div class='balloon' id='Helpuserid'>
-    <p>Ingrese el nombre de usuario único que ha registrado previamente.
+      Ingrese el nombre de usuario único que ha registrado previamente.
       Tiene hasta 64 caracteres y puede contener casi cualquier carácter,
       incluidos los espacios.  Por ejemplo, puede ser su nombre.
       Evite el uso de cualquier cosa que contenga información privada 
       que lo identifique de manera única, como su dirección de 
       correo electrónico.
-    </p>
     </div>
     <div class='balloon' id='Helpemail'>
-    <p>Ingrese la dirección de correo electrónico que utilizó cuando
-        se suscribió por primera vez al servicio. Este campo solo 
-        se utiliza para fines administrativos relacionados con 
-        el sitio web y no se compartirá con ninguna otra organización.
-    </p>
+      Ingrese la dirección de correo electrónico que utilizó cuando
+      se suscribió por primera vez al servicio. Este campo solo 
+      se utiliza para fines administrativos relacionados con 
+      el sitio web y no se compartirá con ninguna otra organización.
     </div>
     <div class='balloon' id='Helppassword'>
-    <p>Esta es la contraseña que registró para el nombre de usuario
-        anterior.  Debe tener al menos 6 caracteres y debe ser
-        difícil de adivinar.
-    </p>
+      Esta es la contraseña que registró para el nombre de usuario
+      anterior.  Debe tener al menos 6 caracteres y debe ser
+      difícil de adivinar.
     </div>
     <div class='balloon' id='Helpremember'>
-    <p>If you are accessing the site from a trusted computer, for example one that
+      If you are accessing the site from a trusted computer, for example one that
       belongs to you and is not used by any other person, then selecting this
       option will cause the userid and password you have entered to be remembered
-      in a file on your computer and you will be automatically logged to the
+      on your computer and you will be automatically logged to the
       site when you access it in the future.
-    </p>
     </div>
     <div class='balloon' id='HelpSubmit'>
-    <p>Click on this button to sign on.  You may also sign on by pressing the
+      Click on this button to sign on.  You may also sign on by pressing the
       Enter key after completing typing your userid and password, or by the
       keyboard short-cuts Alt-I or Ctrl-S.
-    </p>
     </div>
     <div class='balloon' id='HelpSignoff'>
-    <p>Click on this button to sign off.  You may also sign off by the keyboard
+      Click on this button to sign off.  You may also sign off by the keyboard
       short-cut Alt-O (letter 'O').
-    </p>
     </div>
     <div class='balloon' id='HelpRegister'>
-    <p>Click on this button, or use the keyboard short-cut Alt-R, to register 
+      Click on this button, or use the keyboard short-cut Alt-R, to register 
       a new user identifier and associated password. 
       You will be prompted to enter additional registration information.
-    </p>
     </div>
     <div class='balloon' id='HelpForgotPassword'>
-    <p>Click on this button, or use the keyboard short-cut Alt-F,
+      Click on this button, or use the keyboard short-cut Alt-F,
         if you have forgotten either your password or your userid. 
         If you have forgotten your password enter your userid.  
         If you have forgotten your userid enter the
         electronic mail address that you used when you first registered.
-    </p>
     </div>
     <div class='balloon' id='HelpClose'>
-    <p>Click on this button, or use the keyboard short-cut Alt-C, 
+      Click on this button, or use the keyboard short-cut Alt-C, 
       to close the dialog.
-    </p>
     </div>
-    <script src='/jscripts/util.js' type='text/javascript'>
     </script>
-    <script src='/jscripts/Cookie.js' type='text/javascript'>
-    </script>
-    <script src='/Signon.js' type='text/javascript'>
+    <script src='/Signon.js' type='module'>
     </script>

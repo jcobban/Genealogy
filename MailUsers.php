@@ -27,6 +27,7 @@ $mailPattern        = '';
 $options            = '';
 $subject            = 'General';
 $offset             = 0;
+$newoffset          = 0;
 $limit              = 50;
 $id                 = '';
 $body               = '';
@@ -285,6 +286,9 @@ if (isset($_POST) && count($_POST) > 0)
 // create the Template instance
 $template                   = new FtTemplate("MailUsers$lang.html");
 $formatter                  = $template->getFormatter();
+
+if (is_string($langtext))
+    $warn           .= "<p>lang='$langtext' is not supported BCP47 syntax</p>\n";
 
 // if not the administrator do nothing
 if (canUser('all'))

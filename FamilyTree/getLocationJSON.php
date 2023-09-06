@@ -59,7 +59,6 @@ use \Exception;
  *                                                                      *
  *  Copyright &copy; 2021 James A. Cobban                               *
  ************************************************************************/
-header("Content-Type: text/xml");
 require_once __NAMESPACE__ . '/Location.inc';
 require_once __NAMESPACE__ . '/RecordSet.inc';
 require_once __NAMESPACE__ . '/common.inc';

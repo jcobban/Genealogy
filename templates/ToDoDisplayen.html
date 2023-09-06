@@ -14,7 +14,7 @@
  *  Copyright &copy; 2021 James A. Cobban                               *
  **********************************************************************-->
     <div class="hidden" id="breadcrumbs">
-      <a href="/index.html">Home</a>:
+      <a href="/home.html">Home</a>:
       <a href="/genealogy.php?lang=$LANG">Genealogy</a>:
       <a href="/FamilyTree/Services.php?lang=$LANG">Services</a>:
       <a href="/FamilyTree/ToDos.php?idir=$IDIR&amp;lang=$LANG">To Do items for $PERSONNAME</a>:
@@ -38,7 +38,6 @@
                 class="black ina rightnc" style="width: 8em;"
                 value="$IDTD">
           <input type="hidden" name="debug" id="debug" value="$DEBUG">
-          <div style="clear: both;"></div>
         </div>
         <div class="row" id="todoTypeRow">
           <label class="column1" for="ToDoType">
@@ -56,7 +55,6 @@
               Other
             </option>
           </select>
-          <div style="clear: both;"></div>
         </div>
         <div class="row" id="idirRow">
           <label class="column1" for="IDIR">
@@ -64,7 +62,6 @@
           </label>
           <input type="text" name="IDIR" id="IDIR" size="11"
                   class="white rightnc" value="$IDIR" readonly="readonly">
-          <div style="clear: both;"></div>
         </div>
         <div class="row" id="idtcRow">
           <label class="column1" for="IDTC">
@@ -136,7 +133,6 @@
               Will
             </option>
           </select>
-          <div style="clear: both;"></div>
         </div>
         <div class="row" id="idtlRow">
           <label class="column1" for="IDTL">
@@ -146,7 +142,6 @@
           <input type="text" name="Location" id="Location"
                       size="64" class="white left" readonly="readonly"
                       value="$LOCATION">
-          <div style="clear: both;"></div>
         </div>
         <div class="row" id="todoNameRow">
           <label class="column1" for="todoName">
@@ -155,7 +150,6 @@
           <input type="text" name="todoName" id="todoName"
                       size="64" class="white leftnc" readonly="readonly"
                       value="$TODONAME">
-          <div style="clear: both;"></div>
         </div>
         <div class="row" id="openedRow">
           <label class="column1" for="openedDate">
@@ -164,7 +158,6 @@
           <input type="text" name="openedDate" id="openedDate"
                   size="64" class="white leftnc" readonly="readonly"
                   value="$OPENEDDATE">
-          <div style="clear: both;"></div>
         </div>
         <div class="row" id="closedRow">
           <label class="column1" for="closedDate">
@@ -173,7 +166,6 @@
           <input type="text" name="closedDate" id="closedDate"
                   size="64" class="white leftnc" readonly="readonly"
                   value="$CLOSEDDATE">
-          <div style="clear: both;"></div>
         </div>
         <div class="row" id="idarRow">
           <label class="column1" for="IDAR">
@@ -182,7 +174,6 @@
           <input type="text" name="IDAR" id="IDAR"
                   size="11" class="white rightnc" readonly="readonly"
                   value="$IDAR">
-          <div style="clear: both;"></div>
         </div>
         <div class="row" id="statusRow">
           <label class="column1" for="status">
@@ -197,7 +188,6 @@
               Opened
             </option>
           </select>
-          <div style="clear: both;"></div>
         </div>
         <div class="row" id="priorityRow">
           <label class="column1" for="priority">
@@ -215,7 +205,6 @@
               High
             </option>
           </select>
-          <div style="clear: both;"></div>
         </div>
         <div class="row" id="descRow" style="width: 100%;">
           <label class="column1" for="desc">
@@ -223,7 +212,6 @@
           </label>
           <textarea name="desc" id="desc" cols="64" rows="5"
            >$DESC</textarea>
-          <div style="clear: both;"></div>
         </div>
         <div class="row" id="resultsRow" style="width: 100%;">
           <label class="column1" for="results">
@@ -231,7 +219,6 @@
           </label>
           <textarea name="results" id="results" cols="64" rows="5"
            >$RESULTS</textarea>
-          <div style="clear: both;"></div>
         </div>
         <div class="row" id="filingrefRow">
           <label class="column1" for="filingref">
@@ -240,7 +227,6 @@
           <input type="text" name="filingref" id="filingref"
                   size="11" class="white leftnc" readonly="readonly"
                   value="$STATUS">
-          <div style="clear: both;"></div>
         </div>
         <div class="row">
         <div class="column1">
@@ -265,7 +251,6 @@
                   readonly="readonly" disabled="disabled"
                   $QSTAGCHECKED>
         </div>
-        <div style="clear: both;"></div>
       </div>
       $PICTURES
       <p id="buttonRow">
@@ -421,7 +406,7 @@
       Click this button to open a dialog for managing the pictures
       associated with the work item.
     </div>
-    <script src="/jscripts/tinymce/js/tinymce/tinymce.js" type="text/javascript"></script>
+    <script src="/jscripts/tinymce/js/tinymce/tinymce.min.js" type="text/javascript"></script>
     <script src="/jscripts/js20/http.js" type="application/javascript">
     </script>
     <script src="/jscripts/CommonForm.js" type="application/javascript">

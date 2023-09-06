@@ -44,7 +44,7 @@ require_once __NAMESPACE__ . '/Family.inc';
 require_once __NAMESPACE__ . '/common.inc';
 
 // emit the XML header
-print "<?xml version='1.0' encoding='UTF-8'?>\n";
+print "<?xml version='1.0' encoding='UTF-8'?".">\n";
 print "<deleted>\n";
 
 // include info on parameters
@@ -151,52 +151,64 @@ else
 if (strlen($msg) > 0)
 {		// problems detected
     print "    <msg>\n\t$msg\n    </msg>\n";
+    return;
 }		// problems detected
-else
-{		// OK to delete marriage
-    $family->delete(true);
-    $family	= null;
 
-    // delete husband if unreferenced
-    if ($idirhusb != $idir)
-    {		// not invoked from husband's page
-        print "<husband>\n<idir>$idirhusb</idir>\n";
-        if ($husband)
-        {		// have a husband
-    		$numParents	= count($husband->getParents());
-    		$numFamilies	= count($husband->getFamilies());
-    		$numEvents	= count($husband->getEvents());
-    		print "<parents>" . $numParents . "</parents>\n";
-    		print "<families>" . $numFamilies . "</families>\n";
-    		print "<events>" . $numEvents . "</events>\n";
-    		if ($numParents == 0 &&
-    		    $numFamilies == 0 &&
-    		    $numEvents == 0)
-    		    $husband->delete(true);
-        }		// have a husband
-        print "</husband>\n";
-    }		// not invoked from husband's page
+$family->delete(true);
+$family	= null;
 
-    // delete wife if unreferenced
-    if ($idirwife != $idir)
-    {		// not invoked from wife's page
-        print "<wife>\n<idir>$idirwife</idir>\n";
-        if ($wife)
+// delete husband if unreferenced
+if ($idirhusb != $idir)
+{		// not invoked from husband's page
+    print "    <husband>\n        <idir>$idirhusb</idir>\n";
+    if ($husband)
+    {		// have a husband
+		$numParents	    = count($husband->getParents());
+		$numFamilies	= count($husband->getFamilies());
+		$numEvents	    = count($husband->getEvents());
+		print "        <parents>$numParents</parents>\n";
+		print "        <families>$numFamilies</families>\n";
+		print "        <events>$numEvents</events>\n";
+		if ($numParents == 0 &&
+		    $numFamilies == 0 &&
+		    $numEvents == 0)
         {
-    		$numParents	= count($wife->getParents());
-    		$numFamilies	= count($wife->getFamilies());
-    		$numEvents	= count($wife->getEvents());
-    		print "<parents>" . $numParents . "</parents>\n";
-    		print "<families>" . $numFamilies . "</families>\n";
-    		print "<events>" . $numEvents . "</events>\n";
-    		if ($numParents == 0 &&
-    		    $numFamilies == 0 &&
-    		    $numEvents == 0)
-    		    $wife->delete(true);
+            if ($husband->delete())
+                print "        <delete>" . $husband->getLastSqlCmd() .
+                      "</delete>\n";
         }
-        print "</wife>\n";
-    }		// not invoked from wife's page
+		    $husband->delete(true);
+    }		// have a husband
+    print "</husband>\n";
+}		// not invoked from husband's page
 
-}		// OK to delete marriage
- 
+// delete wife if unreferenced
+if ($idirwife != $idir)
+{		// not invoked from wife's page
+    print "    <wife>\n        <idir>$idirwife</idir>\n";
+    if ($wife)
+    {
+		$numParents	    = count($wife->getParents());
+		$numFamilies	= count($wife->getFamilies());
+		$events	        = $wife->getEvents();
+		$numEvents	    = count($events);
+		print "        <parents>$numParents</parents>\n";
+		print "        <families>$numFamilies</families>\n";
+        print "        <events>$numEvents</events>\n";
+        if ($numEvents > 0)
+            foreach($events as $ider => $event)
+                print $event->toXml();
+
+		if ($numParents == 0 &&
+		    $numFamilies == 0 &&
+            $numEvents == 0)
+        {
+            if ($wife->delete())
+                print "        <delete>" . $wife->getLastSqlCmd() .
+                      "</delete>\n";
+        }
+    }
+    print "    </wife>\n";
+}		// not invoked from wife's page
+
 print "</deleted>\n";

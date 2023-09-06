@@ -127,6 +127,7 @@ if (isset($_GET) && count($_GET) > 0)
                 break;
             }
 
+            case 'userid':
             case 'debug':
             {
                 break;
@@ -242,6 +243,7 @@ if (isset($_POST) && count($_POST) > 0)
 
             case 'countryname':
             case 'statename':
+            case 'userid':
             case 'debug':
                 break;
 
@@ -422,22 +424,32 @@ if (strlen($msg) == 0)
                             'limit'     => $limit);
     $counties       = new CountySet($getParms);
 
-    $info       = $counties->getInformation();
-    $count      = $info['count'];
+    $info           = $counties->getInformation();
+    $count          = $info['count'];
 
-    $template->set('TOTALROWS',         $count);
-    $template->set('FIRST',             $offset + 1);
-    $template->set('LAST',              min($count, $offset + $limit));
-    if ($offset > 0)
-        $template->set('npPrev', "&domain=$domain&offset=" . ($offset-$limit) . "&limit=$limit");
+    if ($count == 0)
+    {
+        $template->updateTag('countyForm',
+                             null);
+    }
     else
-        $template->updateTag('prenpprev', null);
-    if ($offset < $count - $limit)
-        $template->set('npNext', "&domain=$domain&offset=" . ($offset+$limit) . "&limit=$limit");
-    else
-        $template->updateTag('prenpnext', null);
-    $template->updateTag('Row$code',
-                         $counties);
+    {
+        $template->set('TOTALROWS',         $count);
+        $template->set('FIRST',             $offset + 1);
+        $template->set('LAST',              min($count, $offset + $limit));
+        if ($offset > 0)
+            $template->set('npPrev', "&domain=$domain&offset=" . ($offset-$limit) . "&limit=$limit");
+        else
+            $template->updateTag('prenpprev', null);
+        if ($offset < $count - $limit)
+            $template->set('npNext', "&domain=$domain&offset=" . ($offset+$limit) . "&limit=$limit");
+        else
+            $template->updateTag('prenpnext', null);
+        $template->updateTag('Row$code',
+                             $counties);
+        $template->updateTag('noCounties',
+                             null);
+    }
 }           // no errors detected
 else
 {

@@ -1,0 +1,257 @@
+<!--*********************************************************************
+ *  CensusStatusDetailsUpdatefr.html									*
+ *																		*
+ *  This template displays the current transcription status of every	*
+ *  page in a selected enumeration division of any of the supported     *
+ *  censuses.                                                           *
+ *																		*
+ *  History:															*
+ *		2019/11/27      created                                         *
+ *      2022/07/05      use CSS display: flex                           *
+ *      2022/12/15      reorder hierarchy                               *
+ *																		*
+ *  Copyright &copy; 2022 James A. Cobban								*
+ **********************************************************************-->
+	<div id="breadcrumbs" class="hidden">
+        <a href="/genealogy.php?lang=$LANG">Généalogie</a>:
+        <a href="/genCountry.php?cc=$CC&lang=$LANG">$COUNTRYNAME</a>:
+        <a href="/genCensuses.php?lang=$LANG">Recensements</a>:
+        <a href="/database/CensusUpdateStatus.php?Census=$CENSUSID&Province=$PROVINCE&lang=$LANG">$PROVINCENAME</a>:
+        <a href="QueryDetail.php?Census=$CENSUSID&district=$DISTID&lang=$LANG">
+            Recherche nominale du Recensement $CENSUSYEAR de $COUNTRYNAME
+        </a>:
+		<a href="/database/CensusUpdateStatus.php?Census=$CENSUSID&amp;lang=$LANG">
+			Résumé de l'état de $COUNTRYNAME
+        </a>:
+        <a href="/database/CensusUpdateStatus.php?Census=$CENSUSID&Province=$PROVINCE&lang=$LANG">
+            $PROVINCENAME
+        </a>:
+        <a href="/database/CensusUpdateStatusDist.php?Census=$CENSUSID&amp;District=$DISTRICTID&amp;lang=$LANG">
+             Résumé District $DISTRICTID $DISTRICTNAME
+        </a>:
+	</div>
+    <div class="body">
+      <h1>
+        $CENSUSYEAR Recensement de Canada Statut de Division
+        <span class="right">
+		  <a href="CensusUpdateStatusDetailsHelpen.html" target="help">? Aide</a>
+        </span>
+      </h1>
+      $TRACE
+      $MSG
+      <div class="spaceBetween" id="topBrowse">
+		<span id="topPrev">
+		    <a href="CensusUpdateStatusDetails.php$NPPREV&lang=$LANG"
+				id="toPrevDiv">
+				<img src="/Images/ArrowLeft.svg">
+		    </a>
+		</span>
+        <span class="label">
+            District $DISTRICTID $DISTRICTNAME,
+            SubDistrict $SUBDISTRICTID $SUBDISTRICTNAME
+		    <span id="divisionPart">Div $DIVISION</span>
+        </span>
+		<span id="topNext">
+            <a href="CensusUpdateStatusDetails.php$NPNEXT&lang=$LANG"
+				id="toNextDiv">
+				<img src="/Images/ArrowRight.svg">
+		    </a>
+		</span>
+      </div>
+      <form action="CensusUpdateStatusDetails.php" method="get"
+                name="buttonForm" id="buttonForm">
+		<input type="hidden" name="Census" id="Census"
+				value="$CENSUSID">
+		<input type="hidden" name="Province" id="Province"
+				value="$PROVINCE">
+		<input type="hidden" name="District" id="District"
+				value="$DISTRICTID">
+		<input type="hidden" name="SubDistrict" id="SubDistrict"
+				value="$SUBDISTRICTID">
+		<input type="hidden" name="Division" id="Division"
+				value="$DIVISION">
+		<input type="hidden" name="ShowProofreader" id="ShowProofreader"
+				value="$SHOWPROOFREADER">
+        <!--- Put out the response as a table -->
+        <table border="1" id="dataTable">
+          <thead>
+            <!--- Put out the column headers -->
+            <tr>
+		      <th class="colhead">
+		        Page
+		      </th>
+		      <th class="colhead">
+		        Fait
+		      </th>
+		      <th class="colhead">
+		        %Fait
+		      </th>
+		      <th class="colhead">
+		        %Lié
+		      </th>
+		      <th class="colhead">
+		        Transcripteur
+		      </th>
+		      <th class="colhead" id="proofHead1">
+		        Relecteur
+		      </th>
+		      <th class="colhead" $COLSPAN2>
+		        Action
+		      </th>
+		      <th class="colhead">
+		        &nbsp;
+		      </th>
+		      <th class="colhead">
+		        Page
+		      </th>
+		      <th class="colhead">
+		        Fait
+		      </th>
+		      <th class="colhead">
+		        %Fait
+		      </th>
+		      <th class="colhead">
+		        %Lié
+		      </th>
+		      <th class="colhead">
+		        Transcripteur
+		      </th>
+		      <th class="colhead" id="proofHead2">
+		        Relecteur
+		      </th>
+		      <th class="colhead" $COLSPAN2>
+		        Action
+		      </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr id="detail$page">
+			  <td class="$pageclass">
+			    $page 
+			  </td>
+			  <td class="dataright">
+			    $namecount 
+			  </td>
+			  <td class="$pctclassdone">
+			    $pctdone 
+			  </td>
+			  <td class="$pctclasslinked">
+			    $pctlinked 
+			  </td>
+			  <td class="dataleft">
+			    $transcriber 
+			  </td>
+			  <td class="dataleft" id="ProofreaderCol">
+			    $proofreader 
+			  </td>
+			  <td class="center"> <!-- button to edit the page-->
+			      <button type="button" id="Edit$page">
+					Mis à Jour 
+			      </button>
+			  </td>
+	        </tr>
+	      </tbody>
+	      <tfoot>
+	        <tr>	<!-- separate total from details with empty row -->
+	        </tr>
+	        <tr>	<!-- totals row -->
+			  <td class="dataright">
+			    Total
+			  </td>
+			  <td class="dataright">
+			    $DONE 
+			  </td>
+			  <td class="$PCTCLASSDONE">
+			    $PCTDONE 
+			  </td>
+			  <td class="$PCTCLASSLINKED">
+			    $PCTLINKED
+			  </td>
+	        </tr>	<!-- totals row -->
+	      </tfoot>
+	    </table>
+        <p id="deletedLines">Suppression de $COUNT lignes 
+            dans des pages entièrement vierges de la transcription.
+        </p>
+        <p>
+		  <button type="submit" id="changeProof">
+		    <span id="donot">Ne montre pas</span>
+		        Relecteur
+		  </button>
+        </p>
+      </form>
+    </div> <!-- class="body" -->
+    <div id="messages" class="hidden">
+	  <span id="censusSyntax">
+		L'identifiant de recensement '$censusId' est syntaxiquement
+        incorrect.
+      </span>
+	  <span id="provSyntax">
+		L'identifiant de province/état '$provinceId'
+        est syntaxiquement invalide.
+      </span>
+	  <span id="domainSyntax">
+		L'identifiant de domaine '$domainId' est syntaxiquement incorrect.
+      </span>
+	  <span id="langSyntax">
+		L'identifiant de langue '$lang' est syntaxiquement incorrect.
+      </span>
+	  <span id="censusMissing">
+		Paramètre de recensement (Census) manquant.
+      </span>
+	  <span id="provinceMissing">
+		Province parameter missing for Census identifier '$censusId'.
+      </span>
+	  <span id="censusReplaced">
+		Census identifier '$censusId' is replaced by '$newCensusId'. 
+      </span>
+	  <span id="censusUndefined">
+		Census identifier '$censusId' is not defined. 
+      </span>
+	  <span id="distSyntax">
+		District identifier '$districtId' is syntactically invalid.
+      </span>
+	  <span id="districtMissing">
+		District parameter missing. 
+      </span>
+	  <span id="districtUndefined">
+		District number $districtId is not defined for Census identifier '$censusId'.
+      </span>
+	  <span id="subdistrictMissing">
+		SubDistrict parameter missing.
+      </span>
+	  <span id="subdistrictUndefined">
+		Sub-District ID '$subdistrictId' is not defined within 
+            District number $districtId of Census identifier '$censusId'.
+      </span>
+	  <span id="unexpected">
+        Unexpected parameter $key=$value. 
+      </span>
+    </div>
+    <!-- mouse over popups-->
+	<div id="mousetoPrevDiv" class="popup">
+	  <p class="large">Go to Subdistrict $PREVSD Division $PREVDIV&nbsp;
+      </p>
+	</div>
+	<div id="mousetoNextDiv" class="popup">
+	  <p class="large">Go to Subdistrict $NEXTSD Division $NEXTDIV&nbsp;
+      </p>
+	</div>
+	<div class="balloon" id="HelpEdit">
+	    Click on this button to edit the transcription of this page.
+	</div>
+	<div class="balloon" id="HelpUpload">
+	    Click on this button to upload the transcription of this page to
+	    the production server.
+	</div>
+	<div class="balloon" id="HelpchangeProof">
+	    Click on this button to enable or disable display of the proofreader id.
+	</div>
+    <script src= '/jscripts/CommonForm.js' type="text/javascript">
+    </script>
+    <script src= '/jscripts/js20/http.js' type="text/javascript">
+    </script>
+    <script src= '/jscripts/util.js' type="text/javascript">
+    </script>
+    <script src= 'CensusUpdateStatusDetails.js' type="text/javascript">
+    </script>

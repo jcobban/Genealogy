@@ -23,8 +23,9 @@ use \Templating\Template;
  *      2018/02/03      change breadcrumbs to new standard              *
  *      2018/12/20      change xxxxHelp.html to xxxxHelpen.html         *
  *      2021/07/09      use template                                    *
+ *      2023/08/08      support placeholder attribute for given names   *
  *                                                                      *
- *  Copyright &copy; 2021 James A. Cobban                               *
+ *  Copyright &copy; 2023 James A. Cobban                               *
  ************************************************************************/
 require_once __NAMESPACE__ . "/FtTemplate.inc";
 require_once __NAMESPACE__ . "/Domain.inc";
@@ -461,11 +462,11 @@ if (isset($_GET) && count($_GET) > 0)
             $getParms['itemNo'] = $item;
             $getParms['role']   = 'G';
             $groom              = new CountyMarriage($getParms);
-            $groom->set('givennames', 'New Groom');
+            $groom->set('placeholder', 'New Groom');
             $reports[]          = $groom;
             $getParms['role']   = 'B';
             $bride              = new CountyMarriage($getParms);
-            $bride->set('givennames', 'New Bride');
+            $bride->set('placeholder', 'New Bride');
             $reports[]          = $bride;
         }                   // loop creating new empty records
     }                       // have required parameters
@@ -663,6 +664,10 @@ if (strlen($msg) == 0)
             $itemNo                 = $record->get('itemno'); 
             $role                   = $record->get('role');
             $givennames             = $record->get('givennames');
+            if ($record->offsetExists('placeholder'))
+                $placeholder        = $record->get('placeholder');
+            else
+                $placeholder        = '';
             $surname                = $record->get('surname');
             $row++;
             if ($row < 10)
@@ -719,6 +724,7 @@ if (strlen($msg) == 0)
             $rtemplate->set('reportNo',         $reportNo);
             $rtemplate->set('reportNoText',     $reportNoText);
             $rtemplate->set('givennames',       $givennames);
+            $rtemplate->set('placeholder',      $placeholder);
             $rtemplate->set('surname',          $surname);
             $rtemplate->set('age',              $age);
             $rtemplate->set('residence',        $residence);
@@ -734,7 +740,9 @@ if (strlen($msg) == 0)
             if ($idir == 0)
             {
                 $rtemplate['Link$row']->update(null);
-                $rtemplate['Clear$row']->update(null);
+                $clear      = $rtemplate['Clear$row'];
+                if ($clear)
+                    $clear->update(null);
             }
             else
                 $rtemplate['Find$row']->update(null);

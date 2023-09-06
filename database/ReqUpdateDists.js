@@ -17,8 +17,10 @@
  *      2019/02/10      no longer need to call pageInit                 *
  *      2020/05/02      use getRecordJSON.php to get domains            *
  *                      use addEventListener and dispatchEvent          *
+ *      2023/01/21      suppress dynamic initialization if parameter    *
+ *                      errors have hidden the input form               *
  *                                                                      *
- *  Copyright &copy; 2020 James A. Cobban                               *
+ *  Copyright &copy; 2023 James A. Cobban                               *
  ************************************************************************/
 
 window.onload   = onLoad;
@@ -33,22 +35,25 @@ window.onload   = onLoad;
 function onLoad()
 {
     // set change event handlers on Select elements
-    var censusSelect        = document.distForm.Census;
-    censusSelect.addEventListener('change', changeCensus);
-    var evt                 = new Event('change',{'bubbles':true});
-    censusSelect.dispatchEvent(evt);
-    var provSelect          = document.distForm.Province;
-    evt                     = new Event('change',{'bubbles':true});
-    provSelect.dispatchEvent(evt);
+    let distForm            = document.forms['distForm'];
+    if (distForm)
+    {
+        let censusSelect        = distForm.Census;
+        censusSelect.addEventListener('change', changeCensus);
+        let evt                 = new Event('change',{'bubbles':true});
+        censusSelect.dispatchEvent(evt);
+        let provSelect          = distForm.Province;
+        evt                     = new Event('change',{'bubbles':true});
+        provSelect.dispatchEvent(evt);
     
-    // initialize dynamic functionality of form elements
-    var elements            = document.distForm.elements;
-    for (var i = 0; i < elements.length; i++)
-    {                   // loop through all form elements
-        var element         = elements[i];
-        element.onkeydown   = keyDown;
-    }                   // loop through all form elements
-
+        // initialize dynamic functionality of form elements
+        let elements            = distForm.elements;
+        for (let i = 0; i < elements.length; i++)
+        {                   // loop through all form elements
+            let element         = elements[i];
+            element.onkeydown   = keyDown;
+        }                   // loop through all form elements
+    }
 }       // function onLoad
 
 /************************************************************************
@@ -62,17 +67,17 @@ function onLoad()
  ************************************************************************/
 function changeCensus(evt)
 {
-    var censusSelect        = this;
-    var censusOptions       = this.options;
-    var census;
+    let censusSelect        = this;
+    let censusOptions       = this.options;
+    let census;
 
     if (this.selectedIndex >= 0)
     {           // option chosen
-        var currCensusOpt       = censusOptions[this.selectedIndex];
+        let currCensusOpt       = censusOptions[this.selectedIndex];
         census                  = currCensusOpt.value;
         if (census.length > 0)
         {       // non-empty option chosen 
-            var options         = {"timeout"    : false};
+            let options         = {"timeout"    : false};
             HTTP.get('/getRecordJSON.php?table=Censuses&id=' + census,
                      gotDomains,
                      options);
@@ -91,13 +96,13 @@ function gotDomains(obj)
 {
     if (obj && typeof(obj) == 'object')
     {
-        var provSelect              = document.distForm.Province;
+        let provSelect              = document.distForm.Province;
         provSelect.options.length   = 0;    // clear the list
 
-        for(var id in obj.domains)
+        for(let id in obj.domains)
         {
-            var domain              = obj.domains[id];
-            var option              = document.createElement('option')
+            let domain              = obj.domains[id];
+            let option              = document.createElement('option')
             option.value            = id.substring(2);
             option.text             = domain;
             provSelect.add(option);
@@ -105,14 +110,14 @@ function gotDomains(obj)
         provSelect.selectedIndex    = 0;
 
         // check for province passed as a parameter
-        var province                = 'ON';
+        let province                = 'ON';
         if ('province' in args)
         {
             province                = args["province"];
         }
     
-        var provOpts                = provSelect.options;
-        for(var i = 0; i < provOpts.length; i++)
+        let provOpts                = provSelect.options;
+        for(let i = 0; i < provOpts.length; i++)
         {
             if (provOpts[i].value == province)
             {               // found matching entry

@@ -15,56 +15,78 @@ use \Templating\Template;
  *		2018/11/19      change Helpen.html to Helpen.html               *
  *		2020/12/26      use FtTemplate                                  *
  *		                protect against XSS exposures                   *
+ *		2022/07/22      add support for Surname pattern match           *
+ *		                support debug output of parameters              *
+ *		                fix setting of $last                            *
  *																		*
- *  Copyright &copy; 2020 James A. Cobban								*
+ *  Copyright &copy; 2022 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/Person.inc';
 require_once __NAMESPACE__ . '/common.inc';
 
 // get the parameters
-$pattern	                = '';
 $count	                    = 0;
 $offset	                    = 0;
+$offsettext                 = null;
 $limit	                    = 20;
+$limittext                  = null;
 $lang                       = 'en';
+$surnamepatt                = null;
+$surnametext                = null;
 
 if (isset($_GET) && count($_GET) > 0)
 {
+    $parmsText  = "<p class='label'>\$_GET</p>\n" .
+                  "<table class='summary'>\n" .
+                  "<tr><th class='colhead'>key</th>" .
+                      "<th class='colhead'>value</th></tr>\n";
     foreach($_GET as $key => $value)
     {
-		switch($key)
+        $safevalue  = htmlspecialchars($value);
+        $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
+                        "<td class='white left'>$safevalue</td></tr>\n"; 
+        switch(strtolower($key))
 		{		// take action based upon key
 		    case 'offset':
-		    {
 				if (ctype_digit($value))
-				    $offset	= intval($value);
-				else
-                    $msg	.= "Invalid Offset='" . 
-                                htmlspecialchars($value) . "'. ";
-				break;
-		    }
+				    $offset	        = intval($value);
+                else
+                    $offsettext     = $safevalue;
+				break;          // offset
 
 		    case 'limit':
-		    {
 				if (ctype_digit($value))
-				    $limit	= intval($value);
+				    $limit	        = intval($value);
 				else
-				    $msg	.= "Invalid Limit='" . 
-                                htmlspecialchars($value) . "'. ";
-				break;
-		    }
+                    $limittext      = $safevalue;
+				break;          // limit
+
+            case 'surname':
+                if (preg_match('/^[a-zA-Z0-9.*?]+$/', $value))
+                    $surnamepatt    = $value;
+                else
+                    $surnametext    = $safevalue;
+                break;          // surname
+
 
 		    case 'lang':
-		    {
                 $lang       = FtTemplate::validateLang($value);
-				break;
-		    }	                // presentation language
+				break;          // presentation language
+
 		}		// take action based upon key
     }
+    if ($debug)
+        $warn       .= $parmsText . "</table>\n";
 }
 
 $template				= new FtTemplate("UnlinkedPersons$lang.html");
 
+if (is_string($offsettext))
+    $warn	.= "<p>Invalid Offset='$offsettext' ignored</p>\n";
+if (is_string($limittext))
+    $warn	.= "<p>Invalid Limit='$limittext' ignored</p>\n";
+if (is_string($surnametext))
+    $msg	.= "Invalid Surname='$surnametext'. ";
 $prevoffset	            = $offset - $limit;
 $nextoffset	            = $offset + $limit;
 
@@ -75,11 +97,13 @@ if (canUser('edit'))
 						"LEFT JOIN tblMR as husb on husb.idirhusb=tblIR.idir " .
 						"LEFT JOIN tblMR as wife on wife.idirwife=tblIR.idir " .
 						"LEFT JOIN tblCR on tblCR.IDIR=tblIR.IDIR " .
-						"WHERE husb.idirhusb IS NULL AND wife.idirwife IS NULL AND tblCR.idcr IS NULL";
+                        "WHERE husb.idirhusb IS NULL AND wife.idirwife IS NULL AND tblCR.idcr IS NULL";
+    if (is_string($surnamepatt))
+        $queryCount     .= " AND tblIR.Surname REGEXP '$surnamepatt'";
     if ($debug)
 		$warn	.= "<p>QueryCount=$queryCount</p>\n";
 
-    $stmt	= $connection->query($queryCount);
+    $stmt	        = $connection->query($queryCount);
     if ($stmt)
     {
 		$record		= $stmt->fetch(PDO::FETCH_NUM);
@@ -96,7 +120,7 @@ if (canUser('edit'))
     else
     {
 		$msg	.= "query '$queryCount' failed. " .
-						   print_r($connection->errorInfo(), true);
+						   print_r($connection->errorInfo(), true) . ". ";
     }
 
     $query	= "SELECT tblIR.idir, tblIR.givenname, tblIR.surname " .
@@ -104,14 +128,16 @@ if (canUser('edit'))
 						"LEFT JOIN tblMR as husb on husb.idirhusb=tblIR.idir " .
 						"LEFT JOIN tblMR as wife on wife.idirwife=tblIR.idir " .
 						"LEFT JOIN tblCR on tblCR.IDIR=tblIR.IDIR " .
-						"WHERE husb.idirhusb IS NULL AND wife.idirwife IS NULL AND tblCR.idcr IS NULL " . 
-						"GROUP BY tblIR.idir, tblIR.givenname, tblIR.surname " .
+						"WHERE husb.idirhusb IS NULL AND wife.idirwife IS NULL AND tblCR.idcr IS NULL "; 
+    if (is_string($surnamepatt))
+        $query      .= "AND tblIR.Surname REGEXP '$surnamepatt' ";
+	$query          .= "GROUP BY tblIR.idir, tblIR.givenname, tblIR.surname " .
 						"ORDER BY tblIR.idir " .
-						"LIMIT $limit";
+                        "LIMIT $limit OFFSET $offset";
     if ($debug)
 		$warn	.= "<p>Query=\"$query\"</p>\n";
 
-    $stmt	= $connection->query($query);
+    $stmt	        = $connection->query($query);
     if ($stmt)
     {
 		$records	= $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -125,8 +151,8 @@ if (canUser('edit'))
     }
     else
     {
-		$msg	.= "query '$query' failed. " .
-						   print_r($connection->errorInfo(), true);
+		$msg	    .= "Query '$query' failed. " .
+						   print_r($connection->errorInfo(), true) . ". ";
     }
 }			// authorized to update database
 else
@@ -143,9 +169,9 @@ if (strlen($msg) == 0)
 	else
 	{			    // got some results
         $template['allLinked']->update(null);
+        $last	        = min($nextoffset - 1, $count);
         $count	        = number_format($count);
         $template->set('COUNT',     $count);
-		$last	        = min($nextoffset - 1, $count);
 		if ($prevoffset >= 0)
         {	        // previous page of output to display
             $template->set('prevoffset',        $prevoffset);
@@ -159,8 +185,9 @@ if (strlen($msg) == 0)
         else
             $template['npnext']->update(null);
 		$template->set('offset',		$offset);
-        $template->set('last',		$last);
-        $template->set('count',		$count);
+        $template->set('last',		    $last);
+        $template->set('count',		    $count);
+		$template->set('limit',		    $limit);
  
         // display the results
         $tr             = $template['dataRow$idir'];

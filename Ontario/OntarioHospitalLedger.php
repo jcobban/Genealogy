@@ -167,9 +167,9 @@ foreach($pages as $row)
 }               // continue until finished
 
 if ($prevPage < 1)
-    $template['topPrev']->update(null);
+    $template['topPrev']->update('&nbsp;');
 if ($totalPages < 21)
-    $template['topNext']->update(null);
+    $template['topNext']->update('&nbsp;');
 $rowElement->update($rowData);
 
 $formatter->setAttribute(NumberFormatter::FRACTION_DIGITS, 0);

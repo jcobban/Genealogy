@@ -233,8 +233,19 @@ $formatter                  = $template->getFormatter();
 // customize title
 if ($location->isExisting())
 {
-	$idlr	    	        = $location->getIdlr();
-    $title	    	        = $template['locationTitle']->innerHTML();
+    $idlr	    	        = $location->getIdlr();
+    $element                = $template['locationTitle'];
+    if ($element)
+        $title	    	        = $template['locationTitle']->innerHTML();
+    else
+    {
+        $document           = $template->getDocument();
+        $elements           = $document->elements;
+        foreach($elements as $id => $tag)
+            print "<p>'$id' -> " . $tag->tagName;
+        $templates          = $template['templates'];
+        //$templates->printTag();
+    }
 }
 else
 if ($idlr == 0)

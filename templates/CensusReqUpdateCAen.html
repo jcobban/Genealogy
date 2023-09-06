@@ -19,7 +19,6 @@
             <a href='ReqUpdate$CENSUSYEARHelpen.html' target='help'>? Help</a>
         </span>
             $CENSUSYEAR Census of $COUNTRYNAME: Update Database
-        <div style='clear: both;'></div>
       </h1>
       $TRACE
       $MSG
@@ -61,6 +60,14 @@
     </div>
     <div class='popup' id='loading'>
       loading
+    </div>
+    <div class="hidden" id="templates">
+        <p id='censusInvalid'>
+            Census='$censusText' invalid, defaults to 'CA1881'
+        </p>
+        <p id='langInvalid'>
+            Invalid language identifier '$langtext', English assumed.
+        </p>
     </div>
     <script src="/jscripts/js20/http.js" type="text/javascript"></script>
     <script src="/jscripts/util.js" type="text/javascript"></script>

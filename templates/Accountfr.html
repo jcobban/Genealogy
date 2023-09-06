@@ -15,7 +15,7 @@
       <a href="/genealogy.php?lang=fr">Généalogie</a>:
     </div>  
     <div class="body">
-      <h1 class="clear">Gestion de la Compte
+      <h1>Gestion de la Compte
         <span class="right">
           <a href="/AccountHelpfr.html" target="help">?&nbsp;Aide</a>
         </span>
@@ -33,10 +33,12 @@
               Identifiant de l'Utilisateur:
             </label>
             <input type="text" size="32" maxlength="64"
-                class="white leftnc" name="userid" id="userid"
-                autocomplete="off" readonly="readonly"
-                value="$USERID"/>
-            Mandatoire
+                    class="white leftnc" 
+                    name="newuserid" id="newuserid"
+                    autocomplete="off"
+                    value="$USERID"/>
+            <input type="hidden" name="userid" id="userid"
+                        value="$USERID"/>
           </p>
           <p id="passRow" class="clear">
             <label class="label" for="password">
@@ -194,6 +196,15 @@
       </form>
     </div> <!-- div class="body" -->
     <div class="hidden" id="templates">
+      <span id="badUsername">
+        Le nouvel identifiant d'utilisateur demandé '$newuserid' contient
+        des caractères non pris en charge.  Veuillez essayer autre chose.
+      </span>
+      <span id="dupUsername">
+        Le nouvel identifiant d'utilisateur demandé '$newuserid' 
+        est déjà utilisé.
+        Veuillez essayer autre chose.
+      </span>
       <span id="badPassword">
         Le mot de passe doit correspondre au mot de passe actuel
         sur le compte. 
@@ -215,19 +226,20 @@
         Compte mis à jour.  
       </span>
     </div>
-    <div class="balloon" id="Helpuserid">
-      Cet champ montre l'identificateur unique de l'usager actuel pour lequel 
-      les fonctions de gestion du compte peut être faites.
+    <div class="balloon" id="Helpnewuserid">
+      Cet champ montre l'identificateur unique de l'usager actuel pour 
+      lequel les fonctions de gestion du compte peut être faites.
     </div>
     <div class="balloon" id="Helppassword">
-      Entrer le mot de passe actuel for cet compte pour autorizer la modification du
-      compte.  Le valeur du mote de passe n'est pas montré.
+      Entrer le mot de passe actuel for cet compte pour autorizer
+      la modification du compte.  Le valeur du mote de passe n'est
+      pas montré.
     </div>
     <div class="balloon" id="HelpnewPassword">
-      Si vous souhaitez changer le mot de passe sur ce compte, entrez-le ici.
-      La valeur du mot de passe neuf n'est pas affichée.
-      Le mot de passe peut être
-      jusqu'à 64 caractères et peut contenir n'importe quel caractère que vous pouvez entrer.
+      Si vous souhaitez changer le mot de passe sur ce compte, entrez-le
+      ici.  La valeur du mot de passe neuf n'est pas affichée.
+      Le mot de passe peut être jusqu'à 64 caractères et peut contenir
+      n'importe quel caractère que vous pouvez entrer.
     </div>
     <div class="balloon" id="HelpgeneratePassword">
       Cliquez sur ce bouton pour générer un mot de passe aléatoire
@@ -238,18 +250,18 @@
       les champs mot de passe euf et répéter le mot de passe neuf.
     </div>
     <div class="balloon" id="HelprandomPassword">
-      This is where the Generate Password button displays the generated
-      password which you can copy to the New and Repeat New Password fields.
+      C'est là que le bouton Générer le mot de passe affiche le mot
+      de passe généré que vous pouvez copier dans les champs Nouveau 
+      et Répéter le nouveau mot de passe.
     </div>
     <div class="balloon" id="HelpnewPassword2">
       Si vous souhaitez changer le mot de passe sur ce compte, 
-      vous devez l'entrer
-      deux fois pour éviter d'éventuelles fautes de frappe qui rendraient le compte
-      inaccessible.
+      vous devez l'entrer deux fois pour éviter d'éventuelles fautes
+      de frappe qui rendraient le compte inaccessible.
       La valeur du mot de passe neuf n'est pas affichée.
     </div>
     <div class="balloon" id="Helpemail">
-      This is the e-mail address associated with the account.
+      Il s'agit de l'adresse courriel associée au compte.
       This e-mail address is used for authorization verification and
       with your permission may also be used for notification messages
       related to the operation of the site.  This address will not be 
@@ -318,7 +330,7 @@
     <div id="HelpReply" class="balloon">
       Click on this button to reply to the blog.
     </div>
-    <script src="/jscripts/tinymce/js/tinymce/tinymce.js"
+    <script src="/jscripts/tinymce/js/tinymce/tinymce.min.js"
             type="application/javascript">
     </script>
     <script src="/Account.js" type="module">

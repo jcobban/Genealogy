@@ -559,7 +559,7 @@ class MarriageSet extends RecordSet
      *  Returns:                                                        *
      *      count of records                                            *
      ********************************************************************/
-    public function count()
+    public function count(): int
     {
         if ($this->expand)
             return $this->limit;

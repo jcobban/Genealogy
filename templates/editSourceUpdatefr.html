@@ -20,7 +20,6 @@
 	      <a href="editSourceHelpfr.html" target="help">? Aide</a>
         </span>
 	        $ACTION Enregistrement Source $IDSR
-        <div style="clear: both;"></div>
       </h1>
       $TRACE
       $MSG
@@ -32,7 +31,6 @@
       	<input type="text" name="SrcName" id="SrcName"
       			size="64" class="white leftnc"
       			value="$SRCNAME">
-      	<div style="clear: both;"></div>
         </div>
         <div class="row" id="srcClassRow">
       	<label  class="column1" for="IDST">
@@ -44,7 +42,6 @@
       			  $srctype 
       	      </option>
       	</select>
-      	<div style="clear: both;"></div>
         </div>
         <div class="row" id="srcTitleRow">
       	<label  class="column1" for="SrcTitle">
@@ -53,7 +50,6 @@
       	<input type="text" name="SrcTitle" id="SrcTitle"
       			size="64" class="white leftnc"
       			value="$SRCTITLE">
-      	<div style="clear: both;"></div>
         </div>
         <div class="row" id="srcAuthorRow">
       	<label  class="column1" for="SrcAuthor">
@@ -66,7 +62,6 @@
       			$author
       	  </option> 
       	</select>
-      	<div style="clear: both;"></div>
         </div>
         <div class="row" id="newAuthorRow">
       	<label  class="column1" for="NewAuthor">
@@ -74,7 +69,6 @@
       	</label>
       	<input type="text" name="NewAuthor" id="NewAuthor"
       			size="64" class="white left" value="">
-      	<div style="clear: both;"></div>
         </div>
         <div class="row" id="srcPublRow">
       	<label  class="column1" for="SrcPubl">
@@ -83,7 +77,6 @@
       	<input type="text" name="SrcPubl" id="SrcPubl"
       			size="64" class="white leftnc"
       			value="$SRCPUBLISHER">
-      	<div style="clear: both;"></div>
         </div>
         <div class="row" id="srcTextRow">
       	<label  class="column1" for="SrcText">
@@ -91,7 +84,6 @@
       	</label>
       	<textarea name="SrcText" id="SrcText" cols="60" rows="4"
       			>$SRCTEXT</textarea>
-      	<div style="clear: both;"></div>
         </div>
         <div class="row" id="srcNoteRow">
       	<label  class="column1" for="SrcNote">
@@ -99,7 +91,6 @@
       	</label>
       	<textarea name="SrcNote" id="SrcNote" cols="60" rows="4"
       			>$SRCNOTE</textarea>
-      	<div style="clear: both;"></div>
         </div>
         <div class="row" id="repoAddrRow">
       	<label  class="column1" for="IDAR">
@@ -110,7 +101,6 @@
       			$name 
       	  </option>
       	</select>
-      	<div style="clear: both;"></div>
         </div>
         <div class="row" id="newRepoRow">
       	<label  class="column1" for="newRepo">
@@ -119,7 +109,6 @@
       	<input type="text" name="newRepo" id="newRepo"
       					size="64" class="white leftnc"
       					value="">
-      	<div style="clear: both;"></div>
         </div>
         <div class="row" id="srcCallNumRow">
       	<label  class="column1" for="SrcCallNum">
@@ -128,7 +117,6 @@
       	<input type="text" name="SrcCallNum" id="SrcCallNum"
       			size="64" class="white leftnc"
       			value="$SRCCALLNUM">
-      	<div style="clear: both;"></div>
         </div>
         <p id="ButtonRow">
         	<input type="hidden" name="idsr" id="idsr"
@@ -246,7 +234,7 @@
 		Click this button to open a dialog for managing the pictures associated
 		with the master source document.
     </div>
-    <script src="/jscripts/tinymce/js/tinymce/tinymce.js" type="application/javascript">
+    <script src="/jscripts/tinymce/js/tinymce/tinymce.min.js" type="application/javascript">
     </script>
     <script src="/jscripts/js20/http.js" type="application/javaScript">
     </script>

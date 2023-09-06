@@ -7,11 +7,12 @@
  *  History:															*
  *		2018/11/06      created                                         *
  *      2019/06/15      use ordinal numbering of records                *
+ *      2023/07/30      migrate to ES2015                               *
  *																		*
- *  Copyright &copy; 2018 James A. Cobban								*
+ *  Copyright &copy; 2023 James A. Cobban								*
  **********************************************************************-->
   <div class="hidden" id="breadcrumbs">
-    <a href="/index.html">Home</a>:
+    <a href="/home.html">Home</a>:
     <a href="/genealogy.php?lang=$LANG">Genealogy</a>:
     <a href="/genCountry.php?cc=CA&amp;lang=$LANG">Canada</a>:
     <a href="/Canada/genProvince.php?Domain=CAON&amp;lang=$LANG">Ontario</a>:
@@ -33,7 +34,6 @@
         </label>
         <input name="pattern" id="pattern" type="text" size="64"
                     class="white leftnc" value="$PATTERN">
-        <div style="clear: both"></div>
       </div>
       <div class="row">
         <label class="label" for="namefld" style="width: 11em;">
@@ -41,7 +41,6 @@
         </label>
         <input name="namefld" id="namefld" type="text" size="64"
                     class="white leftnc" value="">
-        <div style="clear: both"></div>
       </div>
       <p class="label">
         <button type="button" class="button" id="Search" accesskey="s">
@@ -64,15 +63,14 @@
       <p class="label" id="countmatches">
           $COUNT Locations match the specified pattern.
       </p>
-      <div class="center" id="topBrowse">
-        <div class="left" id="topPrev">
-            <a href="Locations.php?pattern=$UPATTERN&amp;limit=$LIMIT&amp;offset=$PREVOFFSET&amp;lang=$LANG">&lt;---</a>
-        </div>
-        <div class="right" id="topNext"> 
-            <a href="Locations.php?pattern=$UPATTERN&amp;limit=$LIMIT&amp;offset=$NEXTOFFSET&amp;lang=$LANG">---&gt;</a>
+      <div class="spaceBetween" id="topBrowse">
+        <div id="topPrev">
+            <a href="Locations.php?pattern=$UPATTERN&amp;limit=$LIMIT&amp;offset=$PREVOFFSET&amp;lang=$LANG"><img src="/Images/ArrowLeft.svg"></a>
         </div>
           rows $FIRST to $LAST of $COUNT 
-        <div style="clear: both;"></div>
+        <div id="topNext"> 
+            <a href="Locations.php?pattern=$UPATTERN&amp;limit=$LIMIT&amp;offset=$NEXTOFFSET&amp;lang=$LANG"><img src="/Images/ArrowRight.svg"></a>
+        </div>
       </div> <!-- class="center" -->
       <!--- Put out the response as a table -->
       <table class="details" id="dataTable">
@@ -184,13 +182,5 @@
             Go to Row $NEXTOFFSET&nbsp;
         </p>
     </div>
-    <script src="/jscripts/js20/http.js" type="application/javascript">
-    </script>
-    <script src="/jscripts/CommonForm.js" type="application/javascript">
-    </script>
-    <script src="/jscripts/util.js" type="application/javascript">
-    </script>
-    <script src="/jscripts/locationCommon.js" type="application/javascript">
-    </script>
-    <script src="Locations.js" type="application/javascript">
+    <script src="Locations.js" type="module">
     </script>

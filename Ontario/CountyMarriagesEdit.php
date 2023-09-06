@@ -40,8 +40,9 @@ use \Templating\Template;
  *                      CountyMarriageSet                               *
  *      2021/04/21      correct error if no matches                     *
  *      2021/05/19      inconsistent spelling of $reportNotext          *
+ *      2023/08/08      support placeholder attribute for given names   *
  *                                                                      *
- *  Copyright &copy; 2021 James A. Cobban                               *
+ *  Copyright &copy; 2023 James A. Cobban                               *
  ************************************************************************/
 require_once __NAMESPACE__ . '/FtTemplate.inc';
 require_once __NAMESPACE__ . "/Country.inc";
@@ -464,12 +465,12 @@ else
             $getParms['role']   = 'G';
             $groom              = new CountyMarriage($getParms);
             $msg                .= $groom->getErrors();
-            $groom->set('givennames', 'New Groom');
+            $groom->set('placeholder', 'New Groom');
             $reports[]          = $groom;
             $getParms['role']   = 'B';
             $bride              = new CountyMarriage($getParms);
             $msg                .= $bride->getErrors();
-            $bride->set('givennames', 'New Bride');
+            $bride->set('placeholder', 'New Bride');
             $reports[]          = $bride;
         }       // loop creating new empty records
     }
@@ -670,6 +671,10 @@ if (strlen($msg) == 0)
             $itemNo                 = $record->get('itemno'); 
             $role                   = $record->get('role');
             $givennames             = $record->get('givennames');
+            if ($record->offsetExists('placeholder'))
+                $placeholder        = $record->get('placeholder');
+            else
+                $placeholder        = '';
             $surname                = $record->get('surname');
             $row++;
             if ($row < 10)
@@ -726,6 +731,7 @@ if (strlen($msg) == 0)
             $rtemplate->set('reportNo',         $reportNo);
             $rtemplate->set('reportNoText',     $reportNotext);
             $rtemplate->set('givennames',       $givennames);
+            $rtemplate->set('placeholder',      $placeholder);
             $rtemplate->set('surname',          $surname);
             $rtemplate->set('age',              $age);
             $rtemplate->set('residence',        $residence);
@@ -740,6 +746,7 @@ if (strlen($msg) == 0)
             $rtemplate->set('sexclass',         $sexclass);
             $rtemplate->set('readonly',         $readonly);
             $rtemplate->set('disabled',         $disabled);
+
             if ($idir == 0)
             {
                 $rtemplate['Link$row']->update(null);
@@ -752,7 +759,6 @@ if (strlen($msg) == 0)
         }                       // process all rows
         $template['norecords']->update(null);
     }
-
     $rowelt->update($data);
 }                           // no errors
 else

@@ -87,8 +87,10 @@ use \Iterator;
  *                      table for pages which were not in Census        *
  *      2021/07/26      delete superfluous pages from end of division   *
  *                      in method getDefaultImage                       *
+ *      2023/01/23      use error_log to notify administrator rather    *
+ *                      than throw                                      *
  *                                                                      *
- *  Copyright &copy; 2021 James A. Cobban                               *
+ *  Copyright &copy; 2023 James A. Cobban                               *
  ************************************************************************/
 require_once __NAMESPACE__ . '/Record.inc' ;
 require_once __NAMESPACE__ . '/Census.inc' ;
@@ -270,7 +272,11 @@ class SubDistrict extends Record
         $sched                  = self::$initRow['sd_sched'];
 
         if (!is_array($parms))
-            throw new Exception("SubDistrict::__construct called with " . gettype($parms));
+        {
+            error_log("SubDistrict::__construct called with " . gettype($parms));
+            $this->msg          = "SubDistrict::__construct called with " . gettype($parms);
+            return;
+        }
         $parmstext              = '';
         $comma                  = '';
         foreach($parms as $field => $value)
@@ -673,11 +679,12 @@ class SubDistrict extends Record
                             'sd_div'    => $this->row['sd_div'],
                             'sd_sched'  => $this->row['sd_sched']);
                     $getParms[$fieldLc]     = $value;
-                    $temp   = new SubDistrict($getParms);
+                    $temp       = new SubDistrict($getParms);
                     if ($temp->isExisting())
                     {
-                        throw new Exception("SubDistrict::set: " . __LINE__ .
-           " attempt to change '$field' would result in duplicate record.");
+                        error_log("SubDistrict::set: " . __LINE__ .
+        " attempt to change '$field' would result in duplicate record.");
+                        return null;
                     }
                 }   // value changed
                 return parent::set($fieldLc, $value);
@@ -704,6 +711,7 @@ class SubDistrict extends Record
     {
         global  $debug;
         global  $warn;
+        global  $msg;
         global  $userid;
         global  $connection;
 
@@ -834,7 +842,10 @@ class SubDistrict extends Record
         if ($updatePopulation)
         {                   // update population column of associated District
             $this->district->synchPopulation();
-            $this->district->save($xml);
+            $count          = $this->district->save($xml);
+            if ($count == 0)
+                $msg        .= $this->district->getErrors() . "\n" .
+                                $this->district->dump();
         }                   // update population column of associated District
     }       // SubDistrict::save
 
@@ -956,9 +967,19 @@ class SubDistrict extends Record
             }                       // avoid creating new instance
             else
             {                       // create new District
-                $distParms          = array('d_census'  => $this->census,
-                                            'd_id'      => $distId);
+                if ($this->census)
+                    $distParms      = array('d_census'  => $this->census,
+                                            'd_id'      => $this['distid']);
+                else
+                    $distParms      = array('d_census'  => $this['census'],
+                                            'd_id'      => $this['distid']);
                 $this->district         = new District($distParms);
+                $text                   = $this->district->getErrors();
+                if (strlen($text) > 0)
+                    print "<p>Subdistrict::getDistrict: " . __LINE__ .
+                    " $text</p>\n" .
+                    "<p>\$distParms=" . var_export($distParms, true) .
+                    "</p>\n" . $this->dump('bad district create');
                 self::$formerDistrict   = $this->district;
             }                       // create new District
         }                           // not set from parameters
@@ -993,9 +1014,9 @@ class SubDistrict extends Record
         $relFrame       = $this->row['sd_relframe'];
         if ($relFrame == 0)
         {
-            $warn       .= "<p>SubDistrict::getDefaultImage: the initial frame number field in the SubDistrict table for Census=$censusId District=$distId Sub-District=$subdistId Division=$div has not been initialized.</p>\n";
-            $warn       .= $this->debugBacktrace();
-            error_log("SubDistrict::getDefaultImage: the initial frame number field in the SubDistrict table for Census=$censusId District=$distId Sub-District=$subdistId Division=$div has not been initialized.\n");
+            $log        = "<p>SubDistrict::getDefaultImage: the initial frame number field in the SubDistrict table for Census=$censusId District=$distId Sub-District=$subdistId Division=$div has not been initialized.</p>\n";
+            $log       .= $this->debugBacktrace();
+            error_log($log);
         }
         $page1          = $this->row['sd_page1'];
         $pages          = $this->row['sd_pages'];
@@ -1039,7 +1060,7 @@ class SubDistrict extends Record
                 $frm    = floor(($page - $page1) * 2 / $bypage) + $relFrame;
                 $website    = "https://central.bac-lac.gc.ca/";
                 $image  = $website .
-                            '.item/?app=Census1851&op=&img&id=e' .
+                            '.item/?app=Census1851&op=img&id=e' .
                             substr('000000000', 0, 9 - strlen($frm)) .
                             $frm;
                 break;
@@ -1103,7 +1124,7 @@ class SubDistrict extends Record
                               '.jpg';
                 $website    = "https://central.bac-lac.gc.ca/";
                 $image  = $website .
-                            '.item/?app=Census1901&op=&img&id=z' .
+                            '.item/?app=Census1901&op=img&id=z' .
                             substr('000000000', 0, 9 - strlen($frm)) .
                             $frm;
                 break;
@@ -1150,6 +1171,15 @@ class SubDistrict extends Record
             {
                 $frm    = $page - $page1 + $relFrame;
                 $image  = "https://central.bac-lac.gc.ca/.item/?app=Census1921&op=img&id=e" .
+                                substr('000000000', 0, 9 - strlen($frm)) .
+                                $frm;
+                break;
+            }   // 1921 census
+
+            case 1931:
+            {
+                $frm    = $page - $page1 + $relFrame;
+                $image  = "https://central.bac-lac.gc.ca/.item/?app=Census1931&op=img&id=e" .
                                 substr('000000000', 0, 9 - strlen($frm)) .
                                 $frm;
                 break;
@@ -1225,7 +1255,7 @@ class SubDistrict extends Record
             }           // success
             else
             {
-                throw new Exception("SubDistrict:getPrevSearch: " .
+                error_log("SubDistrict:getPrevSearch: " .
                                 "getNames: query='$selText', " .
                                 print_r($stmt->errorInfo(),true));
             }           // error on query
@@ -1362,7 +1392,7 @@ class SubDistrict extends Record
             }           // success
             else
             {
-                throw new Exception("SubDistrict::getNames: " .
+                error_log("SubDistrict::getNames: " .
                                 "query='$selText', " .
                                 print_r($stmt->errorInfo(),true));
             }           // error on query

@@ -16,8 +16,9 @@ use \Genealogy\RecordSet;
  *                  support assigning values to outerHTML and innerHTML *
  *      2021/01/24  add method replace                                  *
  *      2021/02/01  replace uses outerHTML if tag is a paragraph        *
+ *      2022/06/10  replace escape with htmlspecialchars                *
  *                                                                      *
- *  Copyright &copy; 2021 James A. Cobban All Rights Reserved           *
+ *  Copyright &copy; 2022 James A. Cobban All Rights Reserved           *
  ************************************************************************/
 require_once __NAMESPACE__ . '/Template.inc' ;
 
@@ -200,12 +201,12 @@ class TemplateTag implements Iterator, ArrayAccess
         if ($this->template->debug)
             $warn   .= "<p>TemplateTag::__construct: " . __LINE__ .
                 " tagName=" . $this->tagName . "," .
-                " id='" .  escape($this->id) . "'," .
+                " id='" .  htmlspecialchars($this->id) . "'," .
                 " start=" . $this->start . "," .
                 " length=" . $this->length . "," .
                 " tagLength=" . $this->tagLength . "," .
                 " etagLength=" . $this->etagLength . "," .
-                " tag=" .  escape(substr($page, $this->start, $this->tagLength)) . "," .
+                " tag=" .  htmlspecialchars(substr($page, $this->start, $this->tagLength)) . "," .
                 " contents=" . $this->contents . "</p>\n";
     }       // function TemplateTag::__construct
 
@@ -335,7 +336,7 @@ class TemplateTag implements Iterator, ArrayAccess
         {           // string
             if ($this->template->debug)
                 $warn       .= "<p>TemplateTag::update: " .  __LINE__ .
-                                " \$array='" . escape($array) . "'</p>\n";
+                                " \$array='" . htmlspecialchars($array) . "'</p>\n";
             $instance       = new ArrayInsertion($this, $array);
             $this->template->addTagUpdate($instance);
         }           // string
@@ -404,7 +405,7 @@ class TemplateTag implements Iterator, ArrayAccess
         if ($this->etagLength > 0)
         {
             $etag       = substr($page, $this->start + $this->length - $this->etagLength, $this->etagLength);
-            $retval     .= escape($etag);
+            $retval     .= htmlspecialchars($etag);
         }
         $retval         .= "</p>\n";
         foreach ($this->children as $child)
@@ -481,7 +482,7 @@ class TemplateTag implements Iterator, ArrayAccess
         {                   // string
             if ($this->template->debug)
                 $warn       .= "<p>TemplateTag::outerHTML: " .  __LINE__ .
-                                " \$replace='" . escape($replace) . "'</p>\n";
+                                " \$replace='" . htmlspecialchars($replace) . "'</p>\n";
             $instance       = new ArrayInsertion($this, $replace);
             $this->template->addTagUpdate($instance);
             return $replace;
@@ -519,7 +520,7 @@ class TemplateTag implements Iterator, ArrayAccess
         {                   // string
             if ($this->template->debug)
                 $warn       .= "<p>TemplateTag::innrHTML: " .  __LINE__ .
-                " \$replace='" . escape($replace) . "'</p>\n";
+                " \$replace='" . htmlspecialchars($replace) . "'</p>\n";
             $replace        = substr($page, $this->start, $this->tagLength) .
                               $replace .
                               substr($page,

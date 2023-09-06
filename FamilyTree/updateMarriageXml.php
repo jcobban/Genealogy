@@ -111,9 +111,11 @@ use \Exception;
  *		                if the name is empty                            *
  *		2019/12/21      ensure birth and death dates of children        *
  *		                are updated                                     *
- *		2020/03/18      add support for generic events                  * 
+ *		2020/03/18      add support for generic events                  *
+ *		2022/08/17      correct providing updated IDIR and IDCR         *
+ *		                when adding children                            * 
  *																		*
- *  Copyright &copy; 2020 James A. Cobban								*
+ *  Copyright &copy; 2022 James A. Cobban								*
  ************************************************************************/
 header("Content-Type: text/xml");
 require_once __NAMESPACE__ . '/Family.inc';
@@ -552,9 +554,54 @@ if (isset($_POST) && count($_POST) > 0)
 		    }	                // detach child button
 
 		    case 'cidir':
-	        {	                // IDIR of child
 				// $id contains rownum from form
 	            // first field in new row
+
+	            // complete processing of previous child
+	            // $child is an instance of Person
+				if ($child !== null)
+	            {		            // complete previous child
+	                $isNewChild                 = !$child->isExisting();
+                    $child->save(false);    // apply pending updates
+                    $lastSql    = $child->getLastSqlCmd();
+	                $cidir                      = $child['idir'];
+	                print "\t\t<idir$oldrow>$cidir</idir$oldrow>\n";
+                    if (strlen($lastSql) > 0)
+                    {
+                        $ttagname   = 'cidir' . __LINE__;
+                        print "\t<$ttagname>$lastSql</$ttagname>\n";
+                    }
+	                if ($isNewChild)
+	                {
+	                    $birthEvent             = $child->getBirthEvent(true);
+	                    $birthsd                = $birthEvent['eventsd'];
+	                    print "\t\t<birthsd$oldrow>$birthsd</birthsd$oldrow>\n";
+	                }
+
+	                if (is_null($childr))
+	                {               // add new child
+	                    $childr             = new Child(array('idmr' => $idmr,
+	                                                          'idir' => $cidir));
+	                    $errors             = $childr->getErrors();
+	                    if (strlen($errors) > 0)
+                            print "\t\t<errors>$errors</errors>\n";
+                        else
+                            print "\t\t<cmd587>" . $child->getLastSqlCmd() .
+                                    "</cmd587>\n";
+	                }               // add new child
+
+		            if ($childr)
+	                {               // reorder children
+	                    $newChild               = !$childr->isExisting();
+	                    $childr['idmr']         = $idmr;
+	                    $childr['idir']         = $cidir;
+		    			$childr['order']		= $childOrder;
+		    			$childOrder++;
+	                    $childr->save("\tchild" . __LINE__);
+	                    $idcr                   = $childr['idcr'];
+	                    print "\t\t<idcr$oldrow>$idcr</idcr$oldrow>\n";
+		            }               // reorder children
+	            }		            // complete previous child
 	            if (strlen($value) > 0)
 	                $idir		                = intval($value);
 	            else
@@ -573,52 +620,6 @@ if (isset($_POST) && count($_POST) > 0)
                     }
 	                $idmr                       = $family->getIdmr();
 	            }                   // possibly true on first child
-
-	            // complete processing of previous child
-	            // $child is an instance of Person
-				if ($child !== null)
-	            {		            // complete previous child
-	                $isNewChild                 = !$child->isExisting();
-                    $child->save(false);
-                    $lastSql    = $child->getLastSqlCmd();
-                    if (strlen($lastSql) > 0)
-                    {
-                        $ttagname   = 'cidir' . __LINE__;
-                        print "\t<$ttagname>$lastSql</$ttagname>\n";
-                    }
-	                $cidir                      = $child['idir'];
-	                if ($isNewChild)
-	                {
-	                    print "\t\t<idir$oldrow>$cidir</idir$oldrow>\n";
-	                    $birthEvent             = $child->getBirthEvent(true);
-	                    $birthsd                = $birthEvent['eventsd'];
-	                    print "\t\t<birthsd$oldrow>$birthsd</birthsd$oldrow>\n";
-	                }
-
-	                if (is_null($childr))
-	                {               // add new child
-	                    $childr             = new Child(array('idmr' => $idmr,
-	                                                          'idir' => $cidir));
-	                    $errors             = $childr->getErrors();
-	                    if (strlen($errors) > 0)
-	                        print "\n\n<errors>$errors</errors>\n";
-	                }               // add new child
-
-		            if ($childr)
-	                {               // reorder children
-	                    $newChild               = !$childr->isExisting();
-	                    $childr['idmr']         = $idmr;
-	                    $childr['idir']         = $cidir;
-		    			$childr['order']		= $childOrder;
-		    			$childOrder++;
-	                    $childr->save("\tchild" . __LINE__);
-	                    if ($newChild)
-	                    {
-	                        $idcr               = $childr['idcr'];
-	                        print "\t\t<idcr$oldrow>$idcr</idcr$oldrow>\n";
-	                    }
-		            }               // reorder children
-	            }		            // complete previous child
 
 				if ($idir == 0)
 				{		            // new person
@@ -652,8 +653,7 @@ if (isset($_POST) && count($_POST) > 0)
 
 	            $childr		                = null; // processed
 	            $oldrow                     = $id;  // row number of child
-				break;
-		    }	                    // IDIR of child
+				break;                  // first record for next child
 
 		    case 'cidcr':
 	        {	                    // IDCR of child, zero for new child

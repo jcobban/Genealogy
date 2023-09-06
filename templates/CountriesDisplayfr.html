@@ -12,7 +12,7 @@
  *  Copyright &copy; 2018 James A. Cobban								*
  **********************************************************************-->
 	<div id='breadcrumbs' class='hidden'>
-      <a href="/index.html">Accueil</a>:
+      <a href="/home.html">Accueil</a>:
 	  <a href='/genealogy.php?lang=fr'>Généalogie</a>:
 	  <a href="/FamilyTree/Services.php?lang=fr">Services</a>:
 	</div> <!-- id='breadcrumbs' -->
@@ -22,7 +22,6 @@
 		<a href='/Canada/CountriesEditHelpfr.html' target='help'>? Aide</a>
 	    </span>
 		Voir la Table des Pays
-	    <div style='clear: both;'></div>
 	  </h1>
 	  $TRACE
 	  $MSG
@@ -41,21 +40,20 @@
 	    <input type='hidden' name='offset' value='$offset'>
 	    <input type='hidden' name='limit' value='$limit'>
 	  <!--- Put out a line with links to previous and next section of table -->
-	  <div class="center" id="topBrowse">
-	    <span class='left' id='topPrev'>
-		<a href='/Canada/CountriesEdit.php?lang=fr$npPrev' id='prenpprev'>
-		&lt;---
-		</a>
+	  <div class="spaceBetween" id="topBrowse">
+	    <span class='bold' id='topPrev'>
+		  <a href='/Canada/CountriesEdit.php?lang=fr$npPrev' id='prenpprev'>
+		    <img src="/Images/ArrowLeft.svg">
+		  </a>
 	    </span>
-	    <span class='right' id='topNext'>
-		<a href='/Canada/CountriesEdit.php?lang=fr$npNext' id='prenpnext'>
-		    ---&gt;
-		</a>
+	    <span id='respdescrows'>
+		  montrer rangs $first à $last de $totalrows
 	    </span>
-	      <span id='respdescrows'>
-		montrer rangs $first a $last de $totalrows
-	      </span>
-	    <div style='clear: both;'></div>
+	    <span class='bold' id='topNext'>
+		  <a href='/Canada/CountriesEdit.php?lang=fr$npNext' id='prenpnext'>
+		    <img src="/Images/ArrowRight.svg">
+		  </a>
+	    </span>
 	  </div> <!-- left and right arrow links -->
 	  <p>
 	    <label class='label' for='pattern' style='width: 10em;'>Pattern:</label>

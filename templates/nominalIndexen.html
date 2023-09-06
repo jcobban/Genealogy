@@ -17,7 +17,7 @@
  *  Copyright &copy; 2022 James A. Cobban                               *
  **********************************************************************-->
     <div class="hidden" id="breadcrumbs">
-        <a href="/index.html">Home</a>:
+        <a href="/home.html">Home</a>:
         <a href="/genealogy.php?lang=$LANG">Genealogy</a>:
         <a href="/FamilyTree/Services.php?lang=$LANG">Services</a>:
         <a href='/Canada/CountriesEdit.php?lang=$LANG'>
@@ -33,7 +33,6 @@
         <span id="title">
           Families of $TREENAME
         </span>
-        <div style="clear: both;"></div>
       </h1>
         $TRACE
         $MSG
@@ -44,7 +43,6 @@
             </label>
               <input type="text" name="Name" id="Name" size="44" 
                 class="white left" value="$NAME" accessKey="N">
-            <div style="clear: both;"></div>
           </div>
           <div class="row" id="birthYearAndSexRow">
            <div class="column1">
@@ -65,7 +63,6 @@
                 <option class="unknown" value="" selected="selected">Any</option>
             </select>
            </div>
-            <div style="clear: both;"></div>
           </div>
           <div class="row" id="marriedAndUnrelatedRow">
             <label class="label" for="incMarried">
@@ -76,7 +73,6 @@
             <button type="button" id="addUnrelated" accessKey="A">
                 <u>A</u>dd a New Unrelated Individual
             </button>
-            <div style="clear: both;"></div>
           </div>
           <div class="row" id="infoIncludeRow">
             <label class="label" for="includeParents">
@@ -91,7 +87,6 @@
             <input type="checkbox" name="includeSpouse" id="includeSpouse"
                 accessKey="S"
                 value="Y" class="em10" checked="checked">
-            <div style="clear: both;"></div>
           </div>
           <div class="row" id="treeNameRow">
             <label class="label" for="treeName">
@@ -105,7 +100,6 @@
                 $atree 
               </option>
             </select>
-            <div style="clear: both;"></div>
           </div>
           <div class="row" id="selectionRow">
             <label class="label" for="individ">
@@ -114,7 +108,6 @@
             <select name="individ" id="individ" size="10" class="nameSelect">
                 <option value="0" class="unknown">Choose an individual</option>
             </select>
-            <div style="clear: both;"></div>
           </div>
       </form>
     
@@ -157,7 +150,6 @@
               <a class="em4" href="/FamilyTree/Surnames.php?initial=Z&lang=$LANG">Z</a>
         </p>
         $OTHERS
-        <div style="clear: both;"></div>
     </div> <!-- end of <div id="body"> -->
     <div class="hidden" id="templates">
       <p class="label" id="InitialsRow$rownum">
@@ -256,7 +248,7 @@
     <div class="popup" id="loading">
         Loading...
     </div>
-    <script src="/jscripts/tinymce/js/tinymce/tinymce.js"
+    <script src="/jscripts/tinymce/js/tinymce/tinymce.min.js"
             type="application/javascript">
     </script>
     <script src="/FamilyTree/nominalIndex.js" type="module">

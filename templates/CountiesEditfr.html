@@ -1,59 +1,62 @@
 <!--*********************************************************************
- *  CountiesEditfr.html													*
- *																		*
- *  French language template for editing counties of a state			*
- *																		*
- *  History:															*
- *		2018/01/09		created											*
+ *  CountiesEditfr.html                                                 *
+ *                                                                      *
+ *  French language template for editing counties of a state            *
+ *                                                                      *
+ *  History:                                                            *
+ *      2018/01/09      created                                         *
  *      2020/02/14      pass full state name and country name           *
  *      2020/07/01      get text of warning messages from locale        *
  *      2021/01/13      include message texts                           *
- *																		*
- *  Copyright &copy; 2021 James A. Cobban								*
+ *                                                                      *
+ *  Copyright &copy; 2021 James A. Cobban                               *
  **********************************************************************-->
   <div class="hidden" id="breadcrumbs">
     <a href="/genealogy.php?lang=fr">
-	Généalogie
+    Généalogie
     </a>:
     <a href="/FamilyTree/Services.php?lang=fr">
-	Services
+    Services
     </a>:
     <a href="/Canada/CountriesEdit.php?lang=fr">
-	Liste des Pays Soutenus
+    Liste des Pays Soutenus
     </a>:
     <a href="/genCountry.php?cc=$CC&lang=fr">
-	$COUNTRYNAME
+    $COUNTRYNAME
+    </a>:
+    <a href="/Canada/genProvince.php?domain=$DOMAIN&lang=$LANG">
+        $DOMAINNAME
     </a>:
   </div>
   <div class="body">
     <h1>
       <span class="right">
-	<a href="/Canada/CountiesEditHelpfr.html" target="help">? Help</a>
+    <a href="/Canada/CountiesEditHelpfr.html" target="help">? Help</a>
       </span>
       $DOMAINNAME: Mise a Jour la Table des Comtés
     </h1>
     $MSG
     $TRACE
-	<p id="changed">Comté changé '$CODE':
-				nom '$NEWCOUNTYNAME'
-				en existance de $NEWCOUNTYSTARTYEAR
-				à $NEWCOUNTYENDYEAR.
+    <p id="changed">Comté changé '$CODE':
+                nom '$NEWCOUNTYNAME'
+                en existance de $NEWCOUNTYSTARTYEAR
+                à $NEWCOUNTYENDYEAR.
     </p>
-	<p id="deleted">Comté ecrasé '$CODE'.
+    <p id="deleted">Comté ecrasé '$CODE'.
     </p>
-	<p id="added">Comté ajouté '$COUNTY':
-				nom '$COUNTYNAME'
-				en existance de $COUNTYSTARTYEAR
-				à $COUNTYENDYEAR.
+    <p id="added">Comté ajouté '$COUNTY':
+                nom '$COUNTYNAME'
+                en existance de $COUNTYSTARTYEAR
+                à $COUNTYENDYEAR.
     </p>
-	<p id="summary">$CHANGECOUNT comtés mise à jour.
+    <p id="summary">$CHANGECOUNT comtés mise à jour.
     </p>
     <!--- Put out the response as a table -->
     <form name="countyForm" id="countyForm"
-				action="CountiesEdit.php" 
-				method="post" 
-				autocomplete="off" 
-				enctype="multipart/form-data">
+                action="CountiesEdit.php" 
+                method="post" 
+                autocomplete="off" 
+                enctype="multipart/form-data">
       <input type="hidden" name="Domain" value="$DOMAIN">
       <input type="hidden" name="CountryName" id="CountryName" value="$COUNTRYNAME">
       <input type="hidden" name="StateName" id="StateName" value="$STATENAME">
@@ -61,123 +64,131 @@
       <input type="hidden" name="offset" value="$OFFSET">
       <input type="hidden" name="limit" value="$LIMIT">
       <input type="hidden" name="lang" value="$LANG">
-  <!--- Put out a line with links to previous and next section of table -->
-  <div class="center" id="topBrowse">
-    <span class="left" id="topPrev">
-	<a href="/Canada/CountiesEdit.php?lang=fr$npPrev" id="prenpprev">
-	&lt;---
-	</a>
-    </span>
-    <span class="right" id="topNext">
-	<a href="/Canada/CountiesEdit.php?lang=fr$npNext" id="prenpnext">
-	    ---&gt;
-	</a>
-    </span>
-      <span id="respdescrows">
-	montrer rangs $FIRST a $LAST de $TOTALROWS
-      </span>
-    <div style="clear: both;"></div>
-  </div> <!-- left and right arrow links -->
+      <!--- Put out a line with links to previous and next section of table -->
+      <div class="spaceBetween" id="topBrowse">
+        <span id="topPrev">
+        <a href="/Canada/CountiesEdit.php?lang=fr$npPrev" id="prenpprev">
+        <img src="/Images/ArrowLeft.svg">
+        </a>
+        </span>
+        <span id="respdescrows">
+            montrer rangs $FIRST à $LAST de $TOTALROWS
+        </span>
+        <span id="topNext">
+        <a href="/Canada/CountiesEdit.php?lang=fr$npNext" id="prenpnext">
+            <img src="/Images/ArrowRight.svg">
+        </a>
+        </span>
+      </div> <!-- left and right arrow links -->
       <table class="form" id="dataTable">
-	<!--- Put out the column headers -->
-	<thead>
-	  <tr id="hdrRow">
-	    <th class="colhead">
-		ID
-	    </th>
-	    <th class="colhead">
-		Nom
-	    </th>
-	    <th class="colhead">
-		Établi
-	    </th>
-	    <th class="colhead">
-		Terminé
-	    </th>
-	    <th class="colhead">
-		Écraser
-	    </th>
-	    <th class="colhead">
-		Cantons
-	    </th>
-	    <th class="colhead">
-		Lieu
-	    </th>
-	  </tr>
-	</thead>
-	<tbody>
-	  <tr id="Row$code">
-	    <td class="right">
-		<input type="text" name="Code$code"
-			    value="$code"
-			    class="ina code" 
-			    size="3" maxlength="3" readonly="readonly">
-	    </td>
-	    <td class="left">
-		<input type="text" name="Name$code" 
-			    value="$name" 
-			    class="white left"
-			    size="28" maxlength="64">
-	    </td>
-	    <td class="left">
-		<input type="text" name="StartYear$code" 
-			    value="$startyear" 
-			    class="white rightnc"
-			    size="4" maxlength="4">
-	    </td>
-	    <td class="left">
-		<input type="text" name="EndYear$code" 
-			    value="$endyear" 
-			    class="white rightnc"
-			    size="4" maxlength="4">
-	    </td>
-	    <td class="center">
-		<button type="button" id="Delete$code">
-		    Écraser
-		</button> 
-	    </td>
-	    <td class="center">
-		<button type="button" id="EditTownships$code">
-		    Cantons
-		</button> 
-	    </td>
-	    <td class="center">
-		<button type="button" id="EditLocation$code">
-		    Lieu
-		</button> 
-	    </td>
-	  </tr>
-	</tbody>
-	<tfoot>
-	  <tr id="ftrRow">
-	    <th class="colhead">
-		ID
-	    </th>
-	    <th class="colhead">
-		Nom
-	    </th>
-	    <th class="colhead">
-		Établi
-	    </th>
-	    <th class="colhead">
-		Terminé
-	    </th>
-	    <th class="colhead">
-		Écraser
-	    </th>
-	    <th class="colhead">
-		Cantons
-	    </th>
-	    <th class="colhead">
-		Lieu
-	    </th>
-	  </tr>
-	</tfoot>
+        <!--- Put out the column headers -->
+        <thead>
+          <tr id="hdrRow">
+            <th class="colhead">
+            ID
+            </th>
+            <th class="colhead">
+            Nom
+            </th>
+            <th class="colhead">
+            Établi
+            </th>
+            <th class="colhead">
+            Terminé
+            </th>
+            <th class="colhead">
+            Écraser
+            </th>
+            <th class="colhead">
+            Cantons
+            </th>
+            <th class="colhead">
+            Lieu
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr id="Row$code">
+            <td class="right">
+            <input type="text" name="Code$code"
+                    value="$code"
+                    class="ina code" 
+                    size="3" maxlength="3" readonly="readonly">
+            </td>
+            <td class="left">
+            <input type="text" name="Name$code" 
+                    value="$name" 
+                    class="white left"
+                    size="28" maxlength="64">
+            </td>
+            <td class="left">
+            <input type="text" name="StartYear$code" 
+                    value="$startyear" 
+                    class="white rightnc"
+                    size="4" maxlength="4">
+            </td>
+            <td class="left">
+            <input type="text" name="EndYear$code" 
+                    value="$endyear" 
+                    class="white rightnc"
+                    size="4" maxlength="4">
+            </td>
+            <td class="center">
+            <button type="button" id="Delete$code">
+                Écraser
+            </button> 
+            </td>
+            <td class="center">
+            <button type="button" id="EditTownships$code">
+                Cantons
+            </button> 
+            </td>
+            <td class="center">
+            <button type="button" id="EditLocation$code">
+                Lieu
+            </button> 
+            </td>
+          </tr>
+        </tbody>
+        <tfoot>
+          <tr id="ftrRow">
+            <th class="colhead">
+            ID
+            </th>
+            <th class="colhead">
+            Nom
+            </th>
+            <th class="colhead">
+            Établi
+            </th>
+            <th class="colhead">
+            Terminé
+            </th>
+            <th class="colhead">
+            Écraser
+            </th>
+            <th class="colhead">
+            Cantons
+            </th>
+            <th class="colhead">
+            Lieu
+            </th>
+          </tr>
+        </tfoot>
       </table>
       <button type="submit" id="Submit">Mise a Jour</button>
-	&nbsp;
+    &nbsp;
       <button type="button" id="Add">Ajouter un Comté Neuf</button>
     </form>
+    <div id="noCounties">
+      <p class="warning">
+        Aucun comté n'est défini pour $DOMAINNAME.
+      </p>
+      <a href="/Canada/genProvince.php?domain=$DOMAIN&lang=$LANG"
+        class="button">
+        Fermer
+      </a>
+    </div>
   </div> <!-- end of <div class="body"> -->
   <div class="hidden" id="messages">
       <span id="duplicateCounty">
@@ -239,7 +250,7 @@
       the county as a location referenced from facts and events in the
       family tree.  See
       <a href="/Family/DisplayLocationHelpfr.html">
-	Display/Edit Location: Help
+    Display/Edit Location: Help
       </a>
       for details.  
     </p>

@@ -11,8 +11,6 @@
  ************************************************************************/
 import {eltMouseOver, eltMouseOut, keyDown, args, popupAlert}
             from "../jscripts6/util.js";
-//import {tinymce as tinyMCE} from "../jscripts/tinymce/js/tinymce/tinymce.js";
-
 
 window.addEventListener("load", onLoad);
 
@@ -128,6 +126,6 @@ function firstMail(ev)
  ************************************************************************/
 function sendNextTranche()
 {
-    console.log{"sendNextTranche: offset=" + formGbl.offset.value);
+    console.log("sendNextTranche: offset=" + formGbl.offset.value);
     formGbl.submit();
 }       // function sendNextTranche

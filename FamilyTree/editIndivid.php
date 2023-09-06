@@ -382,6 +382,7 @@ use \Exception;
  *                      names                                           *
  *                      on creating new Person use Nicknames table      *
  *                      to get default gender                           *
+ *      2022/08/09      do not search for matches on empty given name   *
  *                                                                      *
  *  Copyright &copy; 2022 James A. Cobban                               *
  ************************************************************************/
@@ -553,8 +554,8 @@ if (count($_GET) > 0)
             {
                 $lang               = FtTemplate::validateLang($value);
             }
-        }   // switch on parameter name
-    }       // loop through all parameters
+        }           // switch on parameter name
+    }               // loop through all parameters
 
     if ($debug)
         $warn                       .= $parmsText . "</table>\n";
@@ -1160,56 +1161,63 @@ else
 {                       // adding new person
     $idir                   = 0;
     if ($person)
-    {
-        $id                 = $person->get('id');
-        $gender             = $person->get('gender');
-        $givennames         = preg_split('/\s+/', $person['givenname']);
-        $nicknameset        = new RecordSet('Nicknames',
-                                            array('nickname' => $givennames));
-        foreach($nicknameset as $nickname)
+    {                   // have an instance of Person
+        $id                 = $person['id'];
+        $gender             = $person['gender'];
+        $givenname          = $person['givenname'];
+        if (strlen($givenname) > 0)
         {
-            if ($nickname['gender'] == 0)
+            $givennames     = preg_split('/\s+/', $givenname);
+            $nicknameset    = new RecordSet('Nicknames',
+                                            array('nickname' => $givennames));
+            foreach($nicknameset as $nickname)
             {
-                $gender         = 0;
-                break;
+                if ($nickname['gender'] == 0)
+                {
+                    $gender         = 0;
+                    break;
+                }
+                else
+                if ($nickname['gender'] == 1)
+                {
+                    $gender         = 1;
+                    break;
+                }
             }
-            else
-            if ($nickname['gender'] == 1)
-            {
-                $gender         = 1;
-                break;
-            }
+            $person['gender']   = $gender;
         }
-        $person['gender']   = $gender;
         $genderClass        = $genderClasses[$gender];
-        $private            = $person->get('private');
-    }
+        $private            = $person['private'];
+    }                   // have an instance of Person
     else
-    {
+    {                   // do not have an instance of Person
         $id                 = 0;
         $gender             = 2;
         $genderClass        = 'unknown';
-        $givennames         = preg_split('/\s+/', $given);
-        $nicknameset        = new RecordSet('Nicknames',
-                                            array('nickname' => $givennames));
-        foreach($nicknameset as $nickname)
+        if (strlen($given) > 0)
         {
-            if ($nickname['gender'] == 0)
+            $givennames     = preg_split('/\s+/', $given);
+            $nicknameset    = new RecordSet('Nicknames',
+                                            array('nickname' => $givennames));
+            foreach($nicknameset as $nickname)
             {
-                $gender         = 0;
-                $genderClass    = 'male';
-                break;
-            }
-            else
-            if ($nickname['gender'] == 1)
-            {
-                $gender         = 1;
-                $genderClass    = 'female';
-                break;
+                if ($nickname['gender'] == 0)
+                {
+                    $gender         = 0;
+                    $genderClass    = 'male';
+                    break;
+                }
+                else
+                if ($nickname['gender'] == 1)
+                {
+                    $gender         = 1;
+                    $genderClass    = 'female';
+                    break;
+                }
             }
         }
         $private            = false;
-    }
+    }                   // do not have an instance of Person
     $neverMarried           = 0;
     $neverMarriedRO         = '';
     $fatherGivenName        = '';

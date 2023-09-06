@@ -68,6 +68,8 @@ use \Exception;
  *      2021/10/17      format large numbers with separators            *
  *      2022/03/20      accept INSERT IGNORE                            *
  *      2022/05/29      SELECT failed if only one fieldname in SELECT   *
+ *		2022/12/15      accept table names enclosed in backquotes       *
+ *		                in SHOW CREATE                                  *
  *                                                                      *
  *  Copyright &copy; 2022 James A. Cobban                               *
  ************************************************************************/
@@ -1685,20 +1687,19 @@ function cellToHtml($template, $table, $row, $fldname, $value, $cellclass)
                 break;
             }       // tblSX citation type field
 
-            case 'gender':
-            {       // gender code
+            case 'gender':          // gender code
                 switch($value)
                 {
                     case 0:
-                        $text       = 'male';
+                        $text   = 'male';
                         break;
 
                     case 1:
-                        $text       = 'female';
+                        $text   = 'female';
                         break;
 
                     default:
-                        $text       = 'unknown';
+                        $text   = 'unknown';
                         break;
 
                 }
@@ -1707,18 +1708,27 @@ function cellToHtml($template, $table, $row, $fldname, $value, $cellclass)
                     str_replace(array('$CELLCLASS', '$VALUE', '$TEXT'),
                                 array($cellclass, $value, $text),
                                 $ttext);
-                break;
-            }       // gender code
+                break;              // gender code
 
-            default:
-            {       // ordinary numeric field
+            case 'password':
+            case 'shapassword':     // hashed password
+                if (strlen($value) > 0)
+                    $value      =  '*';
                 $ttext          = $template['simpleCell']->outerHTML;
                 $retval         =
                     str_replace(array('$CELLCLASS', '$VALUE'),
                                 array($cellclass, $value),
                                 $ttext);
-                break;
-            }       // ordinary numeric field
+                break;              // hashed password
+
+            default:                // ordinary numeric field
+                $ttext          = $template['simpleCell']->outerHTML;
+                $retval         =
+                    str_replace(array('$CELLCLASS', '$VALUE'),
+                                array($cellclass, $value),
+                                $ttext);
+                break;              // ordinary numeric field
+
         }           // act on specific field names
     }               // integer value
     else 
@@ -1742,16 +1752,96 @@ function cellToHtml($template, $table, $row, $fldname, $value, $cellclass)
     }
     else
     {               // normal text field
-        $ttext              = $template['simpleCell']->outerHTML;
-        $value              = htmlspecialchars($value);
-        $retval             =
+        switch ($fldname)
+        {           // act on specific field names
+            case 'password':
+            case 'shapassword':     // hashed password
+                if (strlen($value) > 0)
+                    $value      =  '*';
+                $ttext          = $template['simpleCell']->outerHTML;
+                $retval         =
                     str_replace(array('$CELLCLASS', '$VALUE'),
                                 array($cellclass, $value),
                                 $ttext);
+                break;              // hashed password
+
+            default:                // ordinary numeric field
+                $ttext          = $template['simpleCell']->outerHTML;
+                $value          = htmlspecialchars($value);
+                $retval         =
+                    str_replace(array('$CELLCLASS', '$VALUE'),
+                                array($cellclass, $value),
+                                $ttext);
+                break;              // ordinary numeric field
+
+        }           // act on specific field names
     }               // normal text field
 
     return $retval;
 }       // function cellToHtml($template, $table, $row, $fldname, $value)
+
+/************************************************************************
+ *  function showCreate                                                 *
+ *                                                                      *
+ *  Validate an SQL command starting with "SHOW CREATE"                 *
+ *                                                                      *
+ *  Parameters:                                                         *
+ *      $therest        parameters of SHOW CREATE command               *
+ *      $query          set to true for PDO query                       *
+ *      $execute        set to true for PDO execute                     *
+ *      $getCount       set to true for get count                       *
+ *                                                                      *
+ *  Returns:                                                            *
+ *      String containing validates SQL command or null                 *
+ ************************************************************************/
+function showCreate($therest, &$query, &$execute, &$getCount)
+{
+    global $warn;
+
+    $result     = preg_match('/^(\w+)\s+(`?\w+`?)(.*)/i',
+                             $therest,
+                             $matches);
+    if ($result == 1)
+    {
+        $secndopt   = strtoupper($matches[1]);
+        $table      = $matches[2];
+        if (substr($table, 0, 1) == '`')
+            $table  = substr($table, 1);
+        if (substr($table, -1, 1) == '`')
+            $table  = substr($table, 0, strlen($table) - 1);
+        $rest       = $matches[3];
+        switch($secndopt)
+        {
+            case 'TABLE':
+                $info       = Record::getInformation($table);
+                if ($info)
+                {
+                    $query          = true;
+                    $execute        = true;
+                    $getCount       = false;
+                    $table          = $info['table'];
+                    return "SHOW CREATE TABLE $table$rest";
+                }
+                else
+                {
+                    $warn   .= "<p>Table '$table' is not defined</p>\n";
+                }
+                break;
+
+            default:
+                $warn       .= "<p>Unsupported feature for SHOW CREATE '$therest'</p>\n";
+                break;
+        }                   // switch on option
+    }                       // valid syntax
+    else
+    {
+        $warn       .= "<p>Undefined 'SHOW CREATE $therest'</p>\n";
+    }
+    $query          = false;
+    $execute        = false;
+    $getCount       = false;
+    return null;
+}       // function showCreate
 
 /************************************************************************
  *  Open Code                                                           *
@@ -2356,7 +2446,7 @@ if (strlen($msg) == 0 && $sqlCommand && strlen($sqlCommand) > 0)
                             else
                             if (count($matches) == 7 &&
                                 strlen($matches[5]) > 0 &&
-                                strlen($matches[6] > 0))
+                                strlen($matches[6]) > 0)
                             {
                                 $limit  = $matches[5];
                                 $offset = $matches[6];
@@ -2422,29 +2512,68 @@ if (strlen($msg) == 0 && $sqlCommand && strlen($sqlCommand) > 0)
                     $msg    .=
                             'You are not authorized to use this feature. ';
 
-                $result     = preg_match('/^CREATE\s+TABLE\s+(\w+)(.*)/i',
+                $result     = preg_match('/^(\w+)\s*/i',
                                          $therest,
                                          $matches);
-                if ($result == 1)
+                $whole      = $matches[0];
+                $firstopt   = strtoupper($matches[1]);
+                $therest    = substr($therest, strlen($whole));
+                switch($firstopt)
                 {
-                    $table      = $matches[1];
-                    $rest       = $matches[2];
-                    $info       = Record::getInformation($table);
-                    if ($info)
-                    {
-                        $table  = $info['table'];
-                        $sqlCommand = "SHOW CREATE TABLE $table$rest";
-                    }
-                    $query          = true;
-                    $execute        = true;
-                    $getCount       = false;
-                }
-                else
-                {
-                    $warn       .= "<p>Unsupported options 'SHOW $therest'</p>\n";
-                    $query          = false;
-                    $execute        = false;
-                    $getCount       = false;
+                    case 'CREATE':
+                        $sqlCommand = showCreate($therest,
+                                                 $query, 
+                                                 $execute, 
+                                                 $getCount);
+                        break;
+
+                    case 'TABLES':
+                        $sqlCommand     = "SHOW TABLES";
+                        $query          = true;
+                        $execute        = true;
+                        $getCount       = false;
+                        break;
+
+                    case 'BINARY':
+                    case 'CHARACTER':
+                    case 'COLUMNS':
+                    case 'CREATE':
+                    case 'DATABASES':
+                    case 'ERRORS':
+                    case 'EVENTS':
+                    case 'FUNCTION':
+                    case 'GRANTS':
+                    case 'INDEX':
+                    case 'MASTER':
+                    case 'OPEN':
+                    case 'PLUGINS':
+                    case 'PRIVILEGES':
+                    case 'PROCEDURE':
+                    case 'PROCESSLIST':
+                    case 'PROFILE':
+                    case 'PROFILES':
+                    case 'RELAYLOG':
+                    case 'REPLICAS':
+                    case 'STATUS':
+                    case 'TABLE':
+                    case 'TABLES':
+                    case 'TRIGGERS':
+                    case 'VARIABLES':
+                    case 'WARNINGS':
+                        $warn           .= "<p>Unsupported command 'SHOW $firstopt $therest'</p>\n";
+                        $sqlCommand     = null;
+                        $query          = false;
+                        $execute        = false;
+                        $getCount       = false;
+                        break;
+
+                    default:
+                        $warn           .= "<p>Undefined command 'SHOW $firstopt $therest'</p>\n";
+                        $sqlCommand     = null;
+                        $query          = false;
+                        $execute        = false;
+                        $getCount       = false;
+                        break;
                 }
                 $sresult        = null;
                 break;
@@ -2801,16 +2930,16 @@ else
 $fieldParms             = array();
 if (count($badTables) > 0)
 {
-	foreach($badTables as $tableName => $val)
-	{                   // loop through all tables with bad field names
-	    if (array_key_exists($tableName, $fields))
-	    {               // defined table
-	        $fieldsList     = $fields[$tableName];
-	        $fieldParms[]   = array('TABLENAME'     => $tableName,
-	                                'FIELDCOUNT'    => count($fieldsList),
-	                                'FIELDSNAME'    => implode(', ', $fieldsList));
-	    }               // defined table
-	    $template['fieldnames']->update($fieldParms);
+    foreach($badTables as $tableName => $val)
+    {                   // loop through all tables with bad field names
+        if (array_key_exists($tableName, $fields))
+        {               // defined table
+            $fieldsList     = $fields[$tableName];
+            $fieldParms[]   = array('TABLENAME'     => $tableName,
+                                    'FIELDCOUNT'    => count($fieldsList),
+                                    'FIELDSNAME'    => implode(', ', $fieldsList));
+        }               // defined table
+        $template['fieldnames']->update($fieldParms);
     }                   // loop through all table
 }
 else
@@ -2841,7 +2970,9 @@ if ($execute && strlen($msg) == 0)
             $count              = count($sresult);
             if ($count == 0)
                 $count          = 'No';
-            $template->set('COUNT',     $formatter->format($count));
+            else    
+                $count          = $formatter->format($count);
+            $template->set('COUNT',     $count);
             $phpcolumn          = null;
             $data               = '';
             foreach($sresult as $row)

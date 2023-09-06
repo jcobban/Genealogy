@@ -15,7 +15,7 @@
       <a href="/genealogy.php?lang=$LANG">Genealogy</a>:
     </div>  
     <div class="body">
-      <h1 class="clear">Account Management
+      <h1>Account Management
         <span class="right">
           <a href="/AccountHelpen.html" target="help">?&nbsp;Help</a>
         </span>
@@ -33,10 +33,12 @@
               User Identifier:
             </label>
             <input type="text" size="32" maxlength="64"
-                        class="white leftnc" name="userid" id="userid"
-                        autocomplete="off" readonly="readonly"
+                        class="white leftnc"
+                        name="newuserid" id="newuserid"
+                        autocomplete="off"
                         value="$USERID"/>
-            Required for registration.
+            <input type="hidden" name="userid" id="userid"
+                        value="$USERID"/>
           </p>
           <p id="passRow" class="clear">
             <label class="label" for="password">
@@ -195,6 +197,14 @@
       </form>
     </div>
     <div class="hidden" id="templates">
+      <span id="badUsername">
+        The requested new user name '$newuserid' contains unsupported
+        characters.  Please try something else.
+      </span>
+      <span id="dupUsername">
+        The requested new user name '$newuserid' is already in use.
+        Please try something else.
+      </span>
       <span id="badPassword">
         Password must match the current password on the account. 
       </span>
@@ -215,8 +225,8 @@
         Account updated.  
       </span>
     </div>
-    <div class="balloon" id="Helpuserid">
-      This read-only field displays the userid identifying the user identifier
+    <div class="balloon" id="Helpnewuserid">
+      This field displays the the user identifier
       of the current account for which account management functions may be
       performed.
     </div>
@@ -316,7 +326,7 @@
     <div id="HelpReply" class="balloon">
       Click on this button to reply to the blog.
     </div>
-    <script src="/jscripts/tinymce/js/tinymce/tinymce.js"
+    <script src="/jscripts/tinymce/js/tinymce/tinymce.min.js"
             type="application/javascript">
     </script>
     <script src="/Account.js" type="module">

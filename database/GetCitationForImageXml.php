@@ -40,12 +40,13 @@ if (isset($_GET) && count($_GET) > 0)
                                     "<th class='colhead'>value</th></tr>\n";
     foreach($_GET as $key => $value)
     {               // loop through all parameters
+        $safevalue          = htmlspecialchars($value);
         $parmsText          .= "<tr><th class='detlabel'>$key</th>" .
-                                "<td class='white left'>$value</td></tr>\n";
+                                "<td class='white left'>$safevalue</td></tr>\n";
         switch(strtolower($key))
         {
             case 'image':
-                $image      = $value;
+                $image      = $safevalue;
                 break;
         }
     }               // loop through all parameters
@@ -63,7 +64,7 @@ if (strlen($msg) == 0)
     // display the results
     // top node of XML result
     print("<ident>\n");
-    print "<image>" . htmlspecialchars($image) . "</image>\n";
+    print "<image>$image</image>\n";
 
     $pages      = new RecordSet('Pages',
                                 array('image'    => $image));

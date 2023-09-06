@@ -8,10 +8,12 @@
  *      2020/09/12      add tag wrapper around source title             *
  *		2020/11/19      add support for Manitoba Registrations          *
  *      2020/11/25      add FindAGrave support                          *
+ *      2023/09/04      add support for Canadian Military Records by    *
+ *                      idNumber as well as Regimental Number           *
  *																		*
- *  Copyright &copy; 2020 James A. Cobban								*
+ *  Copyright &copy; 2023 James A. Cobban								*
  **********************************************************************-->
-<span id="source">
+<span id="source$IDSX">
   <em>
     <a href="/FamilyTree/Source.php?id=$IDSR&amp;lang=$LANG" target="_blank" id="title">
 		$TITLE 
@@ -48,9 +50,10 @@
 				target="_blank" id="sourceMarriageCounty$IDSX">
 		$DETAIL
     </a>
-    <a href="$URL" target="_blank" id="hyperlink$IDSX">
-		$DETAIL
-    </a>
+    <span id="hyperlink$IDSX">
+      <a href="$URL" target="_blank">
+		$PREFIX</a> $POSTFIX
+    </span>
     <a href="/Ontario/DistrictMarriagesEdit.php?Volume=$VOLUME&amp;ReportNo=$REPORT&amp;ItemNo=$ITEM&amp;lang=$LANG"
 				target="_blank" id="sourceMarriageDistrict$IDSX">
 		$DETAIL
@@ -89,7 +92,7 @@
 				target="_blank" id="sourceWesleyanBaptism$IDSX">
 		$DETAIL 
     </a>
-    <a href="http://www.bac-lac.gc.ca/eng/discover/postal-heritage-philately/post-offices-postmasters/Pages/item.aspx?IdNumber=$ITEM&amp;lang=$LANG"
+    <a href="http://central.bac-lac.gc.ca/.redirect?app=posoffposmas&id=$ITEM&lang=$LANG3"
 				target="_blank" id="sourcePostOffices$IDSX">
 		$DETAIL 
     </a>
@@ -105,15 +108,13 @@
 				target="_blank" id="sourceFindAGrave$IDSX">
 		$DETAIL
     </a>
-    <a href="https://www.bac-lac.gc.ca/eng/discover/military-heritage/first-world-war/personnel-records/Pages/list.aspx?RegimentNum=$ITEM&"
+    <a href="https://www.bac-lac.gc.ca/eng/discover/military-heritage/first-world-war/personnel-records/Pages/list.aspx?RegimentNum=$ITEM"
 				target="_blank" id="sourceCanMilRegtNum$IDSX">
+		$DETAIL
+    </a>
+    <a href="https://www.bac-lac.gc.ca/eng/discover/military-heritage/first-world-war/personnel-records/Pages/item.aspx?IdNumber=$ITEM"
+				target="_blank" id="sourceCanMilIdNum$IDSX">
 		$DETAIL
     </a>
     <span id="detail$IDSX">$DETAIL</span>
 	<p id="unrecTitle$IDSX">Citation.inc: $LINE Unrecognized source title '$TITLE'.</p>
-    <div id="showText$IDSX" class="row" style="white-space: normal;">
-		$TEXT 
-    </div>
-    <div id="showNote$IDSX" class="row" style="white-space: normal;">
-        <strong>Note:</strong> $NOTE 
-    </div>

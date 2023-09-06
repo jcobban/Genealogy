@@ -163,16 +163,29 @@
  *      2021/03/07      use beep to signal button click ignored         *
  *      2021/03/15      use addCitJSON.php in place of addCitXml.php    *
  *      2022/02/01      use addEventListener and removeEventListener    *
+ *      2022/07/24      correct creation of citation to cause of death  *
+ *      2023/07/19      migrate to ES2015                               *
+ *      2023/08/19      correct id of inserted citation row             *
  *                                                                      *
- *  Copyright &copy; 2022 James A. Cobban                               *
+ *  Copyright &copy; 2023 James A. Cobban                               *
  ************************************************************************/
-
-/************************************************************************
- *  dialogDiv                                                           *
- *                                                                      *
- *  global variable to hold a reference to a displayed dialog           *
- ************************************************************************/
-var dialogDiv           = null;
+import {HTTP} from "../jscripts6/js20/http.js";
+import {actMouseOverHelp, openFrame, debug, args,
+        popupAlert, stopProp, hideRightColumn,
+        keyDown, helpDelayTimer, hideHelp, closeFrame, 
+        beep, createFromTemplate, popupLoading, hideLoading,
+        addOption, displayDialog, hideDialog}
+            from "../jscripts6/util.js";
+import {MonthAbbrs, checkDate, dateChanged,
+        checkOccupation, OccAbbrs, CauseAbbrs, checkText,
+        change, changeElt}
+            from "../jscripts6/CommonForm.js";
+import {evtLocAbbrs, locationChanged}
+            from "../jscripts6/locationCommon.js";
+import {templeChanged}
+            from "../jscripts6/templeCommon.js";
+import {Cookie} from "../jscripts6/Cookie.js";
+/* global tinyMCE */
 
 /************************************************************************
  *  Specify the function to get control once the page is loaded.        *
@@ -238,22 +251,36 @@ function loadEdit()
 
             let name;
             if (element.name && element.name.length > 0)
-                name    = element.name;
+                name            = element.name;
             else
-                name    = element.id;
-            let matches = namePattern.exec(name);
-            let id  = '';
+                name            = element.id;
+            let matches         = namePattern.exec(name);
+            //let id              = '';
             if (matches)
             {           // name matched the pattern
-                name    = matches[1];
-                id  = matches[2];
+                name            = matches[1];
+                //id              = matches[2];
             }           // name matched the pattern
 
             // take action specific to specific elements
-            switch(name.toLowerCase())
+            let pattern         = /^([a-zA-Z_$]+)(\d*)$/;
+            let split           = pattern.exec(name.toLowerCase());
+            let column          = name.toLowerCase();
+            //let rownum          = '';
+            let idet            = element.value;
+            let etypeSelect     = form.etype;
+
+            if (split)
+            {
+                column          = split[1];
+                //rownum          = split[2];
+            }
+            else
+            if (name.length > 0)
+                console.log("editEvent.js: loadEdit: 264: pattern=" + pattern + " could not parse <" + element.tagName + " id='" + name.toLowerCase() + "'>");
+            switch(column)
             {           // action depends upon element name
                 case 'etype':
-                {       // event type input field
                     element.addEventListener('keydown',keyDown);
                     element.addEventListener('change', changeEtype);
                     if (!focusSet)
@@ -261,23 +288,17 @@ function loadEdit()
                         element.focus();    // set focus
                         focusSet        = true;
                     }       // need focus in some field
-                    break;
-                }       // event type input field
+                    break;       // event type input field
 
                 case 'idet':
-                {
-                    let idet                = element.value;
-                    let etypeSelect         = form.etype;
                     if (etypeSelect)
                         etypeSelect.value   = idet;
                     else
                         console.log("editEvent.js: loadEdit: 274 " +
                             " idet=" + idet + " etype field not found");
                     break;
-                }
 
                 case 'date':
-                {       // event date 
                     element.addEventListener('keydown',inputKeyDown);
                     element.abbrTbl     = MonthAbbrs;
                     element.checkfunc   = checkDate;
@@ -285,157 +306,116 @@ function loadEdit()
                     element.onblur      = gotoDescription;
                     element.focus();    // set focus
                     focusSet            = true;
-                    break;
-                }       // event date
+                    break;       // event date
 
                 case 'occupation':
-                {       // occupation
                     element.addEventListener('keydown',inputKeyDown);
                     element.checkfunc   = checkOccupation;
                     element.addEventListener('change', change);
                     element.abbrTbl     = OccAbbrs;
-                    break;
-                }       // occupation
+                    break;       // occupation
 
                 case 'location':
-                {       // event location
                     element.addEventListener('focus', focusLocation);
                     element.addEventListener('keydown',inputKeyDown);
                     element.abbrTbl     = evtLocAbbrs;
                     element.addEventListener('change', locationChanged);
-                    break;
-                }       // event location
+                    break;       // event location
 
                 case 'temple':
-                {       // event temple
                     element.addEventListener('focus', focusLocation);
                     element.addEventListener('keydown',inputKeyDown);
                     element.abbrTbl     = evtLocAbbrs;
                     element.addEventListener('change', templeChanged);
-                    break;
-                }       // event temple
+                    break;       // event temple
 
                 case 'templeready':
                 case 'cremated':
                 case 'title':
-                {       // templeReady checkbox
                     element.onblur  = gotoNotes;
-                    break;
-                }       // templeReady checkbox
+                    break;       // templeReady checkbox
 
                 case 'deathcause':
-                {       // cause of death
                     element.addEventListener('keydown',inputKeyDown);
                     element.abbrTbl     = CauseAbbrs;
                     element.checkfunc   = checkText;
                     element.addEventListener('change', change);
-                    break;
-                }       // cause of death
+                    break;       // cause of death
 
                 case 'updevent':
-                {       // <button id='updEvent'>
                     element.addEventListener('keydown',keyDown);
                     element.addEventListener('click',updateEvent);
                     element.addEventListener('change', change);   // default handler
-                    break;
-                }       // <button id='updEvent'>
+                    break;       // <button id='updEvent'>
 
                 case 'raw':
-                {       // <button id='raw'>
                     element.addEventListener('keydown',keyDown);
                     element.addEventListener('click',showRaw);
-                    break;
-                }       // <button id='raw'>
+                    break;       // <button id='raw'>
 
                 case 'clear':
-                {       // <button id='Clear'>
                     element.addEventListener('keydown',keyDown);
                     element.addEventListener('click',clearNotes);
-                    break;
-                }       // <button id='Clear'>
+                    break;       // <button id='Clear'>
 
                 case 'submit':
-                {       // <button id='Submit' type='submit'>
                     element.addEventListener('keydown',keyDown);
                     form.onsubmit       = proceedWithSubmit;
-                    break;
-                }       // <button id='Submit' type='submit'>
+                    break;       // <button id='Submit' type='submit'>
 
                 case 'close':
-                {       // <button id='close'>
                     element.addEventListener('keydown',keyDown);
                     element.addEventListener('click',closeWithoutUpdating);
-                    break;
-                }       // <button id='close'>
-
+                    break;       // <button id='close'>
 
                 case 'note':
-                {       // textual notes on event
-                    element.addEventListener('change', change);   // default handler
+                    element.addEventListener('change', change); 
                     if (!focusSet)
                     {       // need focus in some field
                         element.focus();    // set focus
                         focusSet    = true;
                     }       // need focus in some field
-                    break;
-                }       // textual notes on event
+                    break;       // textual notes on event
 
-                case 'addcitation':
                 case 'addcitationdeathcause':
-                {       // add citation to primary fact
                     element.addEventListener('keydown',keyDown);
                     element.addEventListener('click',addCitation);
-                    break;
-                }       // add citation to primary fact
+                    break;       // add citation
 
                 case 'pictures':
-                {       // <button id='Pictures'>
                     element.addEventListener('keydown',keyDown);
                     element.addEventListener('click',editPictures);
-                    break;
-                }       // <button id='Pictures'>
+                    break;       // <button id='Pictures'>
 
                 case 'editname':
-                {       // edit alternate name button
                     element.addEventListener('keydown',keyDown);
                     element.addEventListener('click',editName);
-                    break;
-                }       // edit alternate name button
+                    break;       // edit alternate name button
 
                 case 'delname':
-                {       // delete alternate name button
                     element.addEventListener('keydown',keyDown);
                     element.addEventListener('click',delName);
-                    break;
-                }       // delete alternate name button
+                    break;       // delete alternate name button
 
                 case 'editcitation':
-                {       // edit alternate name citation button
                     element.addEventListener('keydown',keyDown);
                     element.addEventListener('click',editCitation);
-                    break;
-                }       // edit alternate name citation button
+                    break;       // edit citation button
 
                 case 'delcitation':
-                {       // delete alternate name citation button
                     element.addEventListener('keydown',keyDown);
                     element.addEventListener('click',deleteCitation);
-                    break;
-                }       // delete alternate name citation button
+                    break;       // delete citation button
 
                 case 'addcitation':
-                {       // add alternate name citation button
                     element.addEventListener('keydown',keyDown);
-                    element.addEventListener('click',addAltCitation);
-                    break;
-                }       // add alternate name citation button
+                    element.addEventListener('click',addCitation);
+                    break;       // add citation button
 
                 default:
-                {
                     element.addEventListener('keydown',keyDown);
-                    element.addEventListener('change', change);   // default handler
+                    element.addEventListener('change', change); 
                     break;
-                }       // default
 
             }           // action depends upon element name
         }               // loop through all elements in the form
@@ -457,34 +437,29 @@ function inputKeyDown(ev)
 {
     if (!ev)
     {                   // browser is not W3C compliant
-        ev  =  window.event;    // IE
+        ev          =  window.event;    // IE
     }                   // browser is not W3C compliant
 
-    let code    = ev.keyCode;       // numeric keystroke
+    let code            = ev.code;       // numeric keystroke
 
-    let form    = this.form;        // form containing input field
+    //let form          = this.form;        // form containing input field
 
     // hide the help balloon on any keystroke
-    if (helpDiv)
-    {                   // helpDiv currently displayed
-        helpDiv.style.display   = 'none';
-        helpDiv         = null; // no longer displayed
-    }                   // helpDiv currently displayed
+    hideHelp();
     clearTimeout(helpDelayTimer);   // clear pending help display
-    helpDelayTimer      = null;
 
     // take action based upon code
     switch (code)
     {
-        case KEY_ENTER: // Enter
+        case "ENTER": // Enter
         {
             document.getElementById('updEvent').click();
             return true;        // default action submit
         }               // Enter
 
-        case KEY_F1:    // F1
+        case "F1":    // F1
         {
-            displayHelp(this);      // display help page
+            keyDown(ev);        // display help page
             return false;       // suppress default action
         }               // F1
     }       // switch on key code
@@ -580,7 +555,7 @@ function changeOccupation(editor)
 {
     if (editor.id != 'occupation')
         return;
-    let element             = document.getElementById(editor.id);
+    //let element             = document.getElementById(editor.id);
     let abbrTbl             = OccAbbrs;
     let html                = editor.getContent();
     let tagArray            = html.split('<');
@@ -674,6 +649,12 @@ function changeOccupation(editor)
  ************************************************************************/
 function focusLocation(ev)
 {
+    if (!ev)
+    {       // browser is not W3C compliant
+        ev                              =  window.event;    // IE
+    }       // browser is not W3C compliant
+    ev.stopPropagation();
+
     let mceElt          = tinyMCE.get('occupation');
     if (mceElt)
         changeOccupation(mceElt);
@@ -717,90 +698,6 @@ function gotoNotes()
     if (form.note)
         tinyMCE.get('note').focus();
 }       // function gotoNotes
-
-/************************************************************************
- *  function newEvent                                                   *
- *                                                                      *
- *  This method is called when the XML file representing                *
- *  an instance of Event created to satisfy a change to the event       *
- *  type is retrieved from the database.                                *
- *                                                                      *
- *  Parameters:                                                         *
- *      xmlDoc      XML document representing the new event             *
- ************************************************************************/
-function newEvent(xmlDoc)
-{
-    if (xmlDoc === undefined)
-    {
-        alert("editEvent.js: newEvent: xmlDoc is undefined!");
-        return;
-    }
-    let form        = document.evtForm;
-    let addCitBtn   = document.getElementById('AddCitation');
-    let addCitDcBtn = document.getElementById('addCitationDeathCause')
-
-    let root        = xmlDoc.documentElement;
-    if (root && root.nodeName == 'event')
-    {
-        for (var i = 0; i < root.childNodes.length; i++)
-        {                       // loop through all children
-            let elt                 = root.childNodes[i];
-            if (elt.nodeType == 1)
-            {                   // tag
-                switch(elt.nodeName)
-                {
-                    case 'parms':
-                    {
-                        // no action
-                        break;
-                    }           // parms
-
-                    case 'event':
-                    {           // returned event object
-                        let iders   = elt.getElementsByTagName('ider');
-                        let ider    = iders[0].textContent;
-                        let form    = document.evtForm;
-                        form.type.value     = 30;   // individual event
-                        form.citType.value  = 30;   // individual event
-                        form.ider.value     = ider;
-                        form.idime.value    = ider;
-                        addCitBtn.disabled  = false;
-                        if (addCitDcBtn)
-                            addCitDcBtn.disabled= false;
-                        break;
-                    }           // returned event object
-
-                    case 'msg':
-                    {
-                        alert('editEvent.js: newEvent: message ' +
-                              new XMLSerializer().serializeToString(elt));
-                        break;
-                    }           // error message
-
-                    default:
-                    {
-                        alert('editEvent.js: newEvent: unexpected tag <' +
-                              elt.nodeName + '>');
-                        break;
-                    }           // unexpected
-
-                }               // switch on element name
-            }                   // tag
-        }                       // loop through all children
-    }                           // valid response
-    else
-    {                           // invalid response
-        if (xmlDoc)
-        {
-            if (root.nodeName)
-                alert('editEvent.js: newEvent: ' + new XMLSerializer().serializeToString(root));
-            else
-                alert('editEvent.js: newEvent: ' + root);
-        }
-        else
-            alert('editEvent.js: newEvent: null parameter');
-    }                           // invalid response
-}       // function newEvent
 
 /************************************************************************
  *  function suppressSubmit                                             *
@@ -850,97 +747,105 @@ function updateEvent(ev)
 {
     if (!ev)
     {       // browser is not W3C compliant
-        ev  =  window.event;    // IE
+        ev                              =  window.event;    // IE
     }       // browser is not W3C compliant
     ev.stopPropagation();
 
-    if (deferSubmit)
-    {
-        deferSubmit     = false;
-        return  false;
-    }
+    // if (deferSubmit)
+    // {
+    //     deferSubmit                     = false;
+    //     return  false;
+    // }
 
-    let form            = document.evtForm;
-    let parms           = {};
-    parms.etype         = 0;
-    let formElts        = form.elements;
-    let idime           = 0;
+    let form                			= document.evtForm;
+    let parms               			= {};
+    parms.etype             			= 0;
+    let formElts            			= form.elements;
+    //let idime               			= 0;
     for (var i = 0; i < formElts.length; ++i)
-    {       // loop through elements
-        let elt         = formElts[i];
-        switch(elt.name)
+    {                       // loop through elements
+        let elt             			= formElts[i];
+        let name                        = elt.name;
+        let pattern                     = /^([a-zA-Z_$]+)(\d*)$/;
+        let column           			= name.toLowerCase();
+        // let rownum                      = '';
+        let split           			= pattern.exec(name.toLowerCase());
+        let text                        = elt.value;
+        let option                      = null;
+        if (elt.options)
+            option                      = elt.options[elt.selectedIndex];
+        let mceElt                      = null;
+        let results                     = null;
+        if (split)
+        {
+            column          			= split[1];
+            //rownum          			= split[2];
+        }
+        else
+            console.log("editEvent.js: updateEvent: could not split name=" + name);
+        switch(column)
         {
             case 'etype':
-            {
-                parms.etype         = form.etype.value;
+                parms.etype             = form.etype.value;
                 if (parms.etype > 1000)
-                    parms.type      = Math.floor(parms.etype / 1000);
+                    parms.type          = Math.floor(parms.etype / 1000);
                 else
-                    parms.type      = form.type.value;  // individual event
-                break;
-            }
+                    parms.type          = form.type.value; 
+                break          // etype
 
             case 'kind':
-            {
                 if (elt.checked)
-                    parms.kind      = elt.value;
-                break;
-            }
+                    parms.kind          = elt.value;
+                break          // kind
 
             case 'idir':
             case 'ider':
+            case 'idet':
             case 'idcr':
             case 'idmr':
             case 'idime':
+            case 'dcidime':
             case 'date':
             case 'prefix':
             case 'title':
             case 'type':
             case 'location':
             case 'order':
-            case 'givenName':
+            case 'givenname':
             case 'surname':
-            case 'newAltGivenName':
-            case 'newAltSurname':
-            case 'deathCause':
-            case 'citType':
-            case 'AddCitation':
-            {
-                parms[elt.name]     = elt.value;
+            case 'newaltgivenname':
+            case 'newaltsurname':
+            case 'deathcause':
+            case 'cittype':
+            case 'dccittype':
+            case 'addcitation':
+                parms[elt.name]         = elt.value;
                 break;
-            }   // supported fields
 
             case 'temple':
-            {
-                parms.temple        = elt.value;
-                let option          = elt.options[elt.selectedIndex];
-                parms.location      = option.text.trim();
-                break;
-            }   // supported fields
+                parms.temple            = elt.value;
+                parms.location          = option.text.trim();
+                break;          // temple
 
-            case 'templeReady':
+            case 'templeready':
             case 'notmarried':
             case 'nochildren':
-            {       // check boxes
                 if (elt.checked)
-                    parms[elt.name] = elt.value;
+                    parms[elt.name]     = elt.value;
                 else
-                    parms[elt.name] = 0;
-                break;
-            }       // check boxes
+                    parms[elt.name]     = 0;
+                break;          // check boxes
 
             case 'description':
             case 'occupation':
             case 'note':
-            {       // fields using tinyMCE for extended notes
-                let text                = elt.value;
                 if (typeof tinyMCE !== 'undefined')
                 {
-                    let mceElt          = tinyMCE.get(elt.name);
+                    mceElt              = tinyMCE.get(elt.name);
                     if (mceElt)
                     {
                         text            = mceElt.getContent();
-                        let results     = /<p>(.*)<\/p>/.exec(text);
+                        results         = /<p>(.*)<\/p>/.exec(text);
                         if (results)
                         {
                             text        = results[1];
@@ -952,20 +857,16 @@ function updateEvent(ev)
                 changeElt(elt);
                 text                    = elt.value;
                 parms[elt.name]         = text;
-                break;
-            }       // extended notes
+                break;          // fields using tinyMCE for extended notes
 
-            default:
-            {
-                // pass on fields in a citation
-                if (elt.name.substring(0,6) == 'Source' ||
-                    elt.name.substring(0,4) == 'IDSR' ||
-                    elt.name.substring(0,4) == 'Page')
-                    parms[elt.name] = elt.value;
+            case 'source':
+            case 'idsr':
+            case 'page':
+                parms[elt.name]         = elt.value;
                 break;
-            }
-        }   // switch on elt.name
-    }       // loop through elements
+
+        }                       // switch on elt.name
+    }                           // loop through elements
 
     // if there are no parms then there was an error setting up the
     // event edit, so just close the window
@@ -1013,6 +914,10 @@ function updateEvent(ev)
  ************************************************************************/
 function closeWithoutUpdating(ev)
 {
+    if (!ev)
+    {       // browser is not W3C compliant
+        ev  =  window.event;    // IE
+    }       // browser is not W3C compliant
     closeFrame();
 }       // function closeWithoutUpdating
 
@@ -1039,10 +944,9 @@ function gotEvent(xmlDoc)
     if (root && root.nodeName == 'event')
     {                       // expected response
         let serializer      = new XMLSerializer;
-        if (debug.toLowerCase() == 'y')
-            alert("editEvent.js: gotEvent: " +
+        console.log("editEvent.js: gotEvent: " +
                         serializer.serializeToString(root));
-        let msgs    = root.getElementsByTagName("msg");
+        let msgs            = root.getElementsByTagName("msg");
         if (msgs.length > 0)
         {                   // have messages in reply
             let msgsText    = '';
@@ -1061,9 +965,9 @@ function gotEvent(xmlDoc)
             //alert("editEvent.js: gotEvent: database not updated" +
             //  new XMLSerializer().serializeToString(root));
         }                   // no update
-        //else
-        //    alert("editEvent.js: gotEvent: database updated" +
-        //  new XMLSerializer().serializeToString(root));
+        else
+            console.log("editEvent.js: gotEvent: database updated" +
+                        new XMLSerializer().serializeToString(root));
 
         // ensure that ider and idime fields are initialized
         let idime       = document.getElementById('idime');
@@ -1197,6 +1101,10 @@ function noEvent()
  ************************************************************************/
 function editName(ev)
 {
+    if (!ev)
+    {       // browser is not W3C compliant
+        ev  =  window.event;    // IE
+    }       // browser is not W3C compliant
     let idnx        = this.id.substr(8);
     let formName    = this.form.name;
 
@@ -1223,6 +1131,10 @@ function editName(ev)
  ************************************************************************/
 function delName(ev)
 {
+    if (!ev)
+    {       // browser is not W3C compliant
+        ev  =  window.event;    // IE
+    }       // browser is not W3C compliant
     let idnx    = this.id.substr(7);
 
     // invoke script to update Event and return XML result
@@ -1254,22 +1166,22 @@ function gotDelName(xmlDoc)
         alert("editEvent.js: gotDelName: xmlDoc is undefined!");
         return;
     }
-    let form        = document.evtForm;
+    //let form        = document.evtForm;
 
     let root    = xmlDoc.documentElement;
     if (root && root.nodeName == 'deleted')
     {       // expected root node name
         if (debug.toLowerCase() == 'y')
             alert('editEvent.js: gotDelName: ' + new XMLSerializer().serializeToString(root));
-        let msgs    = root.getElementsByTagName("msg");
+        let msgs                = root.getElementsByTagName("msg");
         if (msgs.length > 0)
         {       // have messages in reply
-            let msgtext = "editEvent.js: gotDelName: msg=";
+            let msgtext         = "editEvent.js: gotDelName: msg=";
             for(var j = 0; j < msgs.length; j++)
-                msgtext     += msgs[j].textContent + ',';
+                msgtext         += msgs[j].textContent + ',';
             alert(msgtext);
         }       // have messages in reply
-        location    = location; // refresh
+        location.reload();      // refresh
     }       // expected root node name
     else
         alert("editEvent.js: gotDelName: unexpected root node <" + 
@@ -1305,12 +1217,12 @@ function eeKeyDown(ev)
     {       // browser is not W3C compliant
         ev  =  window.event;    // IE
     }       // browser is not W3C compliant
-    let code    = ev.keyCode;
+    let code    = ev.code;
 
     // take action based upon code
     switch (code)
     {
-        case LTR_A:
+        case "KeyA":
         {       // letter 'A'
             if (ev.altKey)
             {       // alt-A
@@ -1321,7 +1233,7 @@ function eeKeyDown(ev)
             break;
         }       // letter 'A'
 
-        case LTR_C:
+        case "KeyC":
         {       // letter 'C'
             if (ev.altKey)
             {       // alt-C
@@ -1332,7 +1244,7 @@ function eeKeyDown(ev)
             break;
         }       // letter 'A'
 
-        case LTR_S:
+        case "KeyS":
         {       // letter 'S'
             if (ev.ctrlKey)
             {       // ctrl-S
@@ -1342,7 +1254,7 @@ function eeKeyDown(ev)
             break;
         }       // letter 'S'
 
-        case LTR_U:
+        case "KeyU":
         {       // letter 'U'
             if (ev.altKey)
             {       // alt-U
@@ -1370,7 +1282,6 @@ var pendingElement  = null;
 
 function addCitation(ev)
 {
-    console.log("addCitation: 1361 this.id=" + this.id);
     if (!ev)
     {           // browser is not W3C compliant
         ev          =  window.event;    // IE
@@ -1391,12 +1302,13 @@ function addCitation(ev)
         idet        = form.etype.value;     // event type
     let type        = form.citType.value;   // citation type
     let idime       = form.idime.value;     // key of associated record
+    
     if (this.id == 'addCitationDeathCause')
     {           // special button
         type        = 9;
         idime       = form.idir.value;      // key of associated record
     }           // special button
-    console.log("1386 type=" + type + ", idime=" + idime);
+    console.log("addCitation: 1402: type=" + type + ", idime=" + idime);
 
     if (type < 1)
     {
@@ -1418,13 +1330,7 @@ function addCitation(ev)
         return;
     }
 
-    if (debug.toLowerCase() == 'y')
-    {
-        alert("editEvent: addCitation: id=" + this.id +
-                ", type=" + type +
-                ", idime=" + idime);
-    }
-    console.log("editEvent: addCitation: id=" + this.id +
+    console.log("addCitation: 1424: id=" + this.id +
                 ", type=" + type +
                 ", idime=" + idime);
 
@@ -1463,10 +1369,14 @@ function addCitation(ev)
         sourceName  = 'Source for IDSR=' + idsr;
     }           // backwards compatibility
 
+    console.log("addCitation: 1463: id=" + this.id +
+                ", type=" + type +
+                ", idime=" + idime);
+
     let parms       = {"rownum"     : 0,
                        "detail"     : detail,
                        'idime'      : idime,
-                       'stype'      : type,
+                       'type'       : type,
                        'idsr'       : idsr,
                        'sourceName' : sourceName};
     let newRow      = createFromTemplate('sourceRow$rownum',
@@ -1485,13 +1395,13 @@ function addCitation(ev)
     // support popup help for the fields in the added row
     let sourceCell          = form.Source0;
     sourceCell.helpDiv      = 'SourceSel';
-    actMouseOverHelp(sourceCell);
+    actMouseOverHelp.call(sourceCell);
 
     // set actions for detail input text field
     let element             = form.Page0;
-    element.onblur          = createCitation;   // leave field
-    element.addEventListener('change', createCitation);   // change field
-    actMouseOverHelp(element);
+    element.addEventListener('blur',    createCitation);    // leave field
+    element.addEventListener('change',  createCitation);    // change field
+    actMouseOverHelp.call(element);
 
     // populate the select with the list of defined sources to 
     // in the second cell.  The name of the <select> element,
@@ -1552,7 +1462,7 @@ function editPictures(ev)
     }       // unable to identify record to associate with
 
     // open the edit pictures dialog in the other half of the window
-    let frameClass  = 'left';
+    //let frameClass  = 'left';
     openFrame("pictures",
               "editPictures.php?idir=" + idir + "&idtype=" + picIdType, 
               childFrameClass);
@@ -1651,34 +1561,34 @@ function gotSources(xmlDoc)
     // create a new HTML Option object to represent the ability to
     // create a new source and add it to the Select as the first option
     let option  = addOption(elt,    // Select element
-                        'Add New Source',   // text value to display
-                        -1);    // key to request add
+                            'Add New Source',   // text value to display
+                            -1);    // key to request add
     elt.addEventListener('change', checkForAdd);
 
     // customize selection
     elt.size    = 10;   // height of selection list
 
     // add the options from the XML file to the Select
-    for (var i = 0; i < newOptions.length; ++i)
+    for (let i = 0; i < newOptions.length; ++i)
     {       // loop through source nodes
-        let node    = newOptions[i];
+        let node            = newOptions[i];
 
         // get the text value to display to the user
         // this is the name of the source
-        let text    = node.textContent;
+        let text            = node.textContent;
 
         // get the "id" attribute, this is the IDSR value identifying
         // the source.  It becomes the value of the Option. 
-        let value   = node.getAttribute("id");
+        let value           = node.getAttribute("id");
         if ((value == null) || (value.length == 0))
         {       // cover our ass
-            value       = text;
+            value           = text;
         }       // cover our ass
 
         // create a new HTML Option object and add it to the Select
-        option  = addOption(elt,    // Select element
-                        text,   // text value to display
-                        value); // unique key of source record
+        option          = addOption(elt,    // Select element
+                                    text,   // text value to display
+                                    value); // unique key of source record
 
         // select the last source chosen by the user
         if (idsr &&
@@ -1712,7 +1622,8 @@ function noSources()
  ************************************************************************/
 function createCitation()
 {
-    console.log("editEvent.js: createCitation: 1699, this->" + this.outerHTML)
+    console.log("editEvent.js: createCitation: 1719, this->" + this.outerHTML)
+    //let cell            = this.parentNode;  // cell containing page element
     let rownum          = this.name.substring(4);   // IDSX if existing
 
     // prevent double invocation
@@ -1724,15 +1635,17 @@ function createCitation()
     let formName        = form.name;        // name of the form
 
     // type of event to cite
-    let type            = form.type.value; 
+    let type            = form.elements['CITTYPE' + rownum].value; 
     let idet            = 0;
     if (form.etype)
         idet            = form.etype.value;
 
     // key of associated record
-    let idime           = form.idime.value;
-    if (type == 9)
-        idime           = form.idir.value;
+    let idime           = form.elements['IDIME' + rownum].value;
+    console.log("createCitation: 1740: idime=" + idime + ", type=" + type + ", idet=" + idet +
+    ", IDSR" + rownum + "=" + form.elements["IDSR" + rownum].value +
+    ", IDIME" + rownum + "=" + form.elements["IDIME" + rownum].value +
+    ", CITTYPE" + rownum + "=" + form.elements["CITTYPE" + rownum].value);
 
     let addButton       = document.getElementById('addCitation' + idime);
     if (!addButton)
@@ -1745,9 +1658,6 @@ function createCitation()
 
     // other parameters
     let pageText        = this.value;       // value of page element
-    let cell            = this.parentNode;  // cell containing page element
-    let row             = cell.parentNode;  // row containing page element
-    let cell2           = row.cells[1];     // 2nd cell in same row
     let sourceSel       = form.elements['Source' + rownum];
     let sourceOpt       = null;
     if (sourceSel)
@@ -1890,10 +1800,10 @@ function gotAddCit(jsonDoc)
         if (parms.formname)
         {
             let rowNum              = parms.row;
-            let idsr                = parms.idsr;
-            let sourcename          = parms.source;
-            let formname            = parms.formname;
-            let form                = document.forms[formname];
+            //let idsr                = parms.idsr;
+            //let sourcename          = parms.source;
+            //let formname            = parms.formname;
+            //let form                = document.forms[formname];
             let citation            = jsonDoc.citation;
 
             // locate elements in web page to be updated
@@ -1914,6 +1824,7 @@ function gotAddCit(jsonDoc)
                     let newRow      = createFromTemplate('sourceRown$idsx',
                                                          parms,
                                                          null);
+                    newRow.id       = 'sourceRow' + idsx;
                     tbody.insertBefore(newRow, nextRow);
 
                     // activate functionality of buttons
@@ -1950,10 +1861,10 @@ function noAddCit()
  *  a citation to an alternate name                                     *
  *                                                                      *
  *  Input:                                                              *
- *      this        the invoking <button> element                       *
+ *      this    the invoking <button> element                           *
  *      ev      W3C compliant browsers pass an event as a parameter     *
  ************************************************************************/
-function addAltCitation(ev)
+function addAltCitation(ev) // eslint-disable-line no-unused-vars
 {
     if (!ev)
     {       // browser is not W3C compliant
@@ -1964,12 +1875,13 @@ function addAltCitation(ev)
     this.disabled   = true;         // prevent double add cit
     let form        = this.form;
     let cell        = this.parentNode;  // <td>
-    let row     = cell.parentNode;  // <tr>
+    let row         = cell.parentNode;  // <tr>
     let body        = row.parentNode;   // <tbody>
-    let table       = body.parentNode;  // <table>
+    //let table       = body.parentNode;  // <table>
 
     // identification of the event to be cited
     let type        = 10;           // Citation::STYPE_ALTNAME
+    let idsr        = 0;
     let idime       = this.id.substring(11);// key of Name
 
     // use cookie to recall the specifics of the last citation added
@@ -1980,10 +1892,15 @@ function addAltCitation(ev)
     {           // remember last value entered
         detail      = cookie.text;
     }           // remember last value entered
+    if (cookie.idsr)
+    {           // recall last value entered
+        idsr        = cookie.idsr;
+    }           // recall last value entered
 
     let parms       = {"rownum" : 'A',
                        "detail" : detail,
                        "idime"  : idime,
+                       "idsr"   : idsr,
                        "type"   : type};
     let newRow      = createFromTemplate('sourceRow$rownum',
                                  parms,
@@ -2114,7 +2031,7 @@ function confirmDelete(ev)
     // get the parameter values hidden in the dialog
     let form        = this.form;
     let idsx        = this.id.substr(13);
-    let rownum      = form.elements['rownum' + idsx].value;
+    //let rownum      = form.elements['rownum' + idsx].value;
     let formname    = form.elements['formname' + idsx].value;
 
     let parms       = {"idsx"       : idsx,
@@ -2125,7 +2042,7 @@ function confirmDelete(ev)
         parms["debug"]  = debug;
 
     // hide the dialog
-    dialogDiv.style.display = 'none';
+    hideDialog(ev);
 
     // invoke script to update Event and return XML result
     HTTP.post('/FamilyTree/deleteCitationXml.php',
@@ -2145,17 +2062,17 @@ function confirmDelete(ev)
  ************************************************************************/
 function gotDeleteCit(xmlDoc)
 {
-    let root        = xmlDoc.documentElement;
-    const serializer    = new XMLSerializer();
+    let root                = xmlDoc.documentElement;
+    //const serializer      = new XMLSerializer();
     if (root && (root.nodeName == 'deleted'))
     {               // valid XML response
-        let rownum      = root.getAttribute("rownum");
-        let idsx        = root.getAttribute("idsx");
-        let formname    = root.getAttribute("formname");
-        let form        = document.forms[formname];
+        let rownum          = root.getAttribute("rownum");
+        //let idsx          = root.getAttribute("idsx");
+        //let formname      = root.getAttribute("formname");
+        //let form          = document.forms[formname];
         for (var i = 0; i < root.childNodes.length; i++)
         {           // loop through immediate children of root
-            let elt = root.childNodes[i];
+            let elt         = root.childNodes[i];
             if (elt.nodeType == 1)
             {       // only examine elements at this level
                 if (elt.nodeName == 'msg')
@@ -2185,10 +2102,11 @@ function gotDeleteCit(xmlDoc)
     }               // valid XML response
     else
     {               // error unexpected document
+        let msg             = null;
         if (root)
-            msg = new XMLSerializer().serializeToString(root);
+            msg             = new XMLSerializer().serializeToString(root);
         else
-            msg = xmlDoc;
+            msg             = xmlDoc;
         alert ("editEvent.js: gotDeleteCit: Error: " + msg);
     }               // error unexpected document
 }       // function gotDeleteCit
@@ -2227,9 +2145,9 @@ function updateCitation(idsx,
                               ",idsr=" + idsr +
                               ",sourceName=" + sourceName +
                               ",page=" + page + ")");
-    let form        = this;
-    let sourceElement   = document.getElementById("Source" + idsx);
-    let pageElement = document.getElementById("Page" + idsx);
+    //let form              = this;
+    let sourceElement       = document.getElementById("Source" + idsx);
+    let pageElement         = document.getElementById("Page" + idsx);
     if (sourceElement)
         sourceElement.value = sourceName;
     else
@@ -2344,8 +2262,8 @@ function nameFeedback(parms)
     let title               = "";
     let givenName           = "";
     let surname             = "";
-    let suffix              = "";
-    for(key in parms)
+    let prefix              = "";
+    for(let key in parms)
     {                   // loop through all parameters
         let value           = parms[key];
         switch(key)

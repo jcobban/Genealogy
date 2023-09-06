@@ -391,8 +391,9 @@ use \Exception;
  *      2020/03/25      undefined Event::setIdir                        *
  *      2022/01/19      Field name in class Name changed from `Order`   *
  *                      to `Type` to avoid SQL reserved word            *
+ *      2023/04/01      correct toJson with event list                  *
  *                                                                      *
- *  Copyright &copy; 2022 James A. Cobban                               *
+ *  Copyright &copy; 2023 James A. Cobban                               *
  ************************************************************************/
 require_once __NAMESPACE__ . '/RecordPic.inc';
 require_once __NAMESPACE__ . '/Person.inc';
@@ -1757,7 +1758,8 @@ class Family extends RecordPic
         {       // need to perform query for events
             $idmr           = $this->row['idmr'];
             $parms          = array('idir'      => $idmr,
-                                    'idtype'    => 20);
+                                    'idtype'    => 20,
+                                    'orderby'   => 'eventsd');
             $this->events   = new RecordSet('Events', $parms);
 
             // ensure that methods getXxxxEvent return the same
@@ -2429,15 +2431,21 @@ catch(Exception $e)
             }       // include children
 
             // report on the other events
-        if ($includeEvents)
-        {       // include other events
-            $events     = $this->getEvents();
-            $numEvents  = count($events);
-            foreach($events as $ie => $event)
-            {
-                $retval .= $event->toJson(false);
-            }       // loop through events
-        }       // include other events
+            if ($includeEvents)
+            {       // include other events
+                $retval     .= ", \"events\" : {\n        ";
+                $events     = $this->getEvents();
+                $numEvents  = count($events);
+                $comma      = '';
+                foreach($events as $ie => $event)
+                {
+                    $ider   = $event->getIder();
+                    $retval .= "$comma\"ider$ider\" : " .
+                                $event->toJson(false);
+                    $comma  = ',';
+                }   // loop through events
+                $retval     .= " }";
+            }       // include other events
         }
         catch(Exception $e)
         {
@@ -2947,6 +2955,7 @@ catch(Exception $e)
                 $this->row['mard']      = $value;
                 $this->changed['mard']  = $value;
                 $sort                   = $date->getSortDate();
+                $this->row['marsd']     = $sort;
                 if (is_null($this->marEvent))
                     $this->marEvent  = $this->getMarEvent($value !== '');
                 if ($this->marEvent)
@@ -3844,16 +3853,19 @@ catch(Exception $e)
       <p class='message'><?php print $e->getMessage(); ?>
       </p>
 <?php
-        }       // catch
+        }               // catch
 
         // move any remaining marriage facts
-        $events = $oldFamily->getEvents();
+        $events             = $oldFamily->getEvents();
         for ($ie = 0; $ie < count($events); $ie++)
-        {
-            $event  = $events[$ie];
-            $event->set('idir', $newidmr);
-            $event->save('p');
-        }       // loop through marriage events/facts
+        {               // loop through marriage events/facts
+            $event          = $events[$ie];
+            if ($event)
+            {
+                $event->set('idir', $newidmr);
+                $event->save('p');
+            }
+        }               // loop through marriage events/facts
 
         // apply changes to database
         $this->save('p');

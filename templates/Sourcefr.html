@@ -1,0 +1,128 @@
+<!--*********************************************************************
+ *  Sourcefr.html	    												*
+ *																		*
+ *  Display a web page containing details of an particular source		*
+ *  from the Legacy database.											*
+ *																		*
+ *  History:															*
+ *		2022/06/21      created                                         *
+ *																		*
+ *  Copyright &copy; 2022 James A. Cobban								*
+ **********************************************************************-->
+    <div id="breadcrumbs" class="hidden">
+      <a href="/genealogy.php?lang=$LANG">Genealogie</a>:
+      <a href="/FamilyTree/Services.php?lang=$LANG">Services</a>:
+      <a href="/FamilyTree/Sources.php?lang=$LANG">Sources</a>:
+    </div> <!-- id="breadcrumbs" -->
+    <div class="body">
+      <h1>Source $NAME
+        <span class="right">
+ 		 <a href="SourceHelpen.html" target="help">? Aide</a>
+        </span>
+      </h1>
+      $TRACE
+      $MSG
+    <div class="row" id="idsrRow">
+      <div class="labelRight" class="label">IDSR:</div>
+      <div class="data">
+		$IDSR
+      </div>
+    </div>
+    <div class="row" id="titleRow">
+      <div class="labelRight" class="label">Titre:</div>
+      <div class="data">
+		$SRCTITLE
+      </div>
+    </div>
+    <div class="row">
+      <div class="labelRight" class="label">Type:</div>
+      <div class="data">
+		$TYPETEXT
+      </div>
+    </div>
+    <div class="row" id="authorRow">
+      <div class="labelRight" class="label">Auteur[e]:</div>
+      <div class="data">
+		$SRCAUTHOR
+      </div>
+    </div>
+    <div class="row" is="publisherRow">
+      <div class="labelRight" class="label">Données de Publication:</div>
+      <div class="data">
+		$SRCPUBL
+      </div>
+    </div>
+    <div class="row" id="textRow">
+      <div class="labelRight" class="label">Texte:</div>
+      <div class="data">
+		$SRCTEXT
+      </div>
+    </div>
+    <div class="row" id="notesRow">
+      <div class="labelRight" class="label">Notes:</div>
+      <div class="data">
+		$SRCNOTE
+      </div>
+    </div>
+    <div class="row" id="callNumRow">
+      <div class="labelRight" class="label">Numéro d'Appel:</div>
+      <div class="data">
+		<a href="$SRCCALLNUM" id="callNum">$SRCCALLNUM
+		</a>
+      </div>
+    </div>
+    <div class="row" id="repositoryRow">
+      <div class="labelRight" class="label">Dépôt:</div>
+      <div class="data">
+          <span id="repoName"><a href="/FamilyTree/Address.php?idar=$IDAR&lang=en">$REPONAME</a><br/></span>
+		    <span id="repoAddress1">$REPOADDRESS1<br/></span>
+		    <span id="repoAddress2">$REPOADDRESS2<br/></span>
+		    <span id="repoCity">$REPOCITY<br/></span>
+		    <span id="repoState">$REPOSTATE<br/></span>
+		    <span id="repoPostalCode">$REPOPOSTALCODE<br/></span>
+		    <span id="repoCountry">$REPOCOUNTRY<br/></span>
+      </div>
+    </div>
+    <div class="row" id="homePageRow">
+      <div class="labelRight" class="label">Page d'accueil:</div>
+      <div class="data">
+		<a href="$HOMEPAGE" id="repoHomePageLink">
+				$HOMEPAGE</a>
+      </div>
+    </div>
+    <div class="row" id="repoNotesRow">
+      <div class="labelRight" class="label">Notes:</div>
+      <div class="data">
+		<a href="Notes" id="repoNotesLink">$REPONOTES</a>
+      </div>
+    </div>
+    <div class="row" id="enteredDateRow">
+      <div class="labelRight" class="label">Date Saisie:</div>
+      <div class="data">
+    $ENTEREDD
+      </div>
+    </div>
+		<p id="editButtonRow">
+		  <a href="editSource.php?idsr=$IDSR&lang=$LANG&Debug=$DEBUG"
+		     class="button">Edit
+		  </a>
+		</p>
+    </div> <!-- class="body" -->
+    <div class="hidden" id="messages">`
+        <span id="Display">Montre</span>
+        <span id="Edit">Modifier</span>
+        <span id="Create">Creer de Nouveau</span>
+        <span id="InvalidIDSR">Valeur invalide IDSR='$idsr'. </span>
+        <span id="noParms">Paramètre manquant pour identifier la Source. </span>
+	    <span id="cannotUseName">
+            Seuls les contributeurs connectés peuvent utiliser le
+            paramètre nom puisqu'il peut entraîner la création 
+            d'une nouvelle source.
+        </span>
+        <span id="missingIdsr">
+            Ni IDSR ni paramètre de nom n'ont été spécifiés.
+        </span>
+        <span id="sourceCreated">
+            <p>Nouvelle source '$name' créée.</p>
+        </span>
+    </div><!-- id="messages" -->

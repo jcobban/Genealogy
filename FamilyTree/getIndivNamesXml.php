@@ -126,7 +126,6 @@ use \Exception;
  *		2017/09/12		use get( and set(								*
  *		2017/12/12		use class PersonSet in place of					*
  *						Person::getPersons								*
- *		2019/07/18      fix infinite recursion getting spouse name      *       
  *		2019/12/19      replace xmlentities with htmlentities           *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*
@@ -214,7 +213,9 @@ foreach($_GET as $key => $value)
         {		        // match by given name pattern
             // see note above for surname
             if (strlen(trim($value)) > 0)
-    		    $givenname	= str_replace("'", "", $value);
+                $givenname	    = str_replace(array("'", '[', ']'),
+                                              array('', '', ''), 
+                                              $value);
     		break;
         }		        // match by given name pattern
 
@@ -403,7 +404,7 @@ else
     print "  <parms>\n";
     foreach($_GET as $key => $value)
     {
-        print "    <$key>$value</$key>\n";
+        print "    <$key>" . htmlspecialchars($value) . "</$key>\n";
     }
 
     // include deduced parameters

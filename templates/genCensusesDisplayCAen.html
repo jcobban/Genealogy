@@ -6,8 +6,9 @@
  *  History:															*
  *		2017/10/21		created											*
  *      2019/02/21      support scrolling main section                  *
+ *      2023/01/14      support ES2015                                  *
  *																		*
- *  Copyright &copy; 2019 James A. Cobban								*
+ *  Copyright &copy; 2023 James A. Cobban								*
  **********************************************************************-->
     <div class="hidden" id="breadcrumbs">
         <a href="/genealogy.php">Genealogy  </a>:
@@ -296,13 +297,26 @@
        href="https://www.bac-lac.gc.ca/eng/census/1926/Pages/search.aspx">
 		Library & Archives Canada Nominal Index</a>
     </p>
+    <h2>Census of Canada 1931:</h2>
+    <p class="label">
+	<a target="_blank"
+       href="https://recherche-collection-search.bac-lac.gc.ca/eng/census2/index1931">
+		Library & Archives Canada Census Image Browse</a>
+    </p>
+    <p class="label">
+	<a target="_blank" href="/database/ReqUpdate.php?Census=CA1931&amp;lang=$LANG">
+		View Census Transcription:
+		$CENDONE1931 done of
+		$CENPOP1931
+	</a>
+    </p>
     <h2>Summary:</h2>
     <p class="label">
 		$TOTALTRANSCRIBED transcribed out of
 		$TOTALPOPULATION
     </p>
     </div> <!-- end of <div class="body"> -->
-    <script src= '/jscripts/js20/http.js' type="text/javascript">
+    <script src= '/jscripts6/js20/http.js' type="module">
     </script>
-    <script src= '/jscripts/util.js' type="text/javascript">
+    <script src= '/jscripts6/util.js' type="module">
     </script>

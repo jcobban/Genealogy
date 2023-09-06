@@ -213,13 +213,34 @@
  *      2021/05/08      add "United States of America" as country       *
  *                      clear 'S' from marital status column            *
  *      2021/08/04      add support for NotMember column                *
+ *      2022/08/14      convert fractional age to age in months         *
+ *                      convert age in days to age in months            *
+ *      2022/08/21      improved support for 1921 census occupation     *
+ *      2023/01/05      only clear input text fields in changeSurname   *
+ *      2023/04/23      update SpkEnglish column if sex changes         *
+ *      2023/06/27      add support for Radio, Earnings in 1931 census  *
+ *      2023/08/09      migrate to ES2015                               *
  *                                                                      *
- *  Copyright &copy; 2021 James A. Cobban                               *
+ *  Copyright &copy; 2023 James A. Cobban                               *
  ************************************************************************/
-
-// strings for determining and changing the case of letters
-var  upper              = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-var  lower              = "abcdefghijklmnopqrstuvwxyz";
+import {hideRightColumn, iframe, openFrame,
+        popupAlert, popupLoading, hideLoading,
+        createFromTemplate, displayDialog, getParmsFromXml,
+        addOption,
+        args, debug}
+        from "../jscripts6/util.js";
+import {linkMouseOver, linkMouseOut, columnClick, columnWiden,
+        expAbbr, changeElt, setErrorFlag, numericKeyDown,
+        tableKeyDown,
+        checkFamily, checkAddress, checkName, checkAge, checkSex, 
+        checkMStat, checkFlag, checkFlagSex, checkYear, checkDate,
+        checkOccupation, checkText, checkNumber,
+        AgeAbbrs, SurnAbbrs, AddrAbbrs, OrigAbbrs, CauseAbbrs, BpAbbrs,
+        RlgnAbbrs, OccAbbrs, GivnAbbrs, MonthAbbrs, RelAbbrs,
+        ResTypeAbbrs, StoriesAbbrs,
+        change, dateChanged,  }
+        from "../jscripts6/CommonForm.js";
+/* global HTTP */
 
 /************************************************************************
  *  CenPageSize table                                                   *
@@ -227,16 +248,18 @@ var  lower              = "abcdefghijklmnopqrstuvwxyz";
  *  Table for normal number of rows in full census page                 *
  ************************************************************************/
 var  CenPageSize = {        "1851"  : 50,
-		                    "1861"  : 50,
-		                    "1871"  : 20,
-		                    "1881"  : 25,
-		                    "1891"  : 25,
-		                    "1901"  : 50,
-		                    "1906"  : 50,
-		                    "1911"  : 50,
-		                    "1916"  : 50,
-		                    "1921"  : 50
-		                    };
+                            "1861"  : 50,
+                            "1871"  : 20,
+                            "1881"  : 25,
+                            "1891"  : 25,
+                            "1901"  : 50,
+                            "1906"  : 50,
+                            "1911"  : 50,
+                            "1916"  : 50,
+                            "1921"  : 50,
+                            "1926"  : 50,
+                            "1931"  : 50
+                            };
 
 /************************************************************************
  *  ForeignBplaces table                                                *
@@ -246,94 +269,94 @@ var  CenPageSize = {        "1851"  : 50,
  *  and therefore the year of immigration should be provided            *
  ************************************************************************/
 var  ForeignBplaces = {     'Africa'            : 'Africa',
-			                'African'           : 'Africa',
-			                'Australia'         : 'Australia',
-			                'Austria'           : 'Austria',
-			                'Belgium'           : 'Belgium',
-			                'Bermuda'           : 'Bermuda',
-			                'Borneo'            : 'Borneo',
-			                'C. C. Africa'      : 'C. C. Africa',
-			                'Cape Of Good Hope' : 'Cape of Good Hope',
-			                'Channel Islands'   : 'Channel Islands',
-			                'China'             : 'China',
-			                'Corfu'             : 'Corfu',
-			                'Denmark'           : 'Denmark',
-			                'E. India'          : 'India',
-			                'East India'        : 'India',
-			                'East Indies'       : 'East Indies',
-			                'England'           : 'England',
-			                'Est India'         : 'East India',
-			                'France'            : 'France',
-			                'Germany'           : 'Germany',
-			                'Gibraltar'         : 'Gibraltar',
-			                'Glasgow, Scotland' : 'Scotland',
-			                'Greece'            : 'Greece',
-			                'Guernsey'          : 'Guernsey',
-			                'Holland'           : 'Holland',
-			                'IA, US'            : 'U.States',
-			                'India'             : 'India',
-			                'India East'        : 'India East',
-			                'Indiana'           : 'U.States',
-			                'Ireland'           : 'Ireland',
-			                'Isle Guernsey'     : 'Guernsey',
-			                'Isle Of Jersey'    : 'Jersey',
-			                'Isle of Man'       : 'Isle of Man',
-			                'Italy'             : 'Italy',
-			                'Jersey'            : 'Jersey',
-			                'Jersey Island'     : 'Jersey',
-			                'Malta'             : 'Malta',
-			                'Mechlenburg'       : 'Mechlenburg',
-			                'Michigan'          : 'U.States',
-			                'Michigan, US'      : 'U.States',
-			                'Michigan, USA'     : 'U.States',
-			                'New York, USA'     : 'U.States',
-			                'New Zealand'       : 'New Zealand',
-			                'NJ, US'            : 'U.States',
-			                'North Wales'       : 'North Wales',
-			                'Norway'            : 'Norway',
-			                'NY, US'            : 'U.States',
-			                'OH, US'            : 'U.States',
-			                'Ohio, USA'         : 'U.States',
-			                'Poland'            : 'Poland',
-			                'Prussia'           : 'Prussia',
-			                'Russia'            : 'Russia',
-			                'Scotland'          : 'Scotland',
-			                'Scotland Isles'    : 'Scotland',
-			                'Spain'             : 'Spain',
-			                'Sweden'            : 'Sweden',
-			                'Switzerland'       : 'Switzerland',
-			                'Syria'             : 'Syria',
-			                'Trinidad'          : 'Trinidad',
-			                'U'                 : 'U.States',
-			                'U. States'         : 'U.States',
-			                'U.S.'              : 'U.States',
-			                'U.S.A.'            : 'U.States',
-			                'U.States'          : 'U.States',
-			                'United States'     : 'U.States',
-			                'United States of America' : 'U.States',
-			                'US'                : 'U.States',
-			                'W. I.'             : 'West Indies',
-			                'Wales'             : 'Wales',
-			                'West Indies'       : 'West Indies'};
+                            'African'           : 'Africa',
+                            'Australia'         : 'Australia',
+                            'Austria'           : 'Austria',
+                            'Belgium'           : 'Belgium',
+                            'Bermuda'           : 'Bermuda',
+                            'Borneo'            : 'Borneo',
+                            'C. C. Africa'      : 'C. C. Africa',
+                            'Cape Of Good Hope' : 'Cape of Good Hope',
+                            'Channel Islands'   : 'Channel Islands',
+                            'China'             : 'China',
+                            'Corfu'             : 'Corfu',
+                            'Denmark'           : 'Denmark',
+                            'E. India'          : 'India',
+                            'East India'        : 'India',
+                            'East Indies'       : 'East Indies',
+                            'England'           : 'England',
+                            'Est India'         : 'East India',
+                            'France'            : 'France',
+                            'Germany'           : 'Germany',
+                            'Gibraltar'         : 'Gibraltar',
+                            'Glasgow, Scotland' : 'Scotland',
+                            'Greece'            : 'Greece',
+                            'Guernsey'          : 'Guernsey',
+                            'Holland'           : 'Holland',
+                            'IA, US'            : 'U.States',
+                            'India'             : 'India',
+                            'India East'        : 'India East',
+                            'Indiana'           : 'U.States',
+                            'Ireland'           : 'Ireland',
+                            'Isle Guernsey'     : 'Guernsey',
+                            'Isle Of Jersey'    : 'Jersey',
+                            'Isle of Man'       : 'Isle of Man',
+                            'Italy'             : 'Italy',
+                            'Jersey'            : 'Jersey',
+                            'Jersey Island'     : 'Jersey',
+                            'Malta'             : 'Malta',
+                            'Mechlenburg'       : 'Mechlenburg',
+                            'Michigan'          : 'U.States',
+                            'Michigan, US'      : 'U.States',
+                            'Michigan, USA'     : 'U.States',
+                            'New York, USA'     : 'U.States',
+                            'New Zealand'       : 'New Zealand',
+                            'NJ, US'            : 'U.States',
+                            'North Wales'       : 'North Wales',
+                            'Norway'            : 'Norway',
+                            'NY, US'            : 'U.States',
+                            'OH, US'            : 'U.States',
+                            'Ohio, USA'         : 'U.States',
+                            'Poland'            : 'Poland',
+                            'Prussia'           : 'Prussia',
+                            'Russia'            : 'Russia',
+                            'Scotland'          : 'Scotland',
+                            'Scotland Isles'    : 'Scotland',
+                            'Spain'             : 'Spain',
+                            'Sweden'            : 'Sweden',
+                            'Switzerland'       : 'Switzerland',
+                            'Syria'             : 'Syria',
+                            'Trinidad'          : 'Trinidad',
+                            'U'                 : 'U.States',
+                            'U. States'         : 'U.States',
+                            'U.S.'              : 'U.States',
+                            'U.S.A.'            : 'U.States',
+                            'U.States'          : 'U.States',
+                            'United States'     : 'U.States',
+                            'United States of America' : 'U.States',
+                            'US'                : 'U.States',
+                            'W. I.'             : 'West Indies',
+                            'Wales'             : 'Wales',
+                            'West Indies'       : 'West Indies'};
 
 /************************************************************************
  *  EmpWhereAbbrs table                                                 *
  *                                                                      *
  *  A table for expanding abbreviations for employment locations        *
  ************************************************************************/
-var  EmpWhereAbbrs = {      "And"       		: "and",
-		                    "At"        		: "at",
-		                    "By"        		: "by",
-		                    "F"         		: "Farm",
-		                    "For"       		: "for",
-		                    "From"      		: "from",
-		                    "H"         		: "Home",
-		                    "In"        		: "in",
-		                    "Of"        		: "of",
-		                    "On"        		: "on",
-		                    "Or"        		: "or",
-		                    "["         		: "[blank]"
-		                };
+var  EmpWhereAbbrs = {      "And"               : "and",
+                            "At"                : "at",
+                            "By"                : "by",
+                            "F"                 : "Farm",
+                            "For"               : "for",
+                            "From"              : "from",
+                            "H"                 : "Home",
+                            "In"                : "in",
+                            "Of"                : "of",
+                            "On"                : "on",
+                            "Or"                : "or",
+                            "["                 : "[blank]"
+                        };
 
 /************************************************************************
  *  MMonthAbbrs                                                         *
@@ -342,46 +365,31 @@ var  EmpWhereAbbrs = {      "And"       		: "and",
  *  contain a month, not a full date
  ************************************************************************/
 const  MMonthAbbrs = {
-                "A"         : "Apr",
-                "Ap"        : "Apr",
-                "Au"        : "Aug",
-                "D"         : "Dec",
-                "F"         : "Feb",
-                "G"         : "Aug",
-                "J"         : "Jan",
-                "Ja"        : "Jan",
-                "Jl"        : "July",
-                "Jn"        : "June",
-                "Jun"       : "June",
-                "Ju"        : "July",
-                "Jul"       : "July",
-                "L"         : "July",
-                "M"         : "Mar",
-                "Ma"        : "May",
-                "Mr"        : "Mar",
-                "My"        : "May",
-                "N"         : "Nov",
-                "O"         : "Oct",
-                "S"         : "Sept",
-                "Y"         : "May",
-                "1"         : "Y",
-                "["         : "[blank]"
-                };
-
-/************************************************************************
- *  colNames2Blank table                                                *
- *                                                                      *
- *  A list of column names that are cleared when the surname is changed *
- *  to '[Blank]'.                                                       *
- ************************************************************************/
-var colNames2Blank      = ["Family",
-                           "Sex",
-                           "Race",
-                           "BPlace",
-                           "BPlaceRu",
-                           "Origin",
-                           "Nationality",
-                           "Religion"];
+                            "A"         : "Apr",
+                            "Ap"        : "Apr",
+                            "Au"        : "Aug",
+                            "D"         : "Dec",
+                            "F"         : "Feb",
+                            "G"         : "Aug",
+                            "J"         : "Jan",
+                            "Ja"        : "Jan",
+                            "Jl"        : "July",
+                            "Jn"        : "June",
+                            "Jun"       : "June",
+                            "Ju"        : "July",
+                            "Jul"       : "July",
+                            "L"         : "July",
+                            "M"         : "Mar",
+                            "Ma"        : "May",
+                            "Mr"        : "Mar",
+                            "My"        : "May",
+                            "N"         : "Nov",
+                            "O"         : "Oct",
+                            "S"         : "Sept",
+                            "Y"         : "May",
+                            "1"         : "Y",
+                            "["         : "[blank]"
+                            };
 
 /************************************************************************
  *  bInYearMonth table                                                  *
@@ -409,32 +417,32 @@ var  bInYearMonth       = [ 'Apr',
  *  Table for determining the expected sex value for a relationship.    *
  ************************************************************************/
 var  RelationGender = {     "aunt"              : "F",
-	                        "adopted-daughter"  : "F",
-	                        "adopted-son"       : "M",
-	                        "brother-in-law"    : "M",
-	                        "brother"           : "M",
-	                        "daughter"          : "F",
-	                        "daughter-in-law"   : "F",
-	                        "father"            : "M",
-	                        "father-in-law"     : "M",
-	                        "grand-daughter"    : "F",
-	                        "grand-father"      : "M",
-	                        "grand-mother"      : "F",
-	                        "grand-son"         : "M",
-	                        "husband"           : "M",
-	                        "mother"            : "F",
-	                        "mother-in-law"     : "F",
-	                        "nephew"            : "M",
-	                        "niece"             : "F",
-	                        "son"               : "M",
-	                        "step-daughter"     : "F",
-	                        "sister"            : "F",
-	                        "sister-in-law"     : "F",
-	                        "son-in-law"        : "M",
-	                        "step-son"          : "M",
-	                        "uncle"             : "M",
-	                        "wife"              : "F"
-	                };
+                            "adopted-daughter"  : "F",
+                            "adopted-son"       : "M",
+                            "brother-in-law"    : "M",
+                            "brother"           : "M",
+                            "daughter"          : "F",
+                            "daughter-in-law"   : "F",
+                            "father"            : "M",
+                            "father-in-law"     : "M",
+                            "grand-daughter"    : "F",
+                            "grand-father"      : "M",
+                            "grand-mother"      : "F",
+                            "grand-son"         : "M",
+                            "husband"           : "M",
+                            "mother"            : "F",
+                            "mother-in-law"     : "F",
+                            "nephew"            : "M",
+                            "niece"             : "F",
+                            "son"               : "M",
+                            "step-daughter"     : "F",
+                            "sister"            : "F",
+                            "sister-in-law"     : "F",
+                            "son-in-law"        : "M",
+                            "step-son"          : "M",
+                            "uncle"             : "M",
+                            "wife"              : "F"
+                    };
 
 /************************************************************************
  *  Invoke the function onLoad when the page has been completely loaded *
@@ -505,7 +513,7 @@ function onLoad()
     // add mouseover actions for forward and backward links
     for (var il = 0; il < document.links.length; il++)
     {                       // loop through all hyper-links
-        let  linkTag                = document.links[il];
+        let linkTag                = document.links[il];
         if (linkTag.addEventListener)
         {
             linkTag.addEventListener('mouseover', linkMouseOver, false);
@@ -599,8 +607,8 @@ function setClassByValue(colName,
  ************************************************************************/
 function changeReplDown()
 {
-    let  form       = this.form;
-    let  name       = this.name;
+    let form       = this.form;
+    let name       = this.name;
     if (this.id)
         name      = this.id;
 
@@ -610,13 +618,13 @@ function changeReplDown()
     // shortcut for next incremental value
     if (this.value == '+')
     {               // get next incremental value
-        let  result = /\d+$/.exec(name);
+        let result = /\d+$/.exec(name);
         if (result)
         {           // got row number
-            let  rowNum     = result[0];
+            let rowNum     = result[0];
             let rowNumLen  = rowNum.length;
-            let  columnName = name.substring(0, name.length - rowNumLen);
-            let  prevElement    = null;
+            let columnName = name.substring(0, name.length - rowNumLen);
+            let prevElement    = null;
             while(this.value == '+')
             {           // find last non-empty field
                 rowNum      = rowNum - 1;
@@ -702,6 +710,19 @@ function changeSex()
             absent.value    = this.value;
     }
 
+    // if the form includes a SpkEnglish column
+    let spkEnglish             = form.elements['SpkEnglish' + row];
+    if (spkEnglish)
+    {
+        if (spkEnglish.value == 'Y' ||
+            spkEnglish.value == '?' ||
+            spkEnglish.value == ' ' ||
+            spkEnglish.value == '' ||
+            spkEnglish.value == null ||
+            spkEnglish.value == '1')
+            spkEnglish.value    = this.value;
+    }
+
     // if the form includes a CanRead column
     let canRead             = form.elements['CanRead' + row];
     if (canRead)
@@ -719,7 +740,7 @@ function changeSex()
     }
 
     // for the 1851 and 1861 censuses if the form includes a born this year
-    let  birthElt       = form.elements['Birth' + row];
+    let birthElt       = form.elements['Birth' + row];
     if (birthElt && birthElt.value == '?')
         birthElt.value  = this.value;
 
@@ -741,7 +762,7 @@ function changeCanRead()
 {
     changeElt(this);    // fold value to upper case if required
     let result                  = /([a-zA-Z_$]+)(\d*)$/.exec(this.name);
-    let colName                 = result[1].toLowerCase();
+    //let colName                 = result[1].toLowerCase();
     let rowNum                  = result[2];
     let yes                     = 'Y';
     let form                    = this.form;
@@ -774,12 +795,12 @@ function changeCanRead()
  ************************************************************************/
 function changeCantRead()
 {
-    let  form                       = this.form;
+    let form                       = this.form;
     changeElt(this);    // fold value to upper case if required
     if (this.value.length > 0)
     {                           // non-empty value
         let result                  = /([a-zA-Z_$]+)(\d*)$/.exec(this.name);
-        let colName                 = result[1].toLowerCase();
+        //let colName                 = result[1].toLowerCase();
         let rowNum                  = result[2];
         let sexElement              = form.elements['Sex' + rowNum];
         let value                   = this.value;
@@ -790,13 +811,13 @@ function changeCantRead()
             value                   = 'N';  // no the person can read
         if (value == 'Y' && sexElement)
         {                       // sex column present
-            let  sex                = sexElement.value;
+            let sex                = sexElement.value;
             if (sex == 'M' || sex == 'F')
                 value               = sex;
         }                       // sex column present
         this.value                  = value;
-        let  name                   = 'CantWrite' + rowNum;
-        let  writeElt               = form.elements[name];
+        let name                   = 'CantWrite' + rowNum;
+        let writeElt               = form.elements[name];
         if (writeElt)
         {                       // can't write column present
             writeElt.value          = value;
@@ -821,12 +842,12 @@ function changeCantRead()
  ************************************************************************/
 function changeNotMember()
 {
-    let  form                       = this.form;
+    let form                       = this.form;
     changeElt(this);            // fold value to upper case if required
     if (this.value.length > 0)
     {                           // non-empty value
         let result                  = /([a-zA-Z_$]+)(\d*)$/.exec(this.name);
-        let colName                 = result[1].toLowerCase();
+        //let colName                 = result[1].toLowerCase();
         let rowNum                  = result[2];
         let sexElement              = form.elements['Sex' + rowNum];
         let memberElement           = form.elements['Member' + rowNum];
@@ -861,7 +882,7 @@ function changeAddress(evt)
     changeElt(this);    // perform common processing
     let name                = this.name;
     let result              = /([a-zA-Z_$]+)(\d*)$/.exec(name);
-    let colName             = result[1].toLowerCase();
+    //let colName             = result[1].toLowerCase();
     let rowNum              = result[2];
     let value               = this.value;
     let form                = this.form;
@@ -893,9 +914,9 @@ function changeAddress(evt)
 function changeResType()
 {
     changeElt(this);    // perform common processing
-    let  form   = this.form;
-    let  value  = this.value;
-    let  field;
+    let form   = this.form;
+    let value  = this.value;
+    let field;
     field  = form.elements['Stories' + this.name.substring(7)];
     if (field)
     {           // stories field present
@@ -944,9 +965,9 @@ function changeResType()
 function changeOwnerTenant()
 {
     changeElt(this);    // fold value to upper case if required
-    let  form   = this.form;
-    let  value  = this.value;
-    let  field;
+    let form   = this.form;
+    let value  = this.value;
+    let field;
     let rownum  = this.name.substring(11);
     if (this.value.length > 0)
     {           // owner tenant set
@@ -995,34 +1016,36 @@ function changeOwnerTenant()
  *      this        <input type='text'> element                         *
  *      evt         instance of 'change' Event                          *
  ************************************************************************/
-function changeSurname(evt)
+function changeSurname(/*evt*/)
 {
     changeElt(this);
 
     // special action if value is blanked out
     if ((this.value.length == 0) ||
         this.value.substring(0, 1) == "[")
-    {       // surname blanked out
+    {                   // surname blanked out
         let td              = this.parentNode;
         let col             = td.cellIndex;
         let tr              = td.parentNode;
-        let row             = tr.rowIndex; // row index of current row
+        //let row             = tr.rowIndex; // row index of current row
         for (var i = 0; i < tr.cells.length; i++)
         {
             let cell        = tr.cells[i];
             if (i != col)
-            {       // not surname cell
+            {           // not surname cell
                 let field   = cell.firstChild;
 
                 // the first child may not be the desired input element
                 // for example if there is some text at beginning of cell
                 while(field && field.nodeType != 1)
                     field   = field.nextSibling;
-                if (field && field.value)
+                if (field &&
+                    field.tagName == 'INPUT' &&
+                    field.type == 'text')
                     field.value  = "";
-            }       // cell exists in this row
-        }   // for each column name to blank
-    }       // surname blanked out
+            }           // cell exists in this row
+        }               // for each column name to blank
+    }                   // surname blanked out
 
     this.checkfunc();
 
@@ -1042,38 +1065,86 @@ function changeSurname(evt)
  ************************************************************************/
 function changeOccupation()
 {
-    changeElt(this);    // espand abbreviations and fold value to upper case
-    let  occupation = this.value;
-    let  form       = this.form;
-    let  censusId   = form.Census.value;
-    let  censusYear = censusId.substring(censusId.length - 4);
-    let lineNum      = this.name.substring(10);
-    let whereElement  = form.elements['EmpWhere' + lineNum];
-    let eeElement  = form.elements['Employee' + lineNum];
-    let oaElement  = form.elements['OwnAcct' + lineNum];
+    changeElt(this);    // expand abbreviations, fold value to upper case
+    let occupation          = this.value.toLowerCase();
+    let form                = this.form;
+    //let censusId            = form.Census.value;
+    //let censusYear          = censusId.substring(censusId.length - 4);
+    let lineNum             = this.name.substring(10);
+    let whereElement        = form.elements['EmpWhere' + lineNum];
+    let eeElement           = form.elements['Employee' + lineNum];
+    let etElement           = form.elements['EmpType' + lineNum];
+    let oaElement           = form.elements['OwnAcct' + lineNum];
 
     // fill in default values in other columns
-    if (oaElement &&
-        occupation == 'Farmer')
+    switch (occupation)
     {
-        oaElement.value      = 'Y';
-        evt                 = new Event('change',{'bubbles':true});
-        oaElement.dispatchEvent(evt);
-    }
+        case 'income':
+            if (etElement)
+                etElement.value     = '4';
+            break;
+ 
+        case 'homemaker':
+        case 'home maker':
+        case 'housekeeper':
+        case 'house keeper':
+        case 'student':
+            if (etElement)
+                etElement.value     = ' ';
+            break;
 
-    if (eeElement &&
-        (occupation == 'Farm Laborer' ||
-         occupation == 'Laborer'))
-    {
-        eeElement.value      = 'Y';
-        evt                 = new Event('change',{'bubbles':true});
-        eeElement.dispatchEvent(evt);
-    }
+        case 'farmer':
+        case 'merchant':
+            if (whereElement)
+            {
+                if (occupation == 'farmer')
+                    whereElement.value  = 'Own Farm';
+                else
+                if (occupation == 'merchant')
+                    whereElement.value  = 'Store';
+            }
+            if (oaElement)
+            {
+                oaElement.value     = 'Y';
+                let evt             = new Event('change',{'bubbles':true});
+                oaElement.dispatchEvent(evt);
+            }
+            if (etElement)
+                etElement.value     = 'O';
+            break;
+ 
+        case 'farm laborer':
+        case "farmer's son":
+        case 'laborer':
+            if (whereElement)
+            {
+                if (occupation == 'farm laborer')
+                    whereElement.value  = 'Farm';
+                else
+                if (occupation == "farmer's son")
+                    whereElement.value  = 'Father\'s Farm';
+            }
+            if (eeElement)
+            {
+                eeElement.value     = 'Y';
+                let evt             = new Event('change',{'bubbles':true});
+                eeElement.dispatchEvent(evt);
+            }
+            if (etElement)
+                etElement.value     = 'W';
+            break;
 
-    if (whereElement &&
-        ((occupation == 'Farmer' && censusYear > 1911) ||
-         occupation == 'Farm Laborer'))
-        whereElement.value  = "Farm";
+        default:
+            if (eeElement)
+            {
+                eeElement.value     = 'Y';
+                let evt             = new Event('change',{'bubbles':true});
+                eeElement.dispatchEvent(evt);
+            }
+            if (etElement)
+                etElement.value     = 'W';
+            break;
+    }                   // switch on occupation
 
     // validate the contents of the field
     if (this.checkfunc)
@@ -1092,11 +1163,11 @@ function changeOccupation()
 function changeEmpType()
 {
     changeElt(this);    // fold value to upper case if required
-    let  form       = this.form;
-    let  empType        = this.value;
+    let form       = this.form;
+    let empType        = this.value;
     let occElement  = form.elements['Occupation' + this.name.substring(7)];
     let whereElement  = form.elements['EmpWhere' + this.name.substring(7)];
-    let  occupation = occElement.value;
+    let occupation = occElement.value;
     if (whereElement && empType == 'O' && occupation == 'Farmer')
         whereElement.value  = "Own Farm";
 
@@ -1121,12 +1192,12 @@ function changeGenderFlag()
     let form                    = this.form;
     let value                   = this.value;
     let result                  = /([a-zA-Z_$]+)(\d*)$/.exec(this.name);
-    let colName                 = result[1].toLowerCase();
+    //let colName                 = result[1].toLowerCase();
     let rowNum                  = result[2];
     let sexElement              = form.elements['Sex' + rowNum];
     if ((value == '1' || value == 'Y') && sexElement)
     {           // sex column present
-        let  sex                = sexElement.value;
+        let sex                = sexElement.value;
         if (sex == 'M' || sex == 'F')
             this.value          = sex;
     }           // sex column present
@@ -1148,8 +1219,8 @@ function changeGenderFlag()
 function changeSchoolMons()
 {
     changeElt(this);    // perform common functions
-    let  form       = this.form;
-    let  schoolMons = this.value;
+    let form       = this.form;
+    let schoolMons = this.value;
     let occElement  = form.elements['Occupation' + this.name.substring(10)];
     if (occElement)
     {           // occupation column present
@@ -1241,21 +1312,21 @@ function replDown(curr)
     }                       // value has been modified
 
     // update the presented values of curr field in subsequent rows
-    let  cell       = curr.parentNode;
+    let cell       = curr.parentNode;
     if (cell.nodeName != "TD")
         throw new Error("CensusForm.js: replDown: curr is child of <" +
                         cell.nodeName + ">");
-    let  column     = cell.cellIndex;
-    let  row        = cell.parentNode;
+    let column     = cell.cellIndex;
+    let row        = cell.parentNode;
     if (row.nodeName != "TR")
         throw new Error("CensusForm.js: replDown: cell is child of <" +
                         row.nodeName + ">");
     let rowNum      = row.sectionRowIndex;
-    let  tbody      = row.parentNode;
+    let tbody      = row.parentNode;
     if (tbody.nodeName != "TBODY")
         throw new Error("CensusForm.js: replDown: row is child of <" +
                         tbody.nodeName + ">");
-    let  newValue   = curr.value;
+    let newValue   = curr.value;
     let blankrow  = newValue.toLowerCase() == '[delete]';
 
     for (rowNum++; rowNum < tbody.rows.length; rowNum++)
@@ -1320,8 +1391,9 @@ function changeFBPlace()
     // the default for Mother's birth place is to be the same as the
     // Father's birth place.  If the Mother's birth place has not been
     // given an explicit value, make it match.
-    let colName  = "MothersBPlace" + this.name.substring(this.name.length - 2);
-    let field  = document.censusForm.elements[colName];
+    let rowNum      = this.name.substring(this.name.length - 2);
+    let colName     = "MothersBPlace" + rowNum;
+    let field       = document.censusForm.elements[colName];
     if (field.className.substr(0,5) == 'same ' ||
         field.className.substr(0,3) == 'dft')
     {   // alter value to match modified field
@@ -1347,9 +1419,9 @@ function changeBPlace()
     // expand abbreviation
     changeElt(this);
 
-    let  form   = this.form;
+    let form                = this.form;
     let fldName;
-    let  element;
+    let element;
 
     if (this.value == 'Canada West' ||
         this.value == 'Upper Canada')
@@ -1359,26 +1431,28 @@ function changeBPlace()
              ir < 51;
              ir++)
         {   // go through remainder of column
-            fldName  = 'BPlace' + ir;
+            fldName         = 'BPlace' + ir;
             if (ir < 10)
-                fldName  = 'BPlace0' + ir;
-            element  = form.elements[fldName];
+                fldName     = 'BPlace0' + ir;
+            element         = form.elements[fldName];
             if (element)
             {
-            if (element.value == 'Ontario' || element.value == 'Canada West')
-                element.value  = this.value;
+                if (element.value == 'Ontario' || 
+                    element.value == 'Canada West')
+                    element.value  = this.value;
             }
             else
-                alert("CensusForm.js: changeBPlace: " +
-                      "cannot find form.elements['" + fldName + "']");
+                popupAlert("CensusForm.js: changeBPlace: " +
+                            "cannot find form.elements['"+fldName+"']",
+                           this);
         }   // go through remainder of column
     }       // for pre-confederation censuses change default birth place
 
     // check for foreign birthplace
-    let  foreignBplace  = ForeignBplaces[this.value];
+    let foreignBplace  = ForeignBplaces[this.value];
     if (foreignBplace)
     {
-        let  row    = this.name.substring(6);
+        let row    = this.name.substring(6);
         fldName      = 'ImmYear' + row;
         element      = form.elements[fldName];
         if (element && element.value.length == 0)
@@ -1444,8 +1518,8 @@ function changeMBPlace()
  ************************************************************************/
 function changeEmployee()
 {
-    let  form   = this.form;
-    let  row    = this.name.substring(this.name.length - 2);
+    let form   = this.form;
+    let row    = this.name.substring(this.name.length - 2);
     if (this.value == '1')
         this.value  = 'Y';
     if (this.value.toUpperCase() == 'Y')
@@ -1472,8 +1546,8 @@ function changeEmployee()
  ************************************************************************/
 function changeEmployer()
 {
-    let  form   = this.form;
-    let  row    = this.name.substring(this.name.length - 2);
+    let form   = this.form;
+    let row    = this.name.substring(this.name.length - 2);
     if (this.value == '1')
         this.value  = 'Y';
     if (this.value.toUpperCase() == 'Y')
@@ -1485,7 +1559,7 @@ function changeEmployer()
             form.elements["OwnAct" + row].value  = "N";
         if (form.elements["NumHands" + row])
         {       // number of hands field present
-            let  numHands   = form.elements["NumHands" + row];
+            let numHands   = form.elements["NumHands" + row];
             if (numHands.value == "")
             {       // set default
                 numHands.value  = "0";
@@ -1510,8 +1584,8 @@ function changeEmployer()
  ************************************************************************/
 function changeSelfEmployed()
 {
-    let  form   = this.form;
-    let  row    = this.name.substring(this.name.length - 2);
+    let form   = this.form;
+    let row    = this.name.substring(this.name.length - 2);
     if (this.value == '1')
         this.value  = 'Y';
     if (this.value.toUpperCase() == 'Y')
@@ -1539,15 +1613,15 @@ function changeSelfEmployed()
  ************************************************************************/
 function changeImmYear()
 {
-    let  form       = this.form;
-    let  censusId   = form.Census.value;
-    let  censusYear = censusId.substring(censusId.length - 4);
-    let  immyear        = this.value;
+    let form       = this.form;
+    let censusId   = form.Census.value;
+    let censusYear = censusId.substring(censusId.length - 4);
+    let immyear        = this.value;
     if (this.value == '[')
     {
         this.value  = '[Blank';
     }
-    let  res    = immyear.match(/^[0-9]{4}$/);
+    let res    = immyear.match(/^[0-9]{4}$/);
     if (!res)
     {       // not a 4 digit number
         res  = immyear.match(/^[0-9]{2}$/);
@@ -1576,16 +1650,16 @@ function changeImmYear()
  ************************************************************************/
 function changeBYear()
 {
-    let  form       = this.form;
-    let  censusId   = form.Census.value;
-    let  censusYear = censusId.substring(censusId.length - 4);
-    let  byear      = this.value;
-    let  row        = this.name.substring(this.name.length - 2);
-    let  bDateElt   = form.elements['BDate' + row];
-    let  ageElt     = form.elements['Age' + row];
+    let form       = this.form;
+    let censusId   = form.Census.value;
+    let censusYear = censusId.substring(censusId.length - 4);
+    let byear      = this.value;
+    let row        = this.name.substring(this.name.length - 2);
+    let bDateElt   = form.elements['BDate' + row];
+    let ageElt     = form.elements['Age' + row];
 
     // validate the birth year value
-    let  res        = byear.match(/^[0-9]{4}$/);
+    let res        = byear.match(/^[0-9]{4}$/);
     if (res)
     {       // contains a 4 digit number
         byear      = res[0];
@@ -1622,7 +1696,7 @@ function changeBYear()
     }       // not a 4 digit number
 
     // update birth date field if current value should be adjusted for new year
-    let  offset     = 1;    // birth date probably in previous year
+    let offset     = 1;    // birth date probably in previous year
     if (bDateElt)
     {       // birth date field present
         if (bDateElt.value.length == 0)
@@ -1677,42 +1751,100 @@ function changeBYear()
  ************************************************************************/
 function changeAge()
 {
-    let form                = this.form;
-    let result              = /([a-zA-Z_$]+)(\d*)$/.exec(this.name);
-    let colName             = result[1].toLowerCase();
-    let rowNum              = result[2];
-    let bInYear             = form.elements['BInYear' + rowNum];
+    let form                        = this.form;
+    let result                      = /([a-zA-Z_$]+)(\d*)$/.exec(this.name);
+    //let colName                     = result[1].toLowerCase();
+    let rowNum                      = result[2];
+    let bInYear                     = form.elements['BInYear' + rowNum];
 
     // common functionality to expand abbreviations
     changeElt(this);
 
     // interpret the age value
-    let  age                = this.value;
-    let  ageInYears         = 0;
-    let  res                = age.match(/^[0-9]+$/);
-    if (res)
+    let age                         = this.value;
+    let ageInYears                  = 0;
+    let ageIsInt                    = /^\d+$/.test(age);
+    let ageFraction                 = /^(\d+)\/(\d+)$/.exec(age);
+    let ageMonths                   = /^m?(\d+)m?$/i.exec(age);
+    let ageDays                     = /^d?(\d+)d?$/i.exec(age);
+    if (ageIsInt)
     {                   // an integer
-        ageInYears          = age - 0;
+        ageInYears                  = age - 0;
     }                   // an integer
     else
-    if (bInYear && (res = age.match(/^m?(\d+)m?$/)))
-    {                   // age in months
-        let ageInMonths     = res[1] - 0;
-        if (ageInMonths <= 12 && bInYear.value.length == 0)
-            bInYear.value   = bInYearMonth[ageInMonths];
-    }                   // age in months
+    if (ageFraction !== null && Array.isArray(ageFraction))
+    {                   // age as fraction
+        let nominator               = ageFraction[1] - 0;
+        let denominator             = ageFraction[2] - 0;
+        let ageInMonths             = Math.floor(12 * nominator / denominator);
+        ageInYears                  = Math.floor(ageInMonths / 12);
+        if (ageInYears > 0)
+            this.value              = ageInYears;
+        else
+        if (ageInMonths > 0)
+            this.value              = ageInMonths + 'm';
+        else
+            this.value              = '0';
+        age                         = this.value;
+    }
+    else
+    if (ageMonths !== null && Array.isArray(ageMonths))
+    {                   // age in days
+        let ageInMonths             = ageMonths[1] - 0;
+        ageInYears                  = Math.floor(ageInMonths / 12);
+    }
+    else
+    if (ageDays !== null && Array.isArray(ageDays))
+    {                   // age in days
+        let ageInDays               = ageDays[1] - 0;
+        let ageInMonths             = Math.round(ageInDays / 30.5);
+        ageInYears                  = Math.floor(ageInMonths / 12);
+        if (ageInYears > 0)
+            this.value              = ageInYears;
+        else
+        if (ageInMonths > 0)
+            this.value              = ageInMonths + 'm';
+        else
+            this.value              = '0';
+        age                         = this.value;
+    }
+
+    if (bInYear  && bInYear.value.length == 0)
+    {                   // update born in year indicator
+        if (age == 0)
+        {
+            bInYear.value           = bInYearMonth[0];
+        }
+        else
+        {
+            let ageMonths           = /^(m|)(\d+)(m|)$/.exec(age);
+            if (ageMonths && Array.isArray(ageMonths))
+            {               // age in months
+                if ((ageMonths[1] + ageMonths[3]) == 'm')
+                {
+                    let ageInMonths     = ageMonths[2] - 0;
+                    if (ageInMonths <= 12)
+                        bInYear.value   = bInYearMonth[ageInMonths];
+                }
+            }               // age in months
+            else
+                bInYear.value           = '?';
+        }
+    }                   // update born in year indicator
 
     // update Birth Year text field if not yet set
-    let  bYearElt           = form.elements['BYearTxt' + rowNum];
+    let bYearElt                    = form.elements['BYearTxt' + rowNum];
     if (bYearElt)
     {                   // birth year field present in form
-        let  bYear          = bYearElt.value;
+        let bYear                   = bYearElt.value;
         if (bYear.length == 0 || bYear.substring(0,1) == '[')
         {               // numeric birth year not supplied
-            let  censusYear = form.Census.value
-            censusYear  = censusYear.substring(form.Census.value.length - 4);
+            let censusId            = form.Census.value
+            let censusRes           = /\d{4}$/.exec(censusId);
+            let censusYear          = censusRes[0];
+            let birthYear           = censusYear - 1 - ageInYears;
 
-            bYearElt.value  = "[" + (censusYear - 1 - ageInYears) + "]";
+            bYearElt.value          = "[" + birthYear + "]";
         }               // numeric birth year not supplied
 
         // revalidate the explicit year of birth field in order to
@@ -1721,8 +1853,8 @@ function changeAge()
     }                   // birth year field present in form
 
     // check for born in year column in 1851 and 1861 census
-    let  birthElt           = form.elements['Birth' + rowNum];
-    let  sexElt             = form.elements['Sex' + rowNum];
+    let birthElt           = form.elements['Birth' + rowNum];
+    let sexElt             = form.elements['Sex' + rowNum];
     if (birthElt && ageInYears <= 1)
     {                   // set default value for Birth column
         if (sexElt && sexElt.value.length > 0)
@@ -1732,7 +1864,7 @@ function changeAge()
     }                   // set default value for Birth column
 
     // set default value for BDate field if not already set
-    let  bDateElt           = form.elements['BDate' + rowNum];
+    let bDateElt           = form.elements['BDate' + rowNum];
     if (bDateElt)
     {                   // form has a BDate field
         // do not overwrite bDate value if user has already entered it
@@ -1741,7 +1873,7 @@ function changeAge()
     }                   // form has a BDate field
 
     // set default value for CanRead field if not already set
-    let  canReadElt         = form.elements['CanRead' + rowNum];
+    let canReadElt         = form.elements['CanRead' + rowNum];
     if (canReadElt)
     {                   // form has a CanRead field
         if (ageInYears > 4 && canReadElt.value.length == 0)
@@ -1752,7 +1884,7 @@ function changeAge()
     }                   // form has a CanRead field
 
     // set default value for CanWrite field if not already set
-    let  canWriteElt    = form.elements['CanWrite' + rowNum];
+    let canWriteElt    = form.elements['CanWrite' + rowNum];
     if (canWriteElt)
     {                   // form has a CanWrite field
         if (ageInYears > 4 && canWriteElt.value.length == 0)
@@ -1798,70 +1930,6 @@ function changeDefault()
 }       // function changeDefault
 
 /************************************************************************
- *  function getRangeObject                                             *
- *                                                                      *
- *  Get an object compatible with the W3C Range interface.              *
- *                                                                      *
- *  Input:                                                              *
- *      selectionObject      a Selection or TextRange object            *
- ************************************************************************/
-function getRangeObject(selectionObject)
-{
-    if (selectionObject.getRangeAt)
-        return selectionObject.getRangeAt(0);
-    else
-    {       // Safari 1.3
-        let range = document.createRange();
-        range.setStart(selectionObject.anchorNode,selectionObject.anchorOffset);
-        range.setEnd(selectionObject.focusNode,selectionObject.focusOffset);
-        return range;
-    }
-}
-
-/************************************************************************
- *  function checkRange                                                 *
- *                                                                      *
- *  On a keystroke check the selected range of the document.            *
- *  Under construction.                                                 *
- *                                                                      *
- *  Input:                                                              *
- *      fNode      the node which currently has the focus               *
- ************************************************************************/
-function checkRange(fNode)
-{
-    let userSelection;
-    let  rangeObject;
-        let attrs  = "";
-    if (window.getSelection)
-    {       // W3C compliant
-        // this is a Selection object
-        userSelection  = window.getSelection();
-        for(var attr in userSelection)
-            if (userSelection[attr] instanceof HTMLTableCellElement)
-                attrs += attr + "=" + new XMLSerializer().serializeToString(userSelection[attr]) + ", ";
-            else
-            if (typeof userSelection[attr] != "function")
-                attrs += attr + "=" + userSelection[attr] + ", ";
-            alert("CensusForm.js: checkRange: typeof userSelection:\t" +
-                Object.prototype.toString.apply(userSelection) +
-          "\n\t" + attrs);
-    }       // W3C compliant
-    else
-    if (document.selection)
-    {       // IE
-        // this is an IE TextRange object
-        userSelection  = document.selection.createRange();
-        for(var attr in userSelection)
-            if (typeof userSelection[attr] != "function")
-                attrs += attr + "=" + userSelection[attr] + ", ";
-        alert("CensusForm.js: checkRange: typeof userSelection:\t" +
-                Object.prototype.toString.apply(userSelection) +
-                "\n\t" + attrs);
-    }       // IE
-
-}       // function checkRange
-
-/************************************************************************
  *  function checkBYear                                                 *
  *                                                                      *
  *  Validate the current value of a field containing a birth year.      *
@@ -1877,7 +1945,7 @@ function checkBYear()
     let byearTxt            = this.value;
     let form                = this.form;
     let result              = /([a-zA-Z_$]+)(\d*)$/.exec(this.name);
-    let colName             = result[1].toLowerCase();
+    //let colName             = result[1].toLowerCase();
     let rowNum              = result[2];
     let ageName             = 'Age' + rowNum;
     let age                 = form.elements[ageName].value;
@@ -1895,12 +1963,12 @@ function checkBYear()
         age                 = 0;
 
     // calculate difference between expected age and actual age
-    let  range              = 0;
-    let  re                 = /^(\[?([0-9]{4})\]?|\[blank\]|\[Blank\]|\?|)$/;
-    let  rxResult           = re.exec(byearTxt);
+    let range              = 0;
+    let re                 = /^(\[?([0-9]{4})\]?|\[blank\]|\[Blank\]|\?|)$/;
+    let rxResult           = re.exec(byearTxt);
     if (rxResult && rxResult[2])
     {
-        let  byear          = rxResult[2];
+        let byear          = rxResult[2];
         range               = Math.abs(censusYear - age - byear);
     }
 
@@ -1921,8 +1989,8 @@ function checkBYear()
  ************************************************************************/
 function checkNatYear()
 {
-    let  re         = /^(\[?[0-9]{4}\]?|nat?|\[blank\]?|\[Blank\]?|\?|)$/;
-    let  year       = this.value;
+    let re         = /^(\[?[0-9]{4}\]?|nat?|al(ien)?|\[blank\]?|\[Blank\]?|\?|)$/;
+    let year       = this.value;
     setErrorFlag(this, re.test(year));
 }       // function checkNatYear
 
@@ -1939,7 +2007,7 @@ function checkRelation()
     let relation            = this.value.toLowerCase();
     let relationGender      = RelationGender[relation];
     let result              = /([a-zA-Z_$]+)(\d*)$/.exec(this.name);
-    let colName             = result[1].toLowerCase();
+    //let colName             = result[1].toLowerCase();
     let rowNum              = result[2];
     if (relationGender)
     {           // relationship is gender specific
@@ -1962,8 +2030,8 @@ function checkRelation()
  ************************************************************************/
 function checkOwnerTenant()
 {
-    let  re                 = /^[OPRopr?]?$/;
-    let  type               = this.value;
+    let re                 = /^[OPRopr?]?$/;
+    let type               = this.value;
     setErrorFlag(this, re.test(type));
 }       // function checkOwnerTenant
 
@@ -1978,8 +2046,8 @@ function checkOwnerTenant()
  ************************************************************************/
 function checkDecimal()
 {
-    let  re                 = /^([0-9]*|[0-9]*\.[0-9]*)$/;
-    let  number             = this.value.trim();
+    let re                 = /^([0-9]*|[0-9]*\.[0-9]*)$/;
+    let number             = this.value.trim();
     setErrorFlag(this, re.test(number) && number > 0);
 }       // function checkDecimal
 
@@ -1995,19 +2063,18 @@ function addRow(event)
 {
     event.stopPropagation();
     // locate the last row of the existing table
-    let form      = this.form
-    let formElts  = form.elements;
-    let  table      = document.getElementById("form");
-    let  tbody      = table.tBodies[0];
-    let lastRowNum  = tbody.rows.length;
-    let rowNum      = lastRowNum + 1;
+    //let form            = this.form
+    let table           = document.getElementById("form");
+    let tbody           = table.tBodies[0];
+    let lastRowNum      = tbody.rows.length;
+    let rowNum          = lastRowNum + 1;
     if (rowNum < 10)
-        rowNum      = '0' + rowNum;
-    let  lastRow        = tbody.rows[lastRowNum - 1];
-    let  newRow     = lastRow.cloneNode(true);
+        rowNum          = '0' + rowNum;
+    let lastRow         = tbody.rows[lastRowNum - 1];
+    let newRow          = lastRow.cloneNode(true);
 
     // scan over the last row, and duplicate its contents into the new row
-    for (var child = newRow.firstChild; child; child = child.nextSibling)
+    for (let child = newRow.firstChild; child; child = child.nextSibling)
     {       // loop through all children of new row
         if (child.nodeType == 1)
         {   // element node
@@ -2017,7 +2084,7 @@ function addRow(event)
             }   // <th> element
             else
             {   // some other element, should be <td>
-                for (var gchild = child.firstChild;
+                for (let gchild = child.firstChild;
                      gchild;
                      gchild = gchild.nextSibling)
                 {   // loop through children
@@ -2025,10 +2092,10 @@ function addRow(event)
                         (gchild.nodeName == 'INPUT' ||
                          gchild.nodeName == 'BUTTON'))
                     {       // <input> or <button> element
-                        let  name   = gchild.name;
+                        let name   = gchild.name;
                         if (name.length > 2)
                         {   // update name of new element
-                            let  colName    = name.substring(0, name.length - 2);
+                            let colName    = name.substring(0, name.length - 2);
                             gchild.name  = colName + rowNum;
                         }   // update name of new element
                     }       // <input> or <button> element
@@ -2042,11 +2109,11 @@ function addRow(event)
     // I have to wait until now to activate the functionality of the
     // added elements because they are not part of the <form> until added
     // to the DOM
-    for (var child = newRow.firstChild; child; child = child.nextSibling)
+    for (let child = newRow.firstChild; child; child = child.nextSibling)
     {       // loop through all children of new row
         if (child.nodeType == 1)
         {   // element node
-                for (var gchild = child.firstChild;
+                for (let gchild = child.firstChild;
                      gchild;
                      gchild = gchild.nextSibling)
                 {   // loop through children
@@ -2090,7 +2157,7 @@ function initElement(element, clear)
 {
     let form        = element.form;
 
-    let  fldName    = element.name;
+    let fldName    = element.name;
     if (fldName === undefined || fldName.length == 0)
         fldName     = element.id;
 
@@ -2100,45 +2167,38 @@ function initElement(element, clear)
     // for individual data elements the field name generally
     // consists of a column name plus the line number as the last
     // two characters
-    let result          = /([a-zA-Z_$]+)(\d*)$/.exec(fldName);
-    let colName         = result[1].toLowerCase();
-    let rowNumText      = result[2];
-    let rowNum          = rowNumText;
+    let result              = /([a-zA-Z_$]+)(\d*)$/.exec(fldName);
+    let colName             = result[1].toLowerCase();
+    let rowNumText          = result[2];
+    let rowNum              = rowNumText;
+    let otColName           = 'OwnerTenant' + rowNumText;
+    let otColumn            = form.elements[otColName];
     if (rowNumText.length > 0)
-        rowNum          = parseInt(rowNumText);
+        rowNum              = parseInt(rowNumText);
 
     switch(colName)
-    {   // column specific initialization
+    {                           // column specific initialization
         case 'imagebutton':
-        {
             if (element.addEventListener)
                 element.addEventListener('click', showImage, false);
-            break;
-        }
+            break;              // button to display image
 
         case 'correctimage':
-        {
             if (element.addEventListener)
                 element.addEventListener('click', correctImageUrl, false);
-            break;
-        }
+            break;              // button to display image URL
 
         case 'treematch':
-        {
             if (element.addEventListener)
                 element.addEventListener('click', matchCitations, false);
-            break;
-        }
+            break;              // button to search for match in FT
 
         case 'showimportant':
-        {
             if (element.addEventListener)
                 element.addEventListener('click', showImportant, false);
-            break;
-        }
+            break;               // button to show only important cols   
 
         case 'family':
-        {   // family number
             if (element.addEventListener)
                 element.addEventListener('change', changeReplDown, false);
             element.addEventListener('keydown',   numericKeyDown);
@@ -2154,8 +2214,7 @@ function initElement(element, clear)
                 element.focus();    // set the focus
                 element.select();   // select all of the text
             }
-            break;
-        }   // family number replicates to subsequent rows
+            break;              // family number 
 
         case 'addrsect':
         case 'addrtwp':
@@ -2163,20 +2222,17 @@ function initElement(element, clear)
         case 'addrmdn':
         case 'addrmuni':
         case 'postoffice':
-        {   // fields that replicate to subsequent rows
             if (element.addEventListener)
                 element.addEventListener('change', changeReplDown, false);
             setClassByValue(colName,
                             rowNum,
                             form.elements);
-            element.checkfunc  = checkAddress;
+            element.checkfunc       = checkAddress;
             element.checkfunc();
-            break;
-        }   // fields that replicate to subsequent rows
+            break;              // address subfields
 
         case 'township':
-        {   // fields that replicate to subsequent rows
-            let otColumn        = form.elements['OwnerTenant' + rowNumText];
+            element.abbrTbl         = AddrAbbrs;
             if (otColumn)
             {                   // 1921 census
                 if (element.addEventListener)
@@ -2190,13 +2246,11 @@ function initElement(element, clear)
             setClassByValue(colName,
                             rowNum,
                             form.elements);
-            element.checkfunc  = checkAddress;
+            element.checkfunc       = checkAddress;
             element.checkfunc();
-            break;
-        }   // fields that replicate to subsequent rows
+            break;              // township column 1921 census
 
         case 'surname':
-        {   // fields that replicate to subsequent rows
             element.abbrTbl      = SurnAbbrs;
             if (element.addEventListener)
                 element.addEventListener('change', changeSurname, false);
@@ -2205,77 +2259,64 @@ function initElement(element, clear)
                             form.elements);
             element.checkfunc  = checkName;
             element.checkfunc();
-            break;
-        }   // fields that replicate to subsequent rows
+            break;              // surname
 
         case 'givennames':
-        {   // capitalize and expand abbreviations for given names
             if (clear)
-                element.value  = "";
-            element.abbrTbl      = GivnAbbrs;
+                element.value       = "";
+            element.abbrTbl         = GivnAbbrs;
             if (element.addEventListener)
                 element.addEventListener('change', change, false);
-            element.checkfunc  = checkName;
+            element.checkfunc       = checkName;
             element.checkfunc();
-            break;
-        }   // capitalize given names
+            break;              // given names
 
         case 'age':
-        {   // Age at time of census
             if (clear)
-                element.value  = "";
-            element.abbrTbl      = AgeAbbrs;
+                element.value       = "";
+            element.abbrTbl         = AgeAbbrs;
             if (element.addEventListener)
                 element.addEventListener('change', changeAge, false);
-            element.checkfunc  = checkAge;
+            element.checkfunc       = checkAge;
             element.checkfunc();
-            break;
-        }   // Age at time of census
+            break;              // Age at time of census
 
         case 'ageatdeath':
-        {   // Age at time of death
             if (clear)
-                element.value  = "";
-            element.abbrTbl      = AgeAbbrs;
+                element.value       = "";
+            element.abbrTbl         = AgeAbbrs;
             if (element.addEventListener)
                 element.addEventListener('change', change, false);
-            element.checkfunc  = checkAge;
+            element.checkfunc       = checkAge;
             element.checkfunc();
-            break;
-        }   // Age at time of death
+            break;              // Age at time of death
 
         case 'sex':
-        {   // capitalize flag values
             if (clear)
-                element.value  = "?";
+                element.value       = "?";
             if (element.addEventListener)
                 element.addEventListener('change', changeSex, false);
-            element.checkfunc  = checkSex;
+            element.checkfunc       = checkSex;
             element.checkfunc();
-            break;
-        }   // capitalize flag values
+            break;              // gender
 
         case 'mstat':
-        {   // capitalize flag values
             if (clear || element.value.toLowerCase() == 's')
-                element.value  = "";
+                element.value       = "";
             if (element.addEventListener)
                 element.addEventListener('change', change, false);
-            element.checkfunc  = checkMStat;
+            element.checkfunc       = checkMStat;
             element.checkfunc();
-            break;
-        }   // capitalize flag values
+            break;              // marital status
 
         case 'negro':       // used in 1851
         case 'coloured':    // used in 1861
         case 'indian':
-        {   // capitalize flag values
             if (clear)
-                element.value  = "";
+                element.value       = "";
             if (element.addEventListener)
                 element.addEventListener('change', changeFlagRace, false);
-            break;
-        }   // capitalize flag values
+            break;              // race indicator
 
         case 'member':
         case 'absent':
@@ -2289,58 +2330,55 @@ function initElement(element, clear)
         case 'deaf':
         case 'blind':
         case 'insane':
-        case 'idiot':
         case 'lunatics':    // used in 1851
         case 'lunatic':     // used in 1861
         case 'idiot':       // used in 1911
         case 'unemployed':
         case 'spkenglish':
         case 'spkfrench':
-        {                   // display gender
             if (clear)
-                element.value  = "";
+                element.value       = "";
             if (element.addEventListener)
                 element.addEventListener('change', changeGenderFlag, false);
-            element.checkfunc  = checkFlagSex;
+            element.checkfunc       = checkFlagSex;
             element.checkfunc();
-            break;
-        }                   // display gender
+            break;              // flags which display gender
 
         case 'canread':
-        {                   // capitalize and copy to CanWrite
             numCanReadFlds++;
             if (element.value != '')
                 numCanRead++;
             if (element.addEventListener)
                 element.addEventListener('change', changeCanRead, false);
-            element.checkfunc  = checkFlag;
+            element.checkfunc       = checkFlag;
             element.checkfunc();
-            break;
-        }                   // capitalize and copy to CanWrite
+            break;              // can read indicator
 
         case 'cantread':
-        {                   // capitalize and copy to CantWrite
             if (element.addEventListener)
                 element.addEventListener('change', changeCantRead, false);
-            element.checkfunc  = checkFlag;
+            element.checkfunc       = checkFlag;
             element.checkfunc();
-            break;
-        }                   // capitalize and copy to CantWrite
+            break;              // cannot read indicator
+
+        case 'radio':
+            if (element.addEventListener)
+                element.addEventListener('change', changeFlag, false);
+            element.checkfunc       = checkFlag;
+            element.checkfunc();
+            break;              // own a radio
 
         case 'notmember':
-        {                   // capitalize and clear 'member'
             if (element.addEventListener)
                 element.addEventListener('change', changeNotMember, false);
-            element.checkfunc  = checkFlag;
+            element.checkfunc       = checkFlag;
             element.checkfunc();
-            break;
-        }                   // capitalize and clear 'member'
+            break;              // gender of individual not a family mmbr
 
         case 'origin':
         case 'nationality':
         case 'language':
-        {                   // Expand abbreviations
-            element.abbrTbl      = OrigAbbrs;
+            element.abbrTbl         = OrigAbbrs;
             if (element.addEventListener)
                 element.addEventListener('change', changeReplDown, false);
             setClassByValue(colName,
@@ -2348,21 +2386,17 @@ function initElement(element, clear)
                             form.elements);
             element.checkfunc       = checkName;
             element.checkfunc();
-            break;
-        }                   // Expand abbreviations
+            break;              // language and ethnicity
 
         case 'causeofdeath':
-        {   // Cause of Death in 1851 and 1861 population census
             element.abbrTbl         = CauseAbbrs;
             if (element.addEventListener)
                 element.addEventListener('change', change, false);
             element.checkfunc       = checkText;
             element.checkfunc();
-            break;
-        }   // Cause of Death in 1851 and 1861 population census
+            break;              // Cause of Death
 
         case 'spkother':
-        {   // Expand abbreviations but don't repl down
             if (clear)
                 element.value       = "";
             element.abbrTbl         = OrigAbbrs;
@@ -2370,13 +2404,11 @@ function initElement(element, clear)
                 element.addEventListener('change', change, false);
             element.checkfunc       = checkName;
             element.checkfunc();
-            break;
-        }   // Expand abbreviations
+            break;              // language other than English/French
 
         case 'binyear':
         case 'minyear':
         case 'maryear':
-        {                       // Fields that only contain a month
             if (clear)
                 element.value       = "";
             element.abbrTbl         = MMonthAbbrs;
@@ -2384,11 +2416,9 @@ function initElement(element, clear)
                 element.addEventListener('change', dateChanged, false);
             element.checkfunc       = checkDate;
             element.checkfunc();
-            break;
-        }                       // fields that only contain a month
+            break;              // fields that only contain a month
 
         case 'bdate':
-        {                       // fields containing a date (day & month)
             if (clear)
                 element.value       = "";
             element.abbrTbl         = MonthAbbrs;
@@ -2396,155 +2426,134 @@ function initElement(element, clear)
                 element.addEventListener('change', dateChanged, false);
             element.checkfunc       = checkDate;
             element.checkfunc();
-            break;
-        }                       // fields containing a date (day & month)
+            break;              // fields containing a date (day & month)
 
         case 'relation':
-        {   // Expand abbreviations
             if (clear)
                 element.value       = "";
             element.abbrTbl         = RelAbbrs;
             if (element.addEventListener)
                 element.addEventListener('change', change, false);
-            element.checkfunc  = checkRelation;
+            element.checkfunc       = checkRelation;
             element.checkfunc();
-            break;
-        }   // Expand abbreviations
+            break;              // relationship to head of household
 
         case 'bplace':
-        {   // expand abbreviations for birthplace
             if (clear)
-                element.value  = "Ontario";
-            element.abbrTbl      = BpAbbrs;
+                element.value       = "Ontario";
+            element.abbrTbl         = BpAbbrs;
             if (element.addEventListener)
+            {
                 element.addEventListener('change', changeBPlace, false);
-            element.checkfunc  = checkAddress;
+                let evt             = new Event('change');
+                element.dispatchEvent(evt);
+            }
+            else
+                element.onchange    = changeBPlace;
+            element.checkfunc       = checkAddress;
             element.checkfunc();
-            break;
-        }   // expand abbreviations for birthplace
+            break;              // birthplace
 
         case 'immyear':
-        {   // expand abbreviations for immigration or nat'zation
             if (clear)
-                element.value  = "";
+                element.value       = "";
             if (element.addEventListener)
                 element.addEventListener('change', changeImmYear, false);
-            element.checkfunc  = checkYear;
+            element.checkfunc       = checkYear;
             element.checkfunc();
-            break;
-        }   // expand abbreviations for immigration or nat'zation
+            break;              // immigration 
 
         case 'natyear':
-        {   // expand abbreviations for immigration or nat'zation
             if (clear)
-                element.value  = "";
+                element.value       = "";
             if (element.addEventListener)
                 element.addEventListener('change', change, false);
-            element.checkfunc  = checkNatYear;
+            element.checkfunc       = checkNatYear;
             element.checkfunc();
-            break;
-        }   // expand abbreviations for immigration or nat'zation
+            break;              // naturalization
 
         case 'fathersbplace':
-        {   // Father's birthplace default for Mother's birthplace
-            element.abbrTbl      = BpAbbrs;
+            element.abbrTbl         = BpAbbrs;
             if (element.addEventListener)
                 element.addEventListener('change', changeFBPlace, false);
-            element.checkfunc  = checkAddress;
+            element.checkfunc       = checkAddress;
             element.checkfunc();
-            break;
-        }   // Father's birthplace default for Mother's birthplace
+            break;              // Father's birthplace
 
         case 'mothersbplace':
-        {   // Mother's birthplace
-            element.abbrTbl      = BpAbbrs;
+            element.abbrTbl         = BpAbbrs;
             if (element.addEventListener)
                 element.addEventListener('change', changeMBPlace, false);
-            element.checkfunc  = checkAddress;
+            element.checkfunc       = checkAddress;
             element.checkfunc();
-            break;
-        }   // Mother's birthplace
+            break;              // Mother's birthplace
 
         case 'religion':
-        {   // religion: expand defaults and replicate down
-            element.abbrTbl      = RlgnAbbrs;
+            element.abbrTbl         = RlgnAbbrs;
             if (element.addEventListener)
                 element.addEventListener('change', changeReplDown, false);
             setClassByValue(colName,
                             rowNum,
                             form.elements);
-            element.checkfunc  = checkName;
+            element.checkfunc       = checkName;
             element.checkfunc();
-            break;
-        }   // religion: expand defaults and replicate down
+            break;              // religion
 
         case 'occupation':
         case 'occother':
-        {   // Occupation
             if (clear)
-                element.value  = "";
-            element.abbrTbl      = OccAbbrs;
+                element.value       = "";
+            element.abbrTbl         = OccAbbrs;
             if (element.addEventListener)
                 element.addEventListener('change', changeOccupation, false);
-            element.checkfunc  = checkOccupation;
+            element.checkfunc       = checkOccupation;
             element.checkfunc();
-            break;
-        }   // Occupation
+            break;              // Occupation
 
         case 'emptype':
-        {   // employment type
             if (clear)
-                element.value  = "";
+                element.value       = "";
             if (element.addEventListener)
                 element.addEventListener('change', changeEmpType, false);
-            element.checkfunc  = checkText;
+            element.checkfunc       = checkText;
             element.checkfunc();
-            break;
-        }   // employment type
+            break;      // employment type
 
         case 'empwhere':
-        {   // employment location
-            element.abbrTbl      = EmpWhereAbbrs;
+            element.abbrTbl         = EmpWhereAbbrs;
             if (element.addEventListener)
                 element.addEventListener('change', change, false);
-            element.checkfunc  = checkText;
+            element.checkfunc       = checkText;
             element.checkfunc();
-            break;
-        }   // employment location
+            break;      // employment location
 
         case 'employee':
-        {   // Employee flag
             if (clear)
-                element.value  = "";
+                element.value       = "";
             if (element.addEventListener)
                 element.addEventListener('change', changeEmployee, false);
-            element.checkfunc  = checkFlag;
+            element.checkfunc       = checkFlag;
             element.checkfunc();
-            break;
-        }   // Employee flag`
+            break;      // Employee flag`
 
         case 'employer':
-        {   // Employer
             if (clear)
-                element.value  = "";
+                element.value       = "";
             if (element.addEventListener)
                 element.addEventListener('change', changeEmployer, false);
-            element.checkfunc  = checkFlag;
+            element.checkfunc       = checkFlag;
             element.checkfunc();
-            break;
-        }   // Employer
+            break;      // Employer
 
         case 'ownacct':
         case 'ownmeans':
-        {   // self employed
             if (clear)
-                element.value  = "";
+                element.value       = "";
             if (element.addEventListener)
                 element.addEventListener('change', changeSelfEmployed, false);
-            element.checkfunc  = checkFlag;
+            element.checkfunc       = checkFlag;
             element.checkfunc();
-            break;
-        }   // self employed
+            break;      // self employed
 
         case 'numhands':
         case 'wksemp':
@@ -2553,6 +2562,7 @@ function initElement(element, clear)
         case 'hpwoth':
         case 'incomeemp':
         case 'incomeoth':
+        case 'earnings':
         case 'monthsfact':
         case 'monthshome':
         case 'monthsother':
@@ -2567,55 +2577,45 @@ function initElement(element, clear)
         case 'pigs':
         case 'lifeinsurance':   // 1911
         case 'accinsurance':    // 1911
-        case 'schoolmons':  // 1911
-        {   // numeric fields
             if (clear)
-                element.value  = "";
+                element.value       = "";
             if (element.addEventListener)
                 element.addEventListener('change', change, false);
             element.addEventListener('keydown',   numericKeyDown);
-            element.checkfunc  = checkNumber;
+            element.checkfunc       = checkNumber;
             element.checkfunc();
-            break;
-        }   // numeric fields
+            break;      // numeric fields
 
-        case 'hourlyrate':  // 1911
+        case 'hourlyrate':      // 1911
         case 'costinsurance':   // 1911
         case 'costeducation':   // 1911
-        {   // decimal fields
             if (clear)
-                element.value  = "";
+                element.value       = "";
             if (element.addEventListener)
                 element.addEventListener('change', change, false);
-            element.checkfunc  = checkDecimal;
+            element.checkfunc       = checkDecimal;
             element.checkfunc();
-            break;
-        }   // decimal fields
+            break;      // decimal fields
 
-        case 'schoolmons':
-        {   // months of school in 1921 census
+        case 'schoolmons':      // 1911
             if (clear)
-                element.value  = "";
+                element.value       = "";
             if (element.addEventListener)
                 element.addEventListener('change', changeSchoolMons, false);
             element.addEventListener('keydown',   numericKeyDown);
-            element.checkfunc  = checkNumber;
+            element.checkfunc       = checkNumber;
             element.checkfunc();
-            break;
-        }   // months of school in 1921 census
+            break;      // months of school 
 
         case 'byeartxt':
-        {   // year of birth
             if (element.addEventListener)
                 element.addEventListener('change', changeBYear, false);
-            element.checkfunc  = checkBYear;
+            element.checkfunc       = checkBYear;
             element.checkfunc();
-            break;
-        }   // year of birth
+            break;      // year of birth
 
         case 'location':
         case 'address':
-        {   // Address
             if (clear)
                 element.value       = "";
             element.abbrTbl         = AddrAbbrs;
@@ -2623,12 +2623,10 @@ function initElement(element, clear)
                 element.addEventListener('change', changeAddress, false);
             element.checkfunc       = checkAddress;
             element.checkfunc();
-            break;
-        }   // Address
+            break;      // Address
 
 
         case 'restype':
-        {   // capitalize and expand abbreviations for given names
             if (clear)
                 element.value       = "";
             element.abbrTbl         = ResTypeAbbrs;
@@ -2636,117 +2634,93 @@ function initElement(element, clear)
                 element.addEventListener('change', changeResType, false);
             element.checkfunc       = checkName;
             element.checkfunc();
-            break;
-        }   // residence type
+            break;      // residence type
 
         case 'ownertenant':
-        {   // capitalize and expand abbreviations for given names
             if (clear)
-                element.value  = "";
+                element.value       = "";
             if (element.addEventListener)
                 element.addEventListener('change', changeOwnerTenant, false);
-            element.checkfunc  = checkOwnerTenant;
+            element.checkfunc       = checkOwnerTenant;
             element.checkfunc();
-            break;
-        }   // residence type
+            break;      // residence type
 
         case 'houserent':
-        {   // montly rent
             if (clear)
-                element.value  = "";
-            element.abbrTbl      = StoriesAbbrs;
+                element.value       = "";
+            element.abbrTbl         = StoriesAbbrs;
             if (element.addEventListener)
                 element.addEventListener('change', change, false);
             element.addEventListener('keydown',   numericKeyDown);
-            element.checkfunc  = checkNumber;
+            element.checkfunc       = checkNumber;
             element.checkfunc();
-            break;
-        }   // monthly rent
+            break;      // monthly rent
 
         case 'housematerial':
-        {   // capitalize and expand abbreviations for given names
             if (clear)
-                element.value  = "";
-            element.abbrTbl      = ResTypeAbbrs;
+                element.value       = "";
+            element.abbrTbl         = ResTypeAbbrs;
             if (element.addEventListener)
                 element.addEventListener('change', change, false);
-            element.checkfunc  = checkName;
+            element.checkfunc       = checkName;
             element.checkfunc();
-            break;
-        }   // handle house materials
+            break;      // handle house materials
 
         case 'stories':
-        {   // expand abbreviations for number of stories in residence
             if (clear)
-                element.value  = "";
-            element.abbrTbl      = StoriesAbbrs;
+                element.value       = "";
+            element.abbrTbl         = StoriesAbbrs;
             if (element.addEventListener)
                 element.addEventListener('change', change, false);
-            element.checkfunc  = checkNumber;
+            element.checkfunc       = checkNumber;
             element.checkfunc();
-            break;
-        }   // expand abbreviations for number of stories
+            break;      // expand abbreviations for number of stories
 
         case 'numfamilies':
-        {   // validate number of families
             if (clear)
-                element.value  = "";
+                element.value       = "";
             if (element.addEventListener)
                 element.addEventListener('change', change, false);
             element.addEventListener('keydown',   numericKeyDown);
-            element.checkfunc  = checkNumber;
+            element.checkfunc       = checkNumber;
             element.checkfunc();
-            break;
-        }   // validate number of families
+            break;      // validate number of families
 
         case 'remarks':
-        {   // remarks
             if (clear)
-                element.value  = "";
+                element.value       = "";
             if (element.addEventListener)
                 element.addEventListener('change', change, false);
-            element.checkfunc  = checkText;
+            element.checkfunc        = checkText;
             element.checkfunc();
-            break;
-        }   // remarks
+            break;      // remarks
 
         case 'doidir':
-        {   // button to manage the IDIR element
             if (element.addEventListener)
                 element.addEventListener('click', doIdir, false);
-            break;
-        }   // button to manage the IDIR element
+            break;      // button to manage the IDIR element
 
         case 'clearidir':
-        {   // button to clear the IDIR element
             if (element.addEventListener)
                 element.addEventListener('click', clearIdir, false);
-            break;
-        }   // button to clear the IDIR element
+            break;      // button to clear the IDIR element
 
         case 'reset':
-        {   // button to reset the form to defaults
             if (element.addEventListener)
                 element.addEventListener('click', reset, false);
-            break;
-        }   // button to reset the form to defaults
+            break;      // button to reset the form to defaults
 
         case 'addrow':
-        {   // button to add an additional row to the end
             if (element.addEventListener)
                 element.addEventListener('click', addRow, false);
-            break;
-        }   // button to add an additional row to the end
+            break;      // button to add an additional row to the end
 
         case 'exportjson':
-        {   // button to export the contents in JSON format
             if (element.addEventListener)
                 element.addEventListener('click', exportJSON, false);
-            break;
-        }   // button to export the contents in JSON format
+            break;      // button to export the contents in JSON format
 
         default:
-        {       // all other columns
             if (element.addEventListener)
             {
                 if (element.className.substr(0,5) == 'same ' ||
@@ -2757,8 +2731,7 @@ function initElement(element, clear)
             }
             element.checkfunc  = checkName;
             element.checkfunc();
-            break;
-        }       // all other columns
+            break;          // all other columns
 
     }           // column specific initialization
 
@@ -2766,7 +2739,7 @@ function initElement(element, clear)
     // spreadsheet emulation
     if (element.nodeName.toUpperCase() == 'INPUT')
         element.addEventListener('keydown',   tableKeyDown);
-}   // function initElement
+}       // function initElement
 
 /************************************************************************
  *  function showImportant                                              *
@@ -2779,31 +2752,34 @@ function initElement(element, clear)
 function showImportant(event)
 {
     event.stopPropagation();
-    let form      = this.form;
-    let  table      = document.getElementById('form');
+    //let form                = this.form;
+    let table               = document.getElementById('form');
     if (table)
-    {
-        let  thead  = table.tHead;
+    {                   // table present in form
+        let thead           = table.tHead;
         if (thead && thead.rows.length > 0)
-        {
-            let  trow   = thead.rows[0];
+        {               // table contains a <thead> which contains a <tr>
+            let trow        = thead.rows[0];
             for(var i = 0; i < trow.cells.length; i++)
-            {
-                let th  = trow.cells[i];
-                let label  = th.innerHTML.trim();
+            {           // loop through column labels
+                let th      = trow.cells[i];
+                let label   = th.innerHTML.trim();
                 switch(label.toLowerCase())
-                {
-                    case 'line':
-                    case 'fam':
-                    case 'surname':
-                    case 'given names':
-                    case 'sex':
-                    case 'mst':
+                {       // act on label
+                    case 'address':
+                    case 'age':
                     case 'bdate':
                     case 'byear':
-                    case 'age':
-                    case 'occupation':
+                    case 'fam':
                     case 'ft':
+                    case 'given names':
+                    case 'location':
+                    case 'line':
+                    case 'mst':
+                    case 'occupation':
+                    case 'sex':
+                    case 'surname':
+                    case 'restype':
                     {
                         break;
                     }
@@ -2813,11 +2789,11 @@ function showImportant(event)
                         th.click();
                         break;
                     }
-                }   // act on label
-            }       // loop through column labels
-        }       // table contains a <thead> which contains a <tr>
-    }           // table present in form
-}   // function showImportant
+                }       // act on label
+            }           // loop through column labels
+        }               // table contains a <thead> which contains a <tr>
+    }                   // table present in form
+}       // function showImportant
 
 /************************************************************************
  *  function reset                                                      *
@@ -2831,13 +2807,13 @@ function reset(event)
 {
     event.stopPropagation();
     let form      = this.form;
-    let  census     = form.Census.value;
-    let  censusYear = census.substring(2);
-    let  province   = form.Province.value;
-    let  district   = form.District.value;
-    let  subdistrict    = form.SubDistrict.value;
-    let  division   = form.Division.value;
-    let  page       = form.Page.value;
+    let census     = form.Census.value;
+    let censusYear = census.substring(2);
+//    let province   = form.Province.value;
+    let district   = form.District.value;
+    let subdistrict    = form.SubDistrict.value;
+    let division   = form.Division.value;
+    let page       = form.Page.value;
     let url  = "/getRecordXml.php?Table=Census" + censusYear +
                         "&Census=" + census +
                         "&District=" + district +
@@ -2862,7 +2838,7 @@ function reset(event)
  ************************************************************************/
 function gotPrevLine(xmlDoc)
 {
-    let  rootNode   = xmlDoc.documentElement;
+    let rootNode   = xmlDoc.documentElement;
 
     let prevLine  = getParmsFromXml(rootNode);
     // alter the values and classes of the elements
@@ -2875,8 +2851,8 @@ function gotPrevLine(xmlDoc)
     let origin      = "[Unknown]";
     let nationality  = "[Unknown]";
     let religion  = "[Unknown]";
-    let  rowNum     = 0;
-    for(key in prevLine)
+    let rowNum     = 0;
+    for(let key in prevLine)
     {               // loop through fields in prev line
         switch(key)
         {           // act on specific fields in prev line
@@ -2918,7 +2894,7 @@ function gotPrevLine(xmlDoc)
         let field  = formElts[i];
         // for individual data elements the field name includes the
         // line number from the original form as the last two characters
-        let  fieldName  = field.name;
+        let fieldName  = field.name;
         if (fieldName.length > 2)
         {   // field name long enough to include row number
             rowNum  = parseInt(fieldName.substr(fieldName.length - 2, 2));
@@ -3033,9 +3009,9 @@ function gotPrevLine(xmlDoc)
     }       // loop through all elements
 
     // locate the last row of the existing table
-    let  cenYear        = form.Census.value.substring(2);
-    let  pageSize   = CenPageSize[cenYear];
-    let  addRowButton   = document.getElementById('addRow');
+    let cenYear        = form.Census.value.substring(2);
+    let pageSize   = CenPageSize[cenYear];
+    let addRowButton   = document.getElementById('addRow');
     for(rowNum += 1; rowNum <= pageSize; rowNum++)
         addRowButton.click();
     return false;
@@ -3067,23 +3043,24 @@ var imageTypes  = ['jpg', 'jpeg', 'gif', 'png'];
 function showImage(event)
 {
     event.stopPropagation();
-    let  form               = this.form;
+    let form                = this.form;
     let image               = form.elements['Image'].value;
-    let  lang               = 'en';
+    let lang                = 'en';
     if ('lang' in args)
         lang                = args['lang'];
     let imageUrl            = "/DisplayImage.php?src=" + encodeURIComponent(image) +
                                             "&buttonname=imageButton" +
                                             "&lang=" + lang;
-    let  dotPos             = image.lastIndexOf('.');
+    let dotPos              = image.lastIndexOf('.');
     if (image.substring(0,41) == 'https://central.bac-lac.gc.ca/.item/?app=')
     {
+        // leave alone
     }
     else
     if (dotPos >= 0)
     {
-        let  imageType      = image.substring(dotPos + 1).toLowerCase();
-        let  imageIndex     = imageTypes.indexOf(imageType);
+        let imageType       = image.substring(dotPos + 1).toLowerCase();
+        let imageIndex      = imageTypes.indexOf(imageType);
         if (imageIndex == -1)
             imageUrl        = image;
     }
@@ -3094,7 +3071,7 @@ function showImage(event)
     let copNotice           = document.getElementById('imageCopyrightNote');
     let showNotice          = document.getElementById('showCopyrightNote');
     if (copNotice && showNotice === null)
-    {           // add copyright notice
+    {                   // add copyright notice
         let clone           = copNotice.cloneNode(true);
         clone.id            = 'showCopyrightNote';
         let parentNode      = this.parentNode;
@@ -3107,7 +3084,7 @@ function showImage(event)
             parentNode      = corrButton.parentNode;
             parentNode.removeChild(corrButton);
         }
-    }           // replace button with copyright notice
+    }                   // replace button with copyright notice
     this.disabled           = true;
 
     // display the image in the right half of the window
@@ -3136,34 +3113,34 @@ function showImage(event)
 function correctImageUrl(event)
 {
     event.stopPropagation();
-    let  form       = this.form;
-    let imageLine   = document.getElementById("ImageButton");
-    let imageUrl    = '';
-    let  nextSibling;
-    for(var child   = imageLine.firstChild;
+    //let form                = this.form;
+    let imageLine           = document.getElementById("ImageButton");
+    let imageUrl            = '';
+    let nextSibling;
+    for(var child = imageLine.firstChild;
         child;
         child = nextSibling)
-    {
+    {                   // loop through children of imageLine
         if (child.nodeType == 1 &&
             child.nodeName == 'INPUT' &&
             child.name == 'Image')
-        {       // <input name='Image' ...
-            imageUrl  = child.value;
-        }       // <input name='Image' ...
-        nextSibling  = child.nextSibling;
+        {               // <input name='Image' ...
+            imageUrl        = child.value;
+        }               // <input name='Image' ...
+        nextSibling         = child.nextSibling;
         imageLine.removeChild(child);
-    }       // loop through children of imageLine
+    }                   // loop through children of imageLine
 
     // create new label and <input type='text'>
     imageLine.appendChild(
-                        document.createTextNode("Enter URL of Census Image:"));
-    let  inputTag   = document.createElement("INPUT");
-    inputTag.type  = 'text';
-    inputTag.size  = '64';
-    inputTag.maxlength  = '128';
-    inputTag.name  = 'Image';
-    inputTag.value  = imageUrl;
-    inputTag.className  = 'black white leftnc';
+                    document.createTextNode("Enter URL of Census Image:"));
+    let inputTag            = document.createElement("INPUT");
+    inputTag.type           = 'text';
+    inputTag.size           = '64';
+    inputTag.maxlength      = '128';
+    inputTag.name           = 'Image';
+    inputTag.value          = imageUrl;
+    inputTag.className      = 'black white leftnc';
     imageLine.appendChild(inputTag);
 }   // function correctImageUrl
 
@@ -3179,21 +3156,21 @@ function correctImageUrl(event)
  ************************************************************************/
 function matchCitations(event)
 {
-    event.stopPropagation();
-    let  form       = this.form;
-    let  lang       = 'en';
+    let form                = this.form;
+    let lang                = 'en';
     if ('lang' in args)
-        lang      = args['lang'];
-    let  url        = "matchCitations.php" +
-                          "?Census=" + form.Census.value +
-                          "&Province=" + form.Province.value +
-                          "&District=" + form.District.value +
-                          "&SubDistrict=" + form.SubDistrict.value +
-                          "&Division=" + form.Division.value +
-                          "&Page=" + form.Page.value +
-                          "&lang=" + lang;
+        lang                = args['lang'];
+    let url                 = "matchCitations.php" +
+                              "?Census=" + form.Census.value +
+                              "&Province=" + form.Province.value +
+                              "&District=" + form.District.value +
+                              "&SubDistrict=" + form.SubDistrict.value +
+                              "&Division=" + form.Division.value +
+                              "&Page=" + form.Page.value +
+                              "&lang=" + lang;
 
     window.open(url, "matchCitations");
+    event.stopPropagation();
     return false;
 }   // function matchCitations
 
@@ -3209,33 +3186,35 @@ function matchCitations(event)
 function doIdir(event)
 {
     event.stopPropagation();
-    let  agePattern = /([0-9]+m)|([0-9]+)/;
-    let  rxResults  = null;
-    let  button     = this;
-    let  name       = button.id;
-    let  lineNum        = name.substring(name.length - 2);
-    let  form       = button.form;
-    let  eltName        = 'IDIR' + lineNum;
-    let idir        = 0;
+    let agePattern              = /([0-9]+m)|([0-9]+)/;
+    let rxResults               = null;
+    let button                  = this;
+    let name                    = button.id;
+    let lineNum                 = name.substring(name.length - 2);
+    let form                    = button.form;
+    let eltName                 = 'IDIR' + lineNum;
+    let idir                    = 0;
     if (form.elements[eltName])
-        idir      = form.elements[eltName].value - 0;
+        idir                    = form.elements[eltName].value - 0;
     else
-        alert("CensusForm.js: 2984 form.elements['" + eltName + "' undefined");
-    let  lang           = 'en';
+        popupAlert("CensusForm.js: 2984 form.elements['" + eltName + 
+                        "' undefined",
+                   this);
+    let lang                    = 'en';
     if ('lang' in args)
-        lang          = args['lang'];
+        lang                    = args['lang'];
 
     if (idir > 0)
-    {           // have an existing association
+    {                       // have an existing association
         window.open('/FamilyTree/Person.php?idir=' + idir +
                             '&lang=' + lang,
                     '_blank');
-    }           // have an existing association
+    }                       // have an existing association
     else
-    {           // search for matches
+    {                       // search for matches
         popupLoading(button);
         let result              = /([a-zA-Z_$]+)(\d*)$/.exec(button.id);
-        let colName             = result[1].toLowerCase();
+        //let colName             = result[1].toLowerCase();
         let rowNum              = result[2];
         let surname             = form.elements['Surname' + rowNum].value;
         let givennames          = form.elements['GivenNames' + rowNum].value;
@@ -3274,11 +3253,12 @@ function doIdir(event)
                         "&incMarried=yes&loose=yes" +
                         "&lang=" + lang;
         if (debug.toLowerCase() == 'y')
-            alert("CensusForm.js: doIdir: HTTP.getXML('" + url + "')");
+            popupAlert("CensusForm.js: doIdir: HTTP.getXML('" + url + "')",
+                       this);
         HTTP.getXML(url,
                     gotIdir,
                     noIdir);
-    }       // search for matches
+    }                       // search for matches
 }       // function doIdir
 
 /************************************************************************
@@ -3292,87 +3272,91 @@ function doIdir(event)
  ************************************************************************/
 function gotIdir(xmlDoc)
 {
-    if (debug.toLowerCase() == 'y')
-        alert("CensusForm.js: gotIdir: xmlDoc=" + new XMLSerializer().serializeToString(xmlDoc));
-    let  rootNode   = xmlDoc.documentElement;
-    let  buttonId   = rootNode.getAttribute("buttonId");
-    let  button     = document.getElementById(buttonId);
+    let rootNode                = xmlDoc.documentElement;
+    let buttonId                = rootNode.getAttribute("buttonId");
+    let button                  = document.getElementById(buttonId);
     if (button === null)
     {
         hideLoading();
         alert("CensusForm.js: gotIdir: unable to find element with id='" +
-                buttonId + "' rootNode=" + new XMLSerializer().serializeToString(rootNode));
+                        buttonId + 
+                        "' rootNode=" + 
+                        new XMLSerializer().serializeToString(rootNode));
         return;
     }
+    if (debug.toLowerCase() == 'y')
+        popupAlert("CensusForm.js: gotIdir: xmlDoc=" +
+                        new XMLSerializer().serializeToString(xmlDoc),
+                   button);
 
-    let  form       = button.form;
-    let  line       = buttonId.substring(6);
-    let  surname        = form.elements['Surname' + line].value;
-    let  givennames = form.elements['GivenNames' + line].value;
-    let  age        = form.elements['Age' + line].value;
-    let  bdateElt   = form.elements['BDate' + line];
-    let  byearElt   = form.elements['BYearTxt' + line];
-    let  censusYear = form.Census.value.substring(2);
-    let  birthYear  = censusYear;
-    let  birthDate  = censusYear;   // default
-    let  agePattern = /([0-9]+m)|([0-9]+)/;
-    let  yearPattern    = /[0-9]{4}/;
-    let  rxResults;
+    let form                    = button.form;
+    let line                    = buttonId.substring(6);
+    let surname                 = form.elements['Surname' + line].value;
+    let givennames              = form.elements['GivenNames' + line].value;
+    let age                     = form.elements['Age' + line].value;
+    let bdateElt                = form.elements['BDate' + line];
+    let byearElt                = form.elements['BYearTxt' + line];
+    let censusYear              = form.Census.value.substring(2);
+    //let birthYear               = censusYear;
+    let birthDate               = censusYear;   // default
+    let agePattern              = /([0-9]+m)|([0-9]+)/;
+    let yearPattern             = /[0-9]{4}/;
+    let rxResults;
 
     if (byearElt && (rxResults = yearPattern.exec(byearElt.value)))
-    {       // explicit birth year
+    {                       // explicit birth year
         if (bdateElt)
-            birthDate  = bdateElt.value + ' ' + rxResults[0];
+            birthDate           = bdateElt.value + ' ' + rxResults[0];
         else
-            birthDate  = rxResults[0];
-    }       // explicit birth year
+            birthDate           = rxResults[0];
+    }                       // explicit birth year
     else
-    {       // estimate birth date from age
-        rxResults  = agePattern.exec(age);
+    {                       // estimate birth date from age
+        rxResults               = agePattern.exec(age);
         if (rxResults)
-        {       // parse matched
+        {                   // parse matched
             if (rxResults[1] !== undefined)
-            {       // age in months
-                let months  = rxResults[1];
-                months      = months.substring(0,months.length - 1) - 0;
+            {               // age in months
+                let months      = rxResults[1];
+                months          = months.substring(0,months.length - 1)-0;
                 if (months < 5)
-                    birthDate  = censusYear;
+                    birthDate   = censusYear;
                 else
-                    birthDate  = censusYear - 1;
-            }       // age in months
+                    birthDate   = censusYear - 1;
+            }               // age in months
             else
             if (rxResults[2] !== undefined)
-                birthDate  = censusYear - rxResults[2];
-        }       // parse matched
-    }       // estimate birth date from age
-    let  actionButton   = null;
+                birthDate       = censusYear - rxResults[2];
+        }                   // parse matched
+    }                       // estimate birth date from age
+    //let actionButton            = null;
 
     hideLoading();
     // substitutions into the template
-    let parms           = {"sub"        : "",
-                           "surname"    : surname,
-                           "givenname"  : givennames,
-                           "birthyear"  : birthDate,
-                           "line"       : line};
+    let parms                   = {"sub"        : "",
+                                   "surname"    : surname,
+                                   "givenname"  : givennames,
+                                   "birthyear"  : birthDate,
+                                   "line"       : line};
 
-    let matches  = xmlDoc.getElementsByTagName("indiv");
+    let matches                 = xmlDoc.getElementsByTagName("indiv");
     if (matches.length > 0)
-    {       // have some matching entries
+    {                       // have some matching entries
         return displaySelectIdir('idirChooserForm$sub',
                                  parms,
                                  button,
                                  closeIdirDialog,
                                  matches);
-    }       // have some matching entries
+    }                       // have some matching entries
     else
-    {       // have no matching entries
-        let cmds    = xmlDoc.getElementsByTagName("cmd");
-        parms.cmd   = new XMLSerializer().serializeToString(cmds[0]).replace('<','&lt;');
+    {                       // have no matching entries
+        let cmds                = xmlDoc.getElementsByTagName("cmd");
+        parms.cmd               = new XMLSerializer().serializeToString(cmds[0]).replace('<','&lt;');
         return displayDialog('idirNullForm$sub',
                              parms,
                              button,
                              null);     // default close dialog
-    }       // have no matching entries
+    }                       // have no matching entries
 }       // function gotIdir
 
 /************************************************************************
@@ -3388,17 +3372,17 @@ function gotIdir(xmlDoc)
 function clearIdir(event)
 {
     event.stopPropagation();
-    let  button     = this;
-    let  name       = button.id;
-    let  lineNum        = name.substring(name.length - 2);
-    let  form       = button.form;
-    let  idirElt        = form.elements['IDIR' + lineNum];
-    idirElt.value  = 0;
-    let findButton  = form.elements["doIdir" + lineNum];
+    let button              = this;
+    let name                = button.id;
+    let lineNum             = name.substring(name.length - 2);
+    let form                = button.form;
+    let idirElt             = form.elements['IDIR' + lineNum];
+    idirElt.value           = 0;
+    let findButton          = form.elements["doIdir" + lineNum];
     while(findButton.hasChildNodes())
-    {   // remove contents of cell
+    {                   // remove contents of cell
         findButton.removeChild(findButton.firstChild);
-    }   // remove contents of cell
+    }                   // remove contents of cell
     findButton.appendChild(document.createTextNode("Find"));
 }       // function clearIdir
 
@@ -3429,48 +3413,48 @@ function displaySelectIdir(templateId,
                            action,
                            matches)
 {
-    let dialog              = displayDialog(templateId,
-                                            parms,
-                                            element,
-                                            action,
-                                            true);  // defer display
+    let dialog                  = displayDialog(templateId,
+                                                parms,
+                                                element,
+                                                action,
+                                                true);  // defer display
     if (dialog)
     {
-        let forms           = dialog.getElementsByTagName('form');
-        let form            = forms[0];
+        let forms               = dialog.getElementsByTagName('form');
+        let form                = forms[0];
 
         // update the selection list with the matching individuals
-        let select          = form.chooseIdir;
+        let select              = form.chooseIdir;
         if (select.addEventListener)
             select.addEventListener('change', idirSelected, false);
 
         // add the matches
         for (var i = 0; i < matches.length; ++i)
-        {   // loop through the matches
-            let  indiv      = matches[i];
+        {                   // loop through the matches
+            let indiv           = matches[i];
 
             // get the "id" attribute
-            let  value      = indiv.getAttribute("id");
-            let  surname        = "";
-            let  maidenname = "";
-            let  givenname  = "";
-            let  gender     = "";
-            let  birthd     = "";
-            let  deathd     = "";
-            let  parents        = "";
-            let  spouses        = "";
+            let value           = indiv.getAttribute("id");
+            let surname         = "";
+            let maidenname      = "";
+            let givenname       = "";
+            let gender          = "";// eslint-disable-line no-unused-vars
+            let birthd          = "";
+            let deathd          = "";
+            let parents         = "";
+            let spouses         = "";
 
             for (var child = indiv.firstChild;
                  child;
-                 child = child.nextSibling)
-            {       // loop through all children of indiv
+                 child          = child.nextSibling)
+            {               // loop through all children of indiv
                 if (child.nodeType == 1)
-                {   // element node
+                {           // element node
                     switch(child.nodeName)
-                    {   // act on specific child
+                    {       // act on specific child
                         case "surname":
                         {
-                            surname  = child.textContent;
+                            surname     = child.textContent;
                             break;
                         }
 
@@ -3482,37 +3466,37 @@ function displaySelectIdir(templateId,
 
                         case "givenname":
                         {
-                            givenname  = child.textContent;
+                            givenname   = child.textContent;
                             break;
                         }
 
                         case "gender":
                         {
-                            gender  = child.textContent;
+                            //gender      = child.textContent;
                             break;
                         }
 
                         case "birthd":
                         {
-                            birthd  = child.textContent;
+                            birthd      = child.textContent;
                             break;
                         }
 
                         case "deathd":
                         {
-                            deathd  = child.textContent;
+                            deathd      = child.textContent;
                             break;
                         }
 
                         case "parents":
                         {
-                            parents  = child.textContent;
+                            parents     = child.textContent;
                             break;
                         }
 
                         case "families":
                         {
-                            spouses  = child.textContent;
+                            spouses     = child.textContent;
                             break;
                         }
 
@@ -3522,39 +3506,39 @@ function displaySelectIdir(templateId,
                             //    "nodeName='" + child.nodeName + "'");
                             break;
                         }
-                    }   // act on specific child
-                }   // element node
-            }       // loop through all children of indiv
+                    }       // act on specific child
+                }           // element node
+            }               // loop through all children of indiv
 
-            let text  = surname;
+            let text            = surname;
             if (maidenname != surname)
-                text  += " (" + maidenname + ")";
-            text      += ", " + givenname + "(" +
-                               birthd + "-" +
-                               deathd + ")";
+                text            += " (" + maidenname + ")";
+            text                += ", " + givenname + "(" +
+                                       birthd + "-" +
+                                       deathd + ")";
             if (parents.length > 0)
-                text  += ", child of " + parents;
+                text            += ", child of " + parents;
             if (spouses.length > 0)
-                text  += ", spouse of " + spouses;
+                text            += ", spouse of " + spouses;
 
             // add a new HTML Option object
             addOption(select,   // Select element
-                      text, // text value
+                      text,     // text value
                       value);   // unique key
-        }   // loop through the matches
+        }                   // loop through the matches
 
-        select.selectedIndex  = 0;
+        select.selectedIndex    = 0;
 
         // show the dialog
-        dialog.style.visibility  = 'visible';
-        dialog.style.display  = 'block';
+        dialog.style.visibility = 'visible';
+        dialog.style.display    = 'block';
         // the following is a workaround for a bug in FF 40.0 and Chromium
         // in which the onchange method of the <select> is not called when
         // the mouse is clicked on an option
         for(var io=0; io < select.options.length; io++)
         {
-            let option      = select.options[io];
-            let evt         = new Event('change',{'bubbles':true});
+            let option          = select.options[io];
+            let evt             = new Event('change',{'bubbles':true});
             option.addEventListener("click",
                                     function(event) {
                                         event.stopPropagation(); 
@@ -3564,7 +3548,7 @@ function displaySelectIdir(templateId,
         }
         select.focus();
         return true;
-    }       // template OK
+    }                       // template OK
     else
         return false;
 }       // function displaySelectIdir
@@ -3580,29 +3564,29 @@ function displaySelectIdir(templateId,
  ************************************************************************/
 function idirSelected()
 {
-    let  select = this;
-    let  idir   = 0;
-    let  index  = select.selectedIndex;
+    let select                  = this;
+    let idir                    = 0;
+    let index                   = select.selectedIndex;
     if (index >= 0)
     {
-        let  option = select.options[index];
-        idir  = option.value;
+        let option              = select.options[index];
+        idir                    = option.value;
     }
-    let  form   = this.form;    // <form name='idirChooserForm'>
+    let form                    = this.form;    // name='idirChooserForm'
 
     for(var ie = 0; ie < form.elements.length; ie++)
-    {       // search for choose button
-        let  element    = form.elements[ie];
+    {                       // search for choose button
+        let element             = form.elements[ie];
         if (element != select &&
             element.id && element.id.length >= 6 &&
             element.id.substring(0,6) == "choose")
-        {   // have the button
+        {                   // have the button
             if (idir == 0)
                 element.innerHTML  = 'Cancel';
             else
                 element.innerHTML  = 'Select';
-        }   // have the button
-    }       // search for choose button
+        }                   // have the button
+    }                       // search for choose button
 }       // function idirSelected
 
 /************************************************************************
@@ -3627,26 +3611,26 @@ function noIdir()
 function closeIdirDialog(event)
 {
     event.stopPropagation();
-    let  form   = this.form;
-    let select  = form.chooseIdir;
+    let form                    = this.form;
+    let select                  = form.chooseIdir;
     if (select)
-    {       // select for IDIR present
+    {                   // select for IDIR present
         if (select.selectedIndex >= 0)
-        {   // option chosen
-            let option  = select.options[select.selectedIndex];
-            let idir  = option.value;
+        {               // option chosen
+            let option          = select.options[select.selectedIndex];
+            let idir            = option.value;
             if (idir > 0)
-            {   // individual chosen
-                let line  = this.id.substring(6);
-                let mainForm  = document.censusForm;
-                let census  = mainForm.Census.value;
-                let province  = mainForm.Province.value;
-                let district  = mainForm.District.value;
-                let subDistrict  = mainForm.SubDistrict.value;
-                let division  = mainForm.Division.value;
-                let page  = mainForm.Page.value;
-                let family  = mainForm.elements["Family" + line].value;
+            {           // individual chosen
+                let line        = this.id.substring(6);
+                let mainForm    = document.censusForm;
                 /* hide new code for moment
+                let census      = mainForm.Census.value;
+                let province    = mainForm.Province.value;
+                let district    = mainForm.District.value;
+                let subDistrict = mainForm.SubDistrict.value;
+                let division    = mainForm.Division.value;
+                let page        = mainForm.Page.value;
+                let family      = mainForm.elements["Family" + line].value;
                 HTTP.getXML("/FamilyTree/getFamilyOfXml.php?idir=" + idir +
                                 "&line=" + line +
                                 "&census=" + census +
@@ -3660,50 +3644,52 @@ function closeIdirDialog(event)
                             noFamily);
                 */
                 mainForm.elements["IDIR" + line].value      = idir;
-                let findButton          = mainForm.elements["doIdir" + line];
+                let findButton  = mainForm.elements["doIdir" + line];
                 while(findButton.hasChildNodes())
-                {   // remove contents of cell
+                {           // remove contents of cell
                     findButton.removeChild(findButton.firstChild);
-                }   // remove contents of cell
+                }           // remove contents of cell
                 findButton.appendChild(document.createTextNode("Show"));
-                let cell                    = findButton.parentNode;
-                let clearButton  = document.getElementById("clearIdir" + line);
+                let cell        = findButton.parentNode;
+                let clearId     = "clearIdir" + line;
+                let clearButton = document.getElementById(clearId);
                 if (clearButton === undefined || clearButton === null)
-                {       // need to add clear button
+                {           // need to add clear button
                     clearButton             = document.createElement("BUTTON");
                     clearButton.type        = 'button';
-                    clearButton.id          = "clearIdir" + line;
+                    clearButton.id          = clearId;
                     clearButton.className   = 'button';
-                    clearButton.appendChild(document.createTextNode("Clear"));
+                    clearButton.appendChild(
+                                    document.createTextNode("Clear"));
                     cell.appendChild(clearButton);
                     if (clearButton.addEventListener)
                         clearButton.addEventListener('click', clearIdir, false);
-                }       // need to add clear button
+                }           // need to add clear button
                 let setFlag  = document.getElementById("setIdir" + line);
                 if (setFlag === undefined || setFlag === null)
-                {       // need to add set field
+                {           // need to add set field
                     setFlag                 = document.createElement("INPUT");
                     setFlag.type            = 'hidden';
                     setFlag.id              = "setIdir" + line;
                     setFlag.name            = "setIdir" + line;
                     cell.appendChild(setFlag);
-                }       // need to add set field
+                }           // need to add set field
                 setFlag.value  = idir;
-            }   // individual chosen
-        }   // option chosen
-    }       // select for IDIR present
+            }               // individual chosen
+        }                   // option chosen
+    }                       // select for IDIR present
 
     // hide the dialog
     for (var div = this.parentNode; div; div = div.parentNode)
-    {       // loop up the element tree
+    {                       // loop up the element tree
         if (div.nodeName.toLowerCase() == 'div')
         {
             div.style.display  = 'none';    // hide
             break;
         }
-    }       // loop up the element tree
+    }                       // loop up the element tree
 
-    // suppress default action
+    // suppress default action IE style
     return false;
 }       // function closeIdirDialog
 
@@ -3716,59 +3702,56 @@ function closeIdirDialog(event)
  *  Input:                                                              *
  *      xmlDoc      XML document                                        *
  ************************************************************************/
-function gotFamily(xmlDoc)
-{
+function gotFamily(xmlDoc)// eslint-disable-line no-unused-vars
+{   
     // alert("CensusForm.js: gotFamily: xmlDoc=" + new XMLSerializer().serializeToString(xmlDoc));
 
-    let  rootNode   = xmlDoc.documentElement;
-    let msgs      = xmlDoc.getElementsByTagName("msg");
+    let rootNode            = xmlDoc.documentElement;
+    let msgs                = xmlDoc.getElementsByTagName("msg");
     if (msgs.length > 0)
-    {       // error messages
+    {               // error messages
         alert("CensusForm.gotFamily: error response: " + msgs[0].textContent);
         return;
-    }       // error messages
+    }               // error messages
 
     // get the parameters used to invoke the script into an array
-    let  parms      = xmlDoc.getElementsByTagName("parms");
+    let parms               = xmlDoc.getElementsByTagName("parms");
     if (parms.length > 0)
-        parms      = getParmsFromXml(parms[0]);
+        parms               = getParmsFromXml(parms[0]);
     else
-        parms      = null;
+        parms               = null;
 
     // display the dialog relative to the button
-    let  buttonId   = rootNode.getAttribute("buttonId");
-    let  button     = document.getElementById(buttonId);
-    let  form       = button.form;
-    let  actionButton   = null;
+    let buttonId            = rootNode.getAttribute("buttonId");
+    let button              = document.getElementById(buttonId);
+    //let form                = button.form;
+    //let actionButton        = null;
 
-    let  msgDiv = document.getElementById('IdirDialog');
+    let msgDiv              = document.getElementById('IdirDialog');
     if (msgDiv)
-    {       // have popup <div> to display selection dialog in
-        while(msgDiv.hasChildNodes())
-        {   // remove contents of cell
-            msgDiv.removeChild(findButton.firstChild);
-        }   // remove contents of cell
+    {               // have popup <div> to display selection dialog in
+        msgDiv.innerHTML    = '';
 
-        let matches  = xmlDoc.getElementsByTagName("indiv");
+        let matches         = xmlDoc.getElementsByTagName("indiv");
         if (matches.length > 0)
-        {       // have some matching entries
-            return displayFamilyDialog('FamilyEntryForm$sub',
-                                       parms,
-                                       button,
-                                       closeFamilyDialog,
-                                       matches);
-        }       // have some matching entries
+        {           // have some matching entries
+            return displayFamily('FamilyEntryForm$sub',
+                                 parms,
+                                 button,
+                                 closeFamilyDialog,
+                                 matches);
+        }           // have some matching entries
         else
-        {       // have no matching entries
+        {           // have no matching entries
             // This should never occur because the response must
             // contain all individuals in the identified family: CYA
             return displayDialog('idirNullForm$sub',
                                  parms,
                                  button,
                                  null);     // default close dialog
-        }       // have no matching entries
+        }           // have no matching entries
 
-    }       // support for dynamic display of messages
+    }               // support for dynamic display of messages
 }       // function gotFamily
 
 /************************************************************************
@@ -3798,20 +3781,21 @@ function displayFamily(templateId,
                        action,
                        matches)
 {
-    if (displayDialog(templateId,
-                      parms,
-                      element,
-                      action,
-                      true))
+    let dialog              = displayDialog(templateId,
+                                            parms,
+                                            element,
+                                            action,
+                                            true);
+    if (dialog)
     {
         // update the selection list with the matching individuals
-        let nextNode  = document.getElementById("FamilyButtonLine");
-        let parentNode  = nextNode.parentNode;
+        let nextNode        = document.getElementById("FamilyButtonLine");
+        let parentNode      = nextNode.parentNode;
 
         // add the matches
         for (var i = 0; i < matches.length; ++i)
-        {   // loop through the matches
-            let  indiv  = matches[i];
+        {               // loop through the matches
+            let indiv       = matches[i];
 
             // get the contents of the object
             let fields      = getParmsFromXml(indiv);
@@ -3826,22 +3810,26 @@ function displayFamily(templateId,
                                                  null);
             parentNode.insertBefore(member,
                                     nextNode);
-        }   // loop through the matches
+        }               // loop through the matches
 
         // show the dialog
-        dialog.style.display  = 'block';
+        dialog.style.display    = 'block';
         return true;
-    }       // template OK
+    }                   // template OK
     else
         return false;
 }       // function displayFamily
+
+function closeFamilyDialog()
+{
+}
 
 /************************************************************************
  *  function noFamily                                                   *
  *                                                                      *
  *  The database server was unable to respond to the query.             *
  ************************************************************************/
-function noFamily()
+function noFamily()// eslint-disable-line no-unused-vars
 {
     alert("CensusForm.js: noFamily: " +
           "unable to find script 'getFamilyOfXml.php' on web server");
@@ -3863,33 +3851,33 @@ function noFamily()
  *      parms   array in which each entry associates a line of the      *
  *              census page to the IDIR of the record in the family tree*
  ************************************************************************/
-function idirFeedback(parms)
-{
-    location                    = location;
-    if (false)
-    {
-        let  form               = document.censusForm;
-        let  msg                = "";
-        for(var line in parms)
-        {                   // loop through all matched lines
-            let idir            = parms[line];
-            if (line.length == 1)
-                 line           = '0' + line;
-            let idirElt         = form.elements['IDIR' + line];
-            if (idirElt)
-                idirElt.value   = idir;
-            else
-                alert("CensusForm.js: idirFeedback: " +
-                      "could not find form.elements['IDIR" + line + "']");
-            let findButton      = form.elements["doIdir" + line];
-            if (findButton)
-            {
-                while(findButton.hasChildNodes())
-                {           // remove contents of cell
-                    findButton.removeChild(findButton.firstChild);
-                }           // remove contents of cell
-                findButton.appendChild(document.createTextNode("Show"));
-            }
-        }                   // loop through all matched lines
-    }                       // if false
+function idirFeedback(/*parms*/)// eslint-disable-line no-unused-vars
+{ 
+    location.reload(); 
+//  if (false)
+//  {
+//      let form                = document.censusForm;
+//      let msg                 = "";
+//      for(var line in parms)
+//      {                   // loop through all matched lines
+//          let idir            = parms[line];
+//          if (line.length == 1)
+//               line           = '0' + line;
+//          let idirElt         = form.elements['IDIR' + line];
+//          if (idirElt)
+//              idirElt.value   = idir;
+//          else
+//              alert("CensusForm.js: idirFeedback: " +
+//                    "could not find form.elements['IDIR" + line + "']");
+//          let findButton      = form.elements["doIdir" + line];
+//          if (findButton)
+//          {
+//              while(findButton.hasChildNodes())
+//              {           // remove contents of cell
+//                  findButton.removeChild(findButton.firstChild);
+//              }           // remove contents of cell
+//              findButton.appendChild(document.createTextNode("Show"));
+//          }
+//      }                   // loop through all matched lines
+//  }                       // if false
 }       // function idirFeedback

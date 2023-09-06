@@ -226,12 +226,14 @@ use \Templating\Template;
  *                      ignoring session and cookie values              *
  *      2022/03/22      remove xmlentities                              *
  *      2022/04/27      remove language support from function htmlHeader*
+ *      2022/09/03      configuration file renamed for security         *
+ *      2023/07/18      handle strings with leading digits in pctClass  *
  *                                                                      *
- *  Copyright &copy; 2022 James A. Cobban                               *
+ *  Copyright &copy; 2023 James A. Cobban                               *
  ************************************************************************/
 // identify the SQL server to connect to based upon the URL
 // initializes the global variable $dsn
-require_once __NAMESPACE__ . '/configDb.inc';
+require_once __NAMESPACE__ . '/configDb.php';
 
 // ensure that all required classes are loaded when referenced
 //function __autoload($class_name) {
@@ -275,14 +277,16 @@ try {
 
     $dbversion      = $connection->getAttribute(PDO::ATTR_SERVER_VERSION);
     $connection->setAttribute(PDO::ATTR_CASE, PDO::CASE_LOWER);
+    $connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_SILENT);
     // by default MySQL and MariaDB use quote (") for string literals
     // but the ANSI standard reserves quote to escape column names
-    $connection->query("SET GLOBAL sql_mode='ANSI_QUOTES'");
+    //$connection->query("SET GLOBAL sql_mode='ANSI_QUOTES'");
 } catch(Exception $e)
 {       // error establishing connection
     $msg    .= "Unable to connect to database using: " .
-              "dburl='$dburl', " .
-              $e->getMessage() . ". ";
+                "dburl='$dburl', " .
+                '$dsn[\'username\']=\'' . $dsn['username'] . ", " .
+                $e->getMessage() . ". ";
     $connection = null;
     print "<p>$msg</p>\n";
 }       // error establishing connection
@@ -1120,6 +1124,8 @@ function dialogBot()
  ************************************************************************/
 function pctClass($pct, $border=true)
 {
+    if (is_string($pct))
+        $pct            = intval($pct);
     if ($border)
     {           // style with border
         if ($pct <= 0)

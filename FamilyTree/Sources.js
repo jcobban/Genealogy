@@ -22,8 +22,9 @@
  *      2020/04/29      support fields and buttons for creating new     *
  *                      source and match behavior of Locations          *
  *      2021/01/16      use XMLSerializer for diagnostic output         *
+ *      2022/06/17      correct handling of delete source               *
  *                                                                      *
- *  Copyright &copy; 2021 James A. Cobban                               *
+ *  Copyright &copy; 2022 James A. Cobban                               *
  ************************************************************************/
 
 window.onload           = onloadSources;
@@ -390,11 +391,23 @@ function gotDelete(xmlDoc)
     var  root	            = xmlDoc.documentElement;
     if (root && root.nodeName && root.nodeName == 'deleted')
     {
-		var msglist         = root.getElementsByTagName('msg');
+		let msglist                 = root.getElementsByTagName('msg');
 		if (msglist.length == 0)
 		{
-		    var idsr        = root.getAttribute('idsr');
-		    var row         = document.getElementById('Row' + idsr);
+		    let idsr                = root.getAttribute('idsr');
+            if (idsr === null)
+            {
+                let parms           = root.getElementsByTagName('parms')[0];
+                if (parms)
+                {           // have <parms>
+                    let idsrnode    = root.getElementsByTagName('idsr')[0];
+                    if (idsrnode)
+                    {
+                        idsr    = idsrnode.childNodes[0].nodeValue;
+                    }
+                }           // have <parms>
+            }
+		    var row         = document.getElementById('sourceRow' + idsr);
 		    if (row)
 		    {           // have row to delete
 				var  sect	= row.parentNode;

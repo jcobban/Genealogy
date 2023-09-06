@@ -30,11 +30,10 @@
         <span class="right">
         <a href="ReqUpdatePagesHelpen.html" target="_blank">Aide?</a>
         </span>
-        <div style="clear: both;"></div>
       </h1>
       $TRACE
       $MSG 
-      <form action="PageForm.php" name="distForm">
+      <form action="PageForm.php" name="distForm" id="distForm">
         <input type="hidden" name="ProvinceCode"
                 value="$PROVINCECODE">
         <div id="censusRow" class="row">
@@ -80,7 +79,6 @@
                 </option>
             </select> 
           </div>
-          <div style="clear: both;"></div>
         </div>
         <div id="distRow" class="row">
           <div class="column1">
@@ -106,7 +104,6 @@
             </label>
             <span id="DivisionCell"></span>
           </div>
-          <div style="clear: both;"></div>
         </div>
       <button type="submit" id="Submit">Demander Formule</button>
     </form>
@@ -146,6 +143,16 @@
         <select id="divisionTemplate" size="4">
             <option value="0" selected="selected">Choisir une Division</option>
         </select>
+      <span id="censusUndefined">
+        Le recensement n'est pas identifié.
+      </span>
+      <span id="censusInvalid">
+        L'identifiant $censusid pour le recensement est syntaxiquement
+        invalide.
+      </span>
+      <span id="censusUnsupported">
+        L'identifiant $censusid pour le recensement n'est pas défini.
+      </span>
     </div>
     <script src= '/jscripts/js20/http.js' type="text/javascript">
     </script>

@@ -1,65 +1,87 @@
 <!--*********************************************************************
- *  showAddedIndividualsen.html 										*
- *																		*
+ *  showAddedIndividualsen.html                                         *
+ *                                                                      *
  *  Template to display a list of individuals added to the database     *
- *  during a given week in English.										*
- *																		*
- *  History:															*
- *		2019/08/30	created 											*
- *																		*
- *  Copyright &copy; 2019 James A. Cobban								*
+ *  during a given week in English.                                     *
+ *                                                                      *
+ *  History:                                                            *
+ *      2019/08/30      created                                         *
+ *      2022/07/07      use display flex                                *
+ *                      add paging of results                           *
+ *                                                                      *
+ *  Copyright &copy; 2022 James A. Cobban                               *
  **********************************************************************-->
     <div class="hidden" id="breadcrumbs">
-	    <a href="/index.html">Home</a>:
+        <a href="/home.html">Home</a>:
         <a href="/genealogy.php?lang=$LANG">Genealogy</a>:
         <a href="/FamilyTree/nominalIndex.php?lang=$LANG">
-		    Nominal Index
+            Nominal Index
         </a>:
         <a href="/FamilyTree/Services.php?lang=$LANG">Services</a>:
     </div>
     <div class="body">
       <h1>
         <span class="right">
-		  <a href="showAddedIndividualsHelpen.html" target="help">? Help</a>
+          <a href="showAddedIndividualsHelpen.html" target="help">? Help</a>
         </span>
         Display Persons Added Between $startdate and $enddate
       </h1>
       $TRACE
       $MSG
-      <div class="center">
-		<div class="left" id="toPrevWeek">
+      <div class="spaceBetween" id="topBrowse" style="width: 80%;">
+        <span id="toPrevWeek">
             <a href="showAddedIndividuals.php?week=$prev&lang=$LANG">
-                &lt;---
+                <img src="/Images/ArrowLeft.svg">
             </a>
-		</div>
-		<div class="right" id="toNextWeek">
+        </span>
+        <span>
+            <span id="noMatches">
+                No matches for that period
+            </span>
+            <span id="someMatches">
+                $first to $last of $count matches for that period
+            </span>
+        </span>
+        <span id="toNextWeek">
             <a href="showAddedIndividuals.php?week=$next&lang=$LANG">
-                ---&gt;
+                <img src="/Images/ArrowRight.svg">
             </a>
-        </div>
-        <span id="noMatches">
-            No matches for that period
         </span>
-        <span id="someMatches">
-            $count matches for that period
-        </span>
-		<div style="clear: both;"></div>
       </div>
-      <p class="person" id="person">
-        <a href="Person.php?idir=$idir&lang=$LANG"
-                class="$gender" target="_blank">
-			$surname, $givenname ($birthd&mdash;$deathd)
-	    </a>
-			$parentsStr
-			$spouseStr 
-	  </p>
-      </div> <!-- class="body" -->
+      <div style="display: flex;">
+          <div style="display: flex; flex-direction: column; width: 2em;">
+            <a href="showAddedIndividuals.php?week=$week&offset=$prvoff&lang=$LANG" id="prevPage">
+                <img src="/Images/ArrowUp.svg">
+            </a>
+            <a href="showAddedIndividuals.php?week=$week&offset=$nxtoff&lang=$LANG" id="nextPage">
+                <img src="/Images/ArrowDown.svg">
+            </a>
+          </div>
+          <div>
+		      <p class="person" id="person$idir">
+		        <a href="Person.php?idir=$idir&lang=$LANG"
+		                class="$gender" target="_blank">
+		            $surname, $givenname ($birthd&mdash;$deathd)
+		        </a>
+		            $parentsStr
+		            $spouseStr 
+		      </p> <!-- id="person$idir" -->
+          </div>
+    </div> <!-- class="body" -->
     <div id="mousetoPrevWeek" class="popup">
       <p class="label">Go to Previous Week
       </p>
     </div>
     <div id="mousetoNextWeek" class="popup">
       <p class="label">Go to Next Week
+      </p>
+    </div>
+    <div id="mouseprevPage" class="popup">
+      <p class="label">Previous Page of Matches
+      </p>
+    </div>
+    <div id="mousenextPage" class="popup">
+      <p class="label">Next Page of Matches
       </p>
     </div>
     <script src="/jscripts/js20/http.js" type="application/javascript">

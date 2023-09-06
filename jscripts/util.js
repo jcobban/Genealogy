@@ -225,8 +225,12 @@
  *      2021/04/20      do not scroll menu popup                        *
  *      2021/07/03      correct vertical position of popup dialogs      *
  *      2022/05/21      update global debug flag from args              *
+ *      2022/06/11      scale advertisement for narrow screens          *
+ *      2022/06/12      only activate tinyMCE if textareas are present  *
+ *      2023/01/13      add ARIA support for hamburger menu             *
+ *      2023/06/01      do not start AudioContext                       *
  *                                                                      *
- *  Copyright &copy; 2022 James A. Cobban                               *
+ *  Copyright &copy; 2023 James A. Cobban                               *
  ************************************************************************/
 
 /************************************************************************
@@ -292,7 +296,8 @@ const KEY_F11         = 122;
 const KEY_F12         = 123;
 
 // set global defaults
-var activateMCE             = true;
+var textareas               = document.getElementsByTagName('textarea');
+var activateMCE             = textareas.length > 0;
 var lang                    = 'en';
 
 /************************************************************************
@@ -315,21 +320,11 @@ function isUnicodeSupported()
 
 if ("AudioContext" in window)
 {
-    var audioContext        = new AudioContext();
+//    var audioContext        = new AudioContext();
 }
 else
 {
     alert("AudioContext not supported.  Upgrade your browser.")
-}
-
-/************************************************************************
- * specify the style for tinyMCE editing                                *
- ************************************************************************/
-
-if (activateMCE && tinyMCEparms && typeof tinyMCE !== 'undefined')
-{
-    // alert("tinyMCEparms=" + JSON.stringify(tinyMCEparms));
-    tinyMCE.init(tinyMCEparms);
 }
 
 /************************************************************************
@@ -477,6 +472,15 @@ function getArgs()
  *  scripts.                                                            *
  ************************************************************************/
 var args    = getArgs();
+
+/************************************************************************
+ * specify the style for tinyMCE editing                                *
+ ************************************************************************/
+
+if (activateMCE && tinyMCEparms && typeof tinyMCE !== 'undefined')
+{
+    tinyMCE.init(tinyMCEparms);
+}
 
 /************************************************************************
  *  function getHelpPopupOption                                         *
@@ -636,6 +640,7 @@ function show(id)
         element                 = id;
     else
         element                 = document.getElementById(id);
+    element.style.zIndex        = 5;
     element.style.display       = 'block';
     element.style.visibility    = 'visible';
     element.scrollIntoView();
@@ -1191,6 +1196,10 @@ function displayMenu(ev)
 
     // display the menu offset from the main menu button
     let element                 = document.getElementById('menuButton');
+    element.removeEventListener('click', displayMenu);
+    element.addEventListener('click', closeMenu);
+    element.ariaExpanded        = true;
+    element.ariaLabel           = document.getElementById('closeTheMenu').innerText.trim();
     let leftOffset              = getOffsetLeft(element);
     let rightOffset             = getOffsetRight(element);
 
@@ -1223,6 +1232,32 @@ function displayMenu(ev)
 
     return dialogDiv;
 }       // function displayMenu
+
+/************************************************************************
+ *  function closeMenu                                                  *
+ *                                                                      *
+ *  This function closes the page menu in a popup                       *
+ *                                                                      *
+ *  Input:                                                              *
+ *      this        element with id="menuButton" or id="logo"           *
+ *      ev          click event                                         *
+ ************************************************************************/
+function closeMenu(ev)
+{
+    ev.stopPropagation();
+    let menu                    = document.getElementById('menu');
+    let element                 = document.getElementById('menuButton');
+    element.removeEventListener('click', closeMenu);
+    element.addEventListener('click', displayMenu);
+
+    // hide the menu 
+    element.ariaExpanded        = false;
+    element.ariaLabel           = document.getElementById('displayTheMenu').innerText.trim();;
+    menu.style.display          = 'none';
+    menu.style.visibility       = 'hidden';
+
+    return null;
+}       // function closeMenu
 
 /************************************************************************
  *  function displayDialog                                              *
@@ -1580,6 +1615,8 @@ function keyDownPaging(e)
         case "PageDown":    // page down
         {
             let element     = document.getElementById('topNext');
+            if (element === null)
+                element     = document.getElementById('npNextFront');
             if (element)
             {               // topNext exists
                 for(let child   = element.firstChild;
@@ -1599,6 +1636,8 @@ function keyDownPaging(e)
         case "PageUp":      // page up
         {
             let element     = document.getElementById('topPrev');
+            if (element === null)
+                element     = document.getElementById('npPrevFront');
             if (element)
             {               // topPrev exists
                 for(let child   = element.firstChild;
@@ -1721,6 +1760,8 @@ function commonInit(event)
     document.addEventListener("click", documentOnClick);
     document.addEventListener("keydown", keyDownPaging);
 
+    let windowWidth         = document.body.clientWidth - 8;
+
     // set onclick action for the menu button
     let menuButton          = document.getElementById('menuButton');
     let menuWidth           = 0
@@ -1767,6 +1808,21 @@ function commonInit(event)
         {
             mainSection.style.height    = (windHeight - headHeight - 12) + 'px';
             headSection.style.width     = (headWidth - 10) + 'px';
+        }
+    
+        let adverts             = document.getElementsByClassName('advert');
+        for (let i = 0; i < adverts.length; i++) {
+            let advert          = adverts[i];
+            if (advert.offsetWidth > 0.8 * windowWidth)
+            {
+                let ratio       = (0.8 * headWidth) / advert.offsetWidth;
+                advert.style.transform  = "scale(" + ratio + ")";
+            }
+            else
+            if (advert.offsetWidth < 0.5 * windowWidth)
+            {
+                advert.style.transform  = "scale(1.0)";
+            }
         }
     }                           // headSection defined in template
 
@@ -1845,7 +1901,6 @@ function commonInit(event)
         if (topBrowse || botBrowse)
         {               // page contains pagination row
             let dataWidth           = dataTable.offsetWidth;
-            let windowWidth         = document.body.clientWidth - 8;
             if (dataWidth > windowWidth)
                 dataWidth           = windowWidth;
             if (topBrowse)
@@ -1923,6 +1978,8 @@ function commonResize(event)
     x           = w.innerWidth || e.clientWidth || g.clientWidth,
     y           = w.innerHeight|| e.clientHeight|| g.clientHeight;
 
+    let windowWidth         = document.body.clientWidth - 8;
+
     let topCrumbs           = null;
     let menuButton          = document.getElementById('menuButton');
     let menuWidth           = 0
@@ -1939,15 +1996,24 @@ function commonResize(event)
         logoWidth           = logo.offsetWidth;
     }
 
-    let advert              = document.getElementById('advertSpan');
-    let advertWidth         = 0
-    if (advert)
-    {
-        topCrumbs           = advert.parentNode;
-        advertWidth         = Math.max(advert.offsetWidth, 500);
+    let adverts             = document.getElementsByClassName('advert');
+    let advertWidth         = 0;
+    for (let i = 0; i < adverts.length; i++) {
+        let advert          = adverts[i];
+        advertWidth         += advert.offsetWidth;
+        if (advert.offsetWidth > 0.8 * windowWidth)
+        {
+            let ratio       = (0.8 * windowWidth) / advert.offsetWidth;
+            advert.style.transform  = "scale(" + ratio + ")";
+        }
+        else
+        if (advert.offsetWidth < 0.5 * windowWidth)
+        {
+            advert.style.transform  = "scale(1.0)";
+        }
     }
 
-    let menusWidth= menuWidth + logoWidth + advertWidth;
+    let menusWidth                  = menuWidth + logoWidth + advertWidth;
 
     let dataTable                   = document.getElementById('dataTable');
     if (dataTable)
@@ -1957,7 +2023,6 @@ function commonResize(event)
         if (topBrowse || botBrowse)
         {               // page contains pagination row
             let dataWidth           = dataTable.offsetWidth;
-            let windowWidth         = document.body.clientWidth - 8;
             if (dataWidth > windowWidth)
                 dataWidth           = windowWidth;
             if (topBrowse)
@@ -2908,58 +2973,71 @@ function closeFrame(lastChoice)
 }       // function closeFrame
 
 /************************************************************************
- *  function showImage													*
- *																		*
- *  This function is called when the user clicks a show image button	*
- *  with the mouse or types Alt-I.										*
- *																		*
- *  Input:																*
- *		this			<button id='ShowImage'>							*
- *		ev              instance of 'click' Event                       *
+ *  function showImage                                                  *
+ *                                                                      *
+ *  This function is called when the user clicks a show image button    *
+ *  with the mouse or types Alt-I.                                      *
+ *                                                                      *
+ *  Input:                                                              *
+ *      this            <button id='ShowImage'>                         *
+ *      ev              instance of 'click' Event                       *
  ************************************************************************/
+const urlPattern        = new RegExp('^(http|https)://([a-zA-Z0-9_.]+)');
 function showImage(ev)
 {
-    let	form		    = this.form;
+    let form                    = this.form;
     if (form.Image)
-    {		// Image field defined
-		args.showimage	= 'yes';	// previous and next request image
-		let imageUrl	= form.Image.value;
-		if (imageUrl.length == 0)
-		    alert("util.js: showImage: " +
-				  "no image defined for this registration");
-		else
-		if (imageUrl.length > 23 &&
-		    (imageUrl.substring(0,23) == "http://www.ancestry.ca/" ||
-		     imageUrl.substring(0,23) == "https://www.ancestry.ca" ||
-		     imageUrl.substring(0,23) == "http://interactive.ance" ||
-             imageUrl.substring(0,23) == "https://interactive.anc"))
-		    window.open(imageUrl, "_blank");
-		else
-		if (imageUrl.length > 5 &&
-		    (imageUrl.substring(0,5) == "http:" ||
-		     imageUrl.substring(0,6) == "https:"))
-		    openFrame("Images",
-				      imageUrl,
-				      "right");
-		else
-        if (imageUrl.substring(0, 1) == '/')
-		    openFrame("Images",
-				      '/DisplayImage.php?src=' + imageUrl,
-				      "right");
+    {       // Image field defined
+        args.showimage          = 'yes';    // request image on links`
+        let imageUrl            = form.Image.value;
+        if (imageUrl.length > 0)
+        {                   // have an image reference
+            let found           = imageUrl.match(urlPattern);
+            if (found)
+            {               // URL
+                let proto       = found[1];
+                let domain      = found[2];
+                let w           = document.documentElement.clientWidth;
+                w               = Math.floor(w);
+                let h           = document.documentElement.clientHeight;
+                let options     = "width=" + w +
+                                    ",height=" + h +
+                                    ",left=" + w;
+
+                if (domain == "www.ancestry.ca" ||
+                    domain == "interactive.ancestry.ca" ||
+                    domain == "www.familysearch.org")
+                    window.open(imageUrl, 
+                                "_blank", 
+                                options);
+                else
+                    openFrame("Images",
+                              imageUrl,
+                              "right");
+            }               // URL
+            else
+            if (imageUrl.substring(0, 1) == '/')
+                openFrame("Images",
+                          '/DisplayImage.php?src=' + imageUrl,
+                          "right");
+            else
+                openFrame("Images",
+                          '/DisplayImage.php?src=/Images/' + imageUrl,
+                          "right");
+        }                   // have an image reference
         else
-		    openFrame("Images",
-				      '/DisplayImage.php?src=/Images/' + imageUrl,
-				      "right");
-    }		// Image field defined
+            alert("util.js: showImage: " +
+                  "no image defined for this registration");
+    }                       // Image field defined
     return false;
-}		// function showImage
+}       // function showImage
 
 /************************************************************************
- *  function beep   													*
- *																		*
+ *  function beep                                                       *
+ *                                                                      *
  *  This function is called to issue a warning audio signal when an     *
  *  requested action will not be performed.                             *
- *																		*
+ *                                                                      *
  ************************************************************************/
 function beep()
 {

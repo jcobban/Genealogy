@@ -11,7 +11,7 @@
  *  Copyright &copy; 2019 James A. Cobban                               *
  **********************************************************************-->
     <div id="breadcrumbs" class="hidden">
-      <a href="index.html">
+      <a href="home.html">
             Accueil
       </a>:
       <a href="Blogs.php?lang=fr">
@@ -29,7 +29,6 @@
         <a href="/BlogPostHelpfr.html" target="help">? Aide</a>
           </span>
         $TITLE
-          <div style="clear: both;"></div>
       </h1>
       <div class="hidden"><!-- choices for page title and h1-->
         <span id="NewBlog">Poster Nouveau Blogue Generale</span>
@@ -88,7 +87,6 @@
             <input type="text" class="white left"
                     id="subject" name="subject"
                     size="64" value="$BLOGTITLE">
-            <div style="clear: both;"></div>
         </div>
         <div class="row" id="blogMsgRow">
             <label class='column1' for='message' id="msgLabel">
@@ -96,7 +94,6 @@
             </label>
             <textarea name="message" id="message" placeholder="[enter message]"
                     rows="30">$posttext</textarea>
-            <div style="clear: both;"></div>
         </div>
         <div class="row" id="blogEmailRow">
             <label class='column1' for='emailAddress'>
@@ -105,15 +102,14 @@
             <input type="text" class="$EMAILCLASS leftnc" $READONLY
                     id="emailAddress" name="emailAddress"
                     size="64" value="$EMAIL">
-            <div style="clear: both;"></div>
         </div>
         <p id="blogPostRow">
           <button type="submit" id="PostBlog" accessKey="P">
               <u>P</u>oster Message
+          </button>
           &nbsp;
           <button type="button" id="Close">
               Fermer
-          </button>
           </button>
         </p>
       </form> <!-- name="blogform" id="blogform" -->
@@ -148,7 +144,7 @@
         Cliquez sur ce bouton pour poster le message que vous avez entré.
         L'application prend également en charge le raccourci clavier Alt-B.
     </div>
-    <script src="/jscripts/tinymce/js/tinymce/tinymce.js"
+    <script src="/jscripts/tinymce/js/tinymce/tinymce.min.js"
             type="application/javascript">
     </script>
     <script src="/BlogPost.js" type="module">

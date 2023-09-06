@@ -643,10 +643,26 @@ try {
                         {           // have an event
                             if ($idir > 0 && !is_null($event))
                             {
-                                $event->save();
-                                $command        = $event->getLastSqlCmd();
-                                print "$comma\"cmd\": " .
+                                $ucount         = $event->save();
+                                if (strlen($warn) > 0)
+                                {
+                                    print "$comma\"warn\": " .
+                                                    json_encode($warn);
+                                    $warn       = '';
+                                }
+
+                                if ($ucount > 0)
+                                {
+                                    $command    = $event->getLastSqlCmd();
+                                    print "$comma\"cmd\": " .
                                                     json_encode($command);
+                                }
+                                else
+                                {
+                                    $errors     = $event->getErrors();
+                                    print "$comma\"errors\": " .
+                                                    json_encode($errors);
+                                }
                                 $ider           = $event['ider'];
                                 print "$comma\"event$ider\": " .
                                                 $event->toJson(false);

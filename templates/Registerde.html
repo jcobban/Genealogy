@@ -7,7 +7,7 @@
  *  History:															*
  *		2022/05/29		Created											*
  *																		*
- *  Copyright &copy; 20ww James A. Cobban								*
+ *  Copyright &copy; 2022 James A. Cobban								*
  **********************************************************************-->
   <div id='breadcrumbs' style='hidden'>
       <a href="/genealogy.php?lang=de">
@@ -20,7 +20,6 @@
       <span class='right'>
 		<a href='RegisterHelpen.html' target='help'>? Hilfe</a>
       </span>
-      <div style='clear: both;'></div>
     </h1>
       <span id="titleNew" class="hidden">
 		    Registrieren Sie einen neuen Benutzer
@@ -60,7 +59,7 @@
 		    <label class='label' for='userid'>Benutzerkennung:
 		    </label>
 		    <input type='text' size='32' maxlength='64'
-					name='userid' id='userid' autocomplete='off' 
+					name='newuserid' id='newuserid' autocomplete='off' 
 					class='black white leftnc'
 					value='$NEWUSERID'>
 		</p>
@@ -298,7 +297,5 @@
 		Clicking on this button with the mouse closes the error dialog.
     </p>
   </div>
-    <script src="/jscripts/util.js" type="text/javaScript">
-    </script>
-    <script src="/Register.js" type="text/javaScript">
+    <script src="/Register.js" type="module">
     </script>

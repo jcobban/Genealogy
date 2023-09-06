@@ -82,16 +82,18 @@
  *                      the idir field in the popup template            *
  *      2019/05/19      call element.click to trigger button click      *
  *      2021/01/16      use addEventListener                            *
- *      2921/03/19      use ES2015 import                               *
+ *      2021/03/19      use ES2015 import                               *
  *                      fix popup help for showGraphTree and message    *
+ *      2023/06/04      put mapdiv in front of TinyMce editor           *
+ *      2023/09/03      support location boundaries with style override *
  *                                                                      *
- *  Copyright &copy; 2021 James A. Cobban                               *
+ *  Copyright &copy; 2023 James A. Cobban                               *
  ************************************************************************/
 import {HTTP} from "../jscripts6/js20/http.js";
 import {iframe, actMouseOverHelp, openFrame, openSignon, debug, args,
         getOffsetLeft, getOffsetTop, popupAlert, show,
         showHelp, hideHelp, keyDown,
-        simpleMouseOver, eltMouseOver, eltMouseOut}
+        simpleMouseOver, eltMouseOut}
             from "../jscripts6/util.js";
 import {capitalize} from "../jscripts6/CommonForm.js";
 import {Cookie} from "../jscripts6/Cookie.js";
@@ -157,7 +159,7 @@ function onLoad()
     }       // invoked from another page
 
     // activate local keystroke handling
-    document.body.onkeydown = diKeyDown;
+    document.body.addEventListener("keydown", diKeyDown);
 
     // scan through all forms and set dynamic functionality
     // for specific elements
@@ -185,13 +187,13 @@ function onLoad()
             {                   // switch on name
                 case 'blEdit':
                 {               // edit message button
-                    element.onclick = editBlog;
+                    element.addEventListener("click", editBlog);
                     break;
                 }               // edit message button
 
                 case 'blDel':
                 {               // delete message button
-                    element.onclick = delBlog;
+                    element.addEventListener("click", delBlog);
                     break;
                 }               // delete message button
 
@@ -212,45 +214,45 @@ function onLoad()
 
                 case 'PostBlog':
                 {               // post blog button
-                    element.onclick = postBlog;
+                    element.addEventListener("click", postBlog);
                     break;
                 }               // post blog button
 
                 case 'showDescTree':
                 {               // show descendant tree
-                    element.onclick = showDescTree;
+                    element.addEventListener("click", showDescTree);
                     element.focus();
                     break;
                 }               // show descendant tree
 
                 case 'showAncTree':
                 {               // show ancestor tree
-                    element.onclick = showAncTree;
+                    element.addEventListener("click", showAncTree);
                     break;
                 }               // show ancestor tree
 
                 case 'relationshipCalc':
                 {               // relationship calculator
-                    element.onclick = relationshipCalc;
+                    element.addEventListener("click", relationshipCalc);
                     break;
                 }               // relationship calculator
 
                 case 'ancestrySearch':
                 {               // perform Ancestry.com search
-                    element.onclick = ancestrySearch;
+                    element.addEventListener("click", ancestrySearch);
                     break;
                 }               // perform Ancestry.com search
 
                 case 'edit':
                 {               // edit individual
-                    element.onclick = editPerson;
+                    element.addEventListener("click", editPerson);
                     element.focus();
                     break;
                 }               // edit individual
 
                 case 'reqgrant':
                 {               // request permission to update
-                    element.onclick = reqGrant;
+                    element.addEventListener("click", reqGrant);
                     break;
                 }               // request permission to update
 
@@ -278,19 +280,19 @@ function onLoad()
                 case 'showMap':
                 case 'tshowMap':
                 {
-                    element.onclick = showMap;
+                    element.addEventListener("click", showMap);
                     break;
                 }
 
                 case 'editLoc':
                 {
-                    element.onclick = editLocation;
+                    element.addEventListener("click", editLocation);
                     break;
                 }
 
                 case 'mbsubmit':
                 {
-                    element.onclick = submitMbBirth;
+                    element.addEventListener("click", submitMbBirth);
                     break;
                 }
             }                   // switch on name
@@ -323,14 +325,14 @@ function onLoad()
         let span                    = allSpan[ispan];
         if (span.id.length > 9 && span.id.substring(0,4) == "show")
         {
-            span.onmouseover        = locMouseOver;
-            span.onmouseout         = eltMouseOut;
+            span.addEventListener("mouseover", locMouseOver);
+            span.addEventListener("mouseout", eltMouseOut);
         }
         else
         if (span.id.length > 10 && span.id.substring(0,10) == 'DeathCause')
         {
-            span.onmouseover        = causeMouseOver;
-            span.onmouseout         = eltMouseOut;
+            span.addEventListener("mouseover", causeMouseOver);
+            span.addEventListener("mouseout", eltMouseOut);
         }
     }                           // loop through all spans
 
@@ -344,14 +346,14 @@ function onLoad()
         let hi                      = name.indexOf('#');
         if (hi == -1 && name.substring(0, 13) == "Person.php?id")
         {   // link to another individual
-            anc.onmouseover         = indMouseOver;
-            anc.onmouseout          = eltMouseOut;
+            anc.addEventListener("mouseover", indMouseOver);
+            anc.addEventListener("mouseout", eltMouseOut);
         }   // link to another individual
         else
         if (name.substring(0, 13) == "Source.php?id")
         {   // link to a source
-            anc.onmouseover         = srcMouseOver;
-            anc.onmouseout          = eltMouseOut;
+            anc.addEventListener("mouseover", srcMouseOver);
+            anc.addEventListener("mouseout", eltMouseOut);
         }   // link to a source
         else
         if (name.substring(0, 15) == "getPersonSvg.php")
@@ -777,11 +779,9 @@ function diKeyDown(e)
 {
     if (!e)
     {       // browser is not W3C compliant
-        e               =  window.event;    // IE
+        e                   =  window.event;    // IE
     }       // browser is not W3C compliant
-    let key             = e.key;
-    //let actionsForm     = document.actionsForm;
-    //let idir            = actionsForm.idir.value;
+    let key                 = e.key;            // key label
     let button;
 
     // take action based upon code
@@ -791,51 +791,39 @@ function diKeyDown(e)
         {           // act on specific key
             case 'a':
             case 'A':
-            {       // letter 'A'
                 button  = document.getElementById('showAncTree');
                 button.click(); 
                 return false;
-            }       // letter 'A'
 
             case 'b':
             case 'B':
-            {       // letter 'B'
                 button  = document.getElementById('PostBlog');
                 button.click(); 
                 return false;
-            }       // letter 'B'
 
             case 'd':
             case 'D':
-            {       // letter 'D'
                 button  = document.getElementById('showDescTree');
                 button.click(); 
                 return false;
-            }       // letter 'D'
 
             case 'e':
             case 'E':
-            {       // letter 'E'
                 button  = document.getElementById('edit');
                 button.click(); 
                 return false;
-            }       // letter 'E'
 
             case 'r':
             case 'R':
-            {       // letter 'R'
                 button  = document.getElementById('relationshipCalc');
                 button.click(); 
                 return false;
-            }       // letter 'R'
 
             case 's':
             case 'S':
-            {       // letter 'S'
                 button  = document.getElementById('ancestrySearch');
                 button.click(); 
                 return false;
-            }       // letter 'S'
 
         }           // switch on key code
     }               // alt key shortcuts
@@ -933,43 +921,86 @@ function displayMap(latlng,
                     locn)
 {
     // parse the boundary string
-    let latPatt = /\(([0-9.-]+)/;
-    let lngPatt = /([0-9.-]+)\)/;
-    path    = [];
+    let latPatt                 = /\(([0-9.-]+)/;
+    let lngPatt                 = /([0-9.-]+)\)/;
 
-    if (boundStr.length > 0)
-    {       // have a boundary to display
-        let bounds  = boundStr.split(',');
+    // instance of google.maps.PolygonOptions for displaying boundary
+    let mapStyle                = polyOptions;
+    path                        = [];   // clear global
+
+    let bl                      = boundStr.length;
+    if (bl > 0)
+    {                       // have a boundary to display
+        if (boundStr.charAt(0) == '{')
+        {                   // JSON style prefix
+            let prefEng         = boundStr.indexOf('},');
+            let prefix          = boundStr.substring(0, prefEng + 1);
+            mapStyle            = JSON.parse(prefix);
+            for (let prop in mapStyle)
+            {               // loop through properties
+                let value       = mapStyle[prop];
+                switch (prop)
+                {           // act on specific option
+                    case 'strokeColor':
+                        mapStyle[prop]   = value;
+                        break;
+
+                    case 'strokeOpacity':
+                        mapStyle[prop]   = value;
+                        break;
+
+                    case 'strokeWeight':
+                        mapStyle[prop]   = value;
+                        break;
+
+                    case 'fillColor':
+                        mapStyle[prop]   = value;
+                        break;
+
+                    case 'fillOpacity':
+                        mapStyle[prop]   = value;
+                        break;
+
+                }           // act on specific option
+            }               // loop through properties
+            boundStr            = boundStr.substring(prefEng + 2);
+        }                   // JSON style prefix
+
+        let bounds              = boundStr.split(',');
         for (let ib=0; ib < bounds.length; ib++)
-        {       // loop through each element
-            let bound   = bounds[ib];
-            let rxRes   = latPatt.exec(bound);
+        {                   // loop through each element
+            let bound           = bounds[ib];
+            let rxRes           = latPatt.exec(bound);
             if (rxRes != null)
-            {       // latitude 
-                let lat = rxRes[1];
+            {               // latitude 
+                let lat         = rxRes[1];
                 ib++;
-                bound   = bounds[ib];
-                rxRes   = lngPatt.exec(bound);
+                bound           = bounds[ib];
+                rxRes           = lngPatt.exec(bound);
                 if (rxRes != null)
-                {       // longitude)
+                {           // longitude)
                     let lng     = rxRes[1];
                     let latLng  = new google.maps.LatLng(lat,
                                          lng);
                     path.push(latLng);
-                }       // longitude
+                }           // longitude
                 else
-                {   // match failed
+                {           // match failed
                     alert("Person.js: displayMap: " +
                       "Invalid Boundary Element " +
                       bound + " ignored");
-                }   // match failed
-            }   // succeeded
+                }           // match failed
+            }               // succeeded
             else
                 alert("Person.js: displayMap: " +
                       "Invalid Boundary Element " +
                       bound + " ignored");
-        }       // loop through each element
-        boundary    = new google.maps.Polygon(polyOptions);
+        }                   // loop through each element
+        
+        if (mapStyle.strokeColor == 'red')
+            boundary            = new google.maps.Polygon(mapStyle);
+        else    
+            boundary            = new google.maps.Polyline(mapStyle);
         boundary.setPath(path);
     }       // have a boundary to display
     else
@@ -981,14 +1012,16 @@ function displayMap(latlng,
         let mapDiv              = document.getElementById("mapDiv");
         mapDiv.style.left       = "0px";
         mapDiv.style.top        = "0px";
+        mapDiv.style.zIndex     = "9";
         show.call(mapDiv);               // make visible
 
         let hideMapDiv          = document.getElementById("hideMapDiv");
         hideMapDiv.style.left   = "80px";
         hideMapDiv.style.top    = "0px";
         hideMapDiv.style.width  = "120px";
+        hideMapDiv.style.zIndex = "10";
         let hideMapBtn          = document.getElementById("hideMap");
-        hideMapBtn.onclick      = hideMap;
+        hideMapBtn.addEventListener("click", hideMap);
         show.call(hideMapDiv);           // make visible
 
         let myOptions = {
@@ -1101,6 +1134,7 @@ function submitMbBirth()
  ************************************************************************/
 function locMouseOver(ev)
 {
+    console.log("locMouseOver: " + this.outerHTML);
     simpleMouseOver.call(this, ev, popupLoc);
 }       // locMouseOver
 
@@ -1131,7 +1165,7 @@ function popupLoc()
         helpDiv.style.left  = Math.max(Math.min(getOffsetLeft(this) - 50,                   tableWidth - Math.floor(window.innerWidth/2)), 2) + 'px';
         helpDiv.style.top   = (getOffsetTop(this) +
                               this.offsetHeight + 5) + 'px';
-        helpDiv.onkeydown   = keyDown;
+        helpDiv.addEventListener("keydown", keyDown);
         // so key strokes in balloon will close window
         showHelp.call(this, helpDiv);
     }       // have a help division to display
@@ -1181,7 +1215,7 @@ function popupCause()
         helpDiv.style.left  = Math.max(Math.min(getOffsetLeft(this) - 50,        tableWidth - Math.floor(window.innerWidth/2)), 2) + 'px';
         helpDiv.style.top   = (getOffsetTop(this) +
                                this.offsetHeight + 5) + 'px';
-        helpDiv.onkeydown   = keyDown;
+        helpDiv.addEventListener("keydown", keyDown);
         // so key strokes in balloon will close window
         showHelp.call(this, helpDiv);
     }                   // have a help division to display

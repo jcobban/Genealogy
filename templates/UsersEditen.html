@@ -93,19 +93,18 @@
 	          </span>
 	      </a>
 	    </div>
-      <div class="center" id="topBrowse">
-        <span class="left" id="topPrev">
+      <div class="spaceBetween" id="topBrowse">
+        <span id="topPrev">
 		  <a href="/Users.php?pattern=$pattern&amp;authpattern=$authpattern&amp;mailpattern=$mailpattern&amp;limit=$limit&amp;offset=$prevoffset">
-            &lt;---
+            <img src="/Images/ArrowLeft.svg">
           </a>
         </span>
-        <span class="right" id="topNext">
+        rows $OFFSET to $LAST of $COUNT
+        <span id="topNext">
 		  <a href="/Users.php?pattern=$pattern&amp;authpattern=$authpattern&amp;mailpattern=$mailpattern&amp;limit=$limit&amp;offset=$nextoffset">
-		    ---&gt;
+		    <img src="/Images/ArrowRight.svg">
 		  </a>
         </span>
-        rows $OFFSET to $LAST of $COUNT
-        <div style="clear: both;"></div>
       </div>
     <!--- Put out the response as a table -->
     <table class="details" id="dataTable">
@@ -268,11 +267,5 @@
       Click on this button to confirm the associated user and assign initial
       permissions.  This is in-case the e-mail exchange failed.
     </div>
-    <script src="/jscripts/js20/http.js" type="text/javaScript">
-    </script>
-    <script src="/jscripts/CommonForm.js" type="text/javaScript">
-    </script>
-    <script src="/jscripts/util.js" type="text/javaScript">
-    </script>
-    <script src="Users.js" type="text/javaScript">
+    <script src="Users.js" type="module">
     </script>

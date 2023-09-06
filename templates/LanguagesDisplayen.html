@@ -21,7 +21,6 @@
         <a href="/Canada/LanguagesEditHelpen.html" target="help">? Help</a>
         </span>
         Language Table Display
-        <div style="clear: both;"></div>
       </h1>
       $TRACE
       $MSG
@@ -31,21 +30,20 @@
         to update the database.
         </p>
       <!--- Put out a line with links to previous and next section of table -->
-      <div class="center" id="topBrowse">
-        <span class="left" id="topPrev">
+      <div class="spaceBetween" id="topBrowse">
+        <span id="topPrev">
           <a href="/Canada/LanguagesEdit.php?lang=$LANG$npPrev" id="prenpprev">
-            &lt;---
+            <img src="/Images/ArrowLeft.svg">
           </a>
         </span>
-        <span class="right" id="topNext">
+        <span id="respdescrows">
+            returned rows $FIRST to $LAST of $TOTALROWS
+        </span>
+        <span id="topNext">
           <a href="/Canada/LanguagesEdit.php?lang=$LANG$npNext" id="prenpnext">
-            ---&gt;
+            <img src="/Images/ArrowRight.svg">
           </a>
         </span>
-          <span id="respdescrows">
-        returned rows $FIRST to $LAST of $TOTALROWS
-          </span>
-        <div style="clear: both;"></div>
       </div> <!-- left and right arrow links -->
       <!--- Put out the response as a table -->
       <form name="languageForm" id="languageForm"
@@ -64,9 +62,12 @@
           <!--- Put out the column headers -->
           <thead>
             <tr id="hdrRow">
-              <th class="colhead">
-                  Code
-              </th>
+         	  <th class="colhead">
+         	      Code
+         	  </th>
+         	  <th class="colhead">
+         	      Code3
+         	  </th>
               <th class="colhead">
                   Name
               </th>
@@ -86,12 +87,18 @@
           </thead>
           <tbody>
             <tr id="Row$code">
-              <td class="right">
-                  <input type="text" name="Code$code" id="Code$code"
-                      value="$code" class="white code"
-                      style="text-transform: lowercase; text-align: center;"
-                      size="2" maxlength="2" readonly="readonly">
-              </td>
+         	  <td class="right">
+         	      <input type="text" name="Code$code" id="Code$code"
+         	  		    value="$code" class="white code"
+                        style="text-transform: lowercase; text-align: center;"
+         	  		    size="2" maxlength="2" readonly="readonly">
+         	  </td>
+         	  <td class="right">
+         	      <input type="text" name="Code3$code" id="Code3$code"
+         	  		    value="$code3" class="white code"
+                        style="text-transform: lowercase; text-align: center;"
+         	  		    size="3" maxlength="3">
+         	  </td>
               <td class="left">
                   <input type="text" name="Name$code" id="Name$code" 
                       value="$name" 
@@ -126,13 +133,6 @@
                       class="white leftnc"
                       size="40" maxlength="255">
               </td>
-              <td class="center">
-                <button type="button"
-                      id="Delete$code"
-                      disabled="disabled">
-                      Delete
-                </button> 
-              </td>
             </tr>
           </tbody>
         </table>
@@ -146,6 +146,10 @@
       This field contains a 2-character ISO 639-1 abbreviation for the language 
       which is used to identify this record.
       Except when adding a new language this is a read-only field.
+    </div>
+    <div class="balloon" id="HelpCode3">
+        This field contains a 3-character ISO 639-2 abbreviation for the
+        language which is used to identify this record.
     </div>
     <div class="balloon" id="HelpName">
       The English name of the language.

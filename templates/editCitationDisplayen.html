@@ -9,7 +9,7 @@
  *  Copyright &copy; 2019 James A. Cobban								*
  **********************************************************************-->
     <div id="breadcrumbs" class="hidden">
-      <a href="/index.html">Home</a>:
+      <a href="/home.html">Home</a>:
       <a href="/genealogy.php?lang=$LANG">
           Genealogy
       </a>:
@@ -49,7 +49,6 @@
                     size="6" maxlength="10"
                     readonly="readonly" class="ina rightnc"
                     value="$IDIME">
-          <div style="clear: both;"></div>
         </div>
         <div class="row" id="sourceRow">
           <label class="column1" for="IDSR">
@@ -61,7 +60,6 @@
                     $srcname
             </option>
           </select>
-          <div style="clear: both;"></div>
         </div>
         <div class="row" id="detailRow">
           <label class="column1" for="SrcDetail">
@@ -71,7 +69,6 @@
                     size="60" maxlength="255" readonly="readonly"
                     class="white leftnc"
                     value="$DETAIL">
-          <div style="clear: both;"></div>
         </div>
         <div class="row" id="textRow">
           <label class="column1">
@@ -79,7 +76,6 @@
           </label>
           <textarea name="SrcDetText" id="SrcDetText" rows="4" readonly="readonly"
                     cols="64">$DETAILTEXT</textarea>
-          <div style="clear: both;"></div>
         </div>
         <div class="row" id="noteRow">
           <label class="column1"> 
@@ -87,7 +83,6 @@
           </label>
           <textarea name="SrcDetNote" id="SrcDetNote" rows="4" readonly="readonly"
                     cols="64">$DETAILNOTE</textarea>
-          <div style="clear: both;"></div>
         </div>
         <p id="buttonRow">
           <button type="button" id="Pictures">
@@ -127,7 +122,7 @@
       Click this button to open a dialog for managing the pictures associated
       with the citation.
     </div>
-    <script src="/jscripts/tinymce/js/tinymce/tinymce.js">
+    <script src="/jscripts/tinymce/js/tinymce/tinymce.min.js">
     </script>
     <script src="/jscripts/js20/http.js" type="application/javascript">
     </script>

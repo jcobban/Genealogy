@@ -11,7 +11,7 @@
  *  Copyright &copy; 2019 James A. Cobban                               *
  ************************************************************************/
 
-window.onload   = onLoad;
+window.addEventListener("load", onLoad);
 
 /************************************************************************
  *  function onLoad                                                     *

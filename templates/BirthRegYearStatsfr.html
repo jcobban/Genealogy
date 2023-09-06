@@ -6,8 +6,9 @@
  *  History:															*
  *		2018/10/06  created                                             *
  *      2019/03/21  support adjusting left/right scroll bar to table    *
+ *      2022/07/06  use display: flex                                   *
  *																		*
- *  Copyright &copy; 2019 James A. Cobban								*
+ *  Copyright &copy; 2022 James A. Cobban								*
  **********************************************************************-->
     <div id="breadcrumbs" class="hidden">
       <a href="/genealogy.php?lang=fr">
@@ -37,18 +38,17 @@
       </h1>
       $TRACE
       $MSG
-      <div class="center" id="topBrowse">
-        <span class="left" id="topPrev">
+      <div class="spaceBetween" id="topBrowse">
+        <span id="topPrev">
 		<a href="BirthRegYearStats.php?RegDomain=$DOMAIN&RegYear=$REGYEARP&county=$COUNTY" id="toPrevYear">
-		    &lt;--- $REGYEARP
+		    <img src="/Images/ArrowLeft.svg"> $REGYEARP
 		</a>
         </span>
-        <span class="right" id="topNext">
+        <span id="topNext">
 		<a href="BirthRegYearStats.php?RegDomain=$DOMAIN&RegYear=$REGYEARN&county=$COUNTY" id="toNextYear">
-		    $REGYEARN ---&gt;
+		    $REGYEARN <img src="/Images/ArrowRight.svg">
 		</a>
         </span>
-        <div style="clear: both;"></div>
       </div>
       <form id="display" action="donothing.php" method="get">
         <input type="hidden" id="RegYear" 

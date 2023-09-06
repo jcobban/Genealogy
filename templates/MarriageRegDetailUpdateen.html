@@ -9,11 +9,12 @@
  *      2020/07/03      support selecting Ontario Marriage Licence      *
  *      2020/11/04      increase maximum size of some input fields      *
  *      2021/05/15      preserve language through previous and next     *
+ *      2023/07/16      leave room for scroll in Page field             *
  *																		*
- *  Copyright &copy; 2021 James A. Cobban								*
+ *  Copyright &copy; 2023 James A. Cobban								*
  **********************************************************************-->
     <div id="breadcrumbs" class="hidden">
-      <a href="/index.html">Home</a>:
+      <a href="/home.html">Home</a>:
       <a href="/genealogy.php?lang=$LANG">
           Genealogy
       </a>:
@@ -50,7 +51,6 @@
         <span class="right">
           <a href="MarriageRegDetailHelpen.html" target="help">? Help</a>
         </span>
-        <div style="clear: both;"></div>
       </h1>
       $TRACE
       $MSG 
@@ -128,14 +128,14 @@
                           type="text" size="4" maxlength="4" 
                           class="act right" value="$MSVOL"/>
             </div>
-            <div style="clear: both;"></div>
           </div> <!-- class="row" -->
           <div class="row" >
             <div class="column1">
               <label class="labelSmall" for="OriginalVolume">Volume:</label>
               <input name="OriginalVolume" id="OriginalVolume"
                     type="text" class="act right"
-                    size="3" maxlength="5" 
+                    style="width: 44px;"
+                    maxlength="5" 
                     value="$ORIGINALVOLUME"/>
             </div>
             <div class="column2">
@@ -144,17 +144,18 @@
               </label>
               <input name="OriginalPage" id="OriginalPage"
                     type="number" class="act right"
-                    size="3" maxlength="3" min="0" max="900" 
+                    style="width: 44px;"
+                    maxlength="3" min="0" max="900" 
                     value="$ORIGINALPAGE"/>
             </div>
             <div class="column2">
               <label class="labelSmall" for="OriginalItem">Item:</label>
               <input name="OriginalItem" id="OriginalItem"
                     type="text" class="act right"
-                    size="3" maxlength="3" 
+                    style="width: 40px;"
+                    maxlength="3" 
                     value="$ORIGINALITEM"/>
             </div>
-            <div style="clear: both;"></div>
           </div> <!-- class="row" -->
           <div class="row"  id="RegRow">
             <div class="column1">
@@ -169,7 +170,6 @@
                     type="text" size="20" maxlength="64"
                     value="$REGTOWNSHIP" class="act leftnc"  />
             </div>
-            <div style="clear: both;"></div>
           </div> <!-- class="row" -->
         </fieldset><!-- id="IdentificationSet"-->
         <fieldset class="other" id="MarriageSet">
@@ -187,7 +187,6 @@
                     type="text" size="20" maxlength="128"
                     value="$MPLACE" class="act leftnc"  />
             </div>
-            <div style="clear: both;"></div>
           </div> <!-- class="row" -->
           <div class="row" >
             <div class="column1">
@@ -199,7 +198,6 @@
                 <option value="D">Dispensation</option>
               </select>
             </div>
-            <div style="clear: both;"></div>
           </div> <!-- class="row" -->
         </fieldset><!-- id="MarriageSet"-->
         <fieldset class="male" id="GroomSet">
@@ -217,7 +215,6 @@
                     type="text" size="16" maxlength="120" 
                     class="act left" value="$GROOMSURNAME" />
             </div>
-            <div style="clear: both;"></div>
           </div> <!-- class="row" -->
           <div class="row" id="GroomBirthRow">
             <div class="column1">
@@ -234,7 +231,6 @@
               <input name="GBirthYear" id="GBirthYear" 
                     type="hidden" value="$GROOMBIRTHYEAR">
             </div>
-            <div style="clear: both;"></div>
           </div> <!-- class="row" -->
           <div class="row" id="GroomLinkRow">
             <div class="column2">
@@ -250,7 +246,6 @@
             <button id="ClearG" type="button">
                 Clear
             </button>
-            <div style="clear: both;"></div>
           </div> <!-- class="row" -->
           <div class="row" id="GChooseRow">
             <div class="column2">
@@ -265,7 +260,6 @@
     	        </option>
     	      </select>
             </div>
-            <div style="clear: both;"></div>
           </div> <!-- class="row" -->
           <div class="row" id="GroomResidenceRow">
             <div class="column1">
@@ -280,7 +274,6 @@
       		        type="text" size="22" maxlength="255"
       		        class="act leftnc" value="$GROOMBIRTHPLACE" />
             </div>
-            <div style="clear: both;"></div>
           </div> <!-- class="row" -->
           <div class="row" id="GroomOccupationRow">
             <div class="column1">
@@ -295,7 +288,6 @@
       		        type="text" size="1" maxlength="1"
       		        class="act left1em" value="$GROOMMARSTAT" />
             </div>
-            <div style="clear: both;"></div>
           </div> <!-- class="row" -->
           <div class="row" id="GroomReligionRow">
             <div class="column1">
@@ -304,7 +296,6 @@
       		        type="text" size="16" maxlength="64"
       		        class="act leftnc" value="$GROOMRELIGION" />
             </div>
-            <div style="clear: both;"></div>
           </div> <!-- class="row" -->
 	      <div class="row" id="GroomParentsRow">
 	        <div class="column1">
@@ -319,7 +310,6 @@
 			        type="text" size="22" maxlength="64"
 			        class="act left" value="$GROOMMOTHERNAME" />
 	        </div>
-	        <div style="clear: both;"></div>
           </div> <!-- class="row" -->
         </fieldset><!-- id="GroomSet"-->
         <fieldset class="female" id="BrideSet">
@@ -337,7 +327,6 @@
                     type="text" size="16" maxlength="120"
                     class="act left" value="$BRIDESURNAME" />
             </div>
-            <div style="clear: both;"></div>
           </div> <!-- class="row" -->
           <div class="row" id="BrideBirthRow">
             <div class="column1">
@@ -354,7 +343,6 @@
               <input name="BBirthYear" id="BBirthYear" 
                     type="hidden" value="$BRIDEBIRTHYEAR">
             </div>
-            <div style="clear: both;"></div>
           </div> <!-- class="row" -->
           <div class="row" id="BrideLinkRow">
             <div class="column2">
@@ -370,7 +358,6 @@
             <button id="ClearB" type="button">
                 Clear
             </button>
-            <div style="clear: both;"></div>
           </div> <!-- class="row" -->
           <div class="row" id="BChooseRow">
             <div class="column2">
@@ -385,7 +372,6 @@
     	        </option>
     	      </select>
             </div>
-            <div style="clear: both;"></div>
           </div> <!-- class="row" -->
           <div class="row" id="BrideResidenceRow">
             <div class="column1">
@@ -400,7 +386,6 @@
       		        type="text" size="22" maxlength="255"
       		        class="act leftnc" value="$BRIDEBIRTHPLACE" />
             </div>
-            <div style="clear: both;"></div>
           </div> <!-- class="row" -->
           <div class="row" id="BrideOccupationRow">
             <div class="column1">
@@ -415,7 +400,6 @@
       		        type="text" size="1" maxlength="1"
       		        class="act left1em" value="$BRIDEMARSTAT" />
             </div>
-            <div style="clear: both;"></div>
           </div> <!-- class="row" -->
           <div class="row" id="BrideReligionRow">
             <div class="column1">
@@ -424,7 +408,6 @@
       		        type="text" size="16" maxlength="64"
       		        class="act leftnc" value="$BRIDERELIGION" />
             </div>
-            <div style="clear: both;"></div>
           </div> <!-- class="row" -->
 	      <div class="row" id="BrideParentsRow">
 	        <div class="column1">
@@ -439,7 +422,6 @@
 			        type="text" size="22" maxlength="64"
 			        class="act left" value="$BRIDEMOTHERNAME" />
 	        </div>
-	        <div style="clear: both;"></div>
           </div> <!-- class="row" -->
         </fieldset><!-- id="BrideSet"-->
         <fieldset class="other" id="WitnessSet">
@@ -457,7 +439,6 @@
                     type="text" size="22" maxlength="255"
                     class="act leftnc" value="$WITNESSRES1"/>
             </div>
-            <div style="clear: both;"></div>
           </div> <!-- class="row" -->
           <div class="row" >
             <div class="column1">
@@ -472,7 +453,6 @@
                     type="text" size="22" maxlength="255"
                     class="act left" value="$WITNESSRES2"/>
             </div>
-            <div style="clear: both;"></div>
           </div> <!-- class="row" -->
         </fieldset><!-- id="WitnessSet"-->
         <fieldset class="other" id="MinisterSet">
@@ -490,7 +470,6 @@
                     type="text" size="16" maxlength="120" 
                     class="act left" value="$MINISTERSURNAME" />
             </div>
-            <div style="clear: both;"></div>
           </div> <!-- class="row" -->
           <div class="row" id="MinisterLinkRow">
             <div class="column2">
@@ -506,7 +485,6 @@
             <button id="ClearM" type="button">
                 Clear
             </button>
-            <div style="clear: both;"></div>
           </div> <!-- class="row" -->
           <div class="row" id="MChooseRow">
             <div class="column2">
@@ -521,7 +499,6 @@
     	        </option>
     	      </select>
             </div>
-            <div style="clear: both;"></div>
           </div> <!-- class="row" -->
           <div class="row" id="MinisterResidenceRow">
             <div class="column1">
@@ -536,7 +513,6 @@
       		        type="text" size="22" maxlength="64"
       		        class="act leftnc" value="$MINISTEROCCUPATION" />
             </div>
-            <div style="clear: both;"></div>
           </div> <!-- class="row" -->
           <div class="row" id="MinisterReligionRow">
             <div class="column1">
@@ -545,7 +521,6 @@
       		        type="text" size="16" maxlength="64"
       		        class="act leftnc" value="$MINISTERRELIGION" />
             </div>
-            <div style="clear: both;"></div>
           </div> <!-- class="row" -->
         </fieldset><!-- id="MinisterSet"-->
         <fieldset class="other" id="RegistrationSet">
@@ -567,14 +542,12 @@
                   type="text" size="24" maxlength="128"
                   value="$REGISTRAR" class="act left"/>
             </div>
-            <div style="clear: both;"></div>
           </div> <!-- class="row" -->
           <div class="row" >
             <label class="labelSmall">Remarks:</label>
             <textarea name="Remarks" id="Remarks"
                   cols="65" rows=4 class="act leftnc" 
                   >$REMARKS</textarea>
-            <div style="clear: both;"></div>
           </div> <!-- class="row" -->
           <div class="row" >
             <div class="column2">
@@ -583,7 +556,6 @@
                     type="text" size="75" maxlength="255"
                     value="$IMAGE" class="act left wide" />
             </div>
-            <div style="clear: both;"></div>
           </div> <!-- class="row" -->
           <div class="row" >
             <div class="column2">
@@ -592,7 +564,6 @@
                 Show <u>I</u>mage
               </button>
             </div>
-            <div style="clear: both;"></div>
           </div> <!-- class="row" -->
         </fieldset><!-- id="RegistrationSet"-->
         <p>
@@ -837,7 +808,7 @@
         Image">
       Click on this button to see the original image of the registration.
     </div>
-	<script src="/jscripts/tinymce/js/tinymce/tinymce.js" type="text/javascript"></script>
+	<script src="/jscripts/tinymce/js/tinymce/tinymce.min.js" type="text/javascript"></script>
     <script src="/jscripts/js20/http.js" type="text/javascript"></script>
     <script src="/jscripts/CommonForm.js" type="text/javascript"></script>
     <script src="/jscripts/Ontario.js" type="text/javascript"></script>

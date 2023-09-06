@@ -12,8 +12,9 @@ use \Iterator;
  *                                                                      *
  *  History:                                                            *
  *      2018/01/24      created                                         *
+ *      2023/07/03      add support for sd_id parameter                 *
  *                                                                      *
- *  Copyright &copy; 2018 James A. Cobban                               *
+ *  Copyright &copy; 2023 James A. Cobban                               *
  ************************************************************************/
 require_once __NAMESPACE__ . '/RecordSet.inc';
 require_once __NAMESPACE__ . '/SubDistrict.inc';
@@ -82,7 +83,7 @@ class SubDistrictSet extends RecordSet
         global  $warn;
 
         if ($debug)
-            $warn   .= '<p>SubDistrictSet::getWhere: ' . 
+            $warn       .= '<p>SubDistrictSet::getWhere: ' . 
                            print_r($this->parms, true) . "</p>\n";
         $where          = '';
         $and            = 'WHERE ';
@@ -118,28 +119,39 @@ class SubDistrictSet extends RecordSet
                 }               // census field
 
                 case 'sd_distid':
-                {       // district id field
-                    if (is_string($value))
+                {               // district id field
+                    if (is_string($value) || is_numeric($value))
                     {
                         $distId         = $value;
-                        $parms          = array('census'=>$censusObj,
-                                        'id'    => $value);
-                        $districtObj        = new District($parms);
+                        $parms          = array('census'=> $censusObj,
+                                                'id'    => $value);
+                        //print "<p>\$parms=('census'=>'" . $censusObj->getId() . ",'id => '$value')</p>\n";
+                        $districtObj    = new District($parms);
                     }
                     else
                     if ($value instanceof District)
                     {
-                        $districtObj        = $value;
+                        $districtObj    = $value;
                         $distId         = $districtObj->get('id');
                     }
-                    $where          .= "$and`SD_DistId`=:distid";
+                    else
+                        print "<p>SD_DistId=" . var_export($value, true);
+                    $where              .= "$and`SD_DistId`=:distid";
                     $this->sqlParms['distid']   = $distId;
-                    $and            = ' AND ';
+                    $and                = ' AND ';
                     if (!$districtObj->isExisting())
                         $warn   .= "<p>SubDistrictSet::getWhere: " . __LINE__ .
                                 " Unsupported District='$distId'</p>\n";
                     break;
-                }           // domain field
+                }               // district identifier
+
+                case 'sd_id':
+                {
+                    $where              .= "$and`SD_Id`=:sdid";
+                    $this->sqlParms['sdid']   = $value;
+                    $and                = ' AND ';
+                    break;
+                }               // subdistrict identifier within a district
 
                 default:
                 {

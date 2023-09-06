@@ -23,8 +23,10 @@ use \Iterator;
  *      2021/03/11      optionally generate explain for performance     *
  *      2022/01/10      change fieldname tblNX.`order` to `type` to     *
  *                      avoid conflict with SQL reserved word           *
+ *      2023/03/19      improve performance by not comparing date in    *
+ *                      tblER record                                    *
  *                                                                      *
- *  Copyright &copy; 2022 James A. Cobban                               *
+ *  Copyright &copy; 2023 James A. Cobban                               *
  ************************************************************************/
 require_once __NAMESPACE__ . '/RecordSet.inc';
 require_once __NAMESPACE__ . '/Person.inc';
@@ -531,12 +533,8 @@ class PersonSet extends RecordSet
                         {       // range of dates
                             $startRange = $value[0];
                             $endRange   = $value[1];
-                            $where  .= $and . "((tblIR.`BirthSD`>=? AND " .
+                            $where  .= $and . "(tblIR.`BirthSD`>=? AND " .
                                              "tblIR.`BirthSD`<=?)";
-                            $this->sqlParms[]   = $startRange;
-                            $this->sqlParms[]   = $endRange;
-                            $where  .= " OR (EBirth.`EventSD`>=? AND " .
-                                                "EBirth.`EventSd`<=?))";
                             $this->sqlParms[]   = $startRange;
                             $this->sqlParms[]   = $endRange;
                             $and        = ' AND ';

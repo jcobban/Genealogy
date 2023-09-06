@@ -7,11 +7,13 @@
  *  History:                                                            *
  *      2018/11/30      created                                         *
  *      2022/04/16      support template version of editEvent.php       *
+ *      2022/07/24      correct creation of cause of death event        *
+ *      2023/07/19      migrate to ES2015                               *
  *                                                                      *
- *  Copyright &copy; 2022 James A. Cobban                               *
+ *  Copyright &copy; 2023 James A. Cobban                               *
  **********************************************************************-->
     <div id="breadcrumbs" class="hidden">
-      <a href="/index.html">Home</a>:
+      <a href="/home.html">Home</a>:
       <a href="/genealogy.php?lang=$LANG">
             Genealogy
       </a>:
@@ -34,10 +36,10 @@
         tinyMCEparms.valid_elements     = 'a[href|class|target], span[*], br'
       </script>
       <h1>
+          Edit $TYPETEXT Event for $FORTEXT
         <span class="right">
           <a href="editEventHelpen.html" target="help">? Help</a>
-          </span>
-          Edit $TYPETEXT Event for $FORTEXT
+        </span>
       </h1>
       $TRACE
       $MSG
@@ -249,7 +251,6 @@
                 Sealed to Parents (LDS) Deprecated
             </option>
           </select>
-          <div style="clear: both;"></div>
         </div>
         <div class="row" id="dateRow">
           <label class="column1" for="date">
@@ -258,24 +259,26 @@
             <input type="text" size="24"
                     name="date" id="date" class="white left"
                     value="$DATE">
-          <div style="clear: both;"></div>
         </div>
         <div class="row" id="occRow">
           <label class="column1" for="occupation">
             Occupation:
           </label>
-            <textarea name="occupation" id="occupation"
+          <span style="flex-grow: 1;">
+          <textarea name="occupation" id="occupation"
                 maxlength="255" class="white leftnc" cols="64" rows="4"
                 >$DESCN</textarea>
+          </span>
         </div>
         <div class="row" id="descRow">
           <label class="column1" for="description">
             Description:
           </label>
+          <span style="flex-grow: 1;">
             <textarea name="description" id="description"
                 maxlength="255" class="white leftnc" cols="64" rows="4"
                 >$DESCN</textarea>
-          <div style="clear: both;"></div>
+          </span>
         </div>
         <div class="row" id="templeRow">
           <label class="column1" for="temple" id="templeLabel">
@@ -297,7 +300,6 @@
             <input type="text" name="location" id="location"
                     class="white leftnc" size="64" maxlength="255"
                      value="$LOCNAME">
-          <div style="clear: both;"></div>
         </div>
         <div class="row" id="kindRow">
           <label class="column1" for="location" id="locationLabel">
@@ -309,7 +311,6 @@
             Live:
             <input type="radio" name="kind" id="kindLive" value="0"
                     $liveKind>
-          <div style="clear: both;"></div>
         </div>
         <div class="row" id="templeReadyRow">
           <label class="column1" for="templeReady">
@@ -317,7 +318,6 @@
           </label>
             <input type="checkbox" name="templeReady" id="templeReady"
                     $templechecked value="1">
-          <div style="clear: both;"></div>
         </div>
         <div class="row" id="SurnameRow">
           <label class="column1" for="surname">
@@ -326,7 +326,6 @@
             <input type="text" name="surname" id="surname" size="32"
                 maxlength="120" class="white left"
                 value="$surname">
-          <div style="clear: both;"></div>
         </div>
         <div class="row" id="GivenRow">
           <label class="column1" for="givenName">
@@ -335,7 +334,6 @@
             <input type="text" name="givenName" id="givenName" size="50"
                 maxlength="120" class="white left"
                 value="$given">
-          <div style="clear: both;"></div>
         </div>
         <div class="row" id="namePrefixRow">
           <label class="column1" for="prefix">
@@ -344,7 +342,6 @@
             <input type="text" name="prefix" id="prefix" size="16" class="white left"
                 maxlength="120"
                  value="$prefix">
-          <div style="clear: both;"></div>
         </div>
         <div class="row" id="nameSuffixRow">
           <label class="column1" for="title">
@@ -353,7 +350,6 @@
             <input type="text" name="title" id="title"
                     size="16" class="white left" maxlength="120"
                     value="$nametitle">
-          <div style="clear: both;"></div>
         </div>
         <div class="row" id="crematedRow">
           <label class="column1" for="cremated">
@@ -369,25 +365,24 @@
                 Cremated
               </option>
             </select>
-          <div style="clear: both;"></div>
         </div>
         <div class="row" id="notesRow">
           <label class="column1" for="note">
                 Notes:
           </label>
+          <span style="flex-grow: 1;">
           <textarea name="note" id="note" 
-                    cols="64" rows="10" class="$notesClass">
-                $notes</textarea>
-          <div style="clear: both;"></div>
+                    cols="64" rows="10" class="$notesClass"
+              >$notes</textarea>
+          </span>
         </div>
         <div class="row" id="orderRow">
           <label class="column1" for="order">
                 Order:
           </label>
-            <input type="text" size="3" name="order" id="order"
-                        class="white leftnc"
-                        value="$order">
-          <div style="clear: both;"></div>
+            <input type="text" size="7" name="order" id="order"
+                    class="white right"
+                    value="$order">
         </div>
         <div class="row" id="preferredRow">
           <label class="column1" for="preferred">
@@ -395,7 +390,6 @@
           </label>
             <input type="checkbox" size="3" name="preferred" id="preferred"
                     class="white leftnc" $checked value="1">
-          <div style="clear: both;"></div>
         </div>
         <div class="row" id="notMarRow">
           <label class="column1" for="notmarried">
@@ -403,7 +397,6 @@
           </label>
             <input type="checkbox" name="notmarried" id="notmarried"
                     $checked value="1">
-          <div style="clear: both;"></div>
         </div>
         <div class="row" id="noKidsRow">
           <label class="column1" for="nochildren">
@@ -411,7 +404,6 @@
           </label>
             <input type="checkbox" name="nochildren" id="nochildren"
                     $checked value="1">
-          <div style="clear: both;"></div>
         </div>
         <table id="citTable">
           <thead>
@@ -448,6 +440,10 @@
                 <input type="hidden" name="IDSR$idsx"
                             id="IDSR$idsx"
                             value="$idsr">
+                <input type="hidden" name="IDIME$idsx" id="IDIME$idsx"
+                            value="$idime">
+                <input type="hidden" name="CITTYPE$idsx" id="CITTYPE$idsx"
+                            value="$type">
               </td>
               <td>
                 <input type="text" name="Page$idsx"
@@ -490,7 +486,6 @@
           <button type="button" id="delName$idnx">
                 Delete Name
           </button>
-          <div style="clear: both;"></div>
         </div>
         <div class="row" id="addAltSurnameRow">
           <label class="column1" for="newAltSurname">
@@ -498,7 +493,6 @@
           </label>
             <input type="text" name="newAltSurname" id="newAltSurname"
                     size="32" maxlength="120" class="white left">
-          <div style="clear: both;"></div>
         </div>
         <div class="row" id="addAltGivenRow">
           <label class="column1" for="newAltGivenName">
@@ -506,7 +500,6 @@
           </label>
             <input type="text" name="newAltGivenName" id="newAltGivenName"
                     size="50" maxlength="120" class="white left">
-          <div style="clear: both;"></div>
         </div>
       </fieldset>
       <fieldset class="other" id="deathCauseSet">
@@ -518,7 +511,6 @@
           <input type="text" name="deathCause" id="deathCause"
                     class="white leftnc" size="64" maxlength="255"
                     value="$eDeathCause">
-          <div style="clear: both;"></div>
         </div>
         <table id="DcCitTable">
           <thead>
@@ -548,6 +540,13 @@
                             value="$title"
                             readonly="readonly"
                             size="40" style="width: 20em;">
+                <input type="hidden" name="IDSR$idsx"
+                            id="IDSR$idsx"
+                            value="$idsr">
+                <input type="hidden" name="IDIME$idsx" id="IDIME$idsx"
+                            value="$IDIR">
+                <input type="hidden" name="CITTYPE$idsx" id="CITTYPE$idsx"
+                            value="9">
               </td>
               <td>
                 <input type="text" name="Page$idsx"
@@ -620,6 +619,10 @@
                 <input type="hidden" name="IDSR$idsx"
                             id="IDSR$idsx"
                             value="$idsr">
+                <input type="hidden" name="IDIME$idsx" id="IDIME$idsx"
+                            value="$idime">
+                <input type="hidden" name="CITTYPE$idsx" id="CITTYPE$idsx"
+                            value="$type">
               </td>
               <td>
                 <input type="text" name="Page$idsx"
@@ -646,9 +649,12 @@
                 <select name="Source$rownum" id="Source$rownum"
                                              class="white leftcit">
                 </select>
-                <input type="hidden" name="IDSR$rownum"
-                            id="IDSR$rownum"
-                            value="$idsr">
+                <input type="hidden" value="$idsr"
+                        name="IDSR$rownum" id="IDSR$rownum">
+                <input type="hidden" value="$idime"
+                        name="IDIME$rownum" id="IDIME$rownum">
+                <input type="hidden" value="$type"
+                        name="CITTYPE$rownum" id="CITTYPE$rownum">
               </td>
               <td>
                 <input type="text" name="Page$rownum"
@@ -1237,8 +1243,8 @@
         that documents the current fact or event.
     </div>
     <div class="balloon" id="HelpdeathCause">
-        The cause of death as provided by the coroner or medical attendant, 
-        usually from the death certificate.
+        The cause of death as provided by the coroner or
+        medical attendant, usually from the death certificate.
     </div>
     <div class="balloon" id="HelpaddCitationDeathCause">
         Clicking on this button adds a row to the citation table
@@ -1278,23 +1284,29 @@
         Alt-P, pops up a dialog to manage the set of pictures associated with
         this event.
     </div>
+    <div class="balloon" id="Helpclose">
+        Click on this button to close the dialog without updating the
+        event.
+    </div>
+    <div class="balloon" id="HelpconfirmDelete">
+        Click on this button to confirm deleting the event.
+    </div>
+    <div class="balloon" id="HelpcancelDelete">
+        Click on this button to continue without deleting the event.
+    </div>
+    <div class="balloon" id="HelptempleSelect">
+        Use this selection list to choose the LDS Temple at which a
+        sacrament was performed.
+    </div>
+    <div class="balloon" id="Helppreferred">
+        This check-box is used to indicate that whether this particular
+        event is the preferred event of its type.
+    </div>
     <div id="loading" class="popup">
         Loading...
     </div>
     $LOCATIONDIALOGS
     $TEMPLEDIALOGS
-    <script src="/jscripts/tinymce/js/tinymce/tinymce.js" type="text/javascript"></script>
-    <script src="/jscripts/js20/http.js" type="application/javaScript">
-    </script>
-    <script src="/jscripts/CommonForm.js" type="application/javaScript">
-    </script>
-    <script src="/jscripts/util.js" type="application/javaScript">
-    </script>
-    <script src="/jscripts/Cookie.js" type="application/javaScript">
-    </script>
-    <script src="/jscripts/locationCommon.js" type="application/javaScript">
-    </script>
-    <script src="/jscripts/templeCommon.js" type="application/javaScript">
-    </script>
-    <script src="editEvent.js" type="application/javaScript">
+    <script src="/jscripts/tinymce/js/tinymce/tinymce.min.js" type="text/javascript"></script>
+    <script src="editEvent.js" type="module">
     </script>

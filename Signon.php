@@ -83,8 +83,10 @@ use \Templating\TemplateTag;
  *      2019/02/18      use new FtTemplate constructor                  *
  *      2019/12/22      use new message for missing password            *
  *      2020/12/03      correct XSS vulnerabilities                     *
+ *      2022/06/13      more secure implementation of forgotten password*
+ *      2023/06/01      correct implementation of forgotten password    *
  *                                                                      *
- *  Copyright &copy; 2020 James A. Cobban                               *
+ *  Copyright &copy; 2023 James A. Cobban                               *
  ************************************************************************/
 require_once __NAMESPACE__ . "/User.inc";
 require_once __NAMESPACE__ . '/FtTemplate.inc';
@@ -94,8 +96,10 @@ require_once __NAMESPACE__ . "/common.inc";
 
 // validate parameters
 $newuserid              = '';
+$email                  = '';
 $password               = '';
 $action                 = '';
+$validToken             = '';
 $persist                = false;
 $lang                   = 'en';
 $redirectto             = "UserInfo.php";
@@ -116,18 +120,14 @@ if (count($_GET) > 0)
         {
             case 'redirect':
             {
-                $redirectto     = $value;
+                if (strlen($value) > 0)
+                    $redirectto     = $value;
                 break;
             }
     
             case 'lang':
             {
-                if (strlen($value) >= 2)
-                {
-                    $lang       = strtolower(substr($value,0,2)); 
-                    if (strlen($value) == 5 && substr($value, 2, 1) == '-')
-                        $lang   = $lang . substr($value, 2);
-                }
+                $lang               = FtTemplate::validateLang($value);
                 break;
             }
     
@@ -143,13 +143,13 @@ if (count($_GET) > 0)
     if ($debug)
         $warn       .= $parmsText . "</table>\n";
 }                   // invoked by URL to display signon dialog
-
+else
 if (count($_POST) > 0)
 {                   // invoked by post for new signon
-    $parmsText  = "<p class='label'>\$_POST</p>\n" .
-                  "<table class='summary'>\n" .
-                  "<tr><th class='colhead'>key</th>" .
-                      "<th class='colhead'>value</th></tr>\n";
+    $parmsText      = "<p class='label'>\$_POST</p>\n" .
+                      "<table class='summary'>\n" .
+                        "<tr><th class='colhead'>key</th>" .
+                          "<th class='colhead'>value</th></tr>\n";
     foreach($_POST as $key => $value)
     {               // loop through all parameters
         $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
@@ -159,28 +159,45 @@ if (count($_POST) > 0)
         {       // act on specific parameter
             case 'userid':
             {
-                $newuserid      = trim($value);
+                if (strlen($value) > 0)
+                    $newuserid      = trim($value);
+                break;
+            }
+    
+            case 'email':
+            {
+                if (strlen($value) > 0)
+                    $email          = trim($value);
                 break;
             }
     
             case 'password':
             {
-                $password       = trim($value);
+                if (strlen($value) > 0)
+                    $password       = trim($value);
                 break;
             }
     
             case 'act':
             {               // action to take
-                $action         = trim($value);
+                if (strlen($value) > 0)
+                    $action         = trim($value);
                 break;
             }               // action to take
     
+            case 'redirect':
+            {               // next page
+                if (strlen($value) > 0)
+                    $redirectto     = trim($value);
+                break;
+            }               // next page
+    
             case 'remember':
             {               // user requests persistence
-                $persist        = true;
+                if (strlen($value) > 0 && strtolower($value) != 'n')
+                    $persist        = true;
                 break;
             }               // user requests persistence
-    
     
             case 'lang':
             {
@@ -202,18 +219,35 @@ if (count($_POST) > 0)
 }                   // invoked by post for new signon
 
 // if currently signed on, should not enter this script
-if ($action != 'logoff' &&
-    strlen($userid) > 0 && strlen($authorized) > 0 &&
-    strlen($newuserid) == 0)
-{       // already signed in and not specifying a new login
-    header("Location: Account.php?lang=$lang");
-    exit;
-}       // already signed on
 
-$template           = new FtTemplate("Signon$lang.html");
+$template                   = new FtTemplate("Signon$lang.html");
+
+$validToken                 = hash("sha256", $email . date('Y-m-d'));
+$template->set('VALIDTOKEN',    $validToken);
+$template->set('EMAIL',         $email);
+if (strlen($newuserid) == 0)
+{
+    if (strlen($email) > 0)
+    {
+        $user               = new User(array('email' => $email));
+        if ($user->isExisting())
+        {
+            $newuserid      = $user['username'];
+            $template->set('USERID',        $newuserid);
+        }
+    }
+    else
+        $msg                .= $template['specify']->innerHTML();
+}
+else
+{                       // userid specified
+    $template->set('USERID',        $newuserid);
+    // get existing account details
+    $user                   = new User(array('username' => $newuserid));
+}                       // userid specified
 
 if ($action == 'logoff')
-{
+{                       // remove session information
     $userid                     = $newuserid;
     $authorized                 = '';
     if (isset($_COOKIE['persistence']))
@@ -228,83 +262,142 @@ if ($action == 'logoff')
     }               // remove old implementation
     unset($_SESSION['userid']);
     $msg            .= $template['signedoff']->innerHTML();
-}
+}                       // remove session information
+else
+if ($action == 'forgotPassword')
+{                       // offer to reset password
+    if ($user && $user->isExisting() && strlen($msg) == 0)
+    {                   // found matching user
+        $username       = $user['username'];
+        $email          = $user['email'];
+        $validToken     = hash("sha256", $email . date('Y-m-d'));
+        $template->set('EMAIL',         $email);
+        $serverName     = $_SERVER['SERVER_NAME'];
+        $proto          = $_SERVER['REQUEST_SCHEME'];
+        $emailFrom      = $template['emailfrom']->replace('$serverName',
+                                                          $serverName);
+        $emailFrom      = htmlspecialchars_decode($emailFrom);
+        $headers        = "MIME-Version: 1.0\r\n" .
+                          "Content-type:text/html;charset=UTF-8" . "\r\n" .
+                          "From: $emailFrom\r\n";
+        $tag            = $template['emailsubject'];
+        $emailSubject   = str_replace('$username',
+                                      $username,
+                                      trim($tag->innerHTML));
+        $tag            = $template['emailbody'];
+
+        $emailBody  = str_replace(array('$username', '$email', '$proto', '$serverName','$validToken'),
+                                  array($username, $email, $proto, $serverName, $validToken),
+                                  trim($tag->innerHTML));
+        if ($debug)
+        {
+            $emailTo    = htmlspecialchars($email);
+            $emailClean = htmlspecialchars($emailBody);
+            $warn       .= "<p>mail('$emailTo','$emailSubject','$emailClean')</p>\n";
+        }           // debug
+        $sent       = mail( $email,
+                            $emailSubject,
+                            $emailBody,
+                            $headers);
+    
+        if ($sent)
+        {           // mail sent successfully
+            $template->updateTag('failed', null);
+        }
+        else
+        {           // could not send mail
+            $template->updateTag('respond', null);
+            $emailTo    = htmlspecialchars($email);
+            $emailBody  = htmlspecialchars($emailBody);
+            $warn       .= "<p>mail('$emailTo','$emailSubject'," . 
+                            "$emailBody)</p>\n";
+        }           // could not send mail
+    }               // found matching user
+    else
+    if (strlen($username) > 0 || strlen($email) > 0)
+    {               // invalid parameters or no matching user
+            $text       = $template['noAccount']->innerHTML;
+            $username   = htmlspecialchars($username);
+            $emailTo    = htmlspecialchars($email);
+            $msg        .= str_replace(array('$username', '$email'), 
+                                       array($username, $emailTo),
+                                       $text);
+    }               // invalid parameters or no matching user
+}                   // offer to reset password
+else
+if (strlen($userid) > 0 && strlen($authorized) > 0 &&
+    strlen($newuserid) == 0)
+{       // already signed in and not specifying a new login
+    header("Location: Account.php?lang=$lang");
+    exit;
+}       // already signed on
 
 if ($debug)
     $template->set('DEBUG',     'Y');
 else
     $template->set('DEBUG',     'N');
 $template->set('LANG',          $lang);
-$template->set('USERID',        $newuserid);
 $template->updateTag('otherStylesheets',
                      array('filename'   => '/Signon'));
+
+$rcol                   = $template["rightCol1"]->innerHTML;
+$template->set('RIGHTCOL',  $rcol);
+$template->set('REDIRECTTO',    $redirectto);
 
 if ($debug)
     $warn   .= "<p>Signon.php: " . __LINE__ .
                 " newuserid='" . htmlspecialchars($newuserid) . 
                 "', password='" . htmlspecialchars($password) . "'</p>\n";
-if (strlen($newuserid) == 0)
-    $msg            .= $template['specify']->innerHTML();
-else
-{                   // parameters syntactically OK
-    // get existing account details
-    $stpw           = md5(trim($password));
-    $hashpw         = hash('sha512',trim($password));
-    $user           = new User(array('username' => $newuserid));
-    if ($user->isExisting())
+
+if (is_object($user) && $user->isExisting())
+{
+    if (strlen($password) == 0)
     {
-        if (strlen($password) == 0)
-        {
-            $msg            .= $template['enterpassword']->innerHTML();
-        }
-        else
-        if ($user->chkPassword($password, $persist))
-        {               // password matches
-            $_SESSION['userid']     = $newuserid;
-
-            if ($persist)
-            {           // session persistence
-                setcookie('persistence', 
-                          $user->get('persistence'), 
-                          time() + 60*60*24*7, '/');
-                //error_log("Signon.php: " . __LINE__ . 
-                //            " setcookie('persistence', " . 
-                //            $user->get('persistence') .
-                //            ", seven days, '/')\n"); 
-            }           // session persistence
-
-            if ($redirectto == 'POST')
-            {           // use history
-                // knowledge of the previous page is only held in the
-                // browser so the request to back-up to the previous
-                // page must be performed by Javascript
-                $template   = new FtTemplate("repost$lang.html");
-                $template->set('REDIRECTTO',    $redirectto);
-            }           // use history
-            else
-            if (strlen($warn) == 0)
-            {           // redirect
-                header("Location: " . $redirectto . "?lang=$lang");
-                exit;
-            }           // redirect
-        }               // password matches
-        else
-        {
-            if ($debug)
-                $warn   .= "<p>Signon.php: " . __LINE__ .
-                            " newuserid='" . htmlspecialchars($newuserid) . 
-                            "', password='" . htmlspecialchars($password) . 
-                            "', hashpw='" . htmlspecialchars($hashpw) . 
-                            "', shapassword='" . 
-                            htmlspecialchars($user->get('shapassword')) .
-                            "'</p>\n";
-                $msg            .= $template['incorrect']->innerHTML();
-        }
-    }                   // userid matches
+        $msg                .= $template['enterpassword']->innerHTML();
+    }
     else
-    {                   // userid not found
-        $msg                .= $template['incorrect']->innerHTML();
-    }                   // userid not found
-}                       // userid specified
+    if ($user->chkPassword($password, $persist))
+    {               // password matches
+        $_SESSION['userid']     = $newuserid;
+
+        if ($persist)
+        {           // session persistence
+            setcookie('persistence', 
+                      $user->get('persistence'), 
+                      time() + 60*60*24*7, '/');
+            //error_log("Signon.php: " . __LINE__ . 
+            //            " setcookie('persistence', " . 
+            //            $user->get('persistence') .
+            //            ", seven days, '/')\n"); 
+        }           // session persistence
+
+        if ($redirectto == 'POST')
+        {           // use history
+            // knowledge of the previous page is only held in the
+            // browser so the request to back-up to the previous
+            // page must be performed by Javascript
+            $template   = new FtTemplate("repost$lang.html");
+            $template->set('REDIRECTTO',    $redirectto);
+        }           // use history
+        else
+        if (strlen($warn) == 0)
+        {           // redirect
+            header("Location: " . $redirectto);
+            exit;
+        }           // redirect
+        else
+            $warn   .= "<p>tried header('Location: $redirectto')</p>\n";
+    }               // password matches
+    else
+    {
+        $msg            .= $template['incorrect']->innerHTML();
+    }
+}                   // userid matches
+else
+if (strlen($userid) > 0)
+{                   // userid not found
+    $msg                .= $template['incorrect']->innerHTML();
+}                   // userid not found
+
 $template->display();
 

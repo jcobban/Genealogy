@@ -131,9 +131,9 @@ $template->set('LANG',          $lang);
 if ($count > 0)
 {
     if ($prevoffset < 0)
-        $template['topPrev']->update(null);
+        $template['topPrev']->update('&nbsp;');
     if ($nextoffset >= $count)
-        $template['topNext']->update(null);
+        $template['topNext']->update('&nbsp;');
 	$dataRow            = $template['dataRow'];
 	$dataRowText        = $dataRow->outerHTML();
 	$data               = '';

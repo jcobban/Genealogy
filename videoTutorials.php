@@ -57,9 +57,39 @@ $template->set('CONTACTTABLE',		'Videos');
 $template->set('CONTACTSUBJECT',	'[FamilyTree]' . 
                                     urlencode($_SERVER['REQUEST_URI']));
 $template->set('LANG', $lang);
-$videos		= new RecordSet('Videos', array('lang' => $lang));
-if ($videos->count() == 0)
-    $videos	= new RecordSet('Videos', array('lang' => 'en'));
+//$videos		= new RecordSet('Videos', array('lang' => $lang));
+$handle             = opendir('Videos');
+$videos             = array();
+$row                = 1;
+$even               = 'odd';
+while($filename = readdir($handle))
+{               // loop through files in directory
+    if (substr($filename, 0, 1) == '.')
+        continue;
+    if (preg_match('/(.*)(\.\w+)$/', $filename, $matches))
+    {
+        $filename           = $matches[1];
+        $filetype           = $matches[2];
+    }
+    else
+        $filetype           = '';
+    if ($filetype == '.mp4')
+    {
+        $description        = preg_replace('/([a-z])([A-Z])/',
+                                           '\1 \2',
+                                            $filename);
+        $videos[$row]   = array("row"           => $row,
+                                "even"          => $even,
+                                "filename"      => $filename,
+                                "description"   => $description,
+                                "display"       => 'N'); 
+        if ($even == 'odd')
+            $even       = 'even';
+        else
+            $even       = 'odd';
+        $row++;
+    }               // loop through files in directory
+}               // loop through files in directory
 $template->updateTag('$filename',
-		     $videos);
+		             $videos);
 $template->display();

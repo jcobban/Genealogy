@@ -1,182 +1,187 @@
 <!--*********************************************************************
- *  Personen.html														*
- *																		*
- *  Template for a web page containing details of an particular			*
- *  individual from the Legacy table of individuals.					*
- *																		*
- * History:																*
- *		2017/11/13		created		template for popups					*
- *		2018/01/27		extend template to whole body					*
+ *  Personen.html                                                       *
+ *                                                                      *
+ *  Template for a web page containing details of an particular         *
+ *  individual from the Legacy table of individuals.                    *
+ *                                                                      *
+ * History:                                                             *
+ *      2017/11/13      created     template for popups                 *
+ *      2018/01/27      extend template to whole body                   *
  *      2019/05/17      correct initialization of Blog form             *
  *      2019/05/30      use current tinyMCE                             *
- *																		*
- *  Copyright &copy; 2018 James A. Cobban								*
+ *                                                                      *
+ *  Copyright &copy; 2018 James A. Cobban                               *
  **********************************************************************-->
     <div id="breadcrumbs" class="hidden">
-	  <a href="/index.html">Home</a>:
+      <a href="/home.html">Home</a>:
       <a href="/genealogy.php?lang=$LANG">
-			Genealogy
+            Genealogy
       </a>:
       <a href="/FamilyTree/Services.php?lang=$LANG">
-			Services
+            Services
       </a>:
       <a href="/genCountry.php?cc=CA&lang=$LANG">
-			Canada
+            Canada
       </a>:
       <a href="/FamilyTree/nominalIndex.php?name=$NAMEURI&treename=$TREENAME&lang=$LANG">
-			Nominal Index
+            Nominal Index
       </a>:
       <a href="/FamilyTree/Surnames.php?initial=$PREFIX&lang=$LANG">
-			Surnames Starting with '$PREFIX'
+            Surnames Starting with '$PREFIX'
       </a>:
       <a href="/FamilyTree/Names.php?Surname=$SURNAME&lang=$LANG">
-			Surname '$SURNAME'
+            Surname '$SURNAME'
       </a>:
     </div>
     <div class="body">
       <h1>
         <span class="right">
-		  <a href="/FamilyTree/PersonHelpen.html" target="help">? Help</a>
+          <a href="/FamilyTree/PersonHelpen.html" target="help">? Help</a>
         </span>
-			$TITLE
-			<span id="inTree">: in tree "$treeName"</span>
-        <div style="clear: both;"></div>
+            $TITLE
+            <span id="inTree">: in tree "$treeName"</span>
       </h1>
       $TRACE
       $MSG
-      <div id="display" style="clear: both;">
-			$BODY
+      <div id="display">
+            $BODY
       </div> <!-- id="display" -->
       <p id='wishtosee'>
         If you wish to see the private information on this individual
         <span id='notloggedon'>
-			  <a href='/Register.php' target='_blank'>
-			  register as a new user</a> or
-			  <a href='/Signon.php' target='_blank'>
-			  sign on as an already registered user</a>.
+              <a href='/Register.php' target='_blank'>
+              register as a new user</a> or
+              <a href='/Signon.php' target='_blank'>
+              sign on as an already registered user</a>.
         </span>
         <span id='contactOwners'>
-		    <a href='/contactAuthor.php?idir=$IDIR&tableName=tblIR&subject=%5BFamily%20Tree%5D%20Please%20Grant%20Access%20to%20$TITLE%3A%20IDIR%3D$IDIR'
+            <a href='/contactAuthor.php?idir=$IDIR&tableName=tblIR&subject=%5BFamily%20Tree%5D%20Please%20Grant%20Access%20to%20$TITLE%3A%20IDIR%3D$IDIR'
                 target='_blank'>
-			  contact the users who already have access
-			</a>
-			to request that they grant you access.
+              contact the users who already have access
+            </a>
+            to request that they grant you access.
         </span>
       </p>
       <form name="actionsForm" id="actionsForm"
             action="nothing.php" method="post"
-			enctype='multipart/form-data'>
+            enctype='multipart/form-data'>
         <div class="row" id="buttonsRow">
-			<button type="button" id="showDescTree" accessKey="D">
-				  <u>D</u>escendant Tree
-			</button>
-			&nbsp;
-			<button type="button" id="showAncTree" accessKey="A">
-			    <u>A</u>ncestor Tree
-			</button>
-			&nbsp;
-			<button type="button" id="relationshipCalc" accessKey="R">
-			    <u>R</u>elationship Calculator
-			</button>
-			&nbsp;
-			<button type="button" id="edit" accessKey="E">
-			    <u>E</u>dit This Person
-			</button>
-			&nbsp;
-			<button type="button" id="reqgrant" accessKey="I">
-			    May <u>I</u> Update This Person
-			</button>
-			&nbsp;
-			<a href='/FamilyTree/getPersonSvg.php?idir=$IDIR&lang=$LANG'
-				id="showGraphTree" target="picture" class="button">
-			  <img src='/logobutton.gif' height='25' width='81'
-					alt='James Cobban Logo'>
-			</a>
+            <button type="button" id="showDescTree" accessKey="D">
+                  <u>D</u>escendant Tree
+            </button>
+            &nbsp;
+            <button type="button" id="showAncTree" accessKey="A">
+                <u>A</u>ncestor Tree
+            </button>
+            &nbsp;
+            <button type="button" id="relationshipCalc" accessKey="R">
+                <u>R</u>elationship Calculator
+            </button>
+            &nbsp;
+            <button type="button" id="edit" accessKey="E">
+                <u>E</u>dit This Person
+            </button>
+            &nbsp;
+            <button type="button" id="reqgrant" accessKey="I">
+                May <u>I</u> Update This Person
+            </button>
+            &nbsp;
+            <a href='/FamilyTree/getPersonSvg.php?idir=$IDIR&lang=$LANG'
+                id="showGraphTree" target="picture" class="button">
+              <img src='/logobutton.gif' height='25' width='81'
+                    alt='James Cobban Logo'>
+            </a>
         </div>
         <div id="searchParmsHidden" class="hidden">
-			<input type="hidden" name="idir" id="idir"
-					value="$IDIR">
-			<input type="hidden" name="givenname" id="givenname"
-					value="$GIVENNAME">
-			<input type="hidden" name="surname" id="surname"
-					value="$SURNAME">
-			<input type="hidden" name="treeName" id="treeName"
-					value="$TREENAME">
-			<input type="hidden" name="birthDate" id="birthDate"
-					value="$BIRTHDATE">
-			<input type="hidden" name="birthPlace" id="birthPlace"
-					value="$BIRTHPLACE">
-			<input type="hidden" name="deathDate" id="deathDate"
-					value="$DEATHDATE">
-			<input type="hidden" name="deathPlace" id="deathPlace"
-					value="$DEATHPLACE">
-			<input type="hidden" name="fatherGivenName" id="fatherGivenName"
-					value="$FATHERGIVENNAME">
-			<input type="hidden" name="fatherSurname" id="fatherSurname"
-					value="$FATHERSURNAME">
-			<input type="hidden" name="motherGivenName" id="motherGivenName"
-					value="$MOTHERGIVENNAME">
-			<input type="hidden" name="motherSurname" id="motherSurname"
-					value="$MOTHERSURNAME">
+            <input type="hidden" name="idir" id="idir"
+                    value="$IDIR">
+            <input type="hidden" name="givenname" id="givenname"
+                    value="$GIVENNAME">
+            <input type="hidden" name="surname" id="surname"
+                    value="$SURNAME">
+            <input type="hidden" name="treeName" id="treeName"
+                    value="$TREENAME">
+            <input type="hidden" name="birthDate" id="birthDate"
+                    value="$BIRTHDATE">
+            <input type="hidden" name="birthPlace" id="birthPlace"
+                    value="$BIRTHPLACE">
+            <input type="hidden" name="deathDate" id="deathDate"
+                    value="$DEATHDATE">
+            <input type="hidden" name="deathPlace" id="deathPlace"
+                    value="$DEATHPLACE">
+            <input type="hidden" name="fatherGivenName" id="fatherGivenName"
+                    value="$FATHERGIVENNAME">
+            <input type="hidden" name="fatherSurname" id="fatherSurname"
+                    value="$FATHERSURNAME">
+            <input type="hidden" name="motherGivenName" id="motherGivenName"
+                    value="$MOTHERGIVENNAME">
+            <input type="hidden" name="motherSurname" id="motherSurname"
+                    value="$MOTHERSURNAME">
         </div>
       </form>
       <div class="row" style="width: 100%" id="blogHr">
-        <hr>	<!-- start of blog section of page -->
+        <hr>    <!-- start of blog section of page -->
       </div>
       <form name="blogForm" id="blogForm" 
             action="blogIndiv.php" method="post"
-			enctype='multipart/form-data'>
+            enctype='multipart/form-data'>
         <div id="blog$blid" class="row">
-		  <p class='label'>
-			    At $datetime user '$username' wrote:
-		  </p>
-		  <p>
-			  $text
-		  </p>
-		  <div id="deleteButtons$showButtons"> <!-- $username == $userid -->
-		    <p>
-		      <button type="button" id="blEdit$blid">
-				  Edit Message
-		      </button>
-		      <button type="button" id="blDel$blid">
-				  Delete Message
-		      </button>
-		    </p>
-		  </div> <!-- $username == $userid -->
+          <p class='label'>
+                At $datetime user '$username' wrote:
+          </p>
+          <p>
+              $text
+          </p>
+          <div id="deleteButtons$showButtons"> <!-- $username == $userid -->
+            <p>
+              <button type="button" id="blEdit$blid">
+                  Edit Message
+              </button>
+              <button type="button" id="blDel$blid">
+                  Delete Message
+              </button>
+            </p>
+          </div> <!-- $username == $userid -->
         </div> <!-- id="blog$blid" -->
         <input type="hidden" name="userid" id="userid"
-				value="$USERID">
+                value="$USERID">
         <input type="hidden" name="idir" id="blogidir"
-				value="$IDIR">
-        <div class="row">
-          <textarea name="message" id="message" placeholder="[enter message]"
-				rows='5' cols='100'></textarea>
+                value="$IDIR">
+        <div>
+          <textarea name="message" id="message"
+                    placeholder="[enter message]"
+                    rows='5' cols='100'></textarea>
         </div>
         <div class="row" id="blogEmailRow">
           <label class='column1' for='emailAddress'>
-			  Your E-Mail Address:
+              Your E-Mail Address:
           </label>
           <input type="text" class="white leftnc"
-				  id="emailAddress" name="emailAddress"
-				  size="80" value="$EMAIL">
+                  id="emailAddress" name="emailAddress"
+                  size="80" value="$EMAIL">
         </div>
         <div class="row" id="blogPostRow">
           <button type="button" id="PostBlog" accessKey="B">
-			  Post <u>B</u>log
+              Post <u>B</u>log
           </button>
         </div>
       </form> <!-- name="blogform" id="blogform" -->
-      <div class="row" id="footnotesSection">
-	    <hr class='footnotes'/>
-	    <p class='label'>Footnotes:</p>
-	    <div id='footnote$key'>
-	      <div class="column1" id="#fn$key">
-			$key
-	      </div>
-			$text
-	      <div style='clear: both;'></div>
-	    </div> <!-- class='footnote$key' -->
-      </div> <!-- class="row" id="footnotesSection" -->
+      <div id="footnotesSection">
+        <hr class='footnotes'/>
+        <p class='label'>Footnotes:</p>
+        <div id='footnote$key'>
+          <div class="row">
+            <div class="column1" id="#fn$key">
+              $key
+            </div>
+              &nbsp;
+              $text
+          </div> <!-- class='row' -->
+          <div style="margin-left: 3em; white-space: wrap; width: 80%;" id="other$key">
+              $other
+          </div>
+        </div> <!-- id='footnote$key' -->
+      </div> <!-- id="footnotesSection" -->
     </div> <!-- class="body" -->
 
     <div class="hidden" id="messages">
@@ -192,10 +197,47 @@
       <span id="neverMarried">
         This couple were never married. 
       </span>
+      <div id="showText$IDSX" class="row" style="white-space: normal;">
+        $TEXT 
+      </div>
+      <div id="showNote$IDSX" class="row" style="white-space: normal;">
+          <strong>Note:</strong> $NOTE 
+      </div>
     </div> <!-- id="messages" -->
 
+    <div class="hidden" id="rightColSelection">
+      <span id="rightcol1">
+        <p>
+        When used on a computer with a pointing device, for example a mouse,
+        holding the pointing device over any piece of information
+        causes an explanation of that piece of information to be 
+        displayed in a popup.  This includes:
+        </p>
+        <ol>
+          <li>The names of members of the family highlighted as hyperlinks.
+          </li>
+          <li>Locations where events took place.  This offers the ability
+              to see a map of the location.
+          </li>
+          <li>Causes of death explained by a medical dictionary.
+          </li>
+          <li>Source names
+          </li>
+          <li>Citation page identifications.
+          </li>
+        </ol>
+      </span>
+
+      <p id="rightcol2">
+        If you are signed on and you have been granted permission by an
+        existing owner of this family you can add, delete, or change
+        the information recorded.
+      </p>
+        
+    </div> <!-- id="rightColSelection" -->
+
     <!--*****************************************************************
-     *  generate popups													*
+     *  generate popups                                                 *
      ******************************************************************-->
     <!-- division within which to display a Google map -->
     <div class="map" id="mapDiv">
@@ -232,24 +274,24 @@
   
     <div id="showLocDiv$idlr" class="balloon">
       <b>$name</b>
-      <p>
+      <p class="normal">
       $notes
       </p>
       <form name='locForm$idlr'>
-			  <input type="hidden" name="searchName" value="$searchName">
-			  <input type="hidden" name="county" value="$county">
-			  <input type="hidden" name="Location" value="$location">
-			  <input type="hidden" name="Latitude" value="$latitude">
-			  <input type="hidden" name="Longitude" value="$longitude">
-			  <input type="hidden" name="Zoom" value="$zoom">
-			  <input type="hidden" name="Boundary" value="$boundary">
-			  <button type="button" id="showMap$idlr" class="button">
-			      Show Map
-			  </button>
-			  &nbsp;
-			  <button type="button" id="editLoc$idlr" class="button">
-			      Edit Location
-			  </button>
+              <input type="hidden" name="searchName" value="$searchName">
+              <input type="hidden" name="county" value="$county">
+              <input type="hidden" name="Location" value="$location">
+              <input type="hidden" name="Latitude" value="$latitude">
+              <input type="hidden" name="Longitude" value="$longitude">
+              <input type="hidden" name="Zoom" value="$zoom">
+              <input type="hidden" name="Boundary" value="$boundary">
+              <button type="button" id="showMap$idlr" class="button">
+                  Show Map
+              </button>
+              &nbsp;
+              <button type="button" id="editLoc$idlr" class="button">
+                  Edit Location
+              </button>
       </form>
     </div>
   
@@ -259,12 +301,12 @@
       $notes
       </p>
       <form name='tplForm$idtr'>
-			  <input type="hidden" name="Location" value="$temple">
-			  <input type="hidden" name="Latitude" value="$latitude">
-			  <input type="hidden" name="Longitude" value="$longitude">
-			  <button type="button" id="tshowMap$idtr" class="button">
-			      Show Map
-			  </button>
+              <input type="hidden" name="Location" value="$temple">
+              <input type="hidden" name="Latitude" value="$latitude">
+              <input type="hidden" name="Longitude" value="$longitude">
+              <button type="button" id="tshowMap$idtr" class="button">
+                  Show Map
+              </button>
       </form>
     </div> <!-- end of id=showTplDiv$idtr -->
   
@@ -274,12 +316,12 @@
       $notes
       </p>
       <form name='adrForm$idar'>
-			  <input type="hidden" name="Location" value="$address">
-			  <input type="hidden" name="Latitude" value="$latitude">
-			  <input type="hidden" name="Longitude" value="$longitude">
-			  <button type="button" id="ashowMap$idar" class="button">
-			      Show Map
-			  </button>
+              <input type="hidden" name="Location" value="$address">
+              <input type="hidden" name="Latitude" value="$latitude">
+              <input type="hidden" name="Longitude" value="$longitude">
+              <button type="button" id="ashowMap$idar" class="button">
+                  Show Map
+              </button>
       </form>
     </div> <!-- end of id=showAdrDiv$idar -->
   $DEATHCAUSES
@@ -605,8 +647,8 @@
       although this will not be y reflected in the description
       of this individual until the page is refreshed.
     </div>
-    <script src="/jscripts/tinymce/js/tinymce/tinymce.js" type="application/javascript">
+    <script src="/jscripts/tinymce/js/tinymce/tinymce.min.js" type="application/javascript">
     </script>
     <script src="/FamilyTree/Person.js" type="module">
     </script>
-    <script defer src="https://maps.googleapis.com/maps/api/js?v=3.43&callback=initializeMaps&region=$GOOGLECC&key=$GOOGLEKEY" type="application/javascript"></script>
+    <script defer src="https://maps.googleapis.com/maps/api/js?v=weekly&callback=initializeMaps&region=$GOOGLECC&key=$GOOGLEKEY" type="application/javascript"></script>

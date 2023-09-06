@@ -72,13 +72,14 @@ if (isset($_GET) && count($_GET) > 0)
                           "<th class='colhead'>value</th></tr>\n";
     foreach($_GET as $key => $value)
     {
+        $safevalue              = htmlspecialchars($value);
         $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
-                        "<td class='white left'>$value</td></tr>\n"; 
+                        "<td class='white left'>$safevalue</td></tr>\n"; 
 		switch(strtolower($key))
 		{		// act on specific parameters
 		    case 'lang':
 		    {
-	            $lang       = FtTemplate::validateLang($value);
+	            $lang           = FtTemplate::validateLang($value);
 				break;
 		    }
 		}		// act on specific parameters

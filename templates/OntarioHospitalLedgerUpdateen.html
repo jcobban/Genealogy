@@ -27,27 +27,23 @@
         <span class="right">
           <a href="OntarioHospitalLedgerHelpen.html" target="help">? Help</a>
         </span>
-        <div style="clear: both;"></div>
       </h1>
       $TRACE
       $MSG
-      <div class="center" id="topBrowse">
-        <span class="left" id="topPrev">
+      <div class="spaceBetween" id="topBrowse">
+        <span id="topPrev">
             <a href="OntarioHospitalLedger.php?Location=$LOCATION&amp;Page=$PREVPAGE&amp;lang=$LANG"
                 id="toPrevPage">
-                &lt;---
+                <img src="/Images/ArrowLeft.svg">
             </a>
         </span>
-        <span class="right" id="topNext">
+          $LOCATION Page $PAGE to $LASTPAGE
+        <span id="topNext">
             <a href="OntarioHospitalLedger.php?Location=$LOCATION&amp;Page=$NEXTPAGE&amp;lang=$LANG"
                 id="toNextPage">
-                ---&gt;
+                <img src="/Images/ArrowRight.svg">
             </a>
         </span>
-        <span class="label">
-          $LOCATION Page $PAGE to $LASTPAGE
-        </span>
-        <span style="clear: both;"></span>
       </div>
       <form name="divForm" action="donothing.php">
         <input type="hidden" id="Location" value="$LOCATION">

@@ -190,11 +190,11 @@ if (strlen($msg) == 0)
 	    $template->set('LAST',          $last);
 		if ($prevoffset < 0)
 	    {	// no previous page of output to display
-	        $template->updateTag('topPrev', null);
+            $template->updateTag('topPrev',         '&nbsp;');
 		}	// no previous page of output to display
 		if ($nextoffset >= $count)
 		{	// no next page of output to display
-	        $template->updateTag('topNext', null);
+            $template['topNext']->update('&nbsp;');
         }	// no next page of output to display
 
         // display the results

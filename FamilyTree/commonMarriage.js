@@ -202,26 +202,29 @@
  *      2020/02/12      exploit Template                                *
  *      2020/03/18      new implementation of adding events             *
  *      2022/04/16      support new layout implementation               *
+ *      2022/08/17      correct extraction of information from response *
+ *                      from updateMarriageXML.php                      *
+ *      2022/08/20      switch to updateMarriageJSON from               *
+ *                      updateMarriageXML for server response           *
+ *      2023/07/15      function gotNickname enhanced to set gender     *
+ *                      to female for given names ending in 'a'         *
  *                                                                      *
- *  Copyright &copy; 2020 James A. Cobban                               *
+ *  Copyright &copy; 2023 James A. Cobban                               *
  ************************************************************************/
 
 /************************************************************************
  *  function constants                                                  *
  *                                                                      *
- *  Note that Microsoft Internet Explorer does not support the const    *
- *  keyword prior to IE 11, therefore these constants are declared      *
- *  as variables.                                                       *
  ************************************************************************/
 
-var CHILD_PREFIX            = "child";
-var CHILD_PREFIX_LEN        = CHILD_PREFIX.length;
-var EDIT_CHILD_PREFIX       = "editChild";
-var EDIT_CHILD_PREFIX_LEN   = EDIT_CHILD_PREFIX.length;
-var DELETE_PREFIX           = "Delete";
-var DELETE_PREFIX_LEN       = DELETE_PREFIX.length;
-var EDIT_EVENT_PREFIX       = "EditEvent";
-var EDIT_EVENT_PREFIX_LEN   = EDIT_EVENT_PREFIX.length;
+const CHILD_PREFIX            = "child";
+const CHILD_PREFIX_LEN        = CHILD_PREFIX.length;
+const EDIT_CHILD_PREFIX       = "editChild";
+const EDIT_CHILD_PREFIX_LEN   = EDIT_CHILD_PREFIX.length;
+const DELETE_PREFIX           = "Delete";
+const DELETE_PREFIX_LEN       = DELETE_PREFIX.length;
+const EDIT_EVENT_PREFIX       = "EditEvent";
+const EDIT_EVENT_PREFIX_LEN   = EDIT_EVENT_PREFIX.length;
 
 /************************************************************************
  *  "constants" for event types                                         *
@@ -230,19 +233,19 @@ var EDIT_EVENT_PREFIX_LEN   = EDIT_EVENT_PREFIX.length;
  ************************************************************************
  *      IDIME points to Marriage Record tblMR.idmr                      *
  ************************************************************************/
-var STYPE_LDSS              = 18;   // Sealed to Spouse
-var STYPE_NEVERMARRIED      = 19;   // This individual never married 
-var STYPE_MAR               = 20;   // Marriage 
-var STYPE_MARNOTE           = 21;   // Marriage Note
-var STYPE_MARNEVER          = 22;   // Never Married         
-var STYPE_MARNOKIDS         = 23;   // This couple had no children
-var STYPE_MAREND            = 24;   // Marriage ended
+const STYPE_LDSS              = 18;   // Sealed to Spouse
+const STYPE_NEVERMARRIED      = 19;   // This individual never married 
+const STYPE_MAR               = 20;   // Marriage 
+const STYPE_MARNOTE           = 21;   // Marriage Note
+const STYPE_MARNEVER          = 22;   // Never Married         
+const STYPE_MARNOKIDS         = 23;   // This couple had no children
+const STYPE_MAREND            = 24;   // Marriage ended
                 
 /************************************************************************
  *      IDIME points to Event Record tblER.ider                         *
  ************************************************************************/
-var STYPE_EVENT             = 30;   // Individual Event
-var STYPE_MAREVENT          = 31;   // Marriage Event
+const STYPE_EVENT             = 30;   // Individual Event
+const STYPE_MAREVENT          = 31;   // Marriage Event
 
 /************************************************************************
  *  function childWindows                                               *
@@ -283,10 +286,10 @@ function clickPref()
 {
     if (this.checked)
     {       // the current marriage is preferred
-        var idmr        = this.name.substring(4);
+        let idmr        = this.name.substring(4);
 
         // notify the invoking page that the preferred marriage has changed
-        var opener  = null;
+        let opener  = null;
         if (window.frameElement && window.frameElement.opener)
             opener  = window.frameElement.opener;
         else
@@ -294,11 +297,11 @@ function clickPref()
         if (opener)
             opener.document.indForm.setIdmrPref(idmr);
     
-        var form    = this.form;
-        var formElts    = form.elements;
-        for (var i = 0; i < formElts.length; ++i)
+        let form    = this.form;
+        let formElts    = form.elements;
+        for (let i = 0; i < formElts.length; ++i)
         {
-            var element = formElts[i];
+            let element = formElts[i];
 
             // uncheck all other checkboxes in the preference set
             if ((element.name.substring(0,4) == 'Pref') && (element != this))
@@ -324,8 +327,8 @@ function clickPref()
 function editFamily()
 {
     // disable buttons in the main form until update is complete
-    var idmr        = this.id.substring(4);
-    var href        = location.href;
+    let idmr        = this.id.substring(4);
+    let href        = location.href;
     if (href.indexOf("?") >= 0)
         location.href   = location.href + "&idmr=" + idmr;
     else
@@ -343,13 +346,13 @@ function editFamily()
  ************************************************************************/
 function gotFamily(xmlDoc)
 {
-    var notMarriedChecked   = '';
-    var noChildrenChecked   = '';
-    var noChildrenDisabled  = false;
+    let notMarriedChecked   = '';
+    let noChildrenChecked   = '';
+    let noChildrenDisabled  = false;
 
     // some actions depend upon the value of the idir parameter passed
     // to the script
-    var idir    = 0;
+    let idir    = 0;
     if (args['idir'])
         idir    = args['idir'] - 0;
     else
@@ -360,12 +363,12 @@ function gotFamily(xmlDoc)
     // get information from XML document
     if (xmlDoc.documentElement)
     {       // XML document
-        var root    = xmlDoc.documentElement;
+        let root    = xmlDoc.documentElement;
         if (root.tagName == 'added')
         {       // format with enclosing information
-            for (var i = 0; i < root.childNodes.length; i++)
+            for (let i = 0; i < root.childNodes.length; i++)
             {       // loop through all children
-                var node    = root.childNodes[i];
+                let node    = root.childNodes[i];
                 if (node.tagName == 'family')
                 {   // <family>
                     root    = node;
@@ -375,16 +378,16 @@ function gotFamily(xmlDoc)
         }       // format with enclosing information
         if (root.tagName == 'tblMR' || root.tagName == 'family')
         {       // correctly formatted response
-            var childTable  = document.getElementById('children');
-            var eventSet    = document.getElementById('EventSet');
-            var famForm     = document.famForm;
+            let childTable  = document.getElementById('children');
+            let eventSet    = document.getElementById('EventSet');
+            let famForm     = document.famForm;
 
-            for (var i = 0; i < root.childNodes.length; i++)
+            for (let i = 0; i < root.childNodes.length; i++)
             {       // loop through all children
-                var node    = root.childNodes[i];
+                let node    = root.childNodes[i];
                 if (node.nodeType == 1)
                 {   // element Node
-                    var value   = node.textContent;
+                    let value   = node.textContent;
 
                     switch(node.nodeName)
                     {   // take action depending upon tag name
@@ -422,6 +425,10 @@ function gotFamily(xmlDoc)
 
                         case 'idirwife':
                         {
+                            let idirwife    = famForm.IDIRWife.value;
+                            if (idirwife > 0 &&
+                                idirwife != value)
+                                alert('commonMarriage.js: 430: famForm.IDIRWife.value ' + idirwife + ' changed to ' + value);
                             famForm.IDIRWife.value  = value;
                             document.getElementById('editWife').disabled =
                                 (value == 0) || (value == idir);
@@ -507,7 +514,7 @@ function gotFamily(xmlDoc)
 
                         case 'children':
                         {
-                            var numChildren = node.getAttribute('count');
+                            let numChildren = node.getAttribute('count');
                             if (numChildren > 0)
                             {       // at least one child
                                 noChildrenChecked   = false;
@@ -516,7 +523,7 @@ function gotFamily(xmlDoc)
                             else
                                 noChildrenDisabled  = false;
                             addChildrenFromXml(node,
-                                    childTable);
+                                               childTable);
                             break;
                         }   // children tag
 
@@ -548,23 +555,23 @@ function gotFamily(xmlDoc)
  ************************************************************************/
 function addNotMarriedRow()
 {
-    var famForm = document.famForm;
+    let famForm = document.famForm;
     if (famForm.NotMarried)
         return;     // already displayed
 
-    var parms   = {'temp'   : ''};
-    var newrow  = createFromTemplate('NotMarriedRow$temp',
+    let parms   = {'temp'   : ''};
+    let newrow  = createFromTemplate('NotMarriedRow$temp',
                                  parms,
                                  null);
-    var nextRow = document.getElementById('Marriage');
+    let nextRow = document.getElementById('Marriage');
     if (nextRow === undefined)
         throw "commonMarriage.js: addNotMarriedRow: no element with id 'Marriage'";
-    var tbody   = nextRow.parentNode;
+    let tbody   = nextRow.parentNode;
     tbody.insertBefore(newrow, nextRow);
 
     if (famForm.NotMarried)
         actMouseOverHelp(famForm.NotMarried);
-    var button  = document.getElementById('neverMarriedDetails');
+    let button  = document.getElementById('neverMarriedDetails');
     if (button)
     {
         actMouseOverHelp(button);
@@ -579,20 +586,20 @@ function addNotMarriedRow()
  ************************************************************************/
 function addNoChildrenRow()
 {
-    var famForm = document.famForm;
+    let famForm = document.famForm;
     if (famForm.NoChildren)
         return;     // already displayed
 
-    var parms   = {'temp'   : ''};
-    var newrow  = createFromTemplate('NoChildrenRow$temp',
+    let parms   = {'temp'   : ''};
+    let newrow  = createFromTemplate('NoChildrenRow$temp',
                                  parms,
                                  null);
-    var tbody   = document.getElementById('formBody');
+    let tbody   = document.getElementById('formBody');
     tbody.appendChild(newrow);
 
     if (famForm.NoChildren)
         actMouseOverHelp(famForm.NoChildren);
-    var button  = document.getElementById('noChildrenDetails');
+    let button  = document.getElementById('noChildrenDetails');
     if (button)
     {
         actMouseOverHelp(button);
@@ -611,15 +618,15 @@ function addChildrenFromXml(node,
                             childTable)
 {
     // cleanup existing display
-    var tbody   = document.getElementById('childrenBody');
-    var child;
+    let tbody                   = document.getElementById('childrenBody');
+    let child;
     while((child = tbody.firstChild) != null)
     {       // remove all children
         tbody.removeChild(child);
     }       // remove all children
 
     // add children from XML database record
-    var rownum      = 1;
+    let rownum                  = 1;
     for(child = node.firstChild;
         child;
         child = child.nextSibling)
@@ -627,7 +634,7 @@ function addChildrenFromXml(node,
         // extract parameters from XML element
         if (child.nodeType == 1 && child.nodeName == 'child')
         {   // element node
-            var parms   = getParmsFromXml(child);
+            let parms           = getParmsFromXml(child);
             if (parms.gender == 0 || parms.gender == 'M')
                 parms.gender    = 'male';
             else
@@ -635,12 +642,12 @@ function addChildrenFromXml(node,
                 parms.gender    = 'female';
             else
                 parms.gender    = 'unknown';
-            parms.rownum    = parms.order;
+            parms.rownum        = parms.order;
 
             // if the parms parameter is invalid throw an exception
             if (parms.givenname === undefined)
             {
-                var msg = "";
+                let msg         = "";
                 for(parm in parms) { msg += parm + "='" + parms[parm] + "',"; }
                 throw "commonMarriage.js: addChildrenFromXml: parms={" + msg +  
                         "} child=" + new XMLSerializer().serializeToString(child);
@@ -664,41 +671,41 @@ function addChildrenFromXml(node,
 function changeEventListsFromXml(node,
                           fieldSet)
 {
-    var form        = document.famForm;
+    let form        = document.famForm;
 
     // cleanup existing display
-    var msg             = "";
-    for(var member in fieldSet)
+    let msg             = "";
+    for(let member in fieldSet)
         msg             += member + ",";
-    var row             = fieldSet.firstChild;
+    let row             = fieldSet.firstChild;
     msg                 = "";
-    for(var member in row)
+    for(let member in row)
         msg             += member + ",";
 
     while(row)
     {
-        var nextChild   = row.nextSibling;
+        let nextChild   = row.nextSibling;
         if (row.id && row.id.substring(0,8) == 'EventRow')
             tbody.removeChild(row);
         row = nextChild;
     }       // loop through existing rows in table
 
     // find the position at which to add new event rows
-    var nextRow = document.getElementById('EndedRow');
+    let nextRow = document.getElementById('EndedRow');
     if (nextRow === undefined || nextRow === null)
         nextRow = document.getElementById('AddEventRow');
 
     // add events from database record
-    for(var child = node.firstChild;
+    for(let child = node.firstChild;
         child;
         child = child.nextSibling)
     {   // loop through children
         // extract parameters from XML element
         if (child.nodeType == 1)
         {   // element node
-            var parms   = getParmsFromXml(child);
-            var typeText    = 'Unknown ' + idet;
-            var eventTextElt    = document.getElementById('EventText' + idet);
+            let parms   = getParmsFromXml(child);
+            let typeText    = 'Unknown ' + idet;
+            let eventTextElt    = document.getElementById('EventText' + idet);
             if (eventTextElt)
             {               // have element from web page
                 typeText    = eventTextElt.innerHTML.trim() + ':';
@@ -706,7 +713,7 @@ function changeEventListsFromXml(node,
                                       typeText.substring(1);
             }               // have element from web page
             parms['type']   = typeText;
-            var descn   = parms['description'];
+            let descn   = parms['description'];
             if (descn.length > 0)
             {
                 descn   = descn.substring(0,1).toUpperCase() + 
@@ -714,15 +721,15 @@ function changeEventListsFromXml(node,
                 parms['description']    = descn;
             }
              
-            var newrow          = createFromTemplate('EventRow$ider',
+            let newrow          = createFromTemplate('EventRow$ider',
                                                      parms,
                                                      null);
             fieldSet.insertBefore(newrow, nextRow);
 
             // add handlers for added buttons
-            var ider            = parms['ider'];
-            var eltName         = "citType" + ider;
-            var element         = form.elements[eltName];
+            let ider            = parms['ider'];
+            let eltName         = "citType" + ider;
+            let element         = form.elements[eltName];
             actMouseOverHelp(element);
 
             eltName             = "Date" + ider;
@@ -739,7 +746,7 @@ function changeEventListsFromXml(node,
             actMouseOverHelp(element);
 
             eltName             = "EditEvent" + ider;
-            var button          = document.getElementById(eltName);
+            let button          = document.getElementById(eltName);
             button.onclick      = editEvent;    
             actMouseOverHelp(button);
 
@@ -774,13 +781,13 @@ function noFamily()
  ************************************************************************/
 function marrDel()
 {
-    var idmr        = this.id.substring(DELETE_PREFIX_LEN);
-    var parms       = { "idmr"  : idmr};
+    let idmr        = this.id.substring(DELETE_PREFIX_LEN);
+    let parms       = { "idmr"  : idmr};
 
-    var idirElement = document.getElementById('idir');
+    let idirElement = document.getElementById('idir');
     if (idirElement)
         parms['idir']   = idirElement.value;
-    var childElement    = document.getElementById('child');
+    let childElement    = document.getElementById('child');
     if (childElement)
         parms['child']  = childElement.value;
 
@@ -815,24 +822,24 @@ function gotDelMarr(xmlDoc)
     hideLoading();              // hide loading indicator
     if (xmlDoc.documentElement)
     {                           // XML document
-        var root                    = xmlDoc.documentElement;
+        let root                    = xmlDoc.documentElement;
         if (root.tagName == "deleted")
         {                       // correctly formatted response
-            var msgs                = root.getElementsByTagName("msg");
+            let msgs                = root.getElementsByTagName("msg");
             if (msgs.length == 0)
             {                   // no errors detected
-                var parms           = root.getElementsByTagName("parms");
-                var idmrtag         = parms[0].getElementsByTagName("idmr");
-                var idmr            = idmrtag[0].textContent.trim();
-                var row             = document.getElementById("marriage" + idmr);
-                var section         = row.parentNode;
+                let parms           = root.getElementsByTagName("parms");
+                let idmrtag         = parms[0].getElementsByTagName("idmr");
+                let idmr            = idmrtag[0].textContent.trim();
+                let row             = document.getElementById("marriage" + idmr);
+                let section         = row.parentNode;
                 section.removeChild(row);
-                var numFamilies     = section.rows.length;
+                let numFamilies     = section.rows.length;
                 if (numFamilies == 0)
                 {               // deleted last marriage
                     // notify the opener (editIndivid.php)
                     // that there are no marriages left
-                    var opener      = null;
+                    let opener      = null;
                     if (window.frameElement && window.frameElement.opener)
                         opener      = window.frameElement.opener;
                     else
@@ -840,7 +847,7 @@ function gotDelMarr(xmlDoc)
 
                     if (opener)
                     {           // opened from another dialog
-                        var openerForm  = opener.document.indForm;
+                        let openerForm  = opener.document.indForm;
                         if (openerForm)
                         {       // opened from editIndivid.php
                             try {
@@ -858,13 +865,13 @@ function gotDelMarr(xmlDoc)
                 }               // deleted last marriage
                 else
                 {               // at least one marriage left
-                    var famForm     = document.famForm;
-                    var currIdmr    = famForm.idmr.value;
+                    let famForm     = document.famForm;
+                    let currIdmr    = famForm.idmr.value;
                     if (idmr == currIdmr)
                     {           // deleted currently displayed family
-                        var row     = section.rows[0];
+                        let row     = section.rows[0];
                         idmr        = row.id.substring(8);
-                        var edit    = document.getElementById('Edit' + idmr);
+                        let edit    = document.getElementById('Edit' + idmr);
                         edit.click();
                     }           // deleted currently displayed family
                 }               // at least one marriage left
@@ -918,16 +925,15 @@ function addFamily()
  ************************************************************************/
 function marrReorder()
 {
-    var form        = document.indForm;
-    var idir        = form.idir.value;
-    var sex     = form.sex.value;
+    let form        = document.indForm;
+    let idir        = form.idir.value;
+    let sex     = form.sex.value;
 
-    var parms       = {
+    let parms       = {
                 "idir"      : idir,
                 "sex"       : sex};
 
     // invoke script to update Event and return XML result
-    console.log('commonMarriage.js: marrReorder: /FamilyTree/orderMarriagesByDateXml.php',parms);
     popupLoading(this); // display loading indicator
     HTTP.post('/FamilyTree/orderMarriagesByDateXml.php',
               parms,
@@ -1021,15 +1027,15 @@ function neverMarriedDetails()
  ************************************************************************/
 function changeHusb(parms)
 {
-    for (var ib = 0; ib < editChildButtons.length; ib++)
+    for (let ib = 0; ib < editChildButtons.length; ib++)
     {           // enable all editChild buttons
         editChildButtons[ib].disabled   = false;
     }           // enable all editChild buttons
 
-    for(var iw = 0; iw < childWindows.length; iw++)
+    for(let iw = 0; iw < childWindows.length; iw++)
     {
-        var cw      = childWindows[iw];
-        var cloc    = cw.location;
+        let cw      = childWindows[iw];
+        let cloc    = cw.location;
         if (cloc && cloc.search.indexOf('rowid=Husb') >= 0)
         {
             childWindows.splice(iw, 1);
@@ -1039,11 +1045,22 @@ function changeHusb(parms)
             alert("changeHusb: cw=" + cw.constructor.name);
     }
 
-    var form                = document.famForm;
+    let form                        = document.famForm;
     if (form.IDIRHusb)
-        form.IDIRHusb.value     = parms['idir'];
+    {
+        let idirhusb                = form.IDIRHusb.value;
+        if (idirhusb > 0 && idirhusb != parms['idir'])
+            alert("attempt to changte IDIRHusb from " +
+                    idirhusb + " to " + parms['idir']);
+        form.IDIRHusb.value         = parms['idir'];
+    }
     if (form.HusbSurname)
+    {
+        if (form.HusbSurname.value != parms['surname'])
+            alert("attempt to changte HusbSurbame from " +
+                    form.HusbSurname.value + " to " + parms['surname']);
         form.HusbSurname.value      = parms['surname'];
+    }
     if (form.HusbMarrSurname)
         form.HusbMarrSurname.value  = parms['surname'];
     if (form.WifeMarrSurname &&
@@ -1081,15 +1098,15 @@ function changeHusb(parms)
  ************************************************************************/
 function changeWife(parms)
 {
-    for (var ib = 0; ib < editChildButtons.length; ib++)
+    for (let ib = 0; ib < editChildButtons.length; ib++)
     {           // enable all editChild buttons
         editChildButtons[ib].disabled   = false;
     }           // enable all editChild buttons
 
-    for(var iw = 0; iw < childWindows.length; iw++)
+    for(let iw = 0; iw < childWindows.length; iw++)
     {
-        var cw      = childWindows[iw];
-        var cloc    = cw.location;
+        let cw      = childWindows[iw];
+        let cloc    = cw.location;
         if (cloc && cloc.search.indexOf('rowid=Wife') >= 0)
         {
             childWindows.splice(iw, 1);
@@ -1099,9 +1116,15 @@ function changeWife(parms)
             alert("changeWife: cw=" + cw.constructor.name)
     }
 
-    var form                        = document.famForm;
+    let form                        = document.famForm;
     if (form.IDIRWife)
+    {
+        let idirwife                = form.IDIRWife.value;
+        if (idirwife > 0 &&
+            idirwife != parms['idir'])
+            alert('commonMarriage.js: 1111: famForm.IDIRWife.value ' + idirwife.value + ' changed to ' + parms['idir']);
         form.IDIRWife.value         = parms['idir'];
+    }
     if (form.WifeSurname)
         form.WifeSurname.value      = parms['surname'];
     if (form.WifeGivenName)
@@ -1137,15 +1160,15 @@ function changeWife(parms)
  ************************************************************************/
 function changeChild(parms)
 {
-    for (var ib = 0; ib < editChildButtons.length; ib++)
+    for (let ib = 0; ib < editChildButtons.length; ib++)
     {           // enable all editChild buttons
         editChildButtons[ib].disabled   = false;
     }           // enable all editChild buttons
 
-    for(var iw = 0; iw < childWindows.length; iw++)
+    for(let iw = 0; iw < childWindows.length; iw++)
     {
-        var cw      = childWindows[iw];
-        var cloc    = cw.location;
+        let cw      = childWindows[iw];
+        let cloc    = cw.location;
         
         if (cloc && cloc.search.indexOf('rowid=child') >= 0)
         {
@@ -1156,25 +1179,25 @@ function changeChild(parms)
             alert("changeChild: cw=" + cw.constructor.name)
     }
 
-    var famForm             = document.famForm;
-    var row                 = this;
-    var tableBody           = row.parentNode;
-    var rownum              = row.id.substring(CHILD_PREFIX_LEN);
-    var cIdir               = famForm.elements["CIdir" + rownum];
-    var cIdcr               = famForm.elements["CIdcr" + rownum];
-    var cGender             = famForm.elements["CGender" + rownum];
-    var cGiven              = famForm.elements["CGiven" + rownum];
-    var cSurname            = famForm.elements["CSurname" + rownum];
-    var cBirth              = famForm.elements["Cbirth" + rownum];
-    var cBirthsd            = famForm.elements["Cbirthsd" + rownum];
-    var cDeath              = famForm.elements["Cdeath" + rownum];
-    var cDeathsd            = famForm.elements["Cdeathsd" + rownum];
+    let famForm             = document.famForm;
+    let row                 = this;
+    let tableBody           = row.parentNode;
+    let rownum              = row.id.substring(CHILD_PREFIX_LEN);
+    let cIdir               = famForm.elements["CIdir" + rownum];
+    let cIdcr               = famForm.elements["CIdcr" + rownum];
+    let cGender             = famForm.elements["CGender" + rownum];
+    let cGiven              = famForm.elements["CGiven" + rownum];
+    let cSurname            = famForm.elements["CSurname" + rownum];
+    let cBirth              = famForm.elements["Cbirth" + rownum];
+    let cBirthsd            = famForm.elements["Cbirthsd" + rownum];
+    let cDeath              = famForm.elements["Cdeath" + rownum];
+    let cDeathsd            = famForm.elements["Cdeathsd" + rownum];
 
-    var parmstr             = '';
-    var linkstr             = '{';
-    for (var key in parms)
+    let parmstr             = '';
+    let linkstr             = '{';
+    for (let key in parms)
     {           // loop through parameters
-        var value           = parms[key];
+        let value           = parms[key];
         parmstr             += linkstr + key + "='" + value + "'";
         linkstr             = ',';
         switch(key.toLowerCase())
@@ -1271,8 +1294,8 @@ function changeChild(parms)
  ************************************************************************/
 function eventFeedback(parms)
 {
-    var form        = this;
-    var type        = parseInt(parms['type']) - 0;
+    let form        = this;
+    let type        = parseInt(parms['type']) - 0;
 
     // update field values in the current dialog based upon values
     // returned from the editEvent.php dialog
@@ -1299,7 +1322,7 @@ function eventFeedback(parms)
 
         case STYPE_MARNEVER:
         {       // Never Married
-            var notMarried      = parms['notmarried'];
+            let notMarried      = parms['notmarried'];
             if (notMarried)
                 addNotMarriedRow();
             else
@@ -1310,7 +1333,7 @@ function eventFeedback(parms)
 
         case STYPE_MARNOKIDS:
         {       // No Children  
-            var noChildren      = parms['nochildren'];
+            let noChildren      = parms['nochildren'];
             if (noChildren)
                 addNoChildrenRow();
             else
@@ -1337,8 +1360,8 @@ function eventFeedback(parms)
  ************************************************************************/
 function redisplayFamily()
 {   
-    var idmr    = document.famForm.idmr.value;
-    var url = window.location.search;
+    let idmr    = document.famForm.idmr.value;
+    let url = window.location.search;
     if (url.indexOf('idmr') == -1)
         url = url + '&idmr=' + idmr;
     window.location.search  = url;
@@ -1355,14 +1378,14 @@ function redisplayFamily()
  ************************************************************************/
 function addExistingChild()
 {
-    var form        = this.form;
-    var surname     = encodeURI(form.HusbSurname.value);
-    var idmr        = form.idmr.value;
-    var url     = 'chooseIndivid.php?parentsIdmr=' + idmr + 
+    let form        = this.form;
+    let surname     = encodeURI(form.HusbSurname.value);
+    let idmr        = form.idmr.value;
+    let url     = 'chooseIndivid.php?parentsIdmr=' + idmr + 
                                    '&name=' + surname +
                                    '&treeName=' +
                             encodeURIComponent(form.treename.value);
-    var childWindow = openFrame("chooserFrame",
+    let childWindow = openFrame("chooserFrame",
                                 url,
                                 "left");
 }       // function addExistingChild
@@ -1378,7 +1401,7 @@ function addExistingChild()
  ************************************************************************/
 function detachHusb()
 {
-    var famForm                 = this.form;
+    let famForm                 = this.form;
 
     famForm.IDIRHusb.value      = 0;
     famForm.HusbGivenName.value = '';
@@ -1398,7 +1421,7 @@ function detachHusb()
  ************************************************************************/
 function detachWife()
 {
-    var famForm                 = this.form;
+    let famForm                 = this.form;
 
     famForm.IDIRWife.value      = 0;
     famForm.WifeGivenName.value = '';
@@ -1422,14 +1445,14 @@ function detChild(ev)
         ev                      = window.event;
     ev.stopPropagation();
 
-    var cell                    = this.parentNode;
-    var row                     = cell.parentNode;
-    var tableBody               = row.parentNode;
+    let cell                    = this.parentNode;
+    let row                     = cell.parentNode;
+    let tableBody               = row.parentNode;
 
     // remove the editChild button for this row from the array
     // of editChild buttons
-    var rowid                   = this.id.substring(8);
-    var editButton              = document.getElementById('editChild' + rowid);
+    let rowid                   = this.id.substring(8);
+    let editButton              = document.getElementById('editChild' + rowid);
     if (editButton)
     {                           // found editChild button
         for (ib = 0; ib < editChildButtons.length; ib++)
@@ -1442,11 +1465,11 @@ function detChild(ev)
         }                       // loop through existing editChild buttons
     }                           // found editChild button
 
-    var form                    = this.form;
-    var cidcr                   = form.elements['CIdcr' + rowid];
-    var idcr                    = cidcr.value;
-    var cidir                   = form.elements['CIdir' + rowid];
-    var idir                    = cidir.value;
+    let form                    = this.form;
+    let cidcr                   = form.elements['CIdcr' + rowid];
+    let idcr                    = cidcr.value;
+    let cidir                   = form.elements['CIdir' + rowid];
+    let idir                    = cidir.value;
 
     if (idcr == 0)
     {                           // remove the row from the DOM
@@ -1455,15 +1478,15 @@ function detChild(ev)
     else
     {                           // hide the row 
         cidir.value             = -1;
-        var cgiven              = form.elements['CGiven' + rowid];
+        let cgiven              = form.elements['CGiven' + rowid];
         cgiven.parentNode.removeChild(cgiven);
         // note that it is necessary to start at the end and go back because:
         // 1) the value of row.cells.length changes as cells are deleted
         // 2) the cell referenced by a given index ic changes if cells prior
         //    to that index are deleted
-        for(var ic = row.cells.length - 1; ic > 0 ; ic--)
+        for(let ic = row.cells.length - 1; ic > 0 ; ic--)
         {                       // delete all but the first cell of the row
-            var dcell           = row.cells[ic];
+            let dcell           = row.cells[ic];
             row.removeChild(dcell);
         }                       // delete all but the first cell of the row
     }                           // hide the row 
@@ -1485,9 +1508,9 @@ function editChild(ev)
         ev                  = window.event;
     ev.stopPropagation();
 
-    var msg                 = 'args={';
-    var initIdir            = 0;
-    var lang                = 'en';
+    let msg                 = 'args={';
+    let initIdir            = 0;
+    let lang                = 'en';
     for (attr in args)
     {                       // loop through attributes
         msg                 += attr + "='" + args[attr] + "',";
@@ -1504,21 +1527,21 @@ function editChild(ev)
         }                   // switch on attribute name
     }
 
-    var button              = this;
-    var form                = button.form;
-    var rownum              = button.id.substr(EDIT_CHILD_PREFIX_LEN);
-    var cell                = button.parentNode;
-    var row                 = cell.parentNode;
-    var rowid               = row.id;
-    var script              = 'editIndivid.php?rowid=' + rowid;
-    var idmr                = form.idmr.value - 0;
-    var cIdir               = form.elements['CIdir' + rownum];
+    let button              = this;
+    let form                = button.form;
+    let rownum              = button.id.substr(EDIT_CHILD_PREFIX_LEN);
+    let cell                = button.parentNode;
+    let row                 = cell.parentNode;
+    let rowid               = row.id;
+    let script              = 'editIndivid.php?rowid=' + rowid;
+    let idmr                = form.idmr.value - 0;
+    let cIdir               = form.elements['CIdir' + rownum];
     if (cIdir)
         script              += "&idir=" + cIdir.value;
     if (initIdir && initIdir == cIdir.value)
     {               // edit dialog for this child already open
         // ask user to confirm delete
-        var parms           = {
+        let parms           = {
                 'givenname' : form.elements['CGiven' + rownum].value,
                 'surname'   : form.elements['CSurname' + rownum].value,
                 'idir'      : cIdir,
@@ -1529,8 +1552,8 @@ function editChild(ev)
                       null);            // just close on any button
         return;
     }               // edit dialog for this child already open
-    var cIdcr               = form.elements['CIdcr' + rownum];
-    var idcr                = 0;
+    let cIdcr               = form.elements['CIdcr' + rownum];
+    let idcr                = 0;
     if (cIdcr)
     {
         idcr                = cIdcr.value - 0;
@@ -1540,10 +1563,10 @@ function editChild(ev)
     }
  
     // pass the values of the fields in this row to the edit form
-    var cGiven              = form.elements['CGiven' + rownum];
-    var cSurname            = form.elements['CSurname' + rownum];
-    var cBirth              = form.elements['Cbirth' + rownum];
-    var cDeath              = form.elements['Cdeath' + rownum];
+    let cGiven              = form.elements['CGiven' + rownum];
+    let cSurname            = form.elements['CSurname' + rownum];
+    let cBirth              = form.elements['Cbirth' + rownum];
+    let cDeath              = form.elements['Cdeath' + rownum];
     if (cGiven)
     {           // child given name present in row
         script              += '&initGivenName=' + 
@@ -1553,11 +1576,11 @@ function editChild(ev)
     }           // child given name present in row
     else
     {           // logic error
-        var msg             = "";
-        var comma           = "";
-        for(var ie=0; ie < form.elements.length; ie++)
+        let msg             = "";
+        let comma           = "";
+        for(let ie=0; ie < form.elements.length; ie++)
         {
-            var element     = form.elements[ie];
+            let element     = form.elements[ie];
             msg             += comma + element.name + "='" + 
                                 element.value + "'";
             comma           = ",";
@@ -1582,13 +1605,13 @@ function editChild(ev)
     script                  += '&lang=' + lang;
 
     // disable all of the edit family member buttons
-    for (var ib = 0; ib < editChildButtons.length; ib++)
+    for (let ib = 0; ib < editChildButtons.length; ib++)
     {           // disable all editChild buttons
         editChildButtons[ib].disabled   = true;
     }           // disable all editChild buttons
 
     // open a dialog window to edit the child
-    var childWindow = openFrame("childFrame",
+    let childWindow = openFrame("childFrame",
                                 script,
                                 "left");
     childWindows.push(childWindow);
@@ -1606,9 +1629,9 @@ function editChild(ev)
  ************************************************************************/
 function addNewChild()
 {
-    var form                = this.form;
-    var childTable          = document.getElementById('children');
-    var parms               = {
+    let form                = this.form;
+    let childTable          = document.getElementById('children');
+    let parms               = {
                                 'idir'          : 0,
                                 'givenname'     : '',
                                 'surname'       : '',
@@ -1619,13 +1642,13 @@ function addNewChild()
                                 'gender'        : 'unknown'};
     parms.surname           = form.HusbSurname.value;
 
-    var row                 = childTable.addChildToPage(parms,
+    let row                 = childTable.addChildToPage(parms,
                                                         false);
 
     if (row.id)
     {
-        var rownum          = row.id.substring(CHILD_PREFIX_LEN);
-        var givenName       = form.elements['CGiven' + rownum];
+        let rownum          = row.id.substring(CHILD_PREFIX_LEN);
+        let givenName       = form.elements['CGiven' + rownum];
         givenName.onchange  = givenChanged;
         givenName.focus();      // move the cursor to the new name
     }
@@ -1644,56 +1667,77 @@ function addNewChild()
  *  Input:                                                              *
  *      this    instance of <input id="CGiven...">                      *
  ************************************************************************/
-var givenElt        = null;
+let givenElt        = null;
 function givenChanged()
 {
     givenElt        = this;
-    var givenName   = this.value.toLowerCase();
-    var options             = {};
+    let givenName   = this.value.toLowerCase();
+    let options             = {};
     options.errorHandler    = function() {alert('script getRecordJSON.php not found')};
-    var url         = '/getRecordJSON.php?table=Nicknames&id=' + givenName.replace(/\s+/g, ',');
+    let url         = '/getRecordJSON.php?table=Nicknames&id=' + givenName.replace(/\s+/g, ',');
     HTTP.get(url,
              gotNickname,
              options);
 }   // function givenChanged
 
+/************************************************************************
+ *  function gotNickname                                                *
+ *                                                                      *
+ *  This method is called when the user modifies the value of the       *
+ *  given name of a child.  It adjusts the default gender based         *
+ *  upon the name.                                                      *
+ *                                                                      *
+ *  Input:                                                              *
+ *      nickname        JSON object from server                         *
+ ************************************************************************/
 function gotNickname(nickname)
 {
-    var form        = givenElt.form;
-    var rownum      = givenElt.name.substring(6);
-    var surnameElt  = form.elements['CSurname' + rownum];
-    var genderElt   = form.elements['CGender' + rownum];
+    let form                        = givenElt.form;
+    let rownum                      = givenElt.name.substring(6);
+    let surnameElt                  = form.elements['CSurname' + rownum];
+    let genderElt                   = form.elements['CGender' + rownum];
 
     if (!('gender' in nickname))
     {                       // array of responses
-        console.log("gotNickname called with " + JSON.stringify(nickname));
-        var nicknames   = nickname;
-        for(var name in nicknames)
+        let nicknames               = nickname;
+        for(let name in nicknames)
         {                   // loop through responses
-            nickname   = nicknames[name];
-            console.log ("name=" + name + ", object=" + JSON.stringify(nickname));
-            if ('gender' in nickname)
+            nickname                = nicknames[name];
+            if ('gender' in nickname && nickname.gender !== null)
                 break;
         }                   // loop through responses
     }                       // array of responses
 
-    if (nickname.gender == 'F')
-    {
+    // at this point nickname is either the first entry with
+    // a gender value or the only or last entry
+    let gender                      = nickname.gender;
+    let given                       = nickname.nickname;
+    if (gender == 'F')
+    {                           // gender female
         givenElt.className          = 'female'
         if (surnameElt)
             surnameElt.className    = 'female';
         if (genderElt)
             genderElt.value         = 1;
-    }
+    }                           // gender female
     else
-    if (nickname.gender == 'M')
-    {
+    if (gender == 'M')
+    {                           // gender male
         givenElt.className          = 'male'
         if (surnameElt)
             surnameElt.className    = 'male';
         if (genderElt)
             genderElt.value         = 0;
-    }
+    }                           // gender male
+    else
+    {                           // gender unresolved
+        if (given.substring(given.length - 1) == 'a')
+        givenElt.className          = 'female'
+        if (surnameElt)
+            surnameElt.className    = 'female';
+        if (genderElt)
+            genderElt.value         = 1;
+    }                           // gender unresolved
 
     // fold according to case rules and expand abbreviations
     changeElt(givenElt);
@@ -1714,8 +1758,8 @@ function gotNickname(nickname)
  ************************************************************************/
 function changeHusbSurname()
 {
-    var form        = this.form;
-    var surname     = this.value;
+    let form        = this.form;
+    let surname     = this.value;
     if (form.HusbMarrSurname)
         form.HusbMarrSurname.value  = surname;
     if (form.WifeMarrSurname &&
@@ -1742,9 +1786,9 @@ function changeHusbSurname()
  ************************************************************************/
 function changeCBirth()
 {
-    var form        = this.form;
-    var rowid       = this.name.substring(6);
-    var birthd      = this.value;
+    let form        = this.form;
+    let rowid       = this.name.substring(6);
+    let birthd      = this.value;
 
     // ensure that there is a space between a letter and a digit
     // or a digit and a letter
@@ -1752,10 +1796,10 @@ function changeCBirth()
     birthd          = birthd.replace(/(\d)([a-zA-Z])/g,"$1 $2");
     this.value      = birthd;
 
-    var y           = 0;
+    let y           = 0;
 
-    var datePattern = /\d{4}/;
-    var pieces      = datePattern.exec(birthd);
+    let datePattern = /\d{4}/;
+    let pieces      = datePattern.exec(birthd);
     if (pieces !== null)
     {
         y       = parseInt(pieces[0]);
@@ -1779,9 +1823,9 @@ function changeCBirth()
  ************************************************************************/
 function changeCDeath()
 {
-    var form        = this.form;
-    var rowid       = this.name.substring(6);
-    var deathd      = this.value;
+    let form        = this.form;
+    let rowid       = this.name.substring(6);
+    let deathd      = this.value;
 
     // ensure that there is a space between a letter and a digit
     // or a digit and a letter
@@ -1806,8 +1850,8 @@ function changeCDeath()
  *  Input:                                                              *
  *      this    <button id='update'> element                            *
  ************************************************************************/
-var updateMarriageParms         = "";
-var updatingMarriage            = false;
+let updateMarriageParms         = "";
+let updatingMarriage            = false;
 
 function updateMarr()
 {
@@ -1820,12 +1864,12 @@ function updateMarr()
 
     // do not submit the update if there are open child edit windows
     // count the number of open child edit windows
-    var numOpenChildWindows     = 0;
-    var childWindowNames        = "";
-    var comma                   = "";
-    for(var i   = 0; i < childWindows.length; i++)
+    let numOpenChildWindows     = 0;
+    let childWindowNames        = "";
+    let comma                   = "";
+    for(let i   = 0; i < childWindows.length; i++)
     {       // loop through all edit child windows
-        var childWindow         = childWindows[i];
+        let childWindow         = childWindows[i];
         if (!(childWindow.closed))
         {
             numOpenChildWindows++;
@@ -1846,60 +1890,60 @@ function updateMarr()
     }       // at least one child window still open
 
     // request the update of the marriage record in the database
-    var form                    = this.form;
-    var parms                   = {};
-    var msg                     = "";
+    let form                    = this.form;
+    let parms                   = {};
+    let msg                     = "";
 
     // expand incomplete wife or mother's name
-    var wifeSurname             = form.WifeSurname;
-    var wifeGiven               = form.WifeGivenName;
-    var husbSurname             = form.HusbSurname;
-    var husbGiven               = form.HusbGivenName;
+    let wifeSurname             = form.WifeSurname;
+    let wifeGiven               = form.WifeGivenName;
+    let husbSurname             = form.HusbSurname;
+    let husbGiven               = form.HusbGivenName;
     if (wifeGiven.value.length > 0 && 
         wifeSurname.value.length == 0 &&
         wifeGiven.value.indexOf("Wifeof") < 0)
     {
-        var wifeSurnameStr      = "Wifeof" +
-                              husbGiven.value.toLowerCase() + 
-                              husbSurname.value.toLowerCase();
-        wifeSurnameStr          = wifeSurnameStr.replace(/\s+/g, '');
-        wifeSurname.value       = wifeSurnameStr;
+let wifeSurnameStr      = "Wifeof" +
+                      husbGiven.value.toLowerCase() + 
+                      husbSurname.value.toLowerCase();
+wifeSurnameStr          = wifeSurnameStr.replace(/\s+/g, '');
+wifeSurname.value       = wifeSurnameStr;
     }
 
     // copy selected information from the form to the parameters
-    for (var ei     = 0; ei < form.elements.length; ei++)
+    for (let ei     = 0; ei < form.elements.length; ei++)
     {       // loop through all elements in the form
-        var element             = form.elements[ei];
-        var name                = element.name;
-        if (name == 'Notes')
-        {
-            try {
-                parms[name]     = tinyMCE.get(name).getContent();
-            } catch(err)
-            {
-                parms[name]     = element.value; 
-                alert(err.message); 
-            }
-        }
-        else
-        if (name.length > 0)
-            parms[name]         = element.value;
+let element             = form.elements[ei];
+let name                = element.name;
+if (name == 'Notes')
+{
+    try {
+        parms[name]     = tinyMCE.get(name).getContent();
+    } catch(err)
+    {
+        parms[name]     = element.value; 
+        alert(err.message); 
+    }
+}
+else
+if (name.length > 0)
+    parms[name]         = element.value;
     }               // loop through all elements in the form
 
     updateMarriageParms         = "parms={";
     for(parm in parms)
     {
-        updateMarriageParms += parm + "='" + parms[parm] + "',";
+updateMarriageParms += parm + "='" + parms[parm] + "',";
     }
     if (debug.toLowerCase() == 'y')
-        alert("HTTP.post('/FamilyTree/updateMarriageXml.php', " +
-              updateMarriageParms + "}");
+alert("HTTP.post('/FamilyTree/updateMarriageJSON.php', " +
+      updateMarriageParms + "}");
 
     popupLoading(this); // display loading indicator
-    HTTP.post('/FamilyTree/updateMarriageXml.php',
-              parms,
-              gotUpdatedFamily,
-              noUpdatedFamily);
+    HTTP.post('/FamilyTree/updateMarriageJSON.php',
+      parms,
+      gotUpdatedFamily,
+      noUpdatedFamily);
 }   // function updateMarr
 
 /************************************************************************
@@ -1909,186 +1953,164 @@ function updateMarr()
  *  the updated marriage is returned.                                   *
  *                                                                      *
  *  Parameters:                                                         *
- *      xmlDoc          response from server script                     *
- *                      updateMarriageXml.php as an XML document        *
+ *      jsonDoc         response from server script                     *
+ *                      updateMarriageJSON.php as a JSON document       *
  *                      containing a LegacyMarriage record.             *
  ************************************************************************/
-function gotUpdatedFamily(xmlDoc)
+function gotUpdatedFamily(jsonDoc)
 {
-    if (xmlDoc === null)
+    if (jsonDoc === null)
     {
         hideLoading();  // hide loading indicator
-        alert("gotUpdateMarr: xmlDox is null");
+        alert("gotUpdateMarr: jsonDoc is null");
         return;
     }
-    var root                    = xmlDoc.documentElement;
-    if (debug.toLowerCase() == 'y')
-        alert("gotUpdatedFamily: root=" + new XMLSerializer().serializeToString(root));
-    var idmr                    = 0;
-    var spsIdir                 = 0;
-    var fatherid                = 0;
-    var motherid                = 0;
-    var spsSurname              = '';
-    var spsGivenname            = '';
-    var fatherSurname           = '';
-    var fatherGiven             = '';
-    var motherSurname           = '';
-    var motherGiven             = '';
-    var spsclass                = 'male';
-    var marDate                 = 'Unknown';
+
+    let authElt         = document.getElementById('UserInfoAuthorized');
+    if (authElt && authElt.innerText.toLowerCase() == 'yes')
+        console.log("gotUpdatedFamily: jsonDoc=" + JSON.stringify(jsonDoc));
+
+    let idmr                    = 0;
+    let spsIdir                 = 0;
+    let fatherid                = 0;
+    let motherid                = 0;
+    let spsSurname              = '';
+    let spsGivenname            = '';
+    let fatherSurname           = '';
+    let fatherGiven             = '';
+    let motherSurname           = '';
+    let motherGiven             = '';
+    let spsclass                = 'male';
+    let marDate                 = 'Unknown';
 
     hideLoading();      // hide loading indicator
     updatingMarriage            = false;
-    if (root)
-    {                   // XML document
-        if (root.nodeName == 'marriage')
-        {               // normal response
-            var form            = document.indForm;
-            var sex             = 0;            // 0 for male, 1 for female
-            if (form.sex)
-                sex             = form.sex.value;
-            if (sex == 0)
-                spsclass        = 'female';
-            else
-                spsclass        = 'male';
-
-            for (var i = 0; i < root.childNodes.length; i++)
-            {           // loop through top level nodes of the response
-                var node        = root.childNodes[i];
-                if (node.nodeType != 1)
-                    continue;
-                var value       = node.textContent.trim();
-                switch(node.nodeName)
-                {       // act on individual children
-                    case 'msg':
-                    {       // error message
-                        alert ("commonMarriage.js: gotUpdatedFamily: Error: " +
-                            value + ", " + updateMarriageParms);
-                        var para    = document.getElementById('MarrButtonLine');
-                        para.appendChild(document.createTextNode(
-         new XMLSerializer().serializeToString(root).replace('/</g', '&lt;').replace('/>/g', '&lt;')));
-                        return;
-                    }       // error message
-
-                    case 'idmr':
-                    {       // key of the record
-                        idmr            = value;
-                        break;
-                    }       // key of the record
-
-                    case 'parms':
-                    {       // parameter processing
-                        processParms(node);
-                        break;
-                    }       // parameter processing
-
-                }           // act on individual children
-            }               // check the children for error message text
-
-            // take appropriate action
-            var opener                  = null;
-            if (window.frameElement && window.frameElement.opener)
-                opener                  = window.frameElement.opener;
-            else
-                opener                  = window.opener;
-
-            if (pendingButton)
-            {               // another action to perform
-                form                    = pendingButton.form;
-                form.idmr.value         = idmr;
-                var tmp                 = pendingButton;
-                pendingButton           = null;
-                tmp.click();
-            }               // another action to perform
-            else
-            if (opener)
-            {               // notify the opener (editIndivid.php)
-                if (opener.document.indForm)
-                {
-                    try {
-                        var section = document.getElementById('marriageListBody');
-                        var numFamilies = section.rows.length;
-                        if ('new' in args && args['new'].toLowerCase() == 'y')
-                            numFamilies++;
-                        else
-                        if (numFamilies == 0)
-                            numFamilies = 1;    // adding first family
-                        opener.document.indForm.marriageUpdated(idmr,
-                                            numFamilies);
-                    } catch(e)
-                    { 
-                        alert("commonMarriage.js: 2031 e=" + e); 
-                    }
-                }
-
-                closeFrame();
-            }               // notify the opener (editIndivid.php)
-            else
-            {
-                console.log("commonMarriage.js: gotUpdatedFamily: " +
-                                "window.history.back()"); 
-                window.history.back();
-            }
-        }                   // normal response
+    if (typeof jsonDoc == 'object')
+    {                   // JSON document
+        let form                = document.indForm;
+        let sex                 = 0;            // 0 for male, 1 for female
+        if (form.sex)
+            sex                 = form.sex.value;
+        if (sex == 0)
+            spsclass            = 'female';
         else
-        {                   // unexpected root node
-            alert("commonMarriage.js: gotUpdatedFamily: Unexpected: " +
-                  new XMLSerializer().serializeToString(root) + ", " + updateMarriageParms);
-        }                   // unexpected root node
-    }                       // XML document
+            spsclass            = 'male';
+        
+        let msg                 = jsonDoc.msg;
+        let parms               = jsonDoc.parms;
+        let actions             = jsonDoc.actions;
+        let family              = jsonDoc.family;
+           
+        if (msg)
+        {       // error message
+            alert ("commonMarriage.js: gotUpdatedFamily: Error: " +
+                msg + ", " + updateMarriageParms);
+            let para        = document.getElementById('MarrButtonLine');
+            para.appendChild(document.createTextNode(
+            new JSON.stringify(jsonDoc).replace('/</g', '&lt;').replace('/>/g', '&lt;')));
+            return;
+        }       // error message
+        
+        if (idmr == 0 && family && family.idmr)
+        {       // key of the record
+            idmr                = family.idmr;
+        }       // key of the record
+        
+        if (actions)
+        {       // parameter processing
+            processActions(actions);
+        }       // parameter processing
+
+
+        // take appropriate action
+        let opener                      = null;
+        if (window.frameElement && window.frameElement.opener)
+            opener                      = window.frameElement.opener;
+        else
+            opener                      = window.opener;
+
+        if (pendingButton)
+        {                   // another action to perform
+            form                        = pendingButton.form;
+            form.idmr.value             = idmr;
+            let tmp                     = pendingButton;
+            pendingButton               = null;
+            tmp.click();
+        }                   // another action to perform
+        else
+        if (opener)
+        {                   // notify the opener (editIndivid.php)
+            if (opener.document.indForm)
+            {
+                let section         = document.getElementById('marriageListBody');
+                let numFamilies     = section.rows.length;
+                if ('new' in args && args['new'].toLowerCase() == 'y')
+                    numFamilies++;
+                else
+                if (numFamilies == 0)
+                    numFamilies     = 1;    // adding first family
+                opener.document.indForm.marriageUpdated(idmr,
+                                                        numFamilies);
+            }
+
+            closeFrame();
+        }                   // notify the opener (editIndivid.php)
+        else
+        {                   // not invoked from another page
+            console.log("commonMarriage.js: gotUpdatedFamily: " +
+                            "window.history.back()"); 
+            window.history.back();
+        }                   // not invoked from another page
+    }                       // JSON document
     else
-    {                       // not an XML document, display text
-        alert("commonMarriage.js: gotUpdatedFamily: Unexpected: " + xmlDoc +
-                             ", " + updateMarriageParms);
-    }                       // not an XML document, display text
+    {                       // not a JSON document, display text
+        alert("commonMarriage.js: gotUpdatedFamily: Unexpected: " +
+                            jsonDoc + ", " + updateMarriageParms);
+    }                       // not a JSON document, display text
 }       // function gotUpdatedFamily
 
 /************************************************************************
- *  function processParms                                               *
+ *  function processActions                                             *
  *                                                                      *
- *  This method is called to process the <parms> element from the       *
- *  XML document response from the script updateMarriageXml.php.        *
+ *  This method is called to process the actions member from the        *
+ *  JSON document response from the script updateMarriageJSON.php.      *
  *                                                                      *
  *  Parameters:                                                         *
- *      parms           XML node <parms>                                *
+ *      actions          array containing actions taken by server       *
  ************************************************************************/
-function processParms(parms)
+function processActions(actions)
 {
-    for (var i = 0; i < parms.childNodes.length; i++)
-    {                       // loop through individual parameters
-        var parm                    = parms.childNodes[i];
-        if (parm.nodeType != 1)
-            continue;
-        var value                   = parm.textContent.trim();
-        var namePattern             = /^([a-zA-Z_]+)(\d*)$/;
-        var pieces                  = namePattern.exec(parm.nodeName);
-        var name                    = parm.nodeName.toLowerCase();
-        var rowNum                  = '';
+    let idir                        = 0;
+    let idcr                        = 0;
+
+    for (const action in actions)
+    {                       // loop through individual actions
+        let actionobj               = actions[action];
+        let namePattern             = /^([a-zA-Z_]+)(\d*)$/;
+        let name                    = action.toLowerCase();
+        let rowNum                  = '';
+        let pieces                  = namePattern.exec(name);
         if (pieces)
         {                   // separate column and row
-            name                    = pieces[1].toLowerCase();
+            name                    = pieces[1];
             rowNum                  = pieces[2];
         }                   // separate column and row
 
         switch(name)
-        {                   // act on individual parm
+        {                   // act on individual object
             case 'cidir':
-            {               // original IDIR of a child
-                if (value > 0)
-                    break;  // existing child
-
-                // need to get actual IDIR, IDCR, and BirthSD of new child
-                for (var j = 0; j < parm.childNodes.length; j++)
+                // need to get actual IDIR, IDCR, and BirthSD of
+                // child updated with all of the information from
+                // the preceding parameters
+                for (const childname in actionobj)
                 {           // loop through children
-                    var child               = parm.childNodes[j];
-                    if (child.nodeType != 1)
-                        continue;
-                    var pieces              = namePattern.exec(child.nodeName);
-                    var cname               = parm.nodeName.toLowerCase();
-                    var crowNum             = '';
+                    let value               = actionobj[childname];
+                    let cname               = childname.toLowerCase();
+                    let pieces              = namePattern.exec(cname);
+                    let crowNum             = '';
                     if (pieces)
                     {       // separate column and row
-                        cname               = pieces[1].toLowerCase();
+                        cname               = pieces[1];
                         crowNum             = pieces[2];
                     }       // separate column and row
 
@@ -2096,67 +2118,57 @@ function processParms(parms)
                     {       // act on specific sub-parameter
                         case 'idir':
                         {
-                            var value       = child.textContent.trim();
-                            var fldId       = 'CIdir' + crowNum;
-                            var idirElt     = document.getElementById(fldId);
+                            let fldId       = 'CIdir' + crowNum;
+                            let idirElt     = document.getElementById(fldId);
                             if (idirElt && idirElt.value == 0)
                                 idirElt.value   = value;
-                            else
-                                alert('commonMarriage.js: processParms: ' +
-                                      'cannot find <input id="' + fldId + '">');
                             break;
                         }   // idir
 
                         case 'idcr':
                         case 'newidcr':
                         {
-                            var value       = child.textContent.trim();
-                            var fldId       = 'CIdcr' + crowNum;
-                            var idcrElt     = document.getElementById(fldId);
+                            let fldId       = 'CIdcr' + crowNum;
+                            let idcrElt     = document.getElementById(fldId);
                             if (idcrElt && idcrElt.value == 0)
                                 idcrElt.value   = value;
-                            else
-                                alert('commonMarriage.js: processParms: ' +
-                                      'cannot find <input id="' + fldId + '">');
                             break;
                         }   // idcr
 
                         case 'birthsd':
                         {
-                            var value       = child.textContent.trim();
-                            var fldId       = 'Cbirthsd' + crowNum;
-                            var birthsdElt  = document.getElementById(fldId);
+                            let fldId       = 'Cbirthsd' + crowNum;
+                            let birthsdElt  = document.getElementById(fldId);
                             if (birthsdElt)
                                 birthsdElt.value    = value;
                             else
-                                alert('commonMarriage.js: processParms: ' +
+                                alert('commonMarriage.js: processActions: ' +
                                       'cannot find <input id="' + fldId + '">');
                             break;
                         }   // birthsd
 
                     }       // act on specific sub-parameter
                 }           // loop through children
-                break;
-            }               // original IDIR of a child
+                break;      // first update to child
 
             case 'cidcr':
-            {               // IDCR of a child
-                break;
-            }               // IDCR of a child
+                idcr                = child;
+                break;      // IDCR of a child
+
 
         }                   // act on individual parm
     }                       // loop through individual parameters
-}       // function processParms
+}       // function processActions
 
 /************************************************************************
  *  function noUpdatedFamily                                            *
  *                                                                      *
  *  This method is called if the server does not return                 *
- *  an XML document response from the script updateMarriageXml.php.     *
+ *  a JSON document response from the script updateMarriageJSON.php.    *
  ************************************************************************/
 function noUpdatedFamily()
 {
-    alert("commonMarriage.js: noUpdatedFamily: script updateMarriageXml.php not found on server");
+    alert("commonMarriage.js: noUpdatedFamily: script updateMarriageJSON.php not found on server");
 }       // function noUpdatedFamily
 
 /************************************************************************
@@ -2172,14 +2184,14 @@ function noUpdatedFamily()
  ************************************************************************/
 function orderChildren()
 {
-    var children            = document.getElementById('children');
-    var body                = children.tBodies[0];
-    var bodyRows            = Array();
-    for (var i = 0; i < body.rows.length; i++)
+    let children            = document.getElementById('children');
+    let body                = children.tBodies[0];
+    let bodyRows            = Array();
+    for (let i = 0; i < body.rows.length; i++)
     {
-        var row             = body.rows[i];
-        var rowId           = row.id.substring(5);
-        var idirElt         = document.getElementById('CIdir' + rowId);
+        let row             = body.rows[i];
+        let rowId           = row.id.substring(5);
+        let idirElt         = document.getElementById('CIdir' + rowId);
         if (typeof(idirElt) != 'undefined' && idirElt.value == 0)
         {       // child is not yet in database
             pendingButton   = this;
@@ -2191,7 +2203,7 @@ function orderChildren()
     bodyRows.sort(childOrder);
     while (body.hasChildNodes())
         body.removeChild(body.firstChild);
-    for (var ri = 0; ri < bodyRows.length; ri++)
+    for (let ri = 0; ri < bodyRows.length; ri++)
         body.appendChild(bodyRows[ri]);
 }   // function orderChildren
 
@@ -2214,22 +2226,22 @@ function orderChildren()
 
 function childOrder(first, second)
 {
-    var e1, e2;
-    var sd1, sd2;
-    var firstElements   = first.getElementsByTagName("input");
+    let e1, e2;
+    let sd1, sd2;
+    let firstElements   = first.getElementsByTagName("input");
     for(e1 = 0; e1 < firstElements.length; e1++)
     {
-        var e1Name  = firstElements[e1].name.substring(0,8);
+        let e1Name  = firstElements[e1].name.substring(0,8);
         if (e1Name == 'Cbirthsd')
         {
             sd1     = firstElements[e1].value;
             break;
         }
     }       // loop through input elements
-    var secondElements  = second.getElementsByTagName("input");
+    let secondElements  = second.getElementsByTagName("input");
     for(e2 = 0; e2 < secondElements.length; e2++)
     {
-        var e2Name  = secondElements[e2].name.substring(0,8);
+        let e2Name  = secondElements[e2].name.substring(0,8);
         if (e2Name == 'Cbirthsd')
         {
             sd2     = secondElements[e2].value;
@@ -2257,9 +2269,9 @@ function childOrder(first, second)
 function editEvent(ev)
 {
     let form            = this.form;
-    var matches         = this.id.match(/\d*$/);
-    var rownum          = matches[0];
-    var iderElt         = form.elements['ider' + rownum];
+    let matches         = this.id.match(/\d*$/);
+    let rownum          = matches[0];
+    let iderElt         = form.elements['ider' + rownum];
     if (iderElt)
     {
         let ider        = iderElt.value;
@@ -2306,18 +2318,18 @@ function editIEvent(ev)
         ev              = window.event;
     ev.stopPropagation();
 
-    var form            = this.form;
-    var ider            = 0;
-    var rownum          = this.id.substring(10);
-    var citTypeId       = 'CitType' + rownum;
-    var citTypeElt      = document.getElementById(citTypeId);
+    let form            = this.form;
+    let ider            = 0;
+    let rownum          = this.id.substring(10);
+    let citTypeId       = 'CitType' + rownum;
+    let citTypeElt      = document.getElementById(citTypeId);
     if (citTypeElt)
         citType         = citTypeElt.value;
     else
         citType         = rownum;
     if (citType == 31)
     {
-        var iderElt     = document.getElementById('IDER' + rownum)
+        let iderElt     = document.getElementById('IDER' + rownum)
         ider            = iderElt.value;
     }
 
@@ -2342,7 +2354,7 @@ function editIEvent(ev)
     else
     if (idmr && idmr > 0)
     {               // existing family
-        var url         = 'editEvent.php?idmr=' + idmr +
+        let url         = 'editEvent.php?idmr=' + idmr +
                                 '&type=' + citType;
         let MarD        = document.getElementById('MarD' + rownum);
         let MarLoc      = document.getElementById('MarLoc' + rownum);
@@ -2351,7 +2363,7 @@ function editIEvent(ev)
                            encodeURIComponent(MarD.value) +
                            "&location=" +
                            encodeURIComponent(MarLoc.value);
-        var eventWindow = openFrame("openLeft",
+        let eventWindow = openFrame("openLeft",
                                 url,
                                 "left");
     }               // existing family
@@ -2382,12 +2394,12 @@ function delEvent(ev)
         ev          = window.event;
     ev.stopPropagation();
 
-    var form        = this.form;
-    var matches     = this.id.match(/\d*$/);
-    var rownum      = matches[0];
-    var iderElt     = form.elements['ider' + rownum];
-    var ider        = iderElt.value;
-    var parms       = {"type"       : '31',
+    let form        = this.form;
+    let matches     = this.id.match(/\d*$/);
+    let rownum      = matches[0];
+    let iderElt     = form.elements['ider' + rownum];
+    let ider        = iderElt.value;
+    let parms       = {"type"       : '31',
                        "formname"   : form.name, 
                        "template"   : "",
                        "ider"       : ider,
@@ -2414,15 +2426,15 @@ function delEvent(ev)
 function confirmEventDel()
 {
     // get the parameter values hidden in the dialog
-    var form        = this.form;
-    var rownum      = this.id.substr(12);
-    var ider        = form.ider.value;
+    let form        = this.form;
+    let rownum      = this.id.substr(12);
+    let ider        = form.ider.value;
     dialogDiv.style.display = 'none';
 
 
     if (form)
     {       // have the form
-        var parms   = {"idime"      : ider,
+        let parms   = {"idime"      : ider,
                        "cittype"    : 31};
 
         // invoke script to update Event and return XML result
@@ -2456,23 +2468,23 @@ function delIEvent(ev)
         ev              = window.event;
     ev.stopPropagation();
 
-    var form            = this.form;
-    var ider            = 0;
-    var rownum          = this.id.substring(9);
-    var citTypeId       = 'CitType' + rownum;
-    var citTypeElt      = document.getElementById(citTypeId);
+    let form            = this.form;
+    let ider            = 0;
+    let rownum          = this.id.substring(9);
+    let citTypeId       = 'CitType' + rownum;
+    let citTypeElt      = document.getElementById(citTypeId);
     if (citTypeElt)
         citType         = citTypeElt.value;
     else
         citType         = rownum;
     if (citType == '31')
     {
-        var iderElt     = document.getElementById('IDER' + rownum)
+        let iderElt     = document.getElementById('IDER' + rownum)
         ider            = iderElt.value;
     }
 
     let idmr            = form.idmr.value;
-    var parms       = {"type"       : citType,
+    let parms       = {"type"       : citType,
                        "formname"   : form.name, 
                        "template"   : "",
                        "ider"       : ider,
@@ -2500,17 +2512,16 @@ function delIEvent(ev)
 function confirmDelIEvent()
 {
     // get the parameter values hidden in the dialog
-    var form        = this.form;
-    var citType     = this.id.substr(12);
-    var ider        = form.ider.value;
-    var formname    = form.elements['formname' + citType].value;
-    var form        = document.forms[formname];
+    let form        = this.form;
+    let citType     = this.id.substr(12);
+    let ider        = form.ider.value;
+    let formname    = form.elements['formname' + citType].value;
 
     dialogDiv.style.display = 'none';
 
     if (form)
     {       // have the form
-        var parms   = { "idime"     : form.idmr.value,
+        let parms   = { "idime"     : form.idmr.value,
                         "cittype"   : citType};
         if (ider > 0)
             parms   = { "idime"     : ider,
@@ -2541,15 +2552,15 @@ function gotDelEvent(xmlDoc)
     hideLoading();  // hide loading indicator
     if (xmlDoc.documentElement)
     {       // XML document
-        var root    = xmlDoc.documentElement;
+        let root    = xmlDoc.documentElement;
         if (root.tagName == 'deleted')
         {       // correctly formatted response
-            var msgs    = root.getElementsByTagName('msg');
+            let msgs    = root.getElementsByTagName('msg');
             if (msgs.length == 0)
             {       // no errors detected
                 redisplayFamily();
                 // notify the opener (editIndivid.php) of the updated marriage
-                var opener  = null;
+                let opener  = null;
                 if (window.frameElement && window.frameElement.opener)
                     opener  = window.frameElement.opener;
                 else
@@ -2557,9 +2568,9 @@ function gotDelEvent(xmlDoc)
                 if (opener && opener.document.indForm)
                 {
                     try {
-                        var section         = 
+                        let section         = 
                             document.getElementById('marriageListBody');
-                        var numFamilies     = section.rows.length;
+                        let numFamilies     = section.rows.length;
                         opener.document.indForm.marriageUpdated(0,
                                         numFamilies);
                     } catch(e)
@@ -2706,15 +2717,15 @@ function orderEvents()
  ************************************************************************/
 function editPictures()
 {
-    var form    = this.form;
+    let form    = this.form;
 
     if (form)
     {
-        var idmr    = form.idmr.value;
+        let idmr    = form.idmr.value;
         if (idmr && idmr > 0)
         {
-            var url = "editPictures.php?idir=" + idmr + "&idtype=Mar"; 
-            var childWindow = openFrame("picturesLeft",
+            let url = "editPictures.php?idir=" + idmr + "&idtype=Mar"; 
+            let childWindow = openFrame("picturesLeft",
                                     url,
                                     "left");
         }           // existing family
@@ -2741,12 +2752,12 @@ function changeNameRule()
 {
     if (this.selectedIndex >= 0)
     {       // user has selected a rule
-        var option      = this.options[this.selectedIndex];
-        var form        = this.form;
-        var husbMarrSurname = form.HusbMarrSurname;
-        var wifeMarrSurname = form.WifeMarrSurname;
-        var husbSurname = form.HusbSurname.value;
-        var wifeSurname = form.WifeSurname.value;
+        let option      = this.options[this.selectedIndex];
+        let form        = this.form;
+        let husbMarrSurname = form.HusbMarrSurname;
+        let wifeMarrSurname = form.WifeMarrSurname;
+        let husbSurname = form.HusbSurname.value;
+        let wifeSurname = form.WifeSurname.value;
 
         if (option.value == 0)
         {   // display explicit married surname fields
@@ -2794,11 +2805,11 @@ function gotAddChild(xmlDoc)
     // get information from XML document
     if (xmlDoc.documentElement)
     {       // XML document
-        var root    = xmlDoc.documentElement;
+        let root    = xmlDoc.documentElement;
         if (root.tagName == 'child')
         {       // correctly formatted response
-            var parms       = getParmsFromXml(root);
-            var childTable  = document.getElementById('children');
+            let parms       = getParmsFromXml(root);
+            let childTable  = document.getElementById('children');
             childTable.addChildToPage(parms);
         }       // correctly formatted response
     }       // XML document
@@ -2846,7 +2857,7 @@ function addChildToPage(parms,
                         updateDb,
                         debug)
 {
-    var msg             = "";   // trace message
+    let msg             = "";   // trace message
     for(parm in parms) { msg += parm + "='" + parms[parm] + "',"; }
     if (parms.givenname === undefined)
         throw "commonMarriage.js: addChildToPage: parms=" + msg;
@@ -2854,8 +2865,8 @@ function addChildToPage(parms,
         parms.idcr      = '';
     
     // add information about the  child as a visible row in the web page. 
-    var table           = this;
-    var famForm         = document.famForm;
+    let table           = this;
+    let famForm         = document.famForm;
 
     // ensure that No Children checkbox is cleared and disabled
     // so the user cannot accidentally set it
@@ -2866,14 +2877,14 @@ function addChildToPage(parms,
     }
 
     // get the IDMR value for the current family
-    var idmr            = famForm.idmr.value;
+    let idmr            = famForm.idmr.value;
 
     // get the body of the table of children
-    var tableBody       = table.tBodies[0];
+    let tableBody       = table.tBodies[0];
     
     // insert new row of information into the web page 
     // at the end of the body section of the table
-    var rownum          = tableBody.rows.length + 1;
+    let rownum          = tableBody.rows.length + 1;
     parms.rownum        = rownum;
     if (parms.gender == 'male')
         parms.sex       = 0;
@@ -2882,7 +2893,7 @@ function addChildToPage(parms,
         parms.sex       = 1;
     else
         parms.sex       = 2;
-    var row     = createFromTemplate('child$rownum',
+    let row     = createFromTemplate('child$rownum',
                                      parms,
                                      null,
                                      debug);
@@ -2892,12 +2903,12 @@ function addChildToPage(parms,
     if (parms.idcr)
         row.idcr        = parms.idcr;
     row.changePerson    = changeChild;      // feedback method
-    var inputElements   = row.getElementsByTagName("*");
-    for(var ei = 0; ei < inputElements.length; ei++)
+    let inputElements   = row.getElementsByTagName("*");
+    for(let ei = 0; ei < inputElements.length; ei++)
     {
-        var element     = inputElements[ei];
-        var nodeName    = element.nodeName.toLowerCase();
-        var name;
+        let element     = inputElements[ei];
+        let nodeName    = element.nodeName.toLowerCase();
+        let name;
         if (element.name && element.name.length > 0)
             name        = element.name;
         else
@@ -2905,9 +2916,9 @@ function addChildToPage(parms,
         if (nodeName != 'input' && nodeName != 'button')
             continue;
 
-        var rowNum      = '';
-        var namePattern = /^([a-zA-Z_]+)(\d+)$/;
-        var pieces      = namePattern.exec(name);
+        let rowNum      = '';
+        let namePattern = /^([a-zA-Z_]+)(\d+)$/;
+        let pieces      = namePattern.exec(name);
         if (pieces)
         {       // separate column and row
             name        = pieces[1];
@@ -3005,13 +3016,13 @@ function addChildToPage(parms,
  ************************************************************************/
 function editEventMar(type, button)
 {
-    var form                = document.famForm;
+    let form                = document.famForm;
     if (form)
     {
-        var idmr            = form.idmr.value;
+        let idmr            = form.idmr.value;
         if (idmr && idmr > 0)
         {           // existing family
-            var url         = "editEvent.php?idmr=" + idmr +
+            let url         = "editEvent.php?idmr=" + idmr +
                                             "&type=" + type;
 
             switch(type)
@@ -3025,7 +3036,7 @@ function editEventMar(type, button)
 
             }       // add parameters dependent upon type
 
-            var childWindow = openFrame("eventLeft",
+            let childWindow = openFrame("eventLeft",
                                         url, 
                                         "left");
         }           // existing family
@@ -3054,9 +3065,9 @@ function childKeyDown(e)
     {                           // browser is not W3C compliant
         e   =  window.event;    // IE
     }                           // browser is not W3C compliant
-    var key         = e.key;
-    var element     = e.target;
-    var form        = element.form;
+    let key         = e.key;
+    let element     = e.target;
+    let form        = element.form;
 
     // hide the help balloon on any keystroke
     if (helpDiv)
@@ -3080,19 +3091,19 @@ function childKeyDown(e)
         {                       // enter key
             if (element)
             {
-                var cell            = element.parentNode;
-                var row             = cell.parentNode;
-                var body            = row.parentNode;
-                var rownum          = row.sectionRowIndex;
+                let cell            = element.parentNode;
+                let row             = cell.parentNode;
+                let body            = row.parentNode;
+                let rownum          = row.sectionRowIndex;
                 if (rownum < (body.rows.length - 1))
                 {               // not the last row
                     rownum++;
                     row             = body.rows[rownum];
                     cell            = row.cells[0];
-                    var children= cell.children;
-                    for(var ic = 0; ic < children.length; ic++)
+                    let children= cell.children;
+                    for(let ic = 0; ic < children.length; ic++)
                     {           // loop through children of cell
-                        var child   = children[ic];
+                        let child   = children[ic];
                         if (child.nodeName.toLowerCase() == 'input' &&
                             child.type == 'text')
                         {       // first <input type='text'>
@@ -3113,19 +3124,19 @@ function childKeyDown(e)
         {                       // arrow up key
             if (element)
             {
-                var cell    = element.parentNode;
-                var row = cell.parentNode;
-                var body    = row.parentNode;
-                var rownum  = row.sectionRowIndex;
+                let cell    = element.parentNode;
+                let row = cell.parentNode;
+                let body    = row.parentNode;
+                let rownum  = row.sectionRowIndex;
                 if (rownum > 0)
                 {               // not the first row
                     rownum--;
                     row     = body.rows[rownum];
                     cell    = row.cells[cell.cellIndex];
-                    var children= cell.children;
-                    for(var ic = 0; ic < children.length; ic++)
+                    let children= cell.children;
+                    for(let ic = 0; ic < children.length; ic++)
                     {           // loop through children of cell
-                        var child   = children[ic];
+                        let child   = children[ic];
                         if (child.nodeName.toLowerCase() == 'input' &&
                             child.type == 'text')
                         {       // first <input type='text'>
@@ -3144,19 +3155,19 @@ function childKeyDown(e)
         {                       // arrow down key
             if (element)
             {
-                var cell    = element.parentNode;
-                var row = cell.parentNode;
-                var body    = row.parentNode;
-                var rownum  = row.sectionRowIndex;
+                let cell    = element.parentNode;
+                let row = cell.parentNode;
+                let body    = row.parentNode;
+                let rownum  = row.sectionRowIndex;
                 if (rownum < (body.rows.length - 1))
                 {               // not the last row
                     rownum++;
                     row     = body.rows[rownum];
                     cell    = row.cells[cell.cellIndex];
-                    var children= cell.children;
-                    for(var ic = 0; ic < children.length; ic++)
+                    let children= cell.children;
+                    for(let ic = 0; ic < children.length; ic++)
                     {           // loop through children of cell
-                        var child   = children[ic];
+                        let child   = children[ic];
                         if (child.nodeName.toLowerCase() == 'input' &&
                             child.type == 'text')
                         {       // first <input type='text'>

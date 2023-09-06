@@ -138,9 +138,10 @@ use \Genealogy\RecordSet;
  *                  functions                                           *
  *      2020/05/03  fix interaction of set with third parameter         *
  *      2020/11/16  add list of includes to warning messages            *
- *      2921/12/28  handle failure of get_file_contents                 *
+ *      2021/12/28  handle failure of get_file_contents                 *
+ *      2022/06/11  correct handling of short comments                  *
  *                                                                      *
- *  Copyright &copy; 2021 James A. Cobban All Rights Reserved           *
+ *  Copyright &copy; 2022 James A. Cobban All Rights Reserved           *
  ************************************************************************/
 require_once __NAMESPACE__ . '/TemplateTag.inc' ;
 
@@ -436,11 +437,20 @@ class Template implements ArrayAccess
      *  field in the template.                                          *
      *                                                                  *
      *  INPUT:                                                          *
-     *      $field  name to match in the template                       *
+     *      $field      substitution name to match in the template      *
+     *                  Note that this does not include the preceding   *
+     *                  '$' sign or the enclosing curly brackets.       *
+     *                                                                  *
+     *  Returns:                                                        *
+     *      String value if specified substitution marker value is set  *
+     *      otherwise returns null.                                     *
      ********************************************************************/
     public function get($field)
     {
-        return $this->fields[$field];
+        if (array_key_exists($field, $this->fields))
+            return $this->fields[$field];
+        else
+            return null;
     }       // method Template::get
 
     /********************************************************************
@@ -546,6 +556,11 @@ class Template implements ArrayAccess
         }
     }       // method Template::setFields
 
+    public function getFields()
+    {
+        return $this->fields;
+    }
+
     /********************************************************************
      *  function Template::includeSub                                   *
      *                                                                  *
@@ -616,7 +631,11 @@ class Template implements ArrayAccess
         {           // invalid parameter
             error_log(__FILE__ . " " . __LINE__ .
                         " unable to open \$filename = '$filename'" .
+                        " for submarker=$submarker " .
                         " for template='" . $this->main . "'\n");
+            ob_start();
+            debug_print_backtrace();
+            error_log(ob_get_clean());
             $this->set($submarker, "<p class='message'>" .
                         __FILE__ . " " . __LINE__ .
                         " unable to open \$filename = '$filename'" .
@@ -1189,10 +1208,7 @@ class Template implements ArrayAccess
         global  $warn;
         if (substr($this->main, 0, 4) == 'http')
             return;         // do not report errors in external pages
-        if (true || $this->userCanDebug)
-            $warn   .= "<p>$message</p>\n";
-        else
-            error_log("$message\n");
+        error_log("$message");
     }       // protected function log
 
     /********************************************************************
@@ -1221,15 +1237,17 @@ class Template implements ArrayAccess
 
         $peek                   = count($this->tagStack) - 1;
         $topTag                 = $this->tagStack[$peek];
+        $t  = htmlspecialchars(substr($tagText, 0, 25));
+        //print "<p>1234 $t tagStack=" . $topTag->tagName . "</p>\n";flush();
         if ($tagName == $topTag->tagName &&
             $tag->contents == 'default')
         {       // duplicate start tag
             $this->log("Template::startTag: " . __LINE__ .
-                " &lt;$tagName&gt; encountered when a tag of the same type was open," . $this->diagPosition($tag));
+                " <$tagName> encountered when a tag of the same type was open," . $this->diagPosition($tag));
             $topTag                 = array_pop($this->tagStack);
             if ($this->test)
                 $this->log("Template::startTag: " . __LINE__ .
-                                " close open &lt;{$topTag->tagName}&gt;");
+                                " close open <{$topTag->tagName}>");
             $topTag->etagLength     = 0;
             $topTag->tagLength      = $this->cursor - $topTag->start;
             if ($this->test)
@@ -1265,8 +1283,8 @@ class Template implements ArrayAccess
                                          $remainder);
             $this->log("Template::startTag: " . __LINE__ .
                            ' missing closing tag for "' .
-                            htmlspecialchars($topTagStart) .
-                            "\" before \"" . htmlspecialchars($tagStart) .
+                            $topTagStart .
+                            "\" before \"" . $tagStart .
                             "\" template={$this->main}");
             $topTag->addChild($tag);
             if ($this->test)
@@ -1322,7 +1340,11 @@ class Template implements ArrayAccess
      *                                                                  *
      *  Input:                                                          *
      *      $tagName    string containing name of tag being closed      *
-     *      $tagText    string containing opening tag                   *
+     *      $tagText    string containing closing tag                   *
+     *                                                                  *
+     *  Notes:                                                          *
+     *      $this->start    points to the beginning of the start tag    *
+     *      $this->cursor   points to the start of the end tag          *
      ********************************************************************/
     private function closeTag($tagName, $tagText)
     {
@@ -1330,7 +1352,9 @@ class Template implements ArrayAccess
 
         if ($this->test)
             $this->log("Template::closeTag: " . __LINE__ .
-                        " '$tagName' '" . htmlspecialchars($tagText) . "' cursor={$this->cursor}");
+                        " '$tagName' '" .
+                        htmlspecialchars($tagText) . 
+                        "' cursor={$this->cursor}");
 
         if ($tagName == 'template')
             $this->inTemplate       = false;
@@ -1354,14 +1378,13 @@ class Template implements ArrayAccess
                 $length         = $this->cursor - $tag->start;
                 if ($length > 100)
                     $length     = 100;
-                $contents       = htmlspecialchars(substr($this->page, $tag->start, $length));
+                $contents       = substr($this->page, $tag->start, $length);
                 if (substr($this->main, 0, 7) != 'string ')
                 {
-                    $this->log("Template::closeTag: " . __LINE__ .
-                                    " stray end tag " .
-                                    str_replace('<','&lt',$tagText) .
-                                    " doesn't match $contents" .
-                                    $this->diagPosition($tag));
+//                    $context    = substr($this->page, $this->cursor, 30);
+//                    error_log("Template::closeTag: " . __LINE__ .
+//                                    " stray end tag $context doesn't match $contents" .
+//                                    $this->diagPosition($tag));
                 }
                 $peek                   = count($this->tagStack) - 1;
                 if ($peek >= 0)
@@ -1371,7 +1394,7 @@ class Template implements ArrayAccess
                     {
                         if ($this->test)
                             $this->log("Template::closeTag: " . __LINE__ .
-                                    " close open &lt;{$tag->tagName}&gt;");
+                                    " close open <{$tag->tagName}>");
                         $tag                = array_pop($this->tagStack);
                     }
                     else
@@ -1391,14 +1414,14 @@ class Template implements ArrayAccess
                                     $closeTag       = $this->tagStack[$ij];
                                     if ($this->test)
                                         $this->log("Template::closeTag: " . __LINE__ .
-                                        " close open &lt;{$closeTag->tagName}&gt;");
+                                        " close open <{$closeTag->tagName}>");
                                     $closeTag->etagLength   = 0;
                                     $closeTag->length       = $this->cursor - $closeTag->start;
                                     array_pop($this->tagStack);
                                 }
                                 if ($this->test)
                                     $this->log("Template::closeTag: " . __LINE__ .
-                                    " close open &lt;{$stack->tagName}&gt;");
+                                    " close open <{$stack->tagName}>");
                                 $stack->etagLength  = strlen($tagText);
                                 $stack->length      = $this->cursor +
                                     $stack->etagLength - $stack->start;
@@ -1412,7 +1435,7 @@ class Template implements ArrayAccess
                 {               // top of stack is a block style tag
                     if ($this->test)
                         $this->log("Template::closeTag: " . __LINE__ .
-                                " close open &lt;{$tag->tagName}&gt;");
+                                " close open <{$tag->tagName}>");
                     $tag->etagLength        = 0;
                     $tag->length            = $this->cursor - $tag->start;
                     $tag                    = array_pop($this->tagStack);
@@ -1458,15 +1481,15 @@ class Template implements ArrayAccess
         global  $warn;
         global  $user;
 
-        if ($this->test)
-            $this->log("Template::parseHTML: " . __LINE__ .
-                        " name={$this->main}");
-        $trace                  = '';
-
         $this->inTemplate       = false;
 
         if ($this->dom->length > 0)
             return;     // already parsed
+
+        if ($this->test)
+            $this->log("Template::parseHTML: " . __LINE__ .
+                        " name={$this->main}");
+        $trace                  = '';
 
         $len                    = strlen($this->page);
         if ($len == 0)
@@ -1491,7 +1514,7 @@ class Template implements ArrayAccess
                                          $this->cursor - $textStart);
             // $this->cursor is the index of the opening '<' of the new tag
             $matches            = array();
-            $regResult          = preg_match("#^<([^\s>]+)\s*([^>]*)(>?)#",
+            $regResult          = preg_match("#^<(!--|[^\s>]+)\s*([^>]*)(>?)#",
                                              substr($this->page, $this->cursor),
                                              $matches);
             // $matches[0] is the complete tag
@@ -1502,9 +1525,9 @@ class Template implements ArrayAccess
             {
                 $tagText        = $matches[0];  // whole tag
                 if ($this->test)
-                    print "<p>Template::parseHtml: " . __LINE__ .
+                    error_log("Template::parseHtml: " . __LINE__ .
                                     " tag cursor=$this->cursor " .
-                                    str_replace('<','&lt',$tagText) . "</p>\n";
+                                    $tagText);
                 $end            = $this->cursor + strlen($tagText);
                 $tagName        = strtolower($matches[1]);
                 $rest           = $matches[2];  // contents of tag
@@ -1518,14 +1541,24 @@ class Template implements ArrayAccess
                 {                   // comment tag
                     if (substr($tagText,0,4) == "<!--")
                     {               // comment
-                        // find end of comment
-                        $end            = strpos($this->page, "-->", $this->cursor + 4);
-                        $comment        = substr($this->page, $this->cursor, $end - $this->cursor + 3);
-
-                        if ($end)
-                            $end        += 3;   // point after delimiter
+                        if (substr($rest, -3) == '--!')
+                        {           // have complete comment
+                            $end        = $this->cursor + strlen($tagText);
+                        }           // have complete comment
                         else
-                            $end        = strlen($this->page);
+                        {           // find end of comment
+                            $end        = strpos($this->page,
+                                                 "-->",
+                                                 $this->cursor + 4);
+                            if ($end)
+                                $end    += 3;   // after delimiter
+                            else
+                                $end    = strlen($this->page);
+                            $comment    = substr($this->page,
+                                                 $this->cursor, 
+                                                 $end - $this->cursor);
+                        }           // find end of comment
+
                     }               // comment
                 }                   // comment tag
                 else
@@ -1878,7 +1911,10 @@ class Template implements ArrayAccess
         {           // emit zero instances
             do {        // delete back to beginning of current tag
                 $last       = $result->pop();
-                $pos        = strrpos($last, '<', -1);
+                if (strlen($last) == 0)
+                    $pos    = false;
+                else
+                    $pos    = strrpos($last, '<', -1);
             } while ($pos === false);
             $result->push(substr($last, 0, $pos));
             return;
@@ -2393,7 +2429,10 @@ class Template implements ArrayAccess
                         {
                             do {    // delete back to beginning tag
                                 $last       = $result->pop();
-                                $pos        = strrpos($last, '<', -1);
+                                if (strlen($last) > 0)
+                                    $pos    = strrpos($last, '<', -1);
+                                else
+                                    $pos    = 0;
                             } while ($pos === false);
                             $result->push(substr($last, 0, $pos));
 
@@ -2447,7 +2486,7 @@ class Template implements ArrayAccess
             $this->page     = $before . $resultStr .  $after;
         }           // loop through array insertions
         $runTime    = microtime(true) - $startTime;
-        if ($runTime > 1.0)
+        if ($runTime > 2.0)
         {               // ran for an unexpectedly long time
         if ($this->insertions > 0)
             $warn   .= "<p>Template did $this->insertions insertions in " .

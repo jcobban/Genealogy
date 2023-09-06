@@ -96,13 +96,16 @@ require_once __NAMESPACE__ . '/SubDistrictSet.inc';
 require_once __NAMESPACE__ . '/common.inc';
  
 // default values for parameters
-$censusId               = '';
-$censusYear             = 9999;
+$censusId               = null;
+$censusIdText           = null;
+$censusYear             = null;
 $cc                     = 'CA';
 $countryName            = 'Canada';
 $province               = '';
+$provincetext           = null;
 $provinceName           = '';
-$distId                 = '';
+$distId                 = null;
+$distIdText             = null;
 $DName                  = '';
 $data                   = array();
 $name                   = '';
@@ -111,6 +114,7 @@ $nameWidth              = 20;       // default width of name column
 $remarksWidth           = 16;       // default width of remarks column
 $fcAuto                 = false;    // control automatic update of
 $lang                   = 'en';     // default english
+$langtext               = null;
 $update                 = canUser('admin');
 $npuri                  = '';       // for next and previous links
 $npand                  = '?';      // adding parms to $npuri
@@ -127,73 +131,88 @@ if (count($_GET) > 0)
                       "<th class='colhead'>value</th></tr>\n";
     foreach($_GET as $key => $value)
     {               // loop through all parameters
+        $safevalue                  = htmlspecialchars($value);
         $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
-                        "<td class='white left'>$value</td></tr>\n"; 
+                        "<td class='white left'>$safevalue</td></tr>\n"; 
         if ($value == '?')
         {       // value explicitly not supplied
             $msg    .= $key. ' must be selected. ';
         }       // value explicitly not supplied
         else
         switch(strtolower($key))
-        {       // act on parameter name
+        {                           // act on parameter name
             case 'census':
             case 'censusid':
-            {       // Census Identifier
-                $censusId           = $value;
-                $censusYear         = substr($censusId, -4);
-                break;
-            }       // Census year
+                $matches                = array();
+                if (preg_match('/^[0-9]{4}$/', $value, $matches))
+                {                   // support old parameter value
+                    $censusId           = 'CA' . $value;
+                    $censusYear         = $value;
+                }
+                else
+                if (preg_match('/[a-zA-Z]{2,5}([0-9]{4})/', $value, $matches))
+                {
+                    $censusId           = $value;
+                    $censusYear         = $matches[1];
+                }
+                else
+                    $censusIdText       = $safevalue;
+                break;              // Census identifier
     
             case 'province':
-            {       // province code
-                $province           = $value;
-                break;
-            }       // province code
+            case 'state':
+                if (preg_match('/^[a-zA-Z]{2}$/', $value))
+                    $province           = strtoupper($value);
+                else
+                    $provincetext       = $safevalue;
+                $province               = $value;
+                break;              // province code
     
             case 'district':
-            {       // district number
-                $distId             = $value;
-                break;
-            }       // District number
+                $result                 = array();
+                if (preg_match("/^([0-9]+)(\.[05]|)$/", $value, $result))
+                {
+                    if (count($result) > 2 && $result[2] == '.0')
+                        $distId         = $result[1];   // integral portion
+                    else
+                        $distId         = $value;
+                }
+                else
+                    $distIdText         = $safevalue;
+                $distId                 = $value;
+                break;              // District number
     
             case 'namewidth':
-            {       // explicit width of name column
-                $nameWidth          = $value;
-                break;
-            }       // explicit width of name column
+                if (ctype_digit($value))
+                    $nameWidth          = $value;
+                break;              // explicit width of name column
     
             case 'remarkswidth':
-            {       // explicit width of remarks column
-                $remarksWidth       = $value;
-                break;
-            }       // explicit width of remarks column
+                if (ctype_digit($value))
+                    $remarksWidth       = $value;
+                break;              // explicit width of remarks column
     
             case 'fcauto':
-            {       // automatic update of frame count and page count
                 $fcAuto             = strtolower(substr($value,0,1)) == 'y';
-                break;
-            }       // automatic update of frame count and page count
+                break; // automatic update of frame count and page count
     
             case 'lang':
-            {       // debug handled by common code
-                $lang           = FtTemplate::validateLang($value);
+                $lang               = FtTemplate::validateLang($value,
+                                                               $langtext);
                 break;
-            }       // debug handled by common code
     
             default:
-            {       // unexpected
                 if (strlen($value) > 0)
                 {
                     $npuri          .= "{$npand}{$key}={$value}";
                     $npand          = '&amp;'; 
                 }
-                break;
-            }       // unexpected
-        }       // act on parameter name
-    }       // foreach parameter
+                break;          // unexpected
+        }                       // act on parameter name
+    }                           // foreach parameter
     if ($debug)
         $warn       .= $parmsText . "</table>\n";
-}                   // invoked by URL to display current status of account
+}                               // invoked by URL to display current status
 else
 if (count($_POST) > 0)
 {                   // invoked by submit to update account
@@ -205,8 +224,9 @@ if (count($_POST) > 0)
 
     foreach($_POST as $key => $value)
     {               // loop through all parameters
+        $safevalue                  = htmlspecialchars($value);
         $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
-                        "<td class='white left'>$value</td></tr>\n"; 
+                        "<td class='white left'>$safevalue</td></tr>\n"; 
         // each name in $_POST consists of a database field name and
         // a row number which may be either 2 or 3 digits long
         $numMatches = preg_match('/^([a-zA-Z_]+)(\d*)$/',
@@ -228,64 +248,74 @@ if (count($_POST) > 0)
         if ($column == 'sd_page' && substr($row, 0, 1) == '1')
         {
             $column                 = 'sd_page1';   // fixup
-            $row                    = substr($row, 1);
+            $rownum                 = substr($rownum, 1);
         }
 
         switch($column)
-        {           // act on specific parameter
+        {                           // act on specific parameter
             case 'census':
-            {       // Census Identifier
-                $censusId           = $value;
-                $censusYear         = substr($censusId, -4);
-                $sdParms['sd_census']   = $value;
-                break;
-            }       // Census year
+                if (preg_match('/^[0-9]{4}$/', $value))
+                {                   // support old parameter value
+                    $censusId           = 'CA' . $value;
+                    $sdParms['census']  = $censusId;
+                }
+                else
+                if (preg_match('/[a-zA-Z]{2,5}[0-9]{4}/', $value))
+                {
+                    $censusId           = $value;
+                    $sdParms['census']  = $censusId;
+                }
+                else
+                    $censusIdText       = $safevalue;
+                break;              // Census identifier
     
             case 'province':
-            {       // province code
-                $province           = $value;
-                break;
-            }       // province code
+            case 'state':
+                if (preg_match('/^[a-zA-Z]{2}$/', $value))
+                    $province           = strtoupper($value);
+                else
+                    $provincetext       = $safevalue;
+                $province               = $value;
+                break;              // province identifier
     
             case 'district':
-            {       // district number
-                $distId             = $value;
-                $sdParms['sd_distid']   = $value;
-                break;
-            }       // District number
+                $result                 = array();
+                if (preg_match("/^([0-9]+)(\.[05]|)$/", $value, $result))
+                {
+                    if (count($result) > 2 && $result[2] == '.0')
+                        $distId         = $result[1];   // integral portion
+                    else
+                        $distId         = $value;
+                    $sdParms['distid']  = $distId;
+                }
+                else
+                    $distIdText         = $safevalue;
+                break;              // District number
     
             case 'namewidth':
-            {       // explicit width of name column
-                $nameWidth          = $value;
-                break;
-            }       // explicit width of name column
+                if (ctype_digit($value))
+                    $nameWidth          = $value;
+                break;              // explicit width of name column
     
             case 'remarkswidth':
-            {       // explicit width of remarks column
-                $remarksWidth       = $value;
-                break;
-            }       // explicit width of remarks column
+                if (ctype_digit($value))
+                    $remarksWidth       = $value;
+                break;              // explicit width of remarks column
     
             case 'fcauto':
-            {       // automatic update of frame count and page count
                 $fcAuto             = strtolower(substr($value,0,1)) == 'y';
-                break;
-            }       // automatic update of frame count and page count
+                break; // automatic update of frame count and page count
     
             case 'lang':
-            {       // requested language
-                $lang           = FtTemplate::validateLang($value);
-                break;
-            }       // requested language
+                $lang               = FtTemplate::validateLang($value,
+                                                               $langtext);
+                break;          // requested language
 
             case 'sd_id':
-            {
                 $sd_id                  = $value;
                 break;
-            }
 
             case 'orig_id':
-            {
                 if ($subDistrict)
                 {                   // apply pending changes
                     if ($subDistrict->save() > 0)
@@ -294,28 +324,26 @@ if (count($_POST) > 0)
                         $warn   .= "<p>SubDistForm.php: " . __LINE__ .
                                         " issued '$sqlcmd'</p>\n";
                     }               // database changed
+                    else
+                    {
+                        $msg    .= $subDistrict->getErrors();
+                    }
                     $subDistrict        = null;
                 }                   // apply pending changes
                 $sdParms['sd_id']       = $value;
                 break;
-            }
 
             case 'orig_div':
-            {
                 $sdParms['sd_div']      = $value;
                 break;
-            }
 
             case 'orig_sched':
-            {
                 $sdParms['sd_sched']    = $value;
                 $subDistrict            = new SubDistrict($sdParms);
                 $subDistrict->set('sd_id', $sd_id);
                 break;
-            }
 
             case 'sd_name':
-            {
                 if (strtolower($value) == '[delete]')
                 {                   // user deleted the subdistrict
                     if ($subDistrict->delete(false))
@@ -329,7 +357,6 @@ if (count($_POST) > 0)
                 else                // update the name
                     $subDistrict->set($column, $value);
                 break;
-            }
 
             case 'sd_div':
             case 'sd_sched':
@@ -343,13 +370,11 @@ if (count($_POST) > 0)
             case 'sd_framect':
             case 'sd_bypage':
             case 'sd_remarks':
-            {
                 if ($subDistrict)
                 {
                     $subDistrict->set($column, $value);
                 }
                 break;
-            }
     
         }           // act on specific parameter
     }               // loop through all parameters
@@ -387,33 +412,34 @@ if (!file_exists($tempBase . $includeSub))
 $template               = new FtTemplate($includeSub);
 
 // validate census
-if (strlen($censusId) == 4)
-    $censusId           = 'CA' . $censusId;
-
-$census                 = new Census(array('censusid' => $censusId,
-                                           'collective' => 0));
-$cc                     = $census['cc'];
-$country                = new Country(array('code' => $cc));
-if (is_null($province))
-    $province           = $census['province'];
-$countryName            = $country->getName();
-$censusYear             = $census['year'];
-$name                   = $census['name'];
-$provList               = $census['provinces'];
-$npuri                  .= "{$npand}Census=$censusId";
-$npand                  = '&amp;'; 
+if (is_string($censusIdText))
+    $msg                    .= "Census value '$censusIdText' is syntactically invalid. ";
+else
+if (is_string($censusId))
+{
+    $census                 = new Census(array('censusid'   => $censusId,
+                                               'collective' => 0));
+    if (!$census->isExisting())
+        $msg                .= "Census '$censusId' is not supported. ";
+    $cc                     = $census['cc'];
+    $country                = new Country(array('code' => $cc));
+    if (is_null($province))
+        $province           = $census['province'];
+    $countryName            = $country->getName();
+    $censusYear             = $census['year'];
+    $name                   = $census['name'];
+    $provList               = $census['provinces'];
+    $npuri                  .= "{$npand}Census=$censusId";
+    $npand                  = '&amp;'; 
+}
+else
+    $msg                    .= "Census identifier not specified. ";
 
 // validate district identifier
-if (preg_match('/^[0-9]+(\.[05]|)$/', $distId) == 1)
-{       // matches pattern of a district number
-    if ($distId == floor($distId))
-        $distId         = intval($distId);
-}       // matches pattern of a district number
+if (is_string($distIdText))
+    $msg                    .= "District identifier '$distIdText' is syntactically invalid. ";
 else
-    $msg                .= "District value '$distId' invalid. ";
-
-// if no error messages display the query
-if (strlen($msg) == 0)
+if (is_string($distId))
 {
     $getParms                   = array();
     if ($censusYear == 1851 || $censusYear == 1861)
@@ -422,7 +448,15 @@ if (strlen($msg) == 0)
         $getParms['d_census']   = $censusId;
     $getParms['d_id']           = $distId;
     $district                   = new District($getParms);
+    if (!$district->isExisting())
+        $msg                .= "District $distId is not supported within Census '$censusId'. ";
+}
+else
+    $msg                    .= "District identifier not specified. ";
 
+// if no error messages display the query
+if (strlen($msg) == 0)
+{
     $DName                      = $district['d_name']; 
     $province                   = $district['d_province'];
     $prev                       = $district->getPrev();
@@ -615,8 +649,6 @@ if (strlen($msg) == 0)
                                 'remarks'       => '');
         }           // loop through simulated sub-districts
     }               // fill in empty district
-}                   // no errors in validation
-
 
 // parameters to ReqUpdateSubDists.html
 $search = "?Census=$censusId&amp;Province=$province&amp;District=$distId&amp;lang=$lang";
@@ -653,5 +685,11 @@ if (strlen($npNext) > 0)
 }
 $template->updateTag('Row$line',
                      $data);
+}                   // no errors in validation
+else
+{
+    $template['topBrowse']->update(null);
+    $template['censusForm']->update(null);
+    $template['botBrowse']->update(null);
+}
 $template->display();
-showTrace();

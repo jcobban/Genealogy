@@ -119,71 +119,56 @@ if (isset($_GET) && count($_GET) > 0)
         switch(strtolower($key))
         {
             case 'census':
-            {       // Census Year
-                $censusId                       = $value;
-                if (strlen($censusId) == 4 && ctype_digit($censusId))
+                if (strlen($value) == 4 && ctype_digit($value))
                 {                   // backwards compatibility year only
                     $censusYear                 = $censusId;
                     if ($censusYear < 1867)
-                        $censusId               = 'CW' . $censusId;
+                        $censusId               = 'CW' . $censusYear;
                     else
-                        $censusId               = 'CA' . $censusId;
+                        $censusId               = 'CA' . $censusYear;
                 }                   // backwards compatibility
                 else
-                if (preg_match('/^[a-zA-Z]{2,4}\d{4}$/', $censusId))
-                    $censusYear                 = substr($censusId, -4);
+                if (preg_match('/^[a-zA-Z]{2,4}\d{4}$/', $value))
+                    $censusId                   = $value;
                 else
                     $censusIdtext               = $safevalue;
-                break;
-            }       // Census identifier
+                break;                      // Census identifier
     
             case 'state':
-            {       // state code (international)
-                $province           = $value;
-                break;
-            }       // state code (international)
-    
             case 'province':
-            {       // province code (Canada only)
-                $province           = $value;
-                break;
-            }       // province code (mandatory for pre-1867)
+                if (preg_match('/^[a-zA-Z]{2}$/', $value))
+                    $province                   = strtoupper($value);
+                else
+                    $provincetext               = $safevalue;
+                break;          // province code (mandatory for pre-1867)
 
             case 'offset':
-            {
-                $offset             = $value;
+                if (ctype_digit($value))
+                    $offset             = intval($value);
                 break;
-            }
 
             case 'limit':
             case 'count':
-            {
-                $limit              = $value;
+                if (ctype_digit($value))
+                    $limit              = intval($value);
                 break;
-            }
 
             case 'lang':
-            {       // debug handled by common code
                 $lang               = FtTemplate::validateLang($value);
                 if (substr($lang, 0, 2) == 'fr')
                     $getParms['order']  = 'D_Nom';
                 else
                     $getParms['order']  = 'D_Name';
                 break;
-            }       // debug handled by common code
     
             case 'debug':
             case 'userid':
-            {       // debug handled by common code
-                break;
-            }       // debug handled by common code
+                break;              // handled by common code
     
     
             default:
-            {       // unexpected
-                $warn   .= "Unexpected parameter $key='$value'. ";
-                break;
-            }       // unexpected
+                $warn   .= "Unexpected parameter $key='$safevalue'. ";
+                break;              // unexpected
         }       // switch on parameter name
     }           // foreach parameter
     if ($debug)
@@ -210,59 +195,51 @@ if (count($_POST) > 0)
         switch(strtolower($fldname))
         {           // act on specific parameter
             case 'census':
-            {       // Census identifier
-                $censusId                       = $value;
-                if (strlen($censusId) == 4 && ctype_digit($censusId))
+                if (strlen($value) == 4 && ctype_digit($value))
                 {                   // backwards compatibility year only
                     $censusYear                 = $censusId;
                     if ($censusYear < 1867)
-                        $censusId               = 'CW' . $censusId;
+                        $censusId               = 'CW' . $censusYear;
                     else
-                        $censusId               = 'CA' . $censusId;
+                        $censusId               = 'CA' . $censusYear;
                 }                   // backwards compatibility
                 else
-                if (preg_match('/^[a-zA-Z]{2,4}\d{4}$/', $censusId))
-                    $censusYear                 = substr($censusId, -4);
+                if (preg_match('/^[a-zA-Z]{2,4}\d{4}$/', $value))
+                    $censusId                   = $value;
                 else
                     $censusIdtext               = $safevalue;
-                break;
-            }       // Census identifier
+                break;                      // Census identifier
     
             case 'state':
             case 'province':
-            {       // province code (Canada only)
-                $province               = $value;
-                break;
-            }       // province code (mandatory for pre-1867)
+                if (preg_match('/^[a-zA-Z]{2}$/', $value))
+                    $province                   = strtoupper($value);
+                else
+                    $provincetext               = $safevalue;
+                break;          // province code (mandatory for pre-1867)
 
             case 'offset':
-            {
-                $offset                 = $value;
+                if (ctype_digit($value))
+                    $offset             = intval($value);
                 break;
-            }
 
             case 'limit':
             case 'count':
-            {
-                $limit                  = $value;
+                if (ctype_digit($value))
+                    $limit              = intval($value);
                 break;
-            }
     
             case 'lang':
-            {       // debug handled by common code
                 $lang                   = FtTemplate::validateLang($value);
                 if (substr($lang, 0, 2) == 'fr')
                     $getParms['order']  = 'D_Nom';
                 else
                     $getParms['order']  = 'D_Name';
-                break;
-            }       // debug handled by common code
+                break;              // language
     
             case 'debug':
             case 'userid':
-            {       // debug handled by common code
-                break;
-            }       // debug handled by common code
+                break;              // handled by common code
     
             case 'd_id':
             {       // district identifier
@@ -274,8 +251,8 @@ if (count($_POST) > 0)
                 $d_id                   = $value;
                 if (strlen($d_id) > 0 && is_numeric($d_id))
                 {
-                    $divParms           = array('d_census'      => $census,
-                                                'd_id'          => $d_id);
+                    $divParms           = array('d_census'  => $censusId,
+                                                'd_id'      => $d_id);
                     $district           = new District($divParms);
                 }
                 break;
@@ -325,6 +302,7 @@ else
     $census             = new Census(array('censusid' => $censusId));
     if (strlen($msg) == 0 && $census->isExisting())
     {
+        $censusYear     = $census['year'];
         $cc             = $census['countrycode'];
         if (strlen($province) == 0)
             $province   = $census['province'];
@@ -375,16 +353,7 @@ if (strlen($province) > 0)
 else
     $provinceName               = 'All';
 
-if (ctype_digit($offset))
-    $offset                     = intval($offset);
-else
-    $offset                     = 0;
 $getParms['offset']             = $offset;
-
-if (ctype_digit($limit))
-    $limit                      = intval($limit);
-else
-    $limit                      = 20;
 $getParms['limit']              = $limit;
 
 $search = "?Census=$censusId&amp;Province=$province&amp;lang=$lang";
@@ -545,10 +514,20 @@ if (strlen($npPrev) > 0)
     $template->updateTag('topPrev', array('npPrev' => $npPrev));
     $template->updateTag('botPrev', array('npPrev' => $npPrev));
 }
+else
+{
+    $template->updateTag('topPrev', '&nbsp;');
+    $template->updateTag('botPrev', '&nbsp;');
+}
 if (strlen($npNext) > 0)
 {
     $template->updateTag('topNext', array('npNext' => $npNext));
     $template->updateTag('botNext', array('npNext' => $npNext));
+}
+else
+{
+    $template->updateTag('topNext', '&nbsp;');
+    $template->updateTag('botNext', '&nbsp;');
 }
 
 if (count($data) > 0)

@@ -258,7 +258,7 @@ else
 }       // authorized to update database
 
 if ($reportNo < 2)
-    $template['topPrev']->update(null);
+    $template['topPrev']->update('&nbsp;');
 
 // get contents of record
 $domain             = $report->get('domain');

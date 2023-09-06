@@ -66,9 +66,10 @@ use \Templating\Template;
  *      2020/12/14      blog section removed from display only template *
  *      2021/07/17      deprecate IDNR parameter                        *
  *      2021/09/30      hide line to display surnames with same pattern *
- *                      if no pattern is defined for this surname       * 
+ *                      if no pattern is defined for this surname       *
+ *      2022/06/08      no warning for userid parameter                 * 
  *                                                                      *
- *  Copyright &copy; 2021 James A. Cobban                               *
+ *  Copyright &copy; 2022 James A. Cobban                               *
  ************************************************************************/
 require_once __NAMESPACE__ . '/LegacyDate.inc';
 require_once __NAMESPACE__ . '/Person.inc';
@@ -184,6 +185,7 @@ if (isset($_GET) && count($_GET) > 0)
     
             case 'debug':
             case 'text':
+            case 'userid':
             {                   // handled by common
                 break;
             }                   // handled by common
@@ -351,6 +353,7 @@ $soundslike                 = $surnameRec['soundslike'];
 $pattern                    = $surnameRec['pattern'];
 $notes                      = $surnameRec['notes'];
 $template->set("SURNAME",           htmlspecialchars($surname));
+$template->set("KEYWORDS",          ", family tree " . htmlspecialchars($surname));
 $template->set("PREFIX",            $prefix);
 $template->set('TITLE',             $title, true);
 $template->set("IDNR",              $idnr);
@@ -452,13 +455,14 @@ $information                    = $nxlist->getInformation();
 $query                          = $information['query'];
 $template->set('QUERY',                 $query);
 $nxcount                        = $information['count'];
+
 if ($nxcount == 0)
 {                       // no matching names
-    if (canUser('edit') && 
-        $surnameRec->get('pattern') == '' && 
+    if (canUser('edit') &
+        $surnameRec->get('pattern') == '' &
         $surnameRec->isExisting())
     {
-        $surnameRec->delete(false);
+        $delcount   = $surnameRec->delete(false);
     }
     else
     {

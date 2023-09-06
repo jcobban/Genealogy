@@ -10,8 +10,9 @@ use \Exception;
  *																		*
  *  History:															*
  *		2020/12/01      created                                         *
+ *		2023/08/25      correct sort order altered by JSON              *
  *																		*
- *  Copyright &copy; 2020 James A. Cobban								*
+ *  Copyright &copy; 2023 James A. Cobban								*
  ************************************************************************/
 header("Content-Type: application/json");
 require_once __NAMESPACE__ . "/Census.inc";
@@ -102,7 +103,9 @@ if (strlen($msg) == 0)
         $comma          = '';
 	    foreach($districts as $district)
 	    {		// loop through all result rows
-			$did		= $district->get('d_id');
+            $did		= $district->get('d_id');
+            if (preg_match('/[0-9.]+$/', $did, $matches))
+                $did    = $matches[0];
 			if ($did == floor($did))
 			    $did	= floor($did);
 			if (substr($lang, 0, 2) == 'fr')
@@ -110,7 +113,7 @@ if (strlen($msg) == 0)
 			else
 			    $Name	= htmlspecialchars($district->get('d_name')); 
 			$Province	= $district->get('d_province'); 
-			print("$comma\"$did\" : \"$Name ($Province)\"");
+			print("$comma\"$Name-$did\" : \"$Name ($Province)\"");
             $comma          = ",\n";
         }		// loop through all result rows
 	}		// no errors

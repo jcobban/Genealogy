@@ -28,7 +28,6 @@
 	    Census Administration: $COUNTRYNAME: $CENSUSYEAR Census: District Table
 		<span id='updateTitle'>Update</span>
 		<span id='displayTitle'>Display</span>
-	    <div style='clear: both;'></div>
 	  </h1>
 	
 	  $TRACE
@@ -44,12 +43,12 @@
 		There are currently no census districts defined in the table
 		for this administrative domain.
 	  </p>
-	  <div class='center' id='linkHdr'>
-	    <span class='left' id='npPrevFront'>
-	      <a href='/database/DistForm.php$npPrev'>&lt;---</a>
+      <div class="spaceBetween" id="topBrowse">
+	    <span class='left' id='topPrev'>
+	      <a href='/database/DistForm.php$npPrev'><img src="/Images/ArrowLeft.svg"></a>
 	    </span>
-	    <span class='right' id='npNextFront'>
-	      <a href='/database/DistForm.php$npNext'>---&gt;</a>
+	    <span class='right' id='topNext'>
+	      <a href='/database/DistForm.php$npNext'><img src="/Images/ArrowRight.svg"></a>
 	    </span>
 	    $CENSUSYEAR Census of
 		$COUNTRYNAME
@@ -145,16 +144,14 @@
 	      </tr>
 	    </tbody>
 	  </table>
-	  <div class='center' id='linkHdrBack'>
-	    <span class='left' id='npPrevBack'>
-	      <a href='/database/DistForm.php$npPrev'>&lt;---</a>
+      <div class="spaceBetween" id="botBrowse">
+	    <span id='npPrevBack'>
+	      <a href='/database/DistForm.php$npPrev'><img src="/Images/ArrowLeft.svg"></a>
 	    </span>
-	    <span class='right' id='npNextBack'>
-	      <a href='/database/DistForm.php$npNext'>---&gt;</a>
+	    $CENSUSYEAR Census of $COUNTRYNAME $PROVINCENAME
+	    <span id='botNext'>
+	      <a href='/database/DistForm.php$npNext'><img src="/Images/ArrowRight.svg"></a>
 	    </span>
-	    $CENSUSYEAR Census of
-		$COUNTRYNAME
-	    $PROVINCENAME
 	  </div>
 	    <p>
 	      <button type='submit' id='Submit'>Update Database</button>

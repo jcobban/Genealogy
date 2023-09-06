@@ -42,8 +42,9 @@ use \Exception;
  *		2016/01/21		use class Census to get census information		*
  *		2017/10/25		use class RecordSet								*
  *		2020/12/01      eliminate XSS vulnerabilities                   *
+ *		2023/08/25      exact match on census id                        *
  *																		*
- * Copyright 2020 &copy; James A. Cobban								*
+ * Copyright 2023 &copy; James A. Cobban								*
  ************************************************************************/
 header("Content-Type: text/xml");
 require_once __NAMESPACE__ . '/Census.inc';
@@ -51,18 +52,18 @@ require_once __NAMESPACE__ . '/SubDistrict.inc';
 require_once __NAMESPACE__ . "/RecordSet.inc";
 require_once __NAMESPACE__ . '/common.inc';
 
-$distpattern	= '/^[0-9]+(\.5)?$/';
+$distpattern	                = '/^[0-9]+(\.5)?$/';
 
 // process input parameters
-$census		= null;		// census code 'CCYYYY'
-$distsel		= '';
-$distList		= '';
-$or			= '';		
-$comma		= '';
-$parmList		= '';
-$amp		= '';
-$sched		= '1';
-$getParms	= array();
+$census		                    = null;		// census code 'CCYYYY'
+$distsel		                = '';
+$distList		                = '';
+$or			                    = '';		
+$comma		                    = '';
+$parmList		                = '';
+$amp		                    = '';
+$sched		                    = '1';
+$getParms	                    = array();
 
 foreach ($_POST as $key => $value)
 {		            // loop through parameters
@@ -71,71 +72,65 @@ foreach ($_POST as $key => $value)
     {
         foreach($value as $avalue)
         {
-    		$parmList	.= $amp . $key . '[]=' . htmlspecialchars($avalue);
-    		$amp		= '&amp;';
+            $parmList	        .= $amp . $key . '[]=' . 
+                                    htmlspecialchars($avalue);
+    		$amp		        = '&amp;';
         }
     }
     else
-        $parmList	.= $amp . $key . '=' . htmlspecialchars($value);
-    $amp	= '&amp;';
+        $parmList	            .= $amp . $key . '=' . 
+                                    htmlspecialchars($value);
+    $amp	                    = '&amp;';
 
     switch(strtolower($key))
-    {		        // act on specific key
+    {		                // act on specific key
         case 'census':
-        {
-    		$census	= $value;
-    		$censusRec	= new Census(array('censusid'	=> $value,
-    						   'collective'	=> 0));
+    		$census	            = $value;
+    		$censusRec	        = new Census(array('censusid'	=> $value,
+    						                       'collective'	=> 0));
     		if(!$censusRec->isExisting())
                 $msg	.= "Census='" . htmlspecialshars($value) . 
                             "' is invalid. ";
-    		$getParms['census']	= $census;
+    		$getParms['census']	= "^$census$";
     		break;
-        }
 
         case 'district':
-        {		    // occurs multiple times if multi-selection
     		if (is_array($value))
-    		    $dists	= $value;
+    		    $dists	        = $value;
     		else
-    		    $dists	= explode(",", $value);
+    		    $dists	        = explode(",", $value);
     
     		if (count($dists) > 0)
-    		{		// District value is not empty
+    		{		        // District value is not empty
     		    if (count($dists) == 1)
-    			$getParms['distid']	= $dists[0];
+    			    $getParms['distid']	= $dists[0];
     		    else
-    			$getParms['distid']	= $dists;
+    			    $getParms['distid']	= $dists;
     		}		// District value is an array
-    		$distList	= implode(',', $dists);
-    		break;
-        }		    // occurs multiple times if multi-selection
+    		$distList	        = implode(',', $dists);
+    		break;          // occurs multiple times if multi-selection
 
         case 'sched':
-        {		    // schedule identifier
-    		$sched		= $value;
-    		break;
-        }		    // schedule identifier
+    		$sched		        = $value;
+    		break;          // schedule identifier
 
         case 'debug':
             break;          // already handled
 
         default:
-        {		    // anything else
             $msg	.= "Unexpected parameter $key='" .
                         htmlspecialchars($value) . "'. ";
-    		break;
-        }		    // anything else
-    }		        // act on specific key
-}		            // loop through parameters
+    		break;	        // anything else
+    }		                // act on specific key
+}		                    // loop through parameters
 if (count($getParms) == 0)
     $msg		.= "No parameters passed by method='post'. ";
-$getParms['sched']		= $sched;
+$getParms['sched']		        = $sched;
 
 if (strlen($msg) == 0)
 {		// user supplied needed parameters
     $result		= new RecordSet('SubDistricts',
-    					$getParms);
+    					        $getParms);
 }		// perform query
 
 // display the results

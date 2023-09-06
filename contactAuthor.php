@@ -43,8 +43,9 @@ use \Exception;
  *                      support explicitly sending message to a user    *
  *      2021/01/02      correct XSS vulnerabilities                     *
  *      2021/04/04      post messages to 'Users' table                  *
+ *      2022/07/13      validate parameters better                      *
  *                                                                      *
- *  Copyright &copy; 2021 James A. Cobban                               *
+ *  Copyright &copy; 2022 James A. Cobban                               *
  ************************************************************************/
 require_once __NAMESPACE__ . '/FtTemplate.inc';
 require_once __NAMESPACE__ . '/User.inc';
@@ -55,7 +56,9 @@ require_once __NAMESPACE__ . '/common.inc';
 if (!canUser('blog'))
     $userid     = '';
 $recordid       = 0;
+$recordidtext   = null;
 $tableName      = 'tblIR';
+$tableNametext  = null;
 $about          = '';
 $text           = '';
 $username       = '';
@@ -86,17 +89,31 @@ if (isset($_GET) && count($_GET) > 0)
             case 'id':
             case 'idir':
             {
-                $recordid       = $value;
+                if (strlen($value) > 0)
+                { 
+                    if (ctype_digit($value))
+                        $recordid       = $value;
+                    else
+                        $recordidtext   = $safevalue;
+                }
                 break;
             }       // key value
     
             case 'tablename':
             {
-                $info           = Record::getInformation($value);
-                if ($info)
-                    $tableName  = $info['table'];
-                else
-                    $tableName  = $value;
+                if (strlen($value) > 0)
+                { 
+                    if (preg_match('/^[a-zA-Z_0-9]+$/', $value))
+                    {
+                        $info           = Record::getInformation($value);
+                        if ($info)
+                            $tableName  = $info['table'];
+                        else
+                            $tableName  = $value;
+                    }
+                    else
+                    $tableNametext  = $safevalue;
+                }
                 break;
             }       // table name
     
@@ -126,11 +143,12 @@ if (isset($_GET) && count($_GET) > 0)
     
             case 'lang':
             {
-                $lang       = FtTemplate::validateLang($value);
+                $lang           = FtTemplate::validateLang($value);
                 break;
             }       // language selection
     
             case 'debug':
+            case 'userid':
             {
                 break;
             }       // handled by common code
@@ -151,6 +169,10 @@ $template           = new FtTemplate("ContactAuthor$lang.html");
 
 if ($user && !$user->isExisting())
     $warn           .= "<p>parameter user=$username does not identify a registered user</p>\n";
+if (is_string($recordidtext))
+    $msg            .= "Invalid record ID=$recordidtext. ";
+if (is_string($tableNametext))
+    $msg            .= "Invalid tableName=`$tableNametext`. ";
 
 // take any table specific action
 if (strlen($about) == 0)

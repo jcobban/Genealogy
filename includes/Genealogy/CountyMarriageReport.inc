@@ -34,6 +34,7 @@ use \Exception;
  *      2019/01/06      move to namespace Genealogy                     *
  *      2019/05/18      add $info                                       *
  *      2019/12/19      replace xmlentities with htmlentities           *
+ *      2022/12/13      remove field name prefixes                      *
  *                                                                      *
  *  Copyright &copy; 2019 James A. Cobban                               *
  ************************************************************************/
@@ -55,19 +56,19 @@ class CountyMarriageReport extends Record
      *  static array containing default values for a new record         *
      ********************************************************************/
     protected static    $initRow    = array(
-                        'm_regdomain'           => 'CAON',
-                        'm_volume'              => 1,
-                        'm_reportno'            => 1,
-                        'm_year'                => 1869,
-                        'm_page'                => 1,
-                        'm_givennames'          => '',
-                        'm_surname'             => '',
-                        'm_surnamesoundex'      => '',
-                        'm_faith'               => '',
-                        'm_residence'           => '',
-                        'm_image'               => '',
-                        'm_idir'                => 0,
-                        'm_remarks'             => '');
+                        'regdomain'             => 'CAON',
+                        'volume'                => 1,
+                        'reportno'              => 1,
+                        'year'                  => 1869,
+                        'page'                  => 1,
+                        'givennames'            => '',
+                        'surname'               => '',
+                        'surnamesoundex'        => '',
+                        'faith'                 => '',
+                        'residence'             => '',
+                        'image'                 => '',
+                        'idir'                  => 0,
+                        'remarks'               => '');
 
     /********************************************************************
      *  CountyMarriageReport::$info                                     *
@@ -77,10 +78,10 @@ class CountyMarriageReport extends Record
     protected static    $info   = array(
                 'table'             => 'CountyMarriageReports',
                 'name'              => 'CountyMarriageReports',
-                'prime'             => array('m_regdomain','m_volume','m_reportno'),
+                'prime'             => array('regdomain','volume','reportno'),
                 'srvmg'             => false,
                 'fldcount'          => 6,
-                'order'             => 'M_RegDomain,M_Volume,M_ReportNo',
+                'order'             => 'RegDomain,Volume,ReportNo',
                 'classname'         => 'CountyMarriageReport');
 
     /********************************************************************
@@ -89,27 +90,28 @@ class CountyMarriageReport extends Record
      *  Translation of alternate field names                            *
      ********************************************************************/
     protected static $translate = array(
-                        'regdomain'             => 'm_regdomain',
-                        'domain'                => 'm_regdomain',
-                        'volume'                => 'm_volume',
-                        'reportno'              => 'm_reportno',
-                        'year'                  => 'm_year',
-                        'page'                  => 'm_page',
-                        'givennames'            => 'm_givennames',
-                        'surname'               => 'm_surname',
-                        'surnamesoundex'        => 'm_surnamesoundex',
-                        'faith'                 => 'm_faith',
-                        'residence'             => 'm_residence',
-                        'image'                 => 'm_image',
-                        'idir'                  => 'm_idir',
-                        'remarks'               => 'm_remarks');
+                        'm_regdomain'               => 'regdomain',
+                        'm_domain'                  => 'regdomain',
+                        'domain'                    => 'regdomain',
+                        'm_volume'                  => 'volume',
+                        'm_reportno'                => 'reportno',
+                        'm_year'                    => 'year',
+                        'm_page'                    => 'page',
+                        'm_givennames'              => 'givennames',
+                        'm_surname'                 => 'surname',
+                        'm_surnamesoundex'          => 'surnamesoundex',
+                        'm_faith'                   => 'faith',
+                        'm_residence'               => 'residence',
+                        'm_image'                   => 'image',
+                        'm_idir'                    => 'idir',
+                        'm_remarks'                 => 'remarks');
 
     /********************************************************************
      *  CountyMarriageReport::$defaultOrder                             *
      *                                                                  *
      *  Definition of default order for records retrieved by RecordSet  *
      ********************************************************************/
-    protected static    $defaultOrder   = 'M_regdomain,M_volume,M_reportno';
+    protected static    $defaultOrder   = 'regdomain,volume,reportno';
 
 
     /********************************************************************
@@ -121,8 +123,8 @@ class CountyMarriageReport extends Record
      *  Input:                                                          *
      *      $parms      an associative array containing either          *
      *                  a complete row from the database or             *
-     *                  array('Domain'      => $domain,                 *
-     *                        'Volume'      => $volume,                 *
+     *                  array('Domain'          => $domain,             *
+     *                        'Volume'          => $volume,             *
      *                        'ReportNo'        => $reportNo)           *
      *                  with the case of the parameters ignored         *
      *      'Domain'    a domain identifier consisting of a             *
@@ -169,23 +171,23 @@ class CountyMarriageReport extends Record
                         $fieldLc    = self::$translate[$fieldLc];
                     switch($fieldLc)
                     {                   // act on specific parameter names
-                        case 'm_regdomain':
+                        case 'regdomain':
                         {
-                            $where  .= $and . 'M_RegDomain=?';
+                            $where  .= $and . 'RegDomain=?';
                             $sqlParms[] = $value;
                             $and    = ' AND ';
                             break;
                         }               // domain name
 
-                        case 'm_volume':
+                        case 'volume':
                         {
-                            $where  .= $and . 'M_Volume=?';
+                            $where  .= $and . 'Volume=?';
                             $sqlParms[] = $value;
                             $and    = ' AND ';
                             break;
                         }               // volume number
 
-                        case 'm_reportno':
+                        case 'reportno':
                         {
                             if (is_string($value))
                             {
@@ -222,7 +224,7 @@ class CountyMarriageReport extends Record
                                 $msg    .= "Invalid value '" .
                                        print_r($value, true) .
                                        "' for report number. ";
-                            $where  .= $and . 'M_ReportNo=?';
+                            $where  .= $and . 'ReportNo=?';
                             $sqlParms[] = $reportNo;
                             $and    = ' AND ';
                             break;
@@ -261,9 +263,11 @@ class CountyMarriageReport extends Record
                                 switch(strtolower($field))
                                 {       // act on specific parameter names
                                     case 'domain':
+                                    case 'regdomain':
+                                    case 'm_domain':
                                     case 'm_regdomain':
                                     {
-                                        $dbrow['m_regdomain']   = $value;
+                                        $dbrow['regdomain']     = $value;
                                         $domain                 = $value;
                                     break;
                                     }   // domain name
@@ -271,7 +275,7 @@ class CountyMarriageReport extends Record
                                     case 'volume':
                                     case 'm_volume':
                                     {
-                                        $dbrow['m_volume']      = $value;
+                                        $dbrow['volume']        = $value;
                                         $volume                 = $value;
                                     break;
                                     }   // volume number
@@ -279,7 +283,7 @@ class CountyMarriageReport extends Record
                                     case 'reportno':
                                     case 'm_reportno':
                                     {
-                                        $dbrow['m_reportno']    = $value;
+                                        $dbrow['reportno']      = $value;
                                         $reportNo               = $value;
                                     break;
                                     }   // report number
@@ -288,21 +292,21 @@ class CountyMarriageReport extends Record
                             }           // loop through all search parms
 
                             $getParms   = array(
-                                    'M_RegDomain'   => $domain,
-                                    'M_Volume'      => $volume,
-                                    'M_ReportNo'    => '<' . $reportNo,
-                                    'order'         => 'M_ReportNo DESC',
+                                    'RegDomain'     => $domain,
+                                    'Volume'        => $volume,
+                                    'ReportNo'      => '<' . $reportNo,
+                                    'order'         => 'ReportNo DESC',
                                     'limit'         => 1);
                             $reports    = new RecordSet('CountyMarriageReports',
-                                            $getParms); 
+                                                        $getParms); 
                             if ($reports->count() > 0)
                             {           // copy values from previous report
                                 $report             = $reports->rewind();
-                                $dbrow['m_year']    = $report->get('year');
-                                $dbrow['m_page']    = $report->get('page');
-                                $dbrow['m_image']   = $report->get('image');
+                                $dbrow['year']      = $report->get('year');
+                                $dbrow['page']      = $report->get('page');
+                                $dbrow['image']     = $report->get('image');
                             }           // copy values from previous report
-                            $needInsert = true;
+                            $needInsert             = true;
                         }               // no match, create new row
                     }                   // successful select
                     else
@@ -397,7 +401,7 @@ class CountyMarriageReport extends Record
         foreach($this->row as $key => $value)
         {
             if (substr($key, 0, 2) == 'm_')
-                    $key    = substr($key, 2);
+                $key    = substr($key, 2);
             $retval     .= $comma . "\t\"$key\":\t" . 
                                    json_encode($value);
             $comma      = ",\n";
@@ -417,7 +421,7 @@ class CountyMarriageReport extends Record
      *                                                                  *
      *  Parameters:                                                     *
      *      $name       field name                                      *
-     *                  The name prefix "M_" may be omitted             *
+     *                  The name prefix "" may be omitted             *
      *                                                                  *
      *  Side Effects:                                                   *
      *      Adds warning if $field is not already defined as a field    *
@@ -455,7 +459,7 @@ class CountyMarriageReport extends Record
      *                                                                  *
      *  Parameters:                                                     *
      *      $field      name of field to change.  Case is ignored.      *
-     *                  The name prefix "M_" may be omitted             *
+     *                  The name prefix "" may be omitted             *
      *      $value      value to set the field to                       *
      ********************************************************************/
     function set($field, $value)
@@ -465,9 +469,9 @@ class CountyMarriageReport extends Record
             $fieldLc    = self::$translate[$fieldLc];
         switch($fieldLc)
         {       // act on specific field
-            case 'm_regdomain':
-            case 'm_volume':
-            case 'm_reportno':
+            case 'regdomain':
+            case 'volume':
+            case 'reportno':
             case 'transcribed':
             case 'linked':
             {
@@ -590,20 +594,20 @@ class CountyMarriageReport extends Record
                 // construct the where clause
                 // the following permits altering the primary key fields
                 // as long as a duplicate record is not created
-                $where      = "M_RegDomain=:odomain AND " .
-                                  "M_Volume=:ovolume AND " .
-                                  "M_ReportNo=:oreportNo";
+                $where      = "RegDomain=:odomain AND " .
+                                  "Volume=:ovolume AND " .
+                                  "ReportNo=:oreportNo";
                 if ($this->former)
                 {       // record changed
-                    $sqlParms['odomain']    = $this->former['m_regdomain'];
-                    $sqlParms['ovolume']    = $this->former['m_volume'];
-                    $sqlParms['oreportNo']  = $this->former['m_reportno'];
+                    $sqlParms['odomain']    = $this->former['regdomain'];
+                    $sqlParms['ovolume']    = $this->former['volume'];
+                    $sqlParms['oreportNo']  = $this->former['reportno'];
                 }       // record changed
                 else
                 {       // record not changed
-                    $sqlParms['odomain']    = $this->row['m_regdomain'];
-                    $sqlParms['ovolume']    = $this->row['m_volume'];
-                    $sqlParms['oreportNo']  = $this->row['m_reportno'];
+                    $sqlParms['odomain']    = $this->row['regdomain'];
+                    $sqlParms['ovolume']    = $this->row['volume'];
+                    $sqlParms['oreportNo']  = $this->row['reportno'];
                 }       // record not changed
 
                 // assemble the UPDATE command
@@ -669,15 +673,15 @@ class CountyMarriageReport extends Record
         $sqlParms           = array();
         if ($this->former)
         {           // record has been changed
-            $sqlParms['regdomain']  = $this->former['m_regdomain'];
-            $sqlParms['volume']     = $this->former['m_volume'];
-            $sqlParms['reportNo']   = $this->former['m_reportno'];
+            $sqlParms['regdomain']  = $this->former['regdomain'];
+            $sqlParms['volume']     = $this->former['volume'];
+            $sqlParms['reportNo']   = $this->former['reportno'];
         }           // record has been changed
         else
         {           // record is unchanged
-            $sqlParms['regdomain']  = $this->row['m_regdomain'];
-            $sqlParms['volume']     = $this->row['m_volume'];
-            $sqlParms['reportNo']   = $this->row['m_reportno'];
+            $sqlParms['regdomain']  = $this->row['regdomain'];
+            $sqlParms['volume']     = $this->row['volume'];
+            $sqlParms['reportNo']   = $this->row['reportno'];
         }           // record is unchanged
         $sqlParmsText           = print_r($sqlParms, true);
 
@@ -687,9 +691,9 @@ class CountyMarriageReport extends Record
             // do not delete the record if it is referenced from
             // other records
             $check  = "SELECT COUNT(*) FROM CountyMarriages " .
-                                "WHERE M_RegDomain=:regdomain AND " .
-                                "M_Volume=:volume AND " .
-                                "M_ReportNo=:reportNo";
+                                "WHERE RegDomain=:regdomain AND " .
+                                "Volume=:volume AND " .
+                                "ReportNo=:reportNo";
             $stmt   = $connection->prepare($check);
             $checkText  = debugPrepQuery($check, $sqlParms);
             if ($stmt->execute($sqlParms))
@@ -723,9 +727,9 @@ class CountyMarriageReport extends Record
 
             // the report is unreferenced, so delete it
             $delete = "DELETE FROM CountyMarriageReports " .
-                                "WHERE M_RegDomain=:regdomain AND " .
-                                "M_Volume=:volume AND " .
-                                "M_ReportNo=:reportNo";
+                                "WHERE RegDomain=:regdomain AND " .
+                                "Volume=:volume AND " .
+                                "ReportNo=:reportNo";
             $stmt   = $connection->prepare($delete);
             $deleteText = debugPrepQuery($delete, $sqlParms);
             if ($stmt->execute($sqlParms))

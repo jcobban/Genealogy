@@ -32,7 +32,6 @@
         <span class="right">
             <a href="CountyMarriageEditQueryHelpen.html" target="_blank">Help?</a>
         </span>
-        <div style="clear: both;"></div>
       </h1>
     $TRACE
     $MSG
@@ -59,7 +58,6 @@
                         style="float: left;"
                             class="white rightnc" size="4" maxlength="4"/>
               </div>
-              <div style="clear:both;"></div>
             </div>
             <div class="row">
               <div class="column1">
@@ -74,7 +72,6 @@
                         style="float: left;"
                         class="white rightnc" size="4" maxlength="4"/>
               </div>
-              <div style="clear:both;"></div>
             </div>
           </fieldset>
           <fieldset class="other">
@@ -96,9 +93,7 @@
                 <input name="Soundex" id="Soundex" type="checkbox"
                       class="left"
                     class="white left" value="Y"/>
-                <div style="clear: both;"></div>
               </div>
-              <div style="clear:both;"></div>
             </div>
           </fieldset>
         </div> <!-- id="formTable" -->
@@ -137,13 +132,14 @@
       This specifies to search for marriages that match a particular given name.
     </div>
     <div class="balloon" id="HelpSurname">
-      This specifies to search for surnames that match a particular surname or
-      part of a surname.  This is a regular expression.
+      This specifies to search for surnames that match a particular
+      surname or part of a surname.  This is a regular expression.
     </div>
-    <div class="balloon" id="HelpSurnameSoundex"> 
-      The Soundex code has been used for decades to attempt to match names that
-      sound similar.  For example it is used by police forces to perform a rough
-      match for the names of drivers.  It is a problematic tool, as it
+    <div class="balloon" id="HelpSoundex"> 
+      The Soundex code has been used for decades to attempt to match names
+      that sound similar.  For example it is used by police forces to
+      perform a rough match for the names of drivers.  It is a problematic
+      tool, as it
       is based upon the phonetics of British surnames.
       If you select this option along with a
       complete surname, not a pattern match, in the Surname field, then
@@ -170,8 +166,4 @@
               not available from server.
       </div>
     </div>
-    <script src="/jscripts/CommonForm.js" type="text/javascript"></script>
-    <script src="/jscripts/js20/http.js" type="text/javascript"></script>
-    <script src="/jscripts/Ontario.js" type="text/javascript"></script>
-    <script src="/jscripts/util.js" type="text/javascript"></script>
-    <script src="CountyMarriageEditQuery.js" type="text/javascript"></script>
+    <script src="CountyMarriageEditQuery.js" type="module"></script>

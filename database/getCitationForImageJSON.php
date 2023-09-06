@@ -23,8 +23,9 @@ use \Exception;
  *      2020/05/12      allow mixed case on parameter name              *
  *                      support JSON                                    *
  *		2020/10/10      remove field prefix for Pages table             *
+ *		2023/01/20      protect against XSS                             *
  *                                                                      *
- *  Copyright &copy; 2020 James A. Cobban                               *
+ *  Copyright &copy; 2023 James A. Cobban                               *
  ************************************************************************/
 header("Content-Type: application/json");
 require_once __NAMESPACE__ . '/Page.inc';
@@ -41,12 +42,13 @@ if (isset($_GET) && count($_GET) > 0)
                                     "<th class='colhead'>value</th></tr>\n";
     foreach($_GET as $key => $value)
     {               // loop through all parameters
+        $safevalue          = htmlspecialchars($value);
         $parmsText          .= "<tr><th class='detlabel'>$key</th>" .
-                                "<td class='white left'>$value</td></tr>\n";
+                                "<td class='white left'>$safevalue</td></tr>\n";
         switch(strtolower($key))
         {
             case 'image':
-                $image      = $value;
+                $image      = $safevalue;
                 break;
         }
     }               // loop through all parameters

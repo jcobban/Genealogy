@@ -524,7 +524,7 @@ function gotNames(obj)
 //      {
 //          trace        += "warn=" + JSON.stringify(obj.warn) + "<br>";
 //      }
-        console.log(trace);
+//      console.log("nominalIndex.js: 527 " . trace);
 
         if ('nextSurname' in obj)
         {

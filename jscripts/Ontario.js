@@ -45,8 +45,10 @@
  *      2018/10/30      use Node.textContent rather than getText        *
  *      2021/01/13      drop support of IE<11, use ES2015 syntax        *
  *      2021/01/16      use XMLSerializer for diagnostic output         *
+ *      2022/10/21      do not generate error in gotCountiesFile for    *
+ *                      missing options attribute                       *
  *                                                                      *
- *  Copyright &copy; 2021 James A. Cobban                               *
+ *  Copyright &copy; 2022 James A. Cobban                               *
  ************************************************************************/
 
 // table for expanding county abbreviations to full names
@@ -124,65 +126,71 @@ function gotCountiesFile(xmlDoc)
 {
     if (document.distForm)
     {                   // form present
-        let countySelect    = document.distForm.RegCounty;
-        countySelect.options.length = 1;    // clear the selection
-        let newOptions      = xmlDoc.getElementsByTagName("option");
-
-        // ensure builtin countyNames array matches database
-        countyNames         = [];   // empty out pre-defined contents
-
-        // add options corresponding to the elements in the XML file
-        for (let i = 0; i < newOptions.length; ++i)
-        {
-            // get the source "option" node
-            // note that although this has the same contents and appearance
-            // as an HTML "option" statement, it is an XML Element object,
-            // not an HTML Option object.
-            let node        = newOptions[i];
-
-            // get the text value to display to the user
-            let text        = node.textContent;
-
-            // get the "value" attribute
-            let value       = node.getAttribute("value");
-            if ((value == null) || (value.length == 0))
-            {           // cover our ass
-                value       = text;
-            }           // cover our ass
-
-            // create a new HTML Option object and add it to the Select
-            let newOption   = addOption(countySelect,
-                                text,
-                                value);
-
+        let countySelect        = document.distForm.RegCounty;
+        let options             = countySelect.options;
+        if (options !== undefined)
+        {               // selection list
+            options.length      = 1;    // clear the selection
+            let newOptions      = xmlDoc.getElementsByTagName("option");
+    
             // ensure builtin countyNames array matches database
-            countyNames[value]  = text;
-        }               // loop through source "option" nodes
-
-        // specify the action for selecting a county
-        countySelect.onchange   = changeCounty;
-        let countyTxt           = document.distForm.RegCountyTxt;
-
-        if (countyTxt)
-        {               // county code text field in basic form
-            // select the matching entry in the select list
-            let countyCode      = countyTxt.value;
-            if (countyCode.length > 0)
-            {           // a county has been specified
-                countySelect.value  = countyCode;
-
-                if (countySelect.selectedIndex == 0)
-                {       // no match
-                    // make the text field visible
-                    countyTxt.type  = "text";
-                }       // no match
+            countyNames         = [];   // empty out pre-defined contents
+    
+            // add options corresponding to the elements in the XML file
+            for (let i = 0; i < newOptions.length; ++i)
+            {
+                // get the source "option" node
+                // note that although this has the same contents and
+                // appearance as an HTML "option" statement, it is an
+                // XML Element object,
+                // not an HTML Option object.
+                let node        = newOptions[i];
+    
+                // get the text value to display to the user
+                let text        = node.textContent;
+    
+                // get the "value" attribute
+                let value       = node.getAttribute("value");
+                if ((value == null) || (value.length == 0))
+                {           // cover our ass
+                    value       = text;
+                }           // cover our ass
+    
+                // create a new HTML Option object and add it to the Select
+                let newOption   = addOption(countySelect,
+                                    text,
+                                    value);
+    
+                // ensure builtin countyNames array matches database
+                countyNames[value]  = text;
+            }               // loop through source "option" nodes
+    
+            // specify the action for selecting a county
+            countySelect.onchange   = changeCounty;
+            let countyTxt           = document.distForm.RegCountyTxt;
+    
+            if (countyTxt)
+            {               // county code text field in basic form
+                // select the matching entry in the select list
+                let countyCode      = countyTxt.value;
+                if (countyCode.length > 0)
+                {           // a county has been specified
+                    countySelect.value  = countyCode;
+    
+                    if (countySelect.selectedIndex == 0)
+                    {       // no match
+                        // make the text field visible
+                        countyTxt.type  = "text";
+                    }       // no match
+                    else
+                        changeCounty(); // populate township list
+                }           // a county has been specified
                 else
-                    changeCounty(); // populate township list
-            }           // a county has been specified
-            else
-                countySelect.selectedIndex  = 0;
-        }               // county code text field in basic form
-    }                   // form present
+                    countySelect.selectedIndex  = 0;
+            }               // county code text field in basic form
+        }                   // have selection list for counties
+
+    }                       // form present
 }       // function gotCountiesFile
 
 /************************************************************************

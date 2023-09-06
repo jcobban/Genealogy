@@ -1,156 +1,153 @@
 <!--*********************************************************************
- *  DomainsEditDisplayen.html										    *
- *																		*
- *  Display form for editting information about administrative			*
- *  domains for managing vital statistics records.						*
- *																		*
- *  History:															*
- *		2017/10/28		created											*
- *		2018/01/04		remove Template from template file names		*
+ *  DomainsEditDisplayen.html                                           *
+ *                                                                      *
+ *  Display form for editting information about administrative          *
+ *  domains for managing vital statistics records.                      *
+ *                                                                      *
+ *  History:                                                            *
+ *      2017/10/28      created                                         *
+ *      2018/01/04      remove Template from template file names        *
  *      2019/02/21      support resizing scrolling row and PgUp/Dn      *
  *      2019/12/02      add partof                                      *
  *      2019/12/05      add category                                    *
  *      2022/03/09      add language validation                         *
- *																		*
- *  Copyright &copy; 2022 James A. Cobban								*
+ *                                                                      *
+ *  Copyright &copy; 2022 James A. Cobban                               *
  **********************************************************************-->
     <div id="breadcrumbs" class="hidden">
       <a href="/genealogy.php?lang=$LANG">
-	    Genealogy</a>:
+        Genealogy</a>:
       <a href="/FamilyTree/Services.php?lang=$LANG">
-	    Services</a>:
+        Services</a>:
       <a href="/Canada/CountriesEdit.php?lang=$LANG">
-	    Supported Countries</a>:
+        Supported Countries</a>:
       <a href="/genCountry.php?cc=$CC&amp;lang=$LANG">
-		    $COUNTRYNAME
+            $COUNTRYNAME
       </a>:
     </div> <!-- id="breadcrumbs" -->
     <div class="body">
       <h1>
         <span class="right">
-	    <a href="/Canada/DomainsEditHelpen.html" target="help">? Help</a>
+        <a href="/Canada/DomainsEditHelpen.html" target="help">? Help</a>
         </span>
-	    $COUNTRYNAME: $DOMAINTYPE Table Display
-        <div style="clear: both;"></div>
+        $COUNTRYNAME: $DOMAINTYPE Table Display
       </h1>
     $TRACE
     $MSG
       <p class="warning">
-	    You are not authorized.
-	    <a href="/Signon.php?lang=$LANG" target="_blank" class="button">Sign on</a>
-	    to update the database.
+        You are not authorized.
+        <a href="/Signon.php?lang=$LANG" target="_blank" class="button">Sign on</a>
+        to update the database.
       </p>
-      <!--- Put out a line with links to previous and next section of table -->
-	  <div class="center" id="topBrowse">
-        <span class="left" id="topPrev">
-	    <a href="/Canada/DomainsEdit.php?lang=$lang&amp;cc=$cc&amp;partof=$partof&amp;offset=$offset&amp;limit=$limit" id="prenpprev">
-	    &lt;---
-	    </a>
+      <!--- Put out a line with links to previous and next section -->
+      <div class="spaceBetween" id="topBrowse">
+        <span  id="topPrev">
+          <a href="/Canada/DomainsEdit.php?lang=$lang&amp;cc=$cc&amp;partof=$partof&amp;offset=$offset&amp;limit=$limit" id="prenpprev">
+          <img src="/Images/ArrowLeft.svg">
+          </a>
         </span>
-        <span class="right" id="topNext">
-	    <a href="/Canada/DomainsEdit.php?lang=$lang&amp;cc=$cc&amp;partof=$partof&amp;offset=$offset&amp;limit=$limit" id="prenpnext">
-	        ---&gt;
-	    </a>
+        <span  id="respdescrows">
+            showing rows $first to $last of $totalrows
         </span>
-          <span id="respdescrows">
-	    showing rows $first to $last of $totalrows
-          </span>
-        <div style="clear: both;"></div>
+        <span  id="topNext">
+          <a href="/Canada/DomainsEdit.php?lang=$lang&amp;cc=$cc&amp;partof=$partof&amp;offset=$offset&amp;limit=$limit" id="prenpnext">
+              <img src="/Images/ArrowRight.svg">
+          </a>
+        </span>
       </div> <!-- left and right arrow links -->
       <!--- Put out the response as a table -->
       <form name="domainForm" id="domainForm"
-	    action="DomainsEdit.php" 
-	    method="post" 
-	    autocomplete="off" 
-	    enctype="multipart/form-data">
+        action="DomainsEdit.php" 
+        method="post" 
+        autocomplete="off" 
+        enctype="multipart/form-data">
         <input type="hidden" name="Debug"   value="$DEBUG">
         <input type="hidden" name="cc"      value="$CC">
         <input type="hidden" name="offset"  value="$OFFSET">
         <input type="hidden" name="limit"   value="$LIMIT">
         <div class="row" id="langRow">
           <label class="column1" for="language" style="width: 8em;">
-	        Language:
+            Language:
           </label>
-	      <select name="language" id="language" class="ina left">
-	        <option id="languageOpt" value="$code"$selected>
-		      $name
-	        </option>
-	      </select>
-	      <div style="clear: both;"></div>
+          <select name="language" id="language" class="ina left">
+            <option id="languageOpt" value="$code"$selected>
+              $name
+            </option>
+          </select>
         </div>
         <table class="form" id="dataTable">
           <!--- Put out the column headers -->
           <thead>
             <tr id="hdrRow">
-		      <th class="colhead">
-		        Code
-		      </th>
-		      <th class="colhead">
-		        Name
-		      </th>
-	          <th class="colhead">
-	            Part&nbsp;of
-	          </th>
+              <th class="colhead">
+                Code
+              </th>
+              <th class="colhead">
+                Name
+              </th>
+              <th class="colhead">
+                Part&nbsp;of
+              </th>
               <th class="colhead">
                 Category
               </th>
-		      <th class="colhead">
-		        Counties
-		      </th>
-		      <th class="colhead">
-		        Resources
-		      </th>
+              <th class="colhead">
+                Counties
+              </th>
+              <th class="colhead">
+                Resources
+              </th>
             </tr>
           </thead>
           <tbody>
             <tr id="Row$code">
-		      <td class="right">
-		        <input type="text"
-			            name="Code$code" id="Code$code"
-				        value="$state"
-				        class="ina code" readonly="readonly"
-				        size="6" maxlength="7" >
-		        <input type="hidden"
-			            name="Lang$code" id="Lang$code"
-				        value="$language">
-		      </td>
-		      <td class="left">
-		        <input type="text"
-	    		        name="Name$code" id="Name$code" 
-		    		    value="$name" 
-			    	    class="ina left" readonly="readonly"
-				        size="26" maxlength="255">
-		      </td>
-	          <td class="left">
-	              <input type="text"
-	                    name="Partof$code" id="Partof$code" 
-	                    value="$partof" 
-	                    class="ina left" readonly="readonly"
-	                    size="6" maxlength="16">
-	          </td>
-	          <td class="left">
-	              <input type="text"
-	                  name="Category$code" id="Category$code" 
-	                  value="$category" 
-	                  class="ina left" readonly="readonly"
-	                  size="11" maxlength="32">
-	          </td>
-		      <td class="center">
-		        <button type="button" id="EditCounties$code">
-			      Counties
-		        </button> 
-		      </td>
-		      <td class="left">
-		        <a href="/Canada/genProvince.php?domain=$domain&lang=$lang"
-			        class="button" target="_blank">Details</a>
-		      </td>
+              <td class="right">
+                <input type="text"
+                        name="Code$code" id="Code$code"
+                        value="$state"
+                        class="ina code" readonly="readonly"
+                        size="6" maxlength="7" >
+                <input type="hidden"
+                        name="Lang$code" id="Lang$code"
+                        value="$language">
+              </td>
+              <td class="left">
+                <input type="text"
+                        name="Name$code" id="Name$code" 
+                        value="$name" 
+                        class="ina left" readonly="readonly"
+                        size="26" maxlength="255">
+              </td>
+              <td class="left">
+                  <input type="text"
+                        name="Partof$code" id="Partof$code" 
+                        value="$partof" 
+                        class="ina left" readonly="readonly"
+                        size="6" maxlength="16">
+              </td>
+              <td class="left">
+                  <input type="text"
+                      name="Category$code" id="Category$code" 
+                      value="$category" 
+                      class="ina left" readonly="readonly"
+                      size="11" maxlength="32">
+              </td>
+              <td class="center">
+                <button type="button" id="EditCounties$code">
+                  Counties
+                </button> 
+              </td>
+              <td class="left">
+                <a href="/Canada/genProvince.php?domain=$domain&lang=$lang"
+                    class="button" target="_blank">Details</a>
+              </td>
             </tr>
           </tbody>
         </table>
         <p>
           <button type="submit" id="Submit">Refresh</button>
-	        &nbsp;
-	        <button type="button" id="Close">Close</button>
+            &nbsp;
+            <button type="button" id="Close">Close</button>
         </p>
       </form>
     </div>

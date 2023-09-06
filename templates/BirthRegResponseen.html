@@ -7,11 +7,12 @@
  *  History:															*
  *		2018/10/09		created                                   		*
  *      2018/12/21      add message texts                               *
+ *      2022/07/06      use display: flex                               *
  *																		*
- *  Copyright &copy; 2018 James A. Cobban								*
+ *  Copyright &copy; 2022 James A. Cobban								*
  **********************************************************************-->
     <div id="breadcrumbs" class="hidden">
-      <a href="/index.html">Home</a>:
+      <a href="/home.html">Home</a>:
       <a href="/genealogy.php?lang=$LANG">
       	Genealogy
       </a>:
@@ -48,21 +49,21 @@
       	<a href="BirthRegResponseHelpen.html" target="_blank">Help?</a>
       </span>
       $DOMAINNAME: Birth Registration $ACTION
-      <div style="clear: both;"></div>
     </h1>
       $TRACE
       $MSG
       <!--- Put out a line with links to previous and next section of table -->
-      <div class="center" id="topBrowse">
-        <span class="left" id="topPrev">
-      	  <a href="$NPURI$NPAND$NPPREV">&lt;---</a>
+      <div class="spaceBetween" id="topBrowse">
+        <span id="topPrev">
+      	  <a href="$NPURI$NPAND$NPPREV"><img src="/Images/ArrowLeft.svg"></a>
         </span>
-        <span class="right" id="topNext">
-      	  <a href="$NPURI$NPAND$NPNEXT">---&gt;</a>
-        </span>
+        <span>
       	  displaying rows $OFFSET1 to
       	  $OFFSETNUMROWS of $TOTALROWS
-        <div style="clear: both;"></div>
+        </span>
+        <span id="topNext">
+      	  <a href="$NPURI$NPAND$NPNEXT"><img src="/Images/ArrowRight.svg"></a>
+        </span>
       </div> <!-- end of top page scroll -->
       <!--- Put out the response as a table -->
       <form id="respform">
@@ -131,16 +132,14 @@
       </table>
       </form>
       <!--- Put out a line with links to previous and next section of response -->
-      <div class="center" id="botBrowse">
-        <span class="left" id="botPrev">
-       	  <a href="$NPURI$NPAND$NPPREV">&lt;---</a>
+      <div class="spaceBetween" id="botBrowse">
+        <span id="botPrev">
+       	  <a href="$NPURI$NPAND$NPPREV"><img src="/Images/ArrowLeft.svg"></a>
         </span>
-        <span class="right" id="botNext">
-       	  <a href="$NPURI$NPAND$NPNEXT">---&gt;
+        <span id="botNext">
+       	  <a href="$NPURI$NPAND$NPNEXT"><img src="/Images/ArrowRight.svg">
        	  </a>
         </span>
-        	&nbsp;
-        <div style="clear: both;"></div>
       </div> <!-- end of bottom page scroll -->
     </div> <!-- end of <div id="body"> -->
 

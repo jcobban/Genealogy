@@ -7,8 +7,9 @@
  *		2017/09/19		created											*
  *		2018/01/04		remove Template from template file names		*
  *		2018/01/18		spell out Naissance								*
+ *      2022/07/06      use display: flex                               *
  *																		*
- *  Copyright &copy; 2018 James A. Cobban								*
+ *  Copyright &copy; 2022 James A. Cobban								*
  **********************************************************************-->
   <div class="hidden" id="breadcrumbs">
     <a href="/genealogy.php?lang=fr">Généalogie</a>:
@@ -26,38 +27,38 @@
         <span class="right">
 	  <a href="/database/CensusResponseHelpfr.html" target="help">? Aide</a>
         </span>
-        <div style="clear: both;"></div>
       </h1>
       $MSG
       $TRACE
 		<!--- Put out a line with links to previous and next section of table -->
-		<div class="center" id="topBrowse">
-		    <span class="left" id="topPrev">
+		<div class="spaceBetween" id="topBrowse">
+		  <span id="topPrev">
 			<a href="$npPrev" id="prenpprev">
-			&lt;---
+			<img src="/Images/ArrowLeft.svg">
 			</a>
 		    </span>
-		    <span class="right" id="topNext">
-			<a href="$npNext" id="prenpnext">
-			    ---&gt;
-			</a>
-		    </span>
-		      <span id="respdescrows">montrer rangs $first a $last
-					   de $totalrows
-		      </span>
+		    <span>
+              <span  id="respdescrows">
+                Montrer rangs $first a $last de $totalrows
+              </span>
 		      <span id="respdescsub">
-			$province dist $dId $DName, sousdist $subdId $SubDName
+			    $province dist $dId $DName, sousdist $subdId $SubDName
 		      </span>
 		      <span id="respdescdiv">
-			 div $divId
+			    div $divId
 		      </span>
 		      <span id="respdescpage">
-			 page $page
+			    page $page
 		      </span>
 		      <span id="respdescfam">
-			 famille $family
+			    famille $family
 		      </span>
-		    <div style="clear: both;"></div>
+		    </span>
+		    <span id="topNext">
+			  <a href="$npNext" id="prenpnext">
+			    <img src="/Images/ArrowRight.svg">
+			  </a>
+		    </span>
 		</div>
     <form action="doNothing.php" name="buttonForm" id="buttonForm">
 	<p class="label" id="buttonRow">
@@ -132,20 +133,19 @@
     </tbody>
   </table>
     </form>
-  <!--- Put out a line with links to previous and next section of table -->
-  <div class="center" id="botBrowse">
-    <span class="left" id="botPrev">
-	<a href="$npPrev" id="postnpprev">
-	&lt;---
-	</a>
-    </span>
-    <span class="right" id="npNextBack">
-	<a href="$npNext" id="postnpnext">
-	    ---&gt;
-	</a>
-    </span>
-    <div style="clear: both;"></div>
-  </div>
+    <!--- Put out a line with links to prev and next section of table -->
+    <div class="spaceBetween" id="botBrowse">
+      <span id="botPrev">
+  	    <a href="$npPrev" id="postnpprev">
+  	      <img src="/Images/ArrowLeft.svg">
+  	    </a>
+      </span>
+      <span id="botBack">
+  	    <a href="$npNext" id="postnpnext">
+  	      <img src="/Images/ArrowRight.svg">
+  	    </a>
+      </span>
+    </div> <!-- id="botBrowse" -->
   </div>
   </div> <!-- id="transcription" -->
 <div class="balloon" id="HelpseeAllFields">

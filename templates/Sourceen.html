@@ -20,7 +20,6 @@
         <span class="right">
  		 <a href="SourceHelpen.html" target="help">? Help</a>
         </span>
-        <div style="clear: both;"></div>
       </h1>
       $TRACE
       $MSG
@@ -29,49 +28,42 @@
       <div class="data">
 		$IDSR
       </div>
-      <div style="clear: both;"></div>
     </div>
     <div class="row" id="titleRow">
       <div class="labelRight" class="label">Title:</div>
       <div class="data">
 		$SRCTITLE
       </div>
-      <div style="clear: both;"></div>
     </div>
     <div class="row">
       <div class="labelRight" class="label">Type:</div>
       <div class="data">
 		$TYPETEXT
       </div>
-      <div style="clear: both;"></div>
     </div>
     <div class="row" id="authorRow">
       <div class="labelRight" class="label">Author:</div>
       <div class="data">
 		$SRCAUTHOR
       </div>
-      <div style="clear: both;"></div>
     </div>
     <div class="row" is="publisherRow">
       <div class="labelRight" class="label">Publication Data:</div>
       <div class="data">
 		$SRCPUBL
       </div>
-      <div style="clear: both;"></div>
     </div>
     <div class="row" id="textRow">
       <div class="labelRight" class="label">Text:</div>
       <div class="data">
 		$SRCTEXT
       </div>
-      <div style="clear: both;"></div>
     </div>
     <div class="row" id="notesRow">
       <div class="labelRight" class="label">Notes:</div>
       <div class="data">
 		$SRCNOTE
       </div>
-      <div style="clear: both;"></div>
     </div>
     <div class="row" id="callNumRow">
       <div class="labelRight" class="label">CallNum:</div>
@@ -79,7 +71,6 @@
 		<a href="$SRCCALLNUM" id="callNum">$SRCCALLNUM
 		</a>
       </div>
-      <div style="clear: both;"></div>
     </div>
     <div class="row" id="repositoryRow">
       <div class="labelRight" class="label">Repository:</div>
@@ -92,7 +83,6 @@
 		    <span id="repoPostalCode">$REPOPOSTALCODE<br/></span>
 		    <span id="repoCountry">$REPOCOUNTRY<br/></span>
       </div>
-      <div style="clear: both;"></div>
     </div>
     <div class="row" id="homePageRow">
       <div class="labelRight" class="label">Home Page:</div>
@@ -100,21 +90,18 @@
 		<a href="$HOMEPAGE" id="repoHomePageLink">
 				$HOMEPAGE</a>
       </div>
-      <div style="clear: both;"></div>
     </div>
     <div class="row" id="repoNotesRow">
       <div class="labelRight" class="label">Notes:</div>
       <div class="data">
 		<a href="Notes" id="repoNotesLink">$REPONOTES</a>
       </div>
-      <div style="clear: both;"></div>
     </div>
     <div class="row" id="enteredDateRow">
       <div class="labelRight" class="label">Entered Date:</div>
       <div class="data">
     $ENTEREDD
       </div>
-      <div style="clear: both;"></div>
     </div>
 		<p id="editButtonRow">
 		  <a href="editSource.php?idsr=$IDSR&lang=$LANG&Debug=$DEBUG"
@@ -139,27 +126,3 @@
             <p>New Source '$name' created.</p>
         </span>
     </div><!-- id="messages" -->
-    <div class="hidden" id="srcTypes">`
-		<span data-key="1"></span>
-		<span data-key="2">Bible</span>
-		<span data-key="3">Book</span>
-		<span data-key="4">Census/Tax records</span>
-		<span data-key="5">Church records</span>
-		<span data-key="6">Court records</span>
-		<span data-key="7">Interview</span>
-		<span data-key="8">Personal Journal</span>
-		<span data-key="9">Land records</span>
-		<span data-key="10">Letter</span>
-		<span data-key="11">Military records</span>
-		<span data-key="12">Newspaper</span>
-		<span data-key="13">Periodical</span>
-		<span data-key="14">Personal Communication</span>
-		<span data-key="15">Vital Statistics</span>
-		<span data-key="16">Web Site</span>
-    </div><!-- id="srcTypes" -->
-    <script src="/jscripts/js20/http.js" type="application/javaScript">
-    </script>
-    <script src="/jscripts/util.js" type="application/javaScript">
-    </script>
-    <script src="/default.js" type="application/javaScript">
-    </script>

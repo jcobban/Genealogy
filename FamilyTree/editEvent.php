@@ -948,6 +948,7 @@ if ($idmr > 0)
     }           // invalid IDMR value
 }               // IDMR was specified in parameters
 
+$forText                    = '';
 if (strlen($msg) == 0)
 {
     // validate the presence of parameters depending upon
@@ -968,7 +969,6 @@ if (strlen($msg) == 0)
 
     // determine portion of page heading that describes the record
     // referenced by the event
-    $forText                = '';
     if ((ctype_digit($idir) || is_int($idir)) && $idir > 0)
     {       // IDIR based event
         $forText    = 
@@ -993,6 +993,8 @@ if (strlen($msg) == 0)
     else
     if (ctype_digit($idtd) || is_int($idtd))
         $forText    = "<a href=\"ToDo.php?idtd=$idtd&amp;lang=$lang\">IDTD=$idtd</a>";
+    else
+        $forText    = '';
 
     // take action which depends upon the Citation type
     switch($stype)

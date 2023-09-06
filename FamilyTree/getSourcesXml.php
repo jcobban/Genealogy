@@ -29,8 +29,9 @@ use \Exception;
  *		2015/07/02		access PHP includes using include_path			*
  *		2017/07/30		class LegacySource renamed to class Source		*
  *		2017/10/14		use class RecordSet								*
+ *		2023/01/25      escape parm output                              *
  *																		*
- *  Copyright &copy; 2017 James A. Cobban								*
+ *  Copyright &copy; 2023 James A. Cobban								*
  ************************************************************************/
 header("Content-Type: text/xml");
 require_once __NAMESPACE__ . '/RecordSet.inc';
@@ -49,43 +50,32 @@ print("<sources>\n");
 // can apply the response information to the specific element
 foreach($_GET as $fldname => $value)
 {			// loop through all parameters
-    print "    <$fldname>$value</$fldname>\n";
+    $safevalue                  = htmlspecialchars($value);
+    print "    <$fldname>$safevalue</$fldname>\n";
     switch(strtolower($fldname))
     {		// act on specific parameters
         case 'name':
-        {		// name of <select>
     		// value is just echoed
-    		break;
-        }		// name of <select>
+    		break; // name of <select>
 
         case 'idsr':
-        {		// current selected source
     		// value is just echoed
-    		break;
-        }		// current selected source
+    		break; // current selected source
 
         case 'include':
-        {		// option to include all fields in output
-    		$full	= strtolower($value) == 'all';
-    		break;
-        }		// option to include all fields in output
+    		$full	            = strtolower($value) == 'all';
+    		break; // option to include all fields in output
 
         case 'order':
-        {		// specify alternate source order
-    		$order	= $value;
-    		break;
-        }		// specify alternate source order
+    		$order	            = $value;
+    		break; // specify alternate source order
 
         case 'debug':
-        {		// handled by common code
-    		break;
-        }		// handled by common code
+    		break; // handled by common code
 
         default:
-        {		// restrictions on which sources to return
     		$parms[$fldname]	= $value;
-    		break;
-        }		// restrictions on which sources to return
+    		break; // restrictions on which sources to return
     }
 }			// loop through all parameters
 
@@ -110,4 +100,3 @@ foreach($result as $idsr => $source)
 }		// loop through all sources
 
 print("</sources>\n");	// close off top node of XML result
-

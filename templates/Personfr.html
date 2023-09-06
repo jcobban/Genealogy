@@ -13,7 +13,7 @@
  *  Copyright &copy; 2019 James A. Cobban                               *
  **********************************************************************-->
   <div id="breadcrumbs" class="hidden">
-    <a href="/index.html">Accueil</a>:
+    <a href="/home.html">Accueil</a>:
       <a href="/genealogy.php?lang=fr">
             Généalogie
       </a>:
@@ -37,7 +37,6 @@
         </span>
           $TITLE
           <span id="inTree">: en arbre "$treeName"</span>
-        <div style="clear: both;"></div>
       </h1>
       $TRACE
       $MSG
@@ -143,10 +142,11 @@
             value="$USERID">
       <input type="hidden" name="idir" id="blogidir"
             value="$IDIR">
-    <p>
-      <textarea name="message" id="message" placeholder="[entrer message]"
-            rows='5' cols='100'></textarea>
-    </p>
+        <div style="width: 80%;">
+          <textarea name="message" id="message" 
+                    placeholder="[entrer message]"
+                    rows='5' cols='100'></textarea>
+        </div>
     <div class="row" id="blogEmailRow">
       <label class='column1' for='emailAddress'>
             Votre Addresse Courriel:
@@ -162,17 +162,21 @@
     </div>
   </form> <!-- name="blogform" id="blogform" -->
       </div>
-      <div class="row" id="footnotesSection">
+      <div id="footnotesSection">
         <hr class='footnotes'/>
         <p class='label'>Notes de bas de page:</p>
         <div id='footnote$key'>
-          <div class="column1" id="#fn$key">
-            $key
+          <div class="row">
+            <div class="column1" id="#fn$key">
+              $key
+            </div>
+            $text
+          </div> <!-- class='row' -->
+          <div style="margin-left: 3em;">
+            $other
           </div>
-          $text
-          <div style='clear: both;'></div>
         </div> <!-- class='footnote$key' -->
-      </div> <!-- class="row" id="footnotesSection" -->
+      </div> <!-- id="footnotesSection" -->
     </div> <!-- class="body" -->
 
     <div class="hidden" id="messages">
@@ -188,8 +192,47 @@
       <span id="neverMarried">
         Ce couple ne s'est jamais marié. 
       </span>
+      <div id="showText$IDSX" class="row" style="white-space: normal;">
+        $TEXT 
+      </div>
+      <div id="showNote$IDSX" class="row" style="white-space: normal;">
+          <strong>Note:</strong> $NOTE 
+      </div>
     </div> <!-- id="messages" -->
 
+    <div class="hidden" id="rightColSelection">
+      <span id="rightcol1">
+        <p>
+        Lorsque l'on utilise cette page sur un ordinateur avec
+        un dispositif de pointage, par exemple une souris, le fait 
+        de maintenir le dispositif de pointage au-dessus de n'importe 
+        quel élément d'information entraîne l'affichage d'une 
+        explication de cet élément d'information dans une fenêtre 
+        contextuelle. Ceci comprend:
+        </p>
+        <ol>
+          <li>Les noms des membres de la famille mis en évidence 
+              sous forme d'hyperliens.
+          </li>
+          <li>Lieux où se sont déroulés les événements. Cela offre 
+              la possibilité de voir une carte de l'emplacement.
+          </li>
+          <li>Causes de décès expliquées par un dictionnaire médical.
+          </li>
+          <li>Noms des sources
+          </li>
+          <li>Identifications des pages de citation.
+          </li>
+        </ol>
+      </span>
+
+      <p id="rightcol2">
+        Si vous êtes connecté et que vous avez reçu l'autorisation
+        d'un propriétaire existant de cette famille, vous pouvez ajouter, 
+        supprimer ou modifier les informations enregistrées.
+      </p>
+        
+    </div> <!-- id="rightColSelection" -->
     <!--*****************************************************************
      *  generate popups                                                 *
      ******************************************************************-->
@@ -229,12 +272,12 @@
     </p>
   </div> 
 
-  <div id="showLocDiv$idlr" class="balloon">
-    <b>$name</b>
-    <p>
-    $notes
-    </p>
-    <form name='locForm$idlr'>
+    <div id="showLocDiv$idlr" class="balloon">
+      <b>$name</b>
+      <p class="normal">
+        $notes
+      </p>
+      <form name='locForm$idlr'>
         <input type="hidden" name="searchName" value="$searchName">
         <input type="hidden" name="county" value="$county">
         <input type="hidden" name="Location" value="$location">
@@ -249,8 +292,8 @@
         <button type="button" id="editLoc$idlr" class="button">
               Modifier l'endroit
         </button>
-    </form>
-  </div>
+      </form>
+    </div>
 
   <div id="showTplDiv$idtr" class="balloon">
     <b>Temple: $name</b>
@@ -291,38 +334,38 @@ $DEATHCAUSES
      ******************************************************************-->
     <div id="eventStmt" class="hidden">
       <span data-key='1'>$Pronoun $Description $onDate $atLocation.$Citations $Notes</span>
-      <span data-key='2'>$Pronoun est adopté $onDate $atLocation by $Description.$Citations $Notes</span>
-      <span data-key='3'>$Pronoun est né $Description $onDate $atLocation.$Citations $Notes</span>
-      <span data-key='4'>$Pronoun a été enterré $Description $onDate $atLocation.$Citations $Notes</span>
-      <span data-key='5'>$Pronoun est baptizé $Description $onDate $atLocation.$Citations $Notes</span>
-      <span data-key='6'>$Pronoun est mort $onDate $Description $atLocation.$Citations $Notes</span>
+      <span data-key='2'>$Pronoun est adopté$gsuf $onDate $atLocation by $Description.$Citations $Notes</span>
+      <span data-key='3'>$Pronoun est né$gsuf $Description $onDate $atLocation.$Citations $Notes</span>
+      <span data-key='4'>$Pronoun a été enterré$gsuf $Description $onDate $atLocation.$Citations $Notes</span>
+      <span data-key='5'>$Pronoun a été baptizé$gsuf $Description $onDate $atLocation.$Citations $Notes</span>
+      <span data-key='6'>$Pronoun est mort$gsuf $onDate $Description $atLocation.$Citations $Notes</span>
       <span data-key='7'>$Pronoun a sa mariage annullée $Description, $onDate $atLocation.$Citations $Notes</span>
       <span data-key='8'>$Pronoun est baptizé de LDS $Description $onDate $atLocation.$Citations $Notes</span>
       <span data-key='9'>Il a celebré son bar mitzvah $Description $onDate $atLocation.$Citations $Notes</span>
       <span data-key='10'>Elle a celebré sa bas mitzvah $Description $onDate $atLocation.$Citations $Notes</span>
-      <span data-key='11'>$Pronoun est beni $Description $onDate $atLocation.$Citations $Notes</span>
+      <span data-key='11'>$Pronoun est beni$gsuf $Description $onDate $atLocation.$Citations $Notes</span>
       <span data-key='12'>$Pronoun a apparait a le $Description census $onDate $atLocation.$Citations $Notes</span>
-      <span data-key='13'>$Pronoun est circumcisé $Description $onDate $atLocation.$Citations $Notes</span>
-      <span data-key='14'>$Pronoun est devient un $Description citizen $onDate $atLocation.$Citations $Notes</span>
-      <span data-key='15'>$Pronoun est confirmé $Description $onDate $atLocation.$Citations $Notes</span>
-      <span data-key='16'>$Pronoun est confirmed in The Church of Jesus Christ of Latter-day Saints $Description $onDate $atLocation.$Citations $Notes</span>
-      <span data-key='17'>$Pronoun est involvé in a court case about $Description $onDate $atLocation.$Citations $Notes</span>
-      <span data-key='18'>$Pronoun est cremé $Description $onDate $atLocation.$Citations $Notes</span>
+      <span data-key='13'>$Pronoun a été circoncis $Description $onDate $atLocation.$Citations $Notes</span>
+      <span data-key='14'>$Pronoun est devenu$gsuf citoyenne $Description $onDate $atLocation.$Citations $Notes</span>
+      <span data-key='15'>$Pronoun a été confirmé$gsuf $Description $onDate $atLocation.$Citations $Notes</span>
+      <span data-key='16'>$Pronoun a été confirmé$gsuf dans l'Église de Jésus-Christ des Saints des Derniers Jours $Description $onDate $atLocation.$Citations $Notes</span>
+      <span data-key='17'>$Pronoun est involvé$gsuf in a court case about $Description $onDate $atLocation.$Citations $Notes</span>
+      <span data-key='18'>$Pronoun est cremé$gsuf $Description $onDate $atLocation.$Citations $Notes</span>
       <span data-key='19'>$Pronoun a recu une degreée de $Description $onDate $atLocation.$Citations $Notes</span>
       <span data-key='20'>Ils sont divorcés $Description $onDate $atLocation.$Citations $Notes</span>
       <span data-key='21'>Ils ont demandé le divorce $Description $onDate $atLocation.$Citations $Notes</span>
-      <span data-key='22'>$Pronoun est educé à $Description $onDate $atLocation.$Citations $Notes</span>
+      <span data-key='22'>$Pronoun est educé$gsuf à $Description $onDate $atLocation.$Citations $Notes</span>
       <span data-key='23'>$Pronoun a emigré $Description $onDate de $atLocation.$Citations $Notes</span>
-      <span data-key='24'>$Pronoun est employé comme un $Description $onDate $atLocation.$Citations $Notes</span>
+      <span data-key='24'>$Pronoun est employé$gsuf comme un $Description $onDate $atLocation.$Citations $Notes</span>
       <span data-key='25'>$Pronoun sont engagés $Description $onDate $atLocation.$Citations $Notes</span>
       <span data-key='26'>$Pronoun a reçu First Holy Communion $Description $onDate $atLocation.$Citations $Notes</span>
       <span data-key='27'>$Pronoun a gradué de $Description $onDate $atLocation.$Citations $Notes</span>
       <span data-key='28'>$Pronoun a enjoui $Description $onDate $atLocation.$Citations $Notes</span>
-      <span data-key='29'>$Pronoun est honoré pour $Description $onDate $atLocation.$Citations $Notes</span>
+      <span data-key='29'>$Pronoun est honoré$gsuf pour $Description $onDate $atLocation.$Citations $Notes</span>
       <span data-key='30'>$Pronoun est à l'hôpital pour $Description $onDate $atLocation.$Citations $Notes</span>
-      <span data-key='31'>$Pronoun est ill avec $Description $onDate $atLocation.$Citations $Notes</span>
+      <span data-key='31'>$Pronoun était malade avec $Description $onDate $atLocation.$Citations $Notes</span>
       <span data-key='32'>$Pronoun a immigré $Description $onDate a $atLocation.$Citations $Notes</span>
-      <span data-key='33'>$Pronoun est interviewed $Description $onDate $atLocation.$Citations $Notes</span>
+      <span data-key='33'>$Pronoun a été interviewé$gsuf $Description $onDate $atLocation.$Citations $Notes</span>
       <span data-key='34'>$Pronoun $Description land $onDate $atLocation.$Citations $Notes</span>
       <span data-key='35'>Ils ont publié les banns de mariage $Description $onDate $atLocation.$Citations $Notes</span>
       <span data-key='36'>Ils ont signé un contract de mariage $Description $onDate $atLocation.$Citations $Notes</span>
@@ -330,7 +373,7 @@ $DEATHCAUSES
       <span data-key='38'>Ils ont publié un intent a marier $Description $onDate $atLocation.$Citations $Notes</span>
       <span data-key='39'>Ils ont obtenu un settlement de mariage $Description $onDate $atLocation.$Citations $Notes</span>
       <span data-key='40'>$Pronoun a reçu des attentions medicaux pour $Description $onDate $atLocation.$Citations $Notes</span>
-      <span data-key='41'>$Pronoun est un membre de $Description $onDate $atLocation.$Citations $Notes</span>
+      <span data-key='41'>$Pronoun est un$gsuf membre de $Description $onDate $atLocation.$Citations $Notes</span>
       <span data-key='42'>$Pronoun a servie dans le militaire $Description $onDate $atLocation.$Citations $Notes</span>
       <span data-key='43'>$Pronoun a servie dans une mission $Description $onDate $atLocation.$Citations $Notes</span>
       <span data-key='44'>$Pronoun est named after $Description $onDate $atLocation.$Citations $Notes</span>
@@ -338,15 +381,15 @@ $DEATHCAUSES
       <span data-key='46'>$Pronoun obituary est publié dans le $Description $onDate $atLocation.$Citations $Notes</span>
       <span data-key='47'>$Pronoun a travaillé comme un $Description $onDate $atLocation.$Citations $Notes</span>
       <span data-key='48'>$Pronoun a l'ordinance LDS $Description $onDate $atLocation.$Citations $Notes</span>
-      <span data-key='49'>$Pronoun est ordiné a $Description $onDate $atLocation.$Citations $Notes</span>
-      <span data-key='50'>$Pronoun est descrit comme $Description $onDate $atLocation.$Citations $Notes</span>
+      <span data-key='49'>$Pronoun est ordiné$gsuf a $Description $onDate $atLocation.$Citations $Notes</span>
+      <span data-key='50'>$Pronoun est descrit$gsuf comme $Description $onDate $atLocation.$Citations $Notes</span>
       <span data-key='51'>$Pronoun a un estate probé $Description $onDate $atLocation.$Citations $Notes</span>
       <span data-key='52'>$Pronoun $Description proprieté $onDate $atLocation.$Citations $Notes</span>
       <span data-key='53'>$Pronoun a appartenu a la croyance $Description $onDate $atLocation.$Citations $Notes</span>
       <span data-key='54'>$Pronoun a demeuré $Description $onDate $atLocation.$Citations $Notes</span>
       <span data-key='55'>$Pronoun retired $Description $onDate $atLocation.$Citations $Notes</span>
       <span data-key='56'>$Pronoun attended school $Description $onDate $atLocation.$Citations $Notes</span>
-      <span data-key='57'>$Pronoun est assigned US Social Security Number $Description $onDate $atLocation.$Citations $Notes</span>
+      <span data-key='57'>$Pronoun est assigné US Social Security Number $Description $onDate $atLocation.$Citations $Notes</span>
       <span data-key='58'>$Pronoun signed a will $Description $onDate $atLocation.$Citations $Notes</span>
       <span data-key='59'>$Pronoun had a medical condition of $Description, $onDate, $atLocation.$Citations $Notes</span>
       <span data-key='60'>$Pronoun served in the military: $Description, $onDate, $atLocation.$Citations $Notes</span>
@@ -356,18 +399,18 @@ $DEATHCAUSES
       <span data-key='64'>$Pronoun est $Description $onDate $atLocation.$Citations $Notes</span>
       <span data-key='65'>$Pronoun a appartenu à une groupe familielle $Description $onDate $atLocation.$Citations $Notes</span>
       <span data-key='66'>$Pronoun a s'identifié comme $Description $onDate $atLocation.$Citations $Notes</span>
-      <span data-key='67'>$Pronoun funeral est held $Description $onDate $atLocation.$Citations $Notes</span>
-      <span data-key='68'>$Pronoun est eligé comme $Description $onDate $atLocation.$Citations $Notes</span>
+      <span data-key='67'>Ses funérailles ont eu lieu $Description $onDate $atLocation.$Citations $Notes</span>
+      <span data-key='68'>$Pronoun est eligé$gsuf comme $Description $onDate $atLocation.$Citations $Notes</span>
       <span data-key='69'>$Pronoun est marie $Description $onDate and $atLocation.$Citations $Notes</span>
       <span data-key='70'>Evenement de mariage $Description $onDate $atLocation.$Citations $Notes</span>
-      <span data-key='71'>$possesivePronoun naissance est registré $Description $onDate $atLocation.$Citations $Notes</span>
-      <span data-key='72'>$possesivePronoun mort est registré $Description $onDate $atLocation.$Citations $Notes</span>
-      <span data-key='73'>Son mariage est registré $Description $onDate $atLocation.$Citations $Notes</span>
-      <span data-key='2000'>$Pronoun est né $onDate $atLocation.$Citations $Notes</span>
-      <span data-key='3000'>$Pronoun est baptizé $onDate $atLocation.$Citations $Notes</span>
-      <span data-key='4000'>$Pronoun est mort $onDate $atLocation.$Citations $Notes</span>
-      <span data-key='5000'>$Pronoun est sepulté $onDate $atLocation.$Citations $Notes</span>
-      <span data-key='5001'>$Pronoun est incenéré $onDate $atLocation.$Citations $Notes</span>
+      <span data-key='71'>$possesivePronoun naissance est registré$gsuf $Description $onDate $atLocation.$Citations $Notes</span>
+      <span data-key='72'>$possesivePronoun mort est registré$gsuf $Description $onDate $atLocation.$Citations $Notes</span>
+      <span data-key='73'>Son mariage est registré$gsuf $Description $onDate $atLocation.$Citations $Notes</span>
+      <span data-key='2000'>$Pronoun est né$gsuf $onDate $atLocation.$Citations $Notes</span>
+      <span data-key='3000'>$Pronoun est baptizé$gsuf $onDate $atLocation.$Citations $Notes</span>
+      <span data-key='4000'>$Pronoun est mort$gsuf $onDate $atLocation.$Citations $Notes</span>
+      <span data-key='5000'>$Pronoun est sepulté$gsuf $onDate $atLocation.$Citations $Notes</span>
+      <span data-key='5001'>$Pronoun est incenéré$gsuf $onDate $atLocation.$Citations $Notes</span>
       <span data-key='15000'>$Pronoun a reçu le Baptism LDS $onDate $atLocation.$Citations $Notes</span>
       <span data-key='16000'>$Pronoun a reçu l'Endowment LDS $onDate $atLocation.$Citations $Notes</span>
       <span data-key='26000'>$Pronoun a reçu la Confirmation LDS $onDate $atLocation.$Citations $Notes</span>
@@ -441,8 +484,8 @@ $DEATHCAUSES
         although this will not be reflected in the description
         of this individual until the page is refreshed.
     </div>
-    <script src="/jscripts/tinymce/js/tinymce/tinymce.js" type="application/javascript">
+    <script src="/jscripts/tinymce/js/tinymce/tinymce.min.js" type="application/javascript">
     </script>
     <script src="/FamilyTree/Person.js" type="module">
     </script>
-    <script defer src="https://maps.googleapis.com/maps/api/js?v=3.43&callback=initializeMaps&region=$GOOGLECC&key=$GOOGLEKEY" type="application/javascript"></script>
+    <script defer src="https://maps.googleapis.com/maps/api/js?v=weekly&callback=initializeMaps&region=$GOOGLECC&key=$GOOGLEKEY" type="application/javascript"></script>

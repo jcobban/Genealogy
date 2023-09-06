@@ -182,13 +182,13 @@ else
         $template->set('PREVOFFSET',    $prevoffset);
     }	// previous page of output to display
     else
-        $template['topPrev']->update(null);
+        $template['topPrev']->update('&nbsp;');
     if ($nextoffset  < $count)
     {	// next page of output to display
         $template->set('NEXTOFFSET',    $nextoffset);
     }	// next page of output to display
     else
-        $template['topNext']->update(null);
+        $template['topNext']->update('&nbsp;');
 
     // display the results
     $rowElement             = $template['sourceRow$IDSR'];

@@ -301,8 +301,16 @@ use \Templating\TemplateTag;
  *      2021/03/19      migrate to ES2015                               *
  *      2021/07/07      change to behavior of $family->getEvents()      *
  *                      required adding code for families without spouse*
+ *      2022/06/10      randomly choose blocks of text to display in    *
+ *                      right hand column                               *
+ *      2022/06/13      add gender specific suffix to participles       *
+ *      2022/07/04      in citations put quoted text and notes on       *
+ *                      separate row after source name and page         *
+ *      2022/09/25      correct setting preposition before locations    *
+ *      2023/09/04      only reference Citation methods when we know    *
+ *                      we have an instance of Citation                 *
  *                                                                      *
- *  Copyright &copy; 2021 James A. Cobban                               *
+ *  Copyright &copy; 2023 James A. Cobban                               *
  ************************************************************************/
 require_once __NAMESPACE__ . '/Address.inc';
 require_once __NAMESPACE__ . '/Blog.inc';
@@ -568,31 +576,67 @@ function showCitationTable()
 
     foreach($citTable as $key => $cit)
     {           // loop through all citations
-        $entry             = array('key' => $key);
+        $entry              = array('key' => $key);
+        $other              = '';
+
         // generate HTML for this footnote
         if ($cit instanceof Citation)
         {       // invoke toHtml method
             $entry['text']          = $cit->toHTML($lang);
             $idsr                   = $cit->getIdsr();
+            $idsx                   = $cit['idsx'];
             if ($idsr > 1)
             {
                 $source             = $cit->getSource();
                 $source->setTemplate($template);
                 $sourceTable[$idsr] = $source;
             }
+
+            // interpret text quotation from source
+            $text                   = trim($cit->getDetailText());
+            if (strlen($text) > 0)
+            {
+                if (preg_match('#^\s*<p>([^<]*)</p>\s*$#', $text, $matches))
+                    $text           = $matches[1];
+                $tag                = $template['showText$IDSX'];
+                if ($tag)
+                    $other          .= str_replace(array('$IDSX','$TEXT'),
+                                                   array($idsx, $text),
+                                                   $tag->outerHTML);
+            }
+
+            // interpret comments about the citation
+            $note                   = trim($cit->getDetailNote());
+            if (strlen($note) > 0)
+            {
+                if (preg_match('#^\s*<p>([^<]*)</p>\s*$#', $note, $matches))
+                    $note           = $matches[1];
+                $tag                = $template['showNote$IDSX'];
+                if ($tag)
+                    $other          .= str_replace(array('$IDSX','$NOTE'),
+                                                   array($idsx, $note),
+                                                   $tag->outerHTML);
+                else
+                    error_log("Person.php:showCitationTable: " . __LINE__ .
+                                " unable to find id=showNote\$IDSX in Person$lang.html\n");
+            }
         }       // invoke toHtml method
         else
         {       // not instance of Citation
+            $idsx                   = 0;
             if (is_object($cit) && method_exists($cit, 'getNotes'))
             {       // invoke getNotes method
-                        $entry['text']     = $cit->getNotes();
+                $entry['text']      = '';
+                $entry['other']     = $cit->getNotes();
             }       // invoke getNotes method
             else
             {       // treat as text
-                        $entry['text']     = $cit;
+                $entry['text']      = $cit;
+                $entry['other']     = '';
             }       // treat as text
         }         // not instance of Citation
-        $parmTable[$key]     = $entry;
+        $entry['other']     = $other;
+        $parmTable[$key]    = $entry;
     }           // for each
     $template->updateTag('footnote$key', $parmTable);
 }       // function showCitationTable
@@ -613,6 +657,7 @@ function showCitationTable()
  *                          $Pronoun                                    *
  *                          $reflexivePronoun                           *
  *                          $possesivePronoun                           *
+ *                          $gsuf [Gender suffix]                       *
  *                          $onDate                                     *
  *                          $Location                                   *
  *                          $atLocation                                 *
@@ -694,6 +739,7 @@ function showEvent($pronoun,
         $pronoun            = $t['He'];
         $reflexivePronoun   = $t['Himself'];
         $possesivePronoun   = $t['His'];
+        $gsuf               = $t['malesuffix'];
     }
     else
     if ($person['gender'] == Person::FEMALE)
@@ -701,12 +747,14 @@ function showEvent($pronoun,
         $pronoun            = $t['She'];
         $reflexivePronoun   = $t['Herself'];
         $possesivePronoun   = $t['Hers'];
+        $gsuf               = $t['femalesuffix'];
     }
     else
     {
         $pronoun            = $t['He/She'];
         $reflexivePronoun   = $t['His/Herself'];
         $possesivePronoun   = $t['His/Hers'];
+        $gsuf               = $t['malesuffix'];
     }
 
     $bprivlim       = $person->getBPrivLim();   // birth privacy limit year
@@ -755,6 +803,7 @@ function showEvent($pronoun,
         print str_replace(array('$Pronoun',
                                 '$reflexivePronoun',
                                 '$possesivePronoun',
+                                '$gsuf',
                                 '$onDate',
                                 '$Location',
                                 '$atLocation',
@@ -765,6 +814,7 @@ function showEvent($pronoun,
                           array($pronoun,
                                 $reflexivePronoun,
                                 $possesivePronoun,
+                                $gsuf,
                                 $date,
                                 showLocation($loc,'',''),
                                 showLocation($loc),
@@ -849,18 +899,13 @@ function showLocation($location,
             $prep           = $location->getPreposition();
             if ($prep == '')
                 $prep       = 'at';
-            if (array_key_exists($prep, $t))
-                $retval     .= $t[$prep];
-            else
-                $retval     .= $prep;
+
+            $retval         .= $t[$prep];
         }
         else
         if (strlen($defPrep) > 0)
         {
-            if (array_key_exists($defPrep, $t))
-                $retval     .= $t[$defPrep];
-            else
-                $retval     .= $defPrep;
+            $retval     .= $t[$defPrep];
         }
 
         $retval         .= " <span id=\"{$idprefix}{$locindex}_{$idlr}\">$locname</span>\n";
@@ -1273,7 +1318,7 @@ function displayEvent($ider,
         {                   // do not have a spouse
             print " " . $t['an unknown person'];
         }                   // do not have a spouse
-        
+
         if (strlen($date) > 0)
         {
             if (ctype_digit($date))
@@ -1283,7 +1328,7 @@ function displayEvent($ider,
                 print ' ' . $t['on'] . ' ';
             print ' ' . $date;
         }
-            
+
         // location of marriage
         if ($idlrmar > 1)
         {                   // have location of marriage
@@ -1294,7 +1339,7 @@ function displayEvent($ider,
         $mnotes         = $event['notes'];
         if (strlen($mnotes) == 0)
             print ".\n";
-            
+
         // show citations for this marriage
         if ($ider < 1000000000)
         {                   // real Event
@@ -2103,8 +2148,16 @@ $template->updateTag('showAdrDiv$idar',
                         $addressTable);
 
 ob_start();
-include 'DeathCauses.php';
+include 'DeathCauses.php';      // DeathCauses must be executed
 $template->set('DEATHCAUSES', ob_get_clean());
+
+$randnum                    = rand(0,2);
+if ($randnum > 0)
+{
+    $rcol                   = $template["rightcol$randnum"]->outerHTML;
+    $template->set('RIGHTCOL',  $rcol);
+}
+
 if (strlen($userid) > 0)
 {
     $user                   = new User(array('username' => $userid));

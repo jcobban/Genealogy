@@ -11,7 +11,7 @@
  *  Copyright &copy; 2019 James A. Cobban								*
  **********************************************************************-->
   <div id="breadcrumbs" class="hidden">
-	  <a href="/index.html">Home</a>:
+	  <a href="/home.html">Home</a>:
     <a href="/genealogy.php?lang=$LANG">
 		Genealogy
     </a>:
@@ -45,14 +45,11 @@
   </div>
 
   <div class="body">
-    <h1>
+    <h1 id="title">
+        Voorouders Boom $NAME
       <span class="right">
 		<a href="ancestorReportHelpen.html" target="help">? Help</a>
       </span>
-      <span id="title">
-        Voorouders Boom $NAME
-      </span>
-      <div style="clear: both;"></div>
     </h1>
     $TRACE
     $MSG
@@ -70,7 +67,6 @@
 				value="$ANCDEPTH">
 		<input type="hidden" name="idir" id="idir"
 				value="$IDIR">
-		<div style="clear: both;"></div>
       </div>  <!-- class="row" -->
       <div class="row">
 		<label class="column1" for="incLocsSet">
@@ -80,7 +76,6 @@
 				value="1" $INCLOCSCHECKED>
 		<input type="hidden" name="incLocs" id="incLocs"
 				value="$INCLOCS">
-		<div style="clear: both;"></div>
       </div>  <!-- class="row" -->
       <div class="row">
 		<button type="button" id="Close" accessKey="C">
@@ -119,9 +114,5 @@
 	Click on this button to close the dialog.  Keyboard shortcuts are Alt-C and
 	Alt-Shift-C.
   </div>
-    <script src="/jscripts/js20/http.js" type="text/javascript">
-    </script>
-    <script src="/jscripts/util.js" type="text/javascript">
-    </script>
-    <script src="ancestorReport.js" type="text/javascript">
+    <script src="ancestorReport.js" type="module">
     </script>

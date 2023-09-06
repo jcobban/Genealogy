@@ -1,47 +1,45 @@
 <!--*********************************************************************
- *  LanguagesUpdatefr.html												*
- *																		*
- *  Display form for editting information about 						*
- *  languages for managing record transcriptions.						*
- *																		*
- *  History:															*
- *		2017/10/25		created											*
- *		2018/01/04		remove Template from template file names		*
+ *  LanguagesUpdatefr.html                                              *
+ *                                                                      *
+ *  Display form for editting information about                         *
+ *  languages for managing record transcriptions.                       *
+ *                                                                      *
+ *  History:                                                            *
+ *      2017/10/25      created                                         *
+ *      2018/01/04      remove Template from template file names        *
  *      2018/10/15      add apology text field                          *
  *      2019/02/13      support pageUp and pageDown                     *
- *																		*
- *  Copyright &copy; 2019 James A. Cobban								*
+ *                                                                      *
+ *  Copyright &copy; 2019 James A. Cobban                               *
  **********************************************************************-->
-	<div id="breadcrumbs" class="hidden">
-	  <a href="/genealogy.php?lang=fr">Généalogie</a>:
-	  <a href="/FamilyTree/Services.php?lang=fr">Services</a>:
-	</div> <!-- id="breadcrumbs" -->
-	<div class="body">
+    <div id="breadcrumbs" class="hidden">
+      <a href="/genealogy.php?lang=fr">Généalogie</a>:
+      <a href="/FamilyTree/Services.php?lang=fr">Services</a>:
+    </div> <!-- id="breadcrumbs" -->
+    <div class="body">
       <h1>
         <span class="right">
         <a href="/Canada/LanguagesEditHelpfr.html" target="help">? Aide</a>
         </span>
         Mise a Jour la Table des Langages
-        <div style="clear: both;"></div>
       </h1>
       $TRACE
       $MSG
       <!--- Put out a line with links to previous and next section of table -->
-      <div class="center" id="topBrowse">
-        <span class="left" id="topPrev">
+      <div class="spaceBetween" id="topBrowse">
+        <span id="topPrev">
           <a href="/Canada/LanguagesEdit.php?lang=fr$npPrev" id="prenpprev">
-            &lt;---
+            <img src="/Images/ArrowLeft.svg">
           </a>
         </span>
-        <span class="right" id="topNext">
+        <span id="respdescrows">
+        montrer rangs $FIRST à $LAST de $TOTALROWS
+        </span>
+        <span id="topNext">
          <a href="/Canada/LanguagesEdit.php?lang=fr$npNext" id="prenpnext">
-            ---&gt;
+            <img src="/Images/ArrowRight.svg">
           </a>
         </span>
-          <span id="respdescrows">
-        montrer rangs $FIRST a $LAST de $TOTALROWS
-          </span>
-        <div style="clear: both;"></div>
       </div> <!-- left and right arrow links -->
       <!--- Put out the response as a table -->
       <form name="languageForm" id="languageForm"
@@ -61,70 +59,79 @@
               <thead>
             <tr id="hdrRow">
               <th class="colhead">
-          	    ID
+                  Code
               </th>
               <th class="colhead">
-          	    Nom
+                  Code3
               </th>
               <th class="colhead">
-          	    Nom Native
+                  Nom
               </th>
               <th class="colhead">
-          	    Article
+                  Nom Native
               </th>
               <th class="colhead">
-          	    Possessive
+                  Article
               </th>
               <th class="colhead">
-          	    Apologie
+                  Possessive
               </th>
               <th class="colhead">
-          	    Effacer
+                  Apologie
+              </th>
+              <th class="colhead">
+                  Effacer
               </th>
             </tr>
           </thead>
           <tbody>
             <tr id="Row$code">
               <td class="right">
-              <input type="text" name="Code$code" id="Code$code"
-          		value="$code" class="white code"
-                  style="text-transform: lowercase; text-align: center;"
-          		size="2" maxlength="2" readonly="readonly">
+                  <input type="text" name="Code$code" id="Code$code"
+                        value="$code" class="white code"
+                        style="text-transform: lowercase; text-align: center;"
+                        size="2" maxlength="2" readonly="readonly">
+              </td>
+              <td class="right">
+                  <input type="text" name="Code3$code" id="Code3$code"
+                        value="$code3" class="white code"
+                        style="text-transform: lowercase; text-align: center;"
+                        size="3" maxlength="3">
               </td>
               <td class="left">
               <input type="text" name="Name$code" id="Name$code" 
-          		value="$name" 
-          		class="white leftnc"
-          		size="28" maxlength="64">
+                      value="$name" 
+                      class="white leftnc"
+                      size="28" maxlength="64">
               </td>
               <td class="left">
               <input type="text" name="NativeName$code" id="NativeName$code"
-          		value="$nativename" 
-          		class="white leftnc"
-          		size="28" maxlength="255">
+                      value="$nativename" 
+                      class="white leftnc"
+                      size="28" maxlength="255">
               </td>
               <td class="left">
               <input type="text" name="Article$code" id="Article$code"
-          		value="$article" 
-          		class="white leftnc"
-          		size="12" maxlength="32">
+                      value="$article" 
+                      class="white leftnc"
+                      size="12" maxlength="32">
               </td>
               <td class="left">
               <input type="text" name="Possessive$code" id="Possessive$code"
-          		value="$possessive" 
-          		class="white leftnc"
-          		size="12" maxlength="32">
+                      value="$possessive" 
+                      class="white leftnc"
+                      size="12" maxlength="32">
               </td>
               <td class="left">
-          	    <input type="text" name="Sorry$code" id="Sorry$code"
-          			value="$sorry" 
-          			class="white leftnc"
-          			size="40" maxlength="255">
+                <input type="text" name="Sorry$code" id="Sorry$code"
+                      value="$sorry" 
+                      class="white leftnc"
+                      size="40" maxlength="255">
               </td>
               <td class="center">
-              <button type="button" id="Delete$code">
-          	Effacer
-              </button> 
+                <button type="button" id="Delete$code">
+                    Effacer
+                </button> 
               </td>
             </tr>
           </tbody>
@@ -142,61 +149,63 @@
     </div><!-- class="body" -->
     <!-- The remainder of the page consists of context specific help text. -->
     <div class="balloon" id="HelpCode">
-    <p>This field contains a 2-character ISO 639-1 abbreviation for the language 
-    which is used to identify this record.
-    Except when adding a new language this is a read-only field.
-    </p>
+        This field contains a 2-character ISO 639-1 abbreviation for the language 
+        which is used to identify this record.
+        Except when adding a new language this is a read-only field.
+    </div>
+    <div class="balloon" id="HelpCode3">
+        This field contains a 3-character ISO 639-2 abbreviation for the
+        language which is used to identify this record.
     </div>
     <div class="balloon" id="HelpName">
-    <p>The name of the language.
-    </p>
+        The name of the language.
+    
     </div>
     <div class="balloon" id="Helppattern">
-    <p>Enter text to search for in the language names.
-    </p>
+        Enter text to search for in the language names.
+    
     </div>
     <div class="balloon" id="HelpNativeName">
-    <p>The native name of the language.
-    </p>
+        The native name of the language.
+    
     </div>
     <div class="balloon" id="HelpArticle">
-    <p>The definite article used in this language for most country names which are 
-    singular.  In English country names are usually
+        The definite article used in this language for most country names which are 
+        singular.  In English country names are usually
     <a href="http://www.ef.com/english-resources/english-grammar/countable-and-uncountable-nouns/">uncountable</a> nouns
-    and therefore do not take an article, but in most languages they do, 
-    and the article agrees grammatically with the gender and number of the name
-    of the country.
-    For example in English you refer to "France", but in French you refer to
+        and therefore do not take an article, but in most languages they do, 
+        and the article agrees grammatically with the gender and number of the name
+        of the country.
+        For example in English you refer to "France", but in French you refer to
     "la France".  An exception in English is where the country has a noun phrase
-    as its name, for example "the United Kingdom", and "the United States of America", contrasted with "Great Britain" which is the uncountable name of the
-    largest island in the archipelago of the British Isles.
-    </p>
+        as its name, for example "the United Kingdom", and "the United States of America", contrasted with "Great Britain" which is the uncountable name of the
+        largest island in the archipelago of the British Isles.
+    
     </div>
     <div class="balloon" id="HelpPossessive">
-    <p>The possessive preposition and definite article expression used 
-    in this language for most country names which are singular.  In English,
-    because of the grammatical rule discussed for the "Article" field this
-    expression is almost always just the preposition "of", but in most languages
-    it is the possessive preposition plus a definite article, and the
-    expression agrees grammatically with the gender and number of the name
-    of the country.
-    </p>
+        The possessive preposition and definite article expression used 
+        in this language for most country names which are singular.  In English,
+        because of the grammatical rule discussed for the "Article" field this
+        expression is almost always just the preposition "of", but in most languages
+        it is the possessive preposition plus a definite article, and the
+        expression agrees grammatically with the gender and number of the name
+        of the country.
+    
     </div>
     <div class="balloon" id="HelpDelete">
-    <p>This button is used to delete a language record from the list.
-    </p>
+        This button is used to delete a language record from the list.
+    
     </div>
     <div class="balloon" id="HelpEditDomains">
-    <p>This button is used to display a dialog for editing the lower level
-    administrative units of the language, that is the states or provinces.
-    </p>
+        This button is used to display a dialog for editing the lower level
+        administrative units of the language, that is the states or provinces.
     </div>
     <div class="balloon" id="HelpAdd">
-    Click on this button to add another language into the list.
+        Click on this button to add another language into the list.
     </div>
     <div class="balloon" id="HelpSubmit">
-    Click on this button to update the database to include the changes you
-    have made to the languages list.
+        Click on this button to update the database to include the changes you
+        have made to the languages list.
     </div>
     $DIALOGS
     <script src="/jscripts/CommonForm.js" type="text/javascript">

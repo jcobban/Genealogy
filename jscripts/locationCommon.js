@@ -64,8 +64,10 @@
  *      2020/04/26      convert trailing 1/2 into ½                     *
  *      2020/06/28      preserve square brackets around location value  *
  *      2021/01/13      use ES2015 syntax                               *
+ *      2022/10/03      inner test of <option> may contain specialchars *
+ *      2022/10/06      accept concessions like 'R1N'                   *
  *                                                                      *
- *  Copyright &copy; 2021 James A. Cobban                               *
+ *  Copyright &copy; 2022 James A. Cobban                               *
  ************************************************************************/
 
 /************************************************************************
@@ -172,18 +174,18 @@ function locationChanged(ev)
     // trim off leading and trailing spaces
     let value                   = this.value.trim();
 
-    // convert "1/2" alone or at the end of a number to "½"
-    let halfRegex               = /1\/2([^0-9])/;
-    value                       = value.replace(halfRegex, "½$1");
-
     // insert spaces where they should appear but don't
     let commaRegex              = /,(\w)/g;
     value                       = value.replace(commaRegex, ", $1");
-    let digalfaRegex            = /([0-9½])([a-zA-Z]+)/g;
-    let results                 = digalfaRegex.exec(value);
-    if (results)
-    {
-        let letters             = results[2];
+
+    // concessions identified by mixture of digits and letters
+    let digalfaRegex            = /\s([0-9½])([a-zA-Z]+)/g;
+    let digalfaresults          = digalfaRegex.exec(value);
+    let alfadigRegex            = /\s([a-zA-Z]+)(\d)/g;
+    let alfadigresults          = alfadigRegex.exec(value);
+    if (digalfaresults)
+    {                       // digit followed by some letters
+        let letters             = digalfaresults[2];
         if (letters == 'RN' || letters == 'RS' || letters == 'R' ||
             letters == 'NBTR' || letters == 'RSLR' || letters == 'RNLR' ||
             letters == 'STR' || letters == 'NTR' ||
@@ -192,10 +194,14 @@ function locationChanged(ev)
         {                   // do not separate
         }                   // do not separate
         else
-            value               = value.replace(digalfaRegex, "$1 $2");
-    }
-    let alfadigRegex            = /([a-zA-Z])(\d)/g;
-    value                       = value.replace(alfadigRegex, "$1 $2");
+            value               = value.replace(digalfaRegex, " $1 $2");
+    }                       // digit followed by some letters
+    else
+    if (alfadigresults)
+    {                       // letters followed by digit
+        if (!(alfadigresults[1] == 'LR' || alfadigresults[1] == 'R'))
+            value               = value.replace(alfadigRegex, " $1 $2");
+    }                       // letters followed by digit
 
     // if the location has a concession followed by a lot, switch them
     let conlotRegex             = /^(con \d+)\s([^,]*lot[^,]*)/;
@@ -525,19 +531,23 @@ function closeNewDialog()
  ************************************************************************/
 function locationChosen(ev)
 {
-    let chosenOption    = this.options[this.selectedIndex];
+    let chosenOption        = this.options[this.selectedIndex];
 
     if (chosenOption.value > 0)
     {       // ordinary entry
-        let form        = document.forms[this.getAttribute("formname")];
-        let elementName = this.getAttribute("for");
-        let element     = form.elements[elementName];
+        let form            = document.forms[this.getAttribute("formname")];
+        let elementName     = this.getAttribute("for");
+        let element         = form.elements[elementName];
+        let value           = chosenOption.innerHTML;
+        let textarea        = document.createElement("textarea");
+        textarea.innerHTML  = value;
+        value               = textarea.value;
         if (element)
         {
             if (element.value.charAt(0) == '[')
-                element.value   = '[' + chosenOption.innerHTML + ']';
+                element.value   = '[' + value + ']';
             else
-                element.value   = chosenOption.innerHTML;
+                element.value   = value;
 
             // check for action to take after changed
             if (element.afterChange)

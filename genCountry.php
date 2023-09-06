@@ -31,16 +31,17 @@ $countryName                = 'Canada';
 $lang                       = 'en';     // default english
 
 // if invoked by method=get process the parameters
-if (count($_GET) > 0)
+if (isset($_GET) && count($_GET) > 0)
 {                   // invoked by URL to display current status of account
-    $parmsText  = "<p class='label'>\$_GET</p>\n" .
-                  "<table class='summary'>\n" .
-                  "<tr><th class='colhead'>key</th>" .
-                      "<th class='colhead'>value</th></tr>\n";
+    $parmsText      = "<p class='label'>\$_GET</p>\n" .
+                      "<table class='summary'>\n" .
+                        "<tr><th class='colhead'>key</th>" .
+                          "<th class='colhead'>value</th></tr>\n";
     foreach($_GET as $key => $value)
     {                   // loop through all parameters
+        $safevalue  = htmlspecialchars($value);
         $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
-                        "<td class='white left'>$value</td></tr>\n"; 
+                        "<td class='white left'>$safevalue</td></tr>\n"; 
         switch(strtolower($key))
         {
             case 'cc':

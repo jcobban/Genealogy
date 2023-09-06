@@ -18,7 +18,7 @@
  *  Copyright &copy; 2022 James A. Cobban                               *
  **********************************************************************-->
     <div class="hidden" id="breadcrumbs">
-        <a href="/index.html">
+        <a href="/home.html">
             Startseite
         </a>:
         <a href="/genealogy.php?lang=de">
@@ -42,7 +42,6 @@
         <span id="title">
           Familien von $TREENAME
         </span>
-        <div style="clear: both;"></div>
       </h1>
       $TRACE
       $MSG
@@ -53,7 +52,6 @@
             </label>
               <input type="text" name="Name" id="Name" size="44" 
                 class="white left" value="$NAME" accessKey="N">
-            <div style="clear: both;"></div>
           </div>
           <div class="row" id="birthYearAndSexRow">
            <div class="column1">
@@ -74,7 +72,6 @@
                 <option class="unknown" value="" selected="selected">Jedes</option>
             </select>
            </div>
-            <div style="clear: both;"></div>
           </div>
           <div class="row" id="marriedAndUnrelatedRow">
             <label class="label" for="incMarried">
@@ -85,7 +82,6 @@
             <button type="button" id="addUnrelated" accessKey="A">
                 Eine neue nicht verwandte Person einschließen
             </button>
-            <div style="clear: both;"></div>
           </div>
           <div class="row" id="infoIncludeRow">
             <label class="label" for="includeParents">
@@ -100,7 +96,6 @@
             <input type="checkbox" name="includeSpouse" id="includeSpouse"
                 accessKey="S"
                 value="Y" class="em10" checked="checked">
-            <div style="clear: both;"></div>
           </div>
           <div class="row" id="treeNameRow">
             <label class="label" for="treeName">
@@ -116,7 +111,6 @@
                 $atree 
               </option>
             </select>
-            <div style="clear: both;"></div>
           </div>
           <div class="row" id="selectionRow">
             <label class="label" for="individ">
@@ -125,7 +119,6 @@
             <select name="individ" id="individ" size="10" class="nameSelect">
                 <option value="0" class="unknown">Wähle eine Person</option>
             </select>
-            <div style="clear: both;"></div>
           </div>
       </form>
     
@@ -194,7 +187,6 @@
                 href=="/FamilyTree/Surnames.php?initial=Z&lang=$LANG">Z</a>
         </p>
         $OTHERS
-        <div style="clear: both;"></div>
     </div> <!-- end of <div id="body"> -->
     <div class="hidden" id="templates">
       <p class="label" id="InitialsRow$rownum">
@@ -300,7 +292,7 @@
     <div class="popup" id="loading">
       Wird geladen...
     </div>
-    <script src="/jscripts/tinymce/js/tinymce/tinymce.js"
+    <script src="/jscripts/tinymce/js/tinymce/tinymce.min.js"
             type="application/javascript">
     </script>
     <script src="/FamilyTree/nominalIndex.js" type="module">

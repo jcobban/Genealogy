@@ -7,8 +7,9 @@
  *                                                                      *
  *  History:                                                            *
  *      2021/07/02      created                                         *
+ *      2023/08/10      use placeholder                                 *
  *                                                                      *
- *  Copyright &copy; 2021 James A. Cobban                               *
+ *  Copyright &copy; 2023 James A. Cobban                               *
  **********************************************************************-->
     <div id="breadcrumbs" class="hidden">
       <a href="/genealogy.php?lang=$LANG">
@@ -66,31 +67,32 @@
         <span class="button">Sign on</span></a>
         to update the database.
       </p>
-      <div class="center" id="topBrowse">
-        <div class="left" id="topPrev">
+      <div class="spaceBetween" id="topBrowse">
+        <span id="topPrev">
           <a href="DistrictMarriagesEdit.php?$PREVURI" id="toPrevReport">
-            &lt;--- $PREVTEXT 
+            <img src="/Images/ArrowLeft.svg"> $PREVTEXT 
           </a>
-        </div>
-        <div class="right" id="topNext">
+        </span>
+        <span>
+          <span id="showReport">
+              Volume $VOLUME Report $REPORTNOTEXT
+          </span>
+          <span id="itemNo">
+              Item $ITEMNO
+          </span>
+          <span id="minister">
+              : Marriages performed by
+              $MINISTERNAME,
+              $FAITH minister,
+              of $RESIDENCE,
+              on page $PAGE
+          </span>
+        </span>
+        <span id="topNext">
           <a href="DistrictMarriagesEdit.php?$NEXTURI" id="toNextYear">
-            $NEXTTEXT ---&gt;
+            $NEXTTEXT <img src="/Images/ArrowRight.svg">
           </a>
-        </div>
-        <span id="showReport">
-            Volume $VOLUME Report $REPORTNOTEXT
         </span>
-        <span id="itemNo">
-            Item $ITEMNO
-        </span>
-        <span id="minister">
-            : Marriages performed by
-            $MINISTERNAME,
-            $FAITH minister,
-            of $RESIDENCE,
-            on page $PAGE
-        </span>
-        <div style="clear: both;"></div>
       </div>
       <p class="label center" id="imageButton">
         <a href="$IMAGE" class="button" style="width: 14em;text-align: center;" target="_blank">
@@ -114,15 +116,6 @@
           <!--- Put out the column headers -->
           <thead>
             <tr id="hdrRow">
-              <th class="colhead">
-                Domain
-              </th>
-              <th class="colhead">
-                Volume
-              </th>
-              <th class="colhead">
-                Report No
-              </th>
               <th class="colhead">
                 Item
               </th>
@@ -160,30 +153,13 @@
           </thead>
           <tbody>
             <tr id="Row$row">
-              <td class="left $sexclass">
-                <input type="text"
-                        name="Domain$row" id="Domain$row"
-                        value="$domain"
-                        class="ina left"
-                        size="4" maxlength="6" readonly="readonly">
-              </td>
               <td class="right $sexclass">
-                <input type="text"
-                        name="Volume$row" id="Volume$row" 
-                        value="$volume" 
-                        class="ina rightnc"
-                        readonly="readonly"
-                        size="3" maxlength="5">
-              </td>
-              <td class="right $sexclass">
-                <input type="text"
-                        name="ReportNo$row" id="ReportNo$row" 
-                        value="$reportNoText" 
-                        class="ina rightnc"
-                        readonly="readonly"
-                        size="3" maxlength="5">
-              </td>
-              <td class="right $sexclass">
+                <input type="hidden" name="Domain$row" id="Domain$row"
+                        value="$domain">
+                <input type="hidden" name="Volume$row" id="Volume$row"
+                        value="$volume">
+                <input type="hidden" name="ReportNo$row" id="ReportNo$row"
+                        value="$reportNoText">
                 <input type="text"
                         name="ItemNo$row" id="ItemNo$row"
                         value="$itemNo"
@@ -202,6 +178,7 @@
                 <input type="text"
                         name="GivenNames$row" id="GivenNames$row" 
                         value="$givennames" 
+                        placeholder="$placeholder" 
                         class="$sexclass"
                         readonly="readonly"
                         size="16" maxlength="64">
@@ -353,6 +330,12 @@
          <tbody>
           <tr id="Row$rowa">
             <td class="right male">
+                <input type="hidden" name="Domain$row" id="Domain$row"
+                        value="$domain">
+                <input type="hidden" name="Volume$row" id="Volume$row"
+                        value="$volume">
+                <input type="hidden" name="ReportNo$row" id="ReportNo$row"
+                        value="$reportNoText">
                 <input type="text" 
                         name="ItemNo$rowa" id="ItemNo$rowa"
                         value="$itemNo"
@@ -369,7 +352,8 @@
             <td class="left male">
                 <input type="text" 
                         name="GivenNames$rowa" id="GivenNames$rowa" 
-                        value="New Groom" 
+                        value="" 
+                        placeholder="New Groom" 
                         class="male"
                         size="16" maxlength="64">
             </td>
@@ -418,6 +402,12 @@
           </tr>
           <tr id="Row$rowb">
             <td class="right female">
+                <input type="hidden" name="Domain$row" id="Domain$row"
+                        value="$domain">
+                <input type="hidden" name="Volume$row" id="Volume$row"
+                        value="$volume">
+                <input type="hidden" name="ReportNo$row" id="ReportNo$row"
+                        value="$reportNoText">
                 <input type="text" name="ItemNo$rowb" id="ItemNo$rowb"
                         value="$itemNo"
                         class="ina rightnc"
@@ -432,7 +422,8 @@
             <td class="left female">
                 <input type="text" 
                         name="GivenNames$rowb" id="GivenNames$rowb" 
-                        value="New Bride" 
+                        value="" 
+                        placeholder="New Bride" 
                         class="female"
                         size="16" maxlength="64">
             </td>

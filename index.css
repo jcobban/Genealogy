@@ -1,36 +1,41 @@
 /************************************************************************
- *  index.css								*
- *									*
+ *  index.css								                            *
+ *									                                    *
  *  Stylesheet for the index page of the web-site www.jamescobban.net.	*
  *  This stylesheet provides extensions to simulate a tabbed dialog.	*
- *									*
- *  History:								*
- *	2010/11/22	fill space left after tabs with underline	*
- *	2011/11/10	center label in tab				*
- *	2013/12/29	use CSS for layout instead of tables		*
- *	2015/02/05	tab classes moved to styles.css			*
- *									*
- *  Copyright &copy; 2015 James A. Cobban				*
+ *									                                    *
+ *  History:								                            *
+ *	    2010/11/22	    fill space left after tabs with underline	    *
+ *	    2011/11/10	    center label in tab				                *
+ *	    2013/12/29	    use CSS for layout instead of tables		    *
+ *	    2015/02/05	    tab classes moved to styles.css			        *
+ *									                                    *
+ *  Copyright &copy; 2022 James A. Cobban				                *
  ************************************************************************/
+    html      { width: 100%;
+                height: 100%;
+			}
     body      { background-color: #F5DEB3;
-		margin: 0px;
-		padding: 0px;
-	}
+				margin: 0px;
+				padding: 0px;
+                width: 100%;
+                height: 100%;
+			}
     div.heading {
-		background-color: #F5DEB3;
-		padding: 6px 6px 0px 6px;
-	}
+				background-color: #F5DEB3;
+				padding: 6px 6px 0px 6px;
+			}
     p.label {	font-family: sans-serif;
-		font-size: larger;
-		font-weight: bold;
-		margin-left: 3em;
-		margin-top: 0;
-		margin-bottom: 0.5ex;
-	}
+				font-size: larger;
+				font-weight: bold;
+				margin-left: 3em;
+				margin-top: 0;
+				margin-bottom: 0.5ex;
+			}
     p.message { font-family: sans-serif;
-	}
+			}
     iframe.pane {
-		width:		100%;
-   		border:		0px none transparent;
-		padding:	0px;
-	}
+				width:		100%;
+   		        border:		0px none transparent;
+				padding:	0px;
+			}

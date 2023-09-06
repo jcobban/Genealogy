@@ -1,191 +1,196 @@
 <!--*********************************************************************
- *  CensusUpdateStatusProvincialfr.html									*
- *																		*
- *  Display the progress of the transcription of a specific census		*
- *  for a specific province												*
- *																		*
- *  History:															*
- *		2018/01/18		created											*
+ *  CensusUpdateStatusProvincialfr.html                                 *
+ *                                                                      *
+ *  Display the progress of the transcription of a specific census      *
+ *  for a specific province                                             *
+ *                                                                      *
+ *  History:                                                            *
+ *      2018/01/18      created                                         *
  *      2021/01/13      add search option to menu                       *
- *																		*
- *  Copyright &copy; 2021 James A. Cobban								*
+ *      2023/01/19      add message texts                               *
+ *                                                                      *
+ *  Copyright &copy; 2023 James A. Cobban                               *
  **********************************************************************-->
     <div id='breadcrumbs' class='hidden'>
       <a href="/genealogy.php?lang=fr">Généalogie</a>:
       <a href="/genCountry.php?cc=$CC&amp;lang=fr">$COUNTRYNAME</a>:
       <a href="/database/genCensuses.php?cc=$CC&amp;lang=fr">Recensements</a>:
       <a href="/database/QueryDetail.php?Census=CA1891&amp;Province=$PROVINCE&amp;lang=$LANG">
-		Rechercher la récensement 1891 du Canada
+        Rechercher la récensement 1891 du Canada
       </a>: 
       <a href="$SEARCH">$ACTION $CENSUSYEAR Recensement du $COUNTRYNAME</a>:
     </div>
     <div class='body'>
       <h1>Récensement $CENSUSYEAR du $COUNTRYNAME: $PROVINCENAME État de la Transcription
-  	<span class='right'>
-  	  <a href='/database/CensusUpdateStatusHelpfr.html' target='help'>? Help</a>
-  	</span>
+    <span class='right'>
+      <a href='/database/CensusUpdateStatusHelpfr.html' target='help'>? Help</a>
+    </span>
       </h1>
         $TRACE
         $MSG 
       <div id='displayForm'>
         <!--- Put out a line with links to previous and next census year -->
-        <div class="center" id="topBrowse">
-  	    <div class='left' id="topPrev">
-  	      <a href='/database/CensusUpdateStatus.php?Census=$prevCensus&amp;Province=$prevProv' 
-  		        id='prevCensusLink'>
-  		    &lt;--- $prevCensus Récensement $prevName
-  	      </a>
-  	    </div>
-  	    <div class='right' id="topNext">
-  	     <a href='/database/CensusUpdateStatus.php?Census=$nextCensus&amp;Province=$nextProv' 
-  		        id='nextCensusLink'>
-  		    $nextCensus Récensement $nextName ---&gt;
-  	      </a>
-  	    </div>
-  	    &nbsp;
-  	    <div style='clear: both;'></div>
-        </div>
+        <div class="spaceBetween" id="topBrowse">
+            <span id="topPrev">
+              <a href='/database/CensusUpdateStatus.php?Census=$prevCensus&amp;Province=$prevProv' 
+                    id='prevCensusLink'>
+                <img src="/Images/ArrowLeft.svg"> $prevCensus Récensement $prevName
+              </a>
+            </span>
+            <span id="topNext">
+             <a href='/database/CensusUpdateStatus.php?Census=$nextCensus&amp;Province=$nextProv' 
+                    id='nextCensusLink'>
+                $nextCensus Récensement $nextName <img src="/Images/ArrowRight.svg">
+              </a>
+            </span>
+        </div>  <!--- id="topBrowse" -->
         <!--- Put out the response as a table -->
         <form name='statForm' id='statForm' action='donothing.php'>
-  	<div id="hidden">
-  	  <input type="hidden" id="Census" value="$CENSUSID">
-  	</div>
-  	<table class="form" id="dataTable">
-  	  <thead>
-  	    <!--- Put out the column headers -->
-  	    <tr>
-  	      <th class="colhead1st">
-  		Id
-  	      </th>
-  	      <th class="colhead">
-  		Nom&nbsp;Anglais
-  	      </th>
-  	      <th class="colhead">
-  		Nom&nbsp;Français
-  	      </th>
-  	      <th class="colhead">
-  		Prov
-  	      </th>
-  	      <th class="colhead">
-  		Fait
-  	      </th>
-  	      <th class="colhead">
-  		à&nbsp;Faire
-  	      </th>
-  	      <th class="colhead">
-  		% Fait
-  	      </th>
-  	      <th class="colhead" colspan="2">
-  		Action
-  	      </th>
-  	    </tr>
-  	  </thead>
-  	  <tbody>
-  	    <tr id="row$id">
-  	      <td class="$rowclass bold right first" id="IdCell$id">
-  		      $id 
-  	      </td>
-  	      <td class="$rowclass left" id="NameCell$id">
-  		      $name 
-  	      </td>
-  	      <td class="$rowclass left" id="NomCell$id">
-  		      $nom 
-  	      </td>
-  	      <td class="$rowclass left" id="ProvinceCell$id">
-  		      $province 
-  	      </td>
-  	      <td class="$rowclass right" id="TranscribedCell$id">
-  		      $transcribed 
-  	      </td>
-  	      <td class="$rowclass right" id="PopulationCell$id">
-  		      $population 
-  	      </td>
-  	      <td class="$pctclass" id="PctDoneCell$id">
-  		$pctdone
-  	      </td>
-  	      <td class="$rowclass center" id="DetailsCell$id">
-  		<button type="button" id="Details$id"> 
-  		      Détailles
-  		</button>
-  	      </td>
-  	      <td class="$rowclass center" id="SurnamesCell$id">
-  		<button type="button" id="Surnames$id"> 
-  		      Surnoms
-  		</button>
-  	      </td>
-  	    <!-- complete the current row and set up for the next -->
-  	    </tr>
-  	  </tbody>
-  	  <tfoot>
-  	    <tr>
-  	      <td class="odd bold right first">
-  		&nbsp;
-  	      </td>
-  	      <td class="odd bold right">
-  		&nbsp;
-  	      </td>
-  	      <td class="odd bold left">
-  		Total
-  	      </td>
-  	      <td class="odd bold right">
-  		&nbsp;
-  	      </td>
-  	      <td class="odd bold right">
-  		$total 
-  	      </td>
-  	      <td class="odd bold right">
-  		$total2do 
-  	      </td>
-  	      <td class="$pctDoneClass">
-  		$pctDone
-  	      </td>
-  	    </tr>
-  	  </tfoot>
-  	</table>
+          <input type="hidden" id="Census" value="$CENSUSID">
+          <table class="form" id="dataTable">
+            <thead>
+              <!--- Put out the column headers -->
+              <tr>
+                <th class="colhead1st">
+                  Id
+                </th>
+                <th class="colhead">
+                  Nom&nbsp;Anglais
+                </th>
+                <th class="colhead">
+                  Nom&nbsp;Français
+                </th>
+                <th class="colhead">
+                  Prov
+                </th>
+                <th class="colhead">
+                  Fait
+                </th>
+                <th class="colhead">
+                  à&nbsp;Faire
+                </th>
+                <th class="colhead">
+                  % Fait
+                </th>
+                <th class="colhead" colspan="2">
+                  Action
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr id="row$id">
+                <td class="$rowclass bold right first" id="IdCell$id">
+                    $id 
+                </td>
+                <td class="$rowclass left" id="NameCell$id">
+                    $name 
+                </td>
+                <td class="$rowclass left" id="NomCell$id">
+                    $nom 
+                </td>
+                <td class="$rowclass left" id="ProvinceCell$id">
+                    $province 
+                </td>
+                <td class="$rowclass right" id="TranscribedCell$id">
+                    $transcribed 
+                </td>
+                <td class="$rowclass right" id="PopulationCell$id">
+                    $population 
+                </td>
+                <td class="$pctclass" id="PctDoneCell$id">
+                  $pctdone
+                </td>
+                <td class="$rowclass center" id="DetailsCell$id">
+              <button type="button" id="Details$id"> 
+                    Détailles
+              </button>
+                </td>
+                <td class="$rowclass center" id="SurnamesCell$id">
+              <button type="button" id="Surnames$id"> 
+                    Surnoms
+              </button>
+                </td>
+              <!-- complete the current row and set up for the next -->
+              </tr>
+            </tbody>
+            <tfoot>
+              <tr>
+                <td class="odd bold right first">
+                  &nbsp;
+                </td>
+                <td class="odd bold right">
+                  &nbsp;
+                </td>
+                <td class="odd bold left">
+                  Total
+                </td>
+                <td class="odd bold right">
+                  &nbsp;
+                </td>
+                <td class="odd bold right">
+                  $total 
+                </td>
+                <td class="odd bold right">
+                  $total2do 
+                </td>
+                <td class="$pctDoneClass">
+                  $pctDone
+                </td>
+              </tr>
+            </tfoot>
+          </table>
         </form>
       </div> <!-- id="displayForm"-->
     </div> <!-- class="body" -->
     <div class="hidden">
-        <span id="censusMissing">
-            Le paramètre "Census" est manquant.
-        </span>
-        <span id="censusUnsupported">
-            Census='$censusId' n'est pas défini..
-        </span>
+      <span id="censusInvalid">
+        L'identifiant $value pour le recensement est syntaxiquement
+        incorrect.
+      </span>
+      <span id="provinceInvalid">
+        L'identifiant $value pour le province est syntaxiquement
+        incorrect.
+      </span>
+      <span id="censusMissing">
+        Le paramètre "Census" est manquant.
+      </span>
+      <span id="censusUnsupported">
+        Census='$censusId' n'est pas défini.
+      </span>
     </div>
     <div id="mouseprevCensusLink" class="popup">
       <p class="label">aller à récensement $prevCensus
-  	province $prevName
+        province $prevName
       </p>
     </div>
     <div id="mousenextCensusLink" class="popup">
       <p class="label">aller à récensement $nextCensus
-  	province $nextName
+        province $nextName
       </p>
     </div>
     <div class="balloon" id="HelpDist">
-      This column displays the district number assigned to the census district
-      by the Dominion Bureau of Statistics.
+      This column displays the district number assigned to the census
+      district by the Dominion Bureau of Statistics.
     </div>
     <div class="balloon" id="HelpDistName">
-      This column displays the district name.  This is usually the same as the
-      name of a federal electoral district or riding.
+      This column displays the district name.  This is usually the same
+      as the name of a federal electoral district or riding.
     </div>
     <div class="balloon" id="HelpProv">
-      This column displays the two character abbreviation assigned to the province
-      by Canada Post.
+      This column displays the two character abbreviation assigned
+      to the province by Canada Post.
     </div>
     <div class="balloon" id="HelpDone">
-      This column displays the number of individuals already transcribed in this
-      district.
+      This column displays the number of individuals already transcribed
+      in this district.
     </div>
     <div class="balloon" id="HelpToDo">
-      This column displays the total number of individuals enumerated in this
-      district.
+      This column displays the total number of individuals enumerated
+      in this district.
     </div>
     <div class="balloon" id="HelpDetails">
-      Click on this button to view the division by division transcription progress
-      within the specific district.
+      Click on this button to view the division by division transcription
+      progress within the specific district.
     </div>
     <div class="balloon" id="HelpSurnames">
       Click on this button to view a summary of the surnames present in the

@@ -722,13 +722,13 @@ if (strlen($msg) == 0)
     $template->set('NEXTOFFSET',    $nextoffset);
     if ($prevoffset == '')
     {
-        $template->updateTag('topPrev', null);
-        $template->updateTag('botPrev', null);
+        $template['topPrev']->update('&nbsp;');
+        $template['botPrev']->update('&nbsp;');
     }
     if ($nextoffset = '')
     {
-        $template->updateTag('topNext', null);
-        $template->updateTag('botNext', null);
+        $template['topNext']->update('&nbsp;');
+        $template['botNext']->update('&nbsp;');
     }
     $marrRowElt         = $template['row$regyear$regnum'];
     $marrHTML           = $marrRowElt->outerHTML();

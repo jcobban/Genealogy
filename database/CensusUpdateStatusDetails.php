@@ -94,8 +94,11 @@ use \NumberFormatter;
  *      2020/01/22      internationalize numbers                        *
  *      2020/10/10      remove field prefix for Pages table             *
  *      2022/03/30      fix error if district id empty or invalid       *
+ *      2022/12/22      do not issue warning if Province/State does     *
+ *                      not change current Domain value                 *
+ *      2023/01/19      fix undefined variable warnings                 *
  *                                                                      *
- *  Copyright &copy; 2022 James A. Cobban                               *
+ *  Copyright &copy; 2023 James A. Cobban                               *
  ************************************************************************/
 require_once __NAMESPACE__ . '/District.inc';
 require_once __NAMESPACE__ . '/SubDistrict.inc';
@@ -107,9 +110,11 @@ require_once __NAMESPACE__ . '/common.inc';
 // default values if not specified
 $censusId                       = '';
 $censusIdtext                   = null;
+$census                         = null;
 $censusYear                     = '';
 $districtId                     = '';
 $districtIdtext                 = null;
+$district                       = null;
 $districtName                   = 'unresolved';
 $subdistrictId                  = '';
 $subdistrictIdtext              = null;
@@ -172,10 +177,10 @@ if (isset($_GET) && count($_GET) > 0)
                 else
                 if (preg_match('/^[a-zA-Z]{2}$/', $value))
                 {
-                    if (strlen($domain) != '')
-                        $warn   .= "<p>Province overrides Domain</p>\n";
-                    $province           = strtoupper($value);
-                    $domain             = 'CA' . $value;
+                    $newdomain          = 'CA' . strtoupper($value);
+                    if (strlen($domain) != 0 && $newdomain != $domain)
+                        $warn   .= "<p>Province overrides Domain newdomain='$newdomain', domain='$domain'</p>\n";
+                    $domain             = $newdomain;
                 }
                 else
                     $provincetext       = $safevalue;
@@ -190,10 +195,10 @@ if (isset($_GET) && count($_GET) > 0)
                 else
                 if (preg_match('/^[a-zA-Z]{2}$/', $value))
                 {
-                    if (strlen($domain) != '')
+                    $newdomain          = 'US' . strtoupper($value);
+                    if (strlen($domain) != 0 && $newdomain != $domain)
                         $warn   .= "<p>State overrides Domain</p>\n";
-                    $province           = strtoupper($value);
-                    $domain             = 'US' . $value;
+                    $domain             = $newdomain;
                 }
                 else
                     $provincetext       = $safevalue;
@@ -411,17 +416,19 @@ else
 if (is_string($provincetext))
 {
     $msg            .= $template['provSyntax']->replace('$provinceId', 
-                                                        $provinceIdtext);
+                                                        $provincetext);
 }
 if (is_string($domaintext))
 {
     $msg            .= $template['domainSyntax']->replace('$domainId', 
-                                                        $domainIdtext);
+                                                        $domaintext);
 }
 if (is_string($langtext))
 {
-    $msg            .= $template['langSyntax']->replace('$lang', 
-                                                        $langtext);
+    $warn           .= "<p>" .
+                        $template['langSyntax']->replace('$lang', 
+                                                         $langtext) .
+                       "</p>\n";
 }
 
 $template->set('CENSUSID',          $censusId);
@@ -479,9 +486,9 @@ if (strlen($msg) == 0)
     $template->set('NPNEXT',            $npnext);
 
     if (strlen($npprev) == 0)
-        $template['topPrev']->update(null);
+        $template['topPrev']->update('&nbsp;');
     if (strlen($npnext) == 0)
-        $template['topNext']->update(null);
+        $template['topNext']->update('&nbsp;');
     if (strlen($division) == 0)
         $template['divisionPart']->update(null);
 

@@ -11,7 +11,7 @@
  *  Copyright &copy; 2020 James A. Cobban								*
  **********************************************************************-->
     <div id="breadcrumbs" class="hidden">
-      <a href="/index.html">Home</a>:
+      <a href="/home.html">Home</a>:
       <a href="/genealogy.php?lang=$LANG">
 			Genealogy
       </a>:
@@ -34,7 +34,6 @@
 		  <a href="editMarriagesHelpen.html" target="help">? Help</a>
 	    </span>
         $TITLE
-		<div style="clear: both;"></div>
 	  </h1>
 	  $TRACE
       $MSG
@@ -149,7 +148,6 @@
 					Edit Father
 			    </button>
 			  </div>
-			  <div style="clear: both;"></div>
 			</div>
 			<div class="row" id="HusbMarrSurnameRow">
 			  <div class="column1">
@@ -161,7 +159,6 @@
 		                    maxlength="255" class="white left column2"
 		                    value="$HUSBSURNAME">
 			  </div>
-			  <div style="clear: both;"></div>
 			</div>
 			<div class="row" id="SelectHusbandRow">
 			    <label class="column1" for="chooseHusb">
@@ -181,7 +178,6 @@
 					class="button">
 					Detach Father
 			    </button>
-			  <div style="clear: both;"></div>
 			</div> <!-- end of Father row -->
 		</fieldset> <!-- id="HusbandSet" -->
 		<fieldset id="WifeSet" class="female">
@@ -209,7 +205,6 @@
 					Edit Wife
 			    </button>
 			  </div>
-			  <div style="clear: both;"></div>
 			</div>
 			<div class="row" id="WifeMarrSurnameRow">
 			  <div class="column1">
@@ -221,7 +216,6 @@
 		                    maxlength="255" class="white left column2"
 		                    value="$HUSBSURNAME">
 			  </div>
-			  <div style="clear: both;"></div>
 			</div>
 			<div class="row" id="selectWifeRow">
 			    <label class="column1" for="chooseWife">
@@ -241,7 +235,6 @@
 					    class="button">
 					Detach Wife
 			    </button>
-			  <div style="clear: both;"></div>
 			</div> <!-- end of Wife row -->
 		</fieldset> <!-- id="WifeSet" -->
 		<fieldset id="EventSet" class="other">
@@ -285,7 +278,6 @@
 		                size="6" class="ina rightnc"
 						readonly="readonly" value="$IDMR">
 			  </div>
-			  <div style="clear: both;"></div>
 			</div>
 			<div class="row" id="StatusRow">
 			  <div class="column1">
@@ -298,7 +290,6 @@
 				  </option>
 			    </select>
 			  </div>
-			  <div style="clear: both;"></div>
 			</div> <!-- end of Ending Status row -->
 		
 			<div class="row" id="NameRuleRow">
@@ -311,7 +302,6 @@
 					$TEXT
 				  </option>
 			    </select>
-			  <div style="clear: both;"></div>
 			</div> <!-- end of Name Rule row -->
 		
 			<div class="row" id="NotesRow">
@@ -324,7 +314,6 @@
 			 opening and closing tags and the value of the field -->
 			    <textarea name="Notes" id="Notes" cols="60" rows="4"
 					>$NOTES</textarea>
-			  <div style="clear: both;"></div>
 			</div> <!-- end of Notes row -->
 			<div class="row" id="NoteDetailsButtonRow">
 			  <div class="column1">
@@ -336,7 +325,6 @@
 					Details
 			    </button>
 			  </div>
-			  <div style="clear: both;"></div>
 			</div> <!-- end of NoteDetailsButton row -->
 			<div class="row" id="InformationActionsRow">
 			    <label class="column1" for="chooseHusb">
@@ -345,7 +333,6 @@
 			    <button type="button" class="button" id="Pictures">
 					Edit <u>P</u>ictures
 			    </button>
-			  <div style="clear: both;"></div>
 			</div> <!-- end of Notes row -->
 		</fieldset> <!-- id="InformationSet" -->
 		<fieldset class="other" id="ChildrenSet">
@@ -874,7 +861,6 @@
 				Delete
 		    </button>
 		  </div>
-		  <div style="clear: both;"></div>
 		</div> <!-- end of Marriage row -->
 
         $EVENTTEMPLATE
@@ -911,7 +897,6 @@
 				Delete
 		      </button>
 		    </div>
-		    <div style="clear: both;"></div>
 		</div>
 	  <!-- end of template for sealed to spouse event row -->
 	
@@ -940,7 +925,6 @@
 				Delete
 		    </button>
 		  </div>
-		  <div style="clear: both;"></div>
 		</div>
 	  <!-- end of template for mariage ended event row -->
 	
@@ -976,7 +960,6 @@
 				Delete
 		    </button>
 		  </div>
-		  <div style="clear: both;"></div>
 		</div>
 	  <!-- end of template for marriage event row -->
 	
@@ -994,7 +977,6 @@
 				Details
 		    </button>
 		  </div>
-		  <div style="clear: both;"></div>
 		</div>
 	  <!-- end of template for never married fact row -->
 	
@@ -1012,7 +994,6 @@
 				Details
 		    </button>
 		  </div>
-		  <div style="clear: both;"></div>
 		</div>
 	  <!-- end of template for no children fact row -->
 	
@@ -1047,7 +1028,7 @@
 
       <span id="EventText$idet">$text</span>
     </div> <!-- id="templates" -->
-    <script src="/jscripts/tinymce/js/tinymce/tinymce.js">
+    <script src="/jscripts/tinymce/js/tinymce/tinymce.min.js">
     </script>
     <script src="/jscripts/js20/http.js" type="application/javascript">
     </script>

@@ -44,8 +44,9 @@ use \Exception;
  *		2018/11/19      change Helpen.html to Helpen.html               *
  *		2019/08/30      use Template                                    *
  *      2020/12/05      correct XSS vulnerabilities                     *
+ *      2022/07/07      add support for offset and limit parameters     *
  *																		*
- *  Copyright &copy; 2019 James A. Cobban								*
+ *  Copyright &copy; 2022 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/LegacyDate.inc';
 require_once __NAMESPACE__ . '/Person.inc';
@@ -56,6 +57,8 @@ require_once __NAMESPACE__ . '/common.inc';
 // process parameters
 $week			= 1;
 $weektext       = null;
+$offset         = 0;
+$limit          = 20;
 $lang			= 'en';
 
 // if invoked by method=get process the parameters
@@ -67,12 +70,12 @@ if (count($_GET) > 0)
                       "<th class='colhead'>value</th></tr>\n";
 	foreach($_GET as $key => $value)
     {	            // loop through all parameters
+        $safevalue                  = htmlspecialchars($value);
         $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
-                        "<td class='white left'>$value</td></tr>\n"; 
+                        "<td class='white left'>$safevalue</td></tr>\n"; 
 		switch (strtolower($key))
 		{		    // act on individual parameters
 		    case 'week':
-            {
                 if (strlen($value) > 0)
                 {
 					if (ctype_digit($value) && ($value > 0))
@@ -83,8 +86,7 @@ if (count($_GET) > 0)
 					    $week	    = 1;
 	                }
                 }
-				break;
-		    }		// week
+				break; // week
 
 		    case 'date':
 		    {
@@ -97,6 +99,16 @@ if (count($_GET) > 0)
 				$endday				= intval(strftime('%Y%m%d', $end));
 				break;
 		    }
+
+            case 'offset':
+                if (ctype_digit($value))
+                    $offset         = $value;
+                break;
+
+            case 'limit':
+                if (ctype_digit($value) && $value < 100)
+                    $limit          = $value;
+                break;
 
 		    case 'debug':
 		    {		// already processed by common code
@@ -154,8 +166,8 @@ if(strlen($msg) == 0)
 {
     $getparms	    = array('added'		=> array($startday, $endday),
 	      			        'order'		=> 'Surname, givenName, birthSD',
-		    		        'offset'    => 0,
-			    	        'limit'     => 20);
+		    		        'offset'    => $offset,
+			    	        'limit'     => $limit);
 	$persons	    = new PersonSet($getparms);
     $info	        = $persons->getInformation();
 
@@ -163,23 +175,41 @@ if(strlen($msg) == 0)
 	if (isset($week))
     {
         $template->set('prev',          $prev);
-        $template->set('next',          $next);
+        if ($next == 0)
+            $template['toNextWeek']->update('&nbsp;');
+        else
+            $template->set('next',          $next);
     }		// week set
     else
     {
-        $template['toPrevWeek']->update(null);
-        $template['toNextWeek']->update(null);
+        $template['toPrevWeek']->update('&nbsp;');
+        $template['toNextWeek']->update('&nbsp;');
     }
 
 	if ($count == 0)
     {
         $template['someMatches']->update(null);
-        $template['person']->update(null);
+        $template['person$idir']->update(null);
+        $template['prevPage']->update('&nbsp;');
+        $template['nextPage']->update('&nbsp;');
 	}
 	else
 	{	            // some matches
         $template['noMatches']->update(null);
-        $template['someMatches']->update(array('count'  => $count));
+        $template['someMatches']->update(array('count'  => $count,
+                                               'first'  => ($offset + 1),
+                                               'last'   => ($offset + $limit)));
+
+        if ($offset == 0)
+            $template['prevPage']->update('&nbsp;');
+        else
+            $template['prevPage']->update(array('week'   => $week,
+                                                'prvoff' => $offset-$limit));
+        if ($offset + $limit < $count)
+            $template['nextPage']->update(array('week'   => $week,
+                                                'nxtoff' => $offset+$limit));
+        else
+            $template['nextPage']->update('&nbsp;');
 
         $of                 = $t['of'];
         $husband            = $t['husband'];
@@ -283,7 +313,7 @@ if(strlen($msg) == 0)
 		    		$style	= 'odd';
 			}		// a real entry
         }	        // loop through all rows
-        $template['person']->update($parms);
+        $template['person$idir']->update($parms);
 	}	            // some matches
 }		            // no errors
 

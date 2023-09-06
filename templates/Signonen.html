@@ -20,16 +20,9 @@
         <span class='right'>
         <a href='/SignonHelpen.html' target='help'>? Help</a>
         </span>
-        <div style='clear: both;'></div>
       </h1>
       $TRACE
       $MSG 
-      <p>You can contribute to this web-site by adding transcriptions of
-        census pages, birth/marriage/death registrations, or by adding
-        information about your family to the family tree.
-        If you are not already a subscriber to this web-site, please click
-        on the <b>Register</b> button or hold down the Alt shift and press R.
-      </p>
       <p>In compliance with European Union regulations please note 
         that by signing on you agree that the site may use cookies to
         track your use of the site.
@@ -46,6 +39,8 @@
             class='white leftnc' value='$USERID'/>
         <input type='hidden' name='debug' id='debug' value='$DEBUG'>
         <input type='hidden' name='lang' id='lang' value='$LANG'>
+        <input type='hidden' name='validToken' id='validToken' 
+                value='$VALIDTOKEN'>
         </p>
         <p class='clear' id='passRow'>
         <label class='label' for='password'>
@@ -59,7 +54,7 @@
           E-Mail Address:
         </label>
         <input type='text' size='64' maxlength='256' name='email' id='email'
-            class='white leftnc' value=''/>
+            class='white leftnc' value='$EMAIL'/>
         </p>
         <p class='clear' id='rememberRow'>
         <label class='label' for='remember'>
@@ -105,72 +100,104 @@
         </p>
       </form>
     </div>
-    <div class="hidden" id='signedoff'>Signed off.</div>
-    <div class="hidden" id='specify'>
-            Please specify your user name and password.</div>
-    <div class="hidden" id='enterpassword'>
-            Please enter your password.</div>
-    <div class="hidden" id='incorrect'>
-            User Name and/or Password Incorrect.</div>
+    <div class="hidden" id='messages'>
+      <span id='signedoff'>Signed off.</span>
+      <span id='specify'>
+            Please specify your user name and password.</span>
+      <span id='enterpassword'>
+            Please enter your password.</span>
+      <span id='incorrect'>
+            User Name and/or Password Incorrect.</span>
+      <div class="hidden" id="noAccount">
+          Unable to find account record for user '$username' or
+          email address '$email'. 
+      </div>
+      <div class="hidden" id="noAccountUser">
+          Unable to find account record for user '$username'. 
+      </div>
+      <div class="hidden" id="noAccountEmail">
+          Unable to find account record for email address '$email'. 
+      </div>
+      <div id="rightCol1">
+        <p>
+          If you cannot remember your username, enter your e-mail address
+          and the service will look up your account.
+          If you cannot remember your password click on "Forgot Password"
+          and the service will send you an e-mail with instructions on
+          how to reset your password.
+        </p>
+        <p>You can contribute to this web-site by adding transcriptions of
+          census pages, birth/marriage/death registrations, or by adding
+          information about your family to the family tree.
+          If you are not already a subscriber to this web-site, please click
+          on the <b>Register</b> button or hold down the Alt shift and press R.
+        </p>
+      </div>
+      <p id='respond'>Please respond to the e-mail sent to '$EMAIL'.</p>
+      <p id='failed' class="warning">Unable to send e-mail to '$EMAIL'</p>
+      <div id='emailsubject'>
+        [JamesCobban.net] Lost Userid or Password
+      </div> <!-- id="emailsubject" -->
+      <div id='emailfrom'>
+        Administrator &lt;webmaster@$serverName&gt;
+      </div> <!-- id="emailfrom" -->
+      <div class='hidden' id='emailbody'>
+        <p>Your userid is '$username'.  A request has been made to reset
+         your password.  If you made this request 
+         <a href="$proto://$serverName/resetPassword.php?username=$username&validate=$validToken">
+             click here to reset your password</a>.
+        </p>
+      </div>
+    </div><!-- id="messages" --!>
     <div class='balloon' id='Helpuserid'>
-    <p>Enter the unique user name which you have previously registered.
-      This is up to 64 characters long and may contain almost any characters,
+      Enter the unique user name which you have previously registered.
+      This is up to 64 characters long and may contain almost any
+      characters,
       including spaces.  For example it may be your name.
       Avoid using anything that contains private information that uniquely
       identifies you such as your e-mail address.
-    </p>
     </div>
     <div class='balloon' id='Helpemail'>
-    <p>Enter the electronic mail address that you used when you first subscribed
-      to the service.  This field is only used for administrative purposes
-      related to the web-site.
-    </p>
+      Enter the electronic mail address that you used when you first
+      subscribed to the service.  This field is only used for
+      administrative purposes related to the web-site.
     </div>
     <div class='balloon' id='Helppassword'>
-    <p>This is the password that you registered for the above user name.  It
+      This is the password that you registered for the above user name.  It
       must be at least 6 characters long, and should be hard to guess.
-    </p>
     </div>
     <div class='balloon' id='Helpremember'>
-    <p>If you are accessing the site from a trusted computer, for example one that
-      belongs to you and is not used by any other person, then selecting this
-      option will cause the userid and password you have entered to be remembered
-      in a file on your computer and you will be automatically logged to the
+      If you are accessing the site from a trusted computer, for example
+      one that belongs to you and is not used by any other person, then
+      selecting this option will cause the userid and password you have 
+      entered to be remembered on your computer and you will be 
+      automatically logged to the
       site when you access it in the future.
-    </p>
     </div>
     <div class='balloon' id='HelpSubmit'>
-    <p>Click on this button to sign on.  You may also sign on by pressing the
+      Click on this button to sign on.  You may also sign on by pressing the
       Enter key after completing typing your userid and password, or by the
       keyboard short-cuts Alt-I or Ctrl-S.
-    </p>
     </div>
     <div class='balloon' id='HelpSignoff'>
-    <p>Click on this button to sign off.  You may also sign off by the keyboard
-      short-cut Alt-O (letter 'O').
-    </p>
+      Click on this button to sign off.  You may also sign off by the
+      keyboard short-cut Alt-O (letter 'O').
     </div>
     <div class='balloon' id='HelpRegister'>
-    <p>Click on this button, or use the keyboard short-cut Alt-R, to register 
-      a new user identifier and associated password. 
+      Click on this button, or use the keyboard short-cut Alt-R, to
+      register a new user identifier and associated password. 
       You will be prompted to enter additional registration information.
-    </p>
     </div>
     <div class='balloon' id='HelpForgotPassword'>
-    <p>Click on this button, or use the keyboard short-cut Alt-F, if you have
-      forgotten either your password or your userid.  If you have forgotten your
-      password enter your password.  If you have forgotten your userid enter the
-      electronic mail address that you used when you first registered.
-    </p>
+      Click on this button, or use the keyboard short-cut Alt-F, if you
+      have forgotten either your password or your userid.
+      If you have forgotten 
+      your userid enter the electronic mail address that you used when 
+      you first registered.
     </div>
     <div class='balloon' id='HelpClose'>
-    <p>Click on this button, or use the keyboard short-cut Alt-C, 
+      Click on this button, or use the keyboard short-cut Alt-C, 
       to close the dialog.
-    </p>
     </div>
-    <script src='/jscripts/util.js' type='text/javascript'>
-    </script>
-    <script src='/jscripts/Cookie.js' type='text/javascript'>
-    </script>
-    <script src='/Signon.js' type='text/javascript'>
+    <script src='/Signon.js' type='module'>
     </script>

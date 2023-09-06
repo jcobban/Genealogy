@@ -1157,6 +1157,7 @@ require_once __NAMESPACE__ . '/CensusLine.inc';
         case 'Census1911':
         case 'Census1916':
         case 'Census1921':
+        case 'Census1931':
         {
 require_once __NAMESPACE__ . '/CensusLine.inc';
             $record         = new RecordSet($table,$parms);

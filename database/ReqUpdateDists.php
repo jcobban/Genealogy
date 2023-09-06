@@ -36,8 +36,10 @@ use \Exception;
  *      2020/03/13      use FtTemplate::validateLang                    *
  *      2020/05/02      wrong index into set of Domains                 *
  *      2021/04/04      escape CONTACTSUBJECT                           *
+ *      2023/01/21      protect against XSS                             *
+ *      2023/03/23      correct default for province code               *
  *                                                                      *
- *  Copyright &copy; 2021 James A. Cobban                               *
+ *  Copyright &copy; 2023 James A. Cobban                               *
  ************************************************************************/
 require_once __NAMESPACE__ . '/Census.inc';
 require_once __NAMESPACE__ . '/CensusSet.inc';
@@ -46,81 +48,96 @@ require_once __NAMESPACE__ . '/Country.inc';
 require_once __NAMESPACE__ . '/FtTemplate.inc';
 require_once __NAMESPACE__ . '/common.inc';
 
-$censusId               = '';
+$censusId               = null;
+$censusIdText           = null;
 $censusYear             = '';
 $provinces              = '';
 $cc                     = 'CA';
+$cctext                 = null;
 $countryName            = 'Canada';
-$province               = 'CW';
+$province               = null;
+$provincetext           = null;
 $lang                   = 'en';
+$langtext               = null;
 
-foreach($_GET as $key => $value)
-{       // loop through parameters
-    switch(strtolower($key))
-    {
-        case 'cc':
+if (isset($_GET) && count($_GET) > 0)
+{	        	    // invoked by URL
+    $parmsText          = "<p class='label'>\$_GET</p>\n" .
+				               "<table class='summary'>\n" .
+				                  "<tr><th class='colhead'>key</th>" .
+			                        "<th class='colhead'>value</th></tr>\n";
+    foreach($_GET as $key => $value)
+    {               // loop through parameters
+        $safevalue      = htmlspecialchars($value);
+        $parmsText      .= "<tr><th class='detlabel'>$key</th>" .
+                            "<td class='white left'>$safevalue</td></tr>\n"; 
+        switch(strtolower($key))
         {
-            if (strlen($value) == 2)
-                $cc     = strtoupper($value);
-            break;
-        }
-
-        case 'census':
-        {
-            // support old parameter value
-            if (strlen($value) == 4)
-            {
-                $censusId   = 'CA' . $value;
-                $censusYear = $value;
-            }
-            else
-            {
-                $censusId   = $value;
-                $cc         = strtoupper(substr($censusId,0,2));
-            }
-            break;
-        }
-
-        case 'province':
-        {           // province code
-            $province       = $value;
-            if (strlen($value) == 2)
-            {
-                $pos        = strpos($provinces, $value);
-                if ($pos === false && ($pos & 1) == 1)
-                    $msg    .= "Invalid value '$value' for Province. ";
-            }
-            else
-            if (strlen($value) != 0)
-                $msg    .= "Invalid value '$value' for Province. ";
-            break;
-        }           // province code
-
-        case 'lang':
-        {
-                $lang               = FtTemplate::validateLang($value);
-            break;
-        }           // language code
-
-    }               // act on specific parameters
-}                   // loop through parameters
+            case 'cc':
+                if (preg_match('/^[a-zA-Z]{2}$/', $value))
+                    $cc                 = strtoupper($value);
+                else
+                    $cctext             = $safevalue;
+                break;
+    
+            case 'census':
+                // support old parameter value
+                if (preg_match('/^[0-9]{4}$/', $value))
+                    $censusId           = 'CA' . $value;
+                else
+                if (preg_match('/[a-zA-Z]{2,5}[0-9]{4}/', $value))
+                    $censusId           = $value;
+                else
+                    $censusIdText       = $safevalue;
+                break;
+    
+            case 'province':
+            case 'state':
+                if (preg_match('/^[a-zA-Z]{2}$/', $value))
+                    $province       = strtoupper($value);
+                else
+                    $provincetext   = $safevalue;
+                break;
+    
+            case 'lang':
+                $lang               = FtTemplate::validateLang($value,
+                                                               $langtext);
+                break;
+    
+        }               // act on specific parameters
+    }                   // loop through parameters
+    if ($debug)
+        $warn                       .= $parmsText . "</table>\n";
+}	        	        // invoked by URL
 
 // notify the invoker if they are not authorized
-$update             = canUser('edit');
 $template           = new FtTemplate("ReqUpdateDists$lang.html");
 
-/************************************************************************
- *      $censusList                                                     *
- *                                                                      *
- *      List of censuses to choose from                                 *
- ************************************************************************/
-if (strlen($censusId) >= 6)
+if (!canUser('edit'))
+{
+    $msg            .= $template['notsignedon']->innerHTML;
+}
+
+// complete interpretation of Census parameter
+if (is_string($censusIdText))
+{
+    $census             = null;
+    $cc                 = substr($censusIdText, 0, 2);
+    $msg                .= $template['censusInvalid']->
+                                        replace('$censusId', $censusIdText);
+    $provinces          = '';
+    $censusList         = array();
+}
+else
+if (is_string($censusId))
 {
     $census             = new Census(array('censusid'   => $censusId));
     $cc                 = $census['cc'];
     if (strlen($census['province']) > 0)
         $province       = $census['province'];
     $censusYear         = $census['year'];
+    if ($censusYear < 1867 && !is_string($province))
+        $province       = 'CW';
 
     $censusList         = array();
     $getParms           = array('cc'    => $cc);
@@ -140,21 +157,42 @@ if (strlen($censusId) >= 6)
     }
     else
     {
-        $warn           .= "<p>Census '$censusId' is unsupported</p>\n";
+        $msg            .= $template['censusUnsupp']->
+                                replace('$censusId', $censusId);
         $provinces      = '';
     }
 }
 else
+    $msg                .= $template['censusMissing']->innerHTML;
+
+// validate province
+if (is_string($provincetext))
 {
-    $census             = null;
-    $cc                 = substr($censusId, 0, 2);
-    $warn               .= "<p>Census '$censusId' is unsupported</p>\n";
-    $provinces          = '';
-    $censusList         = array();
+    $msg                .= $template['provinceInvalid']->
+                                replace('$province', $provincetext);
+}
+else
+if (is_string($province))
+{
+    $pos            = strpos($provinces, $province);
+    if ($pos === false || ($pos & 1) == 1)
+        $msg    .= $template['provinceUnsupp']->replace(
+                        array('$value', '$censusId'),
+                        array($province, $censusId));
 }
 
-$country                = new Country(array('code' => $cc));
-$countryName            = $country->get('name');
+// validate country
+if (is_string($cctext))
+    $msg                .= $template['countryInvalid']->
+                                                replace('$cc', $cctext);
+else
+{
+    $country                = new Country(array('code' => $cc));
+    if (!$country->isExisting())
+        $msg                .= $template['countryUnsupp']->
+                                                replace('$cc', $cc);
+    $countryName            = $country->get('name');
+}
 
 $template->set('CENSUSYEAR',    $censusYear);
 $template->set('CC',            $cc);
@@ -165,40 +203,45 @@ $template->set('CONTACTTABLE',  'Districts');
 $template->set('CONTACTSUBJECT',    '[FamilyTree]' . 
                                     urlencode($_SERVER['REQUEST_URI']));
 
-$template->updateTag('censusOpt', $censusList);
-if ($censusYear > 1867)
-{           // post confederation census
-    if ($province == 'CW' || $province == '')
-        $template->updateTag('allProvincesOpt',
-                             array('selected' => "selected='selected'"));
+if (strlen($msg) == 0)
+{
+    $template->updateTag('censusOpt', $censusList);
+    if ($censusYear > 1867)
+    {           // post confederation census
+        if ($province == 'CW' || $province == '')
+            $template->updateTag('allProvincesOpt',
+                                 array('selected' => "selected='selected'"));
+        else
+            $template->updateTag('allProvincesOpt',
+                                 array('selected' => ''));
+    }
     else
-        $template->updateTag('allProvincesOpt',
-                             array('selected' => ''));
+        $template->updateTag('allProvincesOpt', null);
+    
+    $getParms           = array('cc' => $cc);
+    $domains            = new DomainSet($getParms);
+    $provArray          = array();
+    for ($ip = 0; $ip < strlen($provinces); $ip = $ip + 2)
+    {               // loop through all provinces
+        $pc             = substr($provinces, $ip, 2);
+        $domainObj      = $domains["$cc$pc"];
+        if (is_null($domainObj))
+        {
+            error_log("ReqUpdateDists.php: " . __LINE__ . " Province code '$cc$pc' not found in Domains of country code '$cc'\n");
+            $domainObj  = new Domain(array('code' => "$cc$pc"));
+        }
+        $provinceName   = $domainObj->get('name');
+        if ($pc == $province)
+            $seld       = "selected='selected'";
+        else
+            $seld       = '';
+        $provArray[$pc] = array('pc'        => $pc,
+                                'name'      => $provinceName,
+                                'selected'  => $seld);
+    }
+    $template->updateTag('provinceOpt', $provArray);
 }
 else
-    $template->updateTag('allProvincesOpt', null);
+    $template['distForm']->update(null);
 
-$getParms           = array('cc' => $cc);
-$domains            = new DomainSet($getParms);
-$provArray          = array();
-for ($ip = 0; $ip < strlen($provinces); $ip = $ip + 2)
-{               // loop through all provinces
-    $pc             = substr($provinces, $ip, 2);
-    $domainObj      = $domains["$cc$pc"];
-    if (is_null($domainObj))
-    {
-        error_log("ReqUpdateDists.php: " . __LINE__ . " Province code '$cc$pc' not found in Domains of country code '$cc'\n");
-        $domainObj  = new Domain(array('code' => "$cc$pc"));
-    }
-    $provinceName   = $domainObj->get('name');
-    if ($pc == $province)
-        $seld       = "selected='selected'";
-    else
-        $seld       = '';
-    $provArray[$pc] = array('pc'        => $pc,
-                            'name'      => $provinceName,
-                            'selected'  => $seld);
-}
-$template->updateTag('provinceOpt', $provArray);
 $template->display();
-showTrace();

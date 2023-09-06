@@ -59,7 +59,6 @@
                   <option value="2" $PICSELECTED2>Video</option>
                   <option value="3" $PICSELECTED3>Other</option>
               </select>
-            <div style="clear: both;"></div>
           </div>
           <div class="row" id="imageURLRow">
             <label class="column1" for="picnameurl">
@@ -71,7 +70,6 @@
               <button type="button" id="browseFile">
                   Browse
               </button>
-            <div style="clear: both;"></div>
           </div>
           <div class="row" id="contentsRow">
             <div class="left">
@@ -86,7 +84,6 @@
 			        $CAPTION
 	          </p>
             </div>
-           <div style="clear: both;"></div>
           </div>
           <div class="row" id="captionRow">
             <label class="column1" for="piccaption">
@@ -95,7 +92,6 @@
               <input type="text" size="64" name="piccaption" id="piccaption"
                   maxlength="255" class="white leftnc"
                   value="$CAPTION">
-            <div style="clear: both;"></div>
           </div>
           <div class="row" id="dateRow">
             <label class="column1" for="picdate">
@@ -104,7 +100,6 @@
               <input type="text" size="16" name="picdate" id="picdate"
                           maxlength="30" class="white left"
                           value="$DATE">
-            <div style="clear: both;"></div>
           </div>
           <div class="row" id="descriptionRow">
             <label class="column1" for="picdesc">
@@ -112,7 +107,6 @@
             </label>
               <textarea  cols="50" rows="4" name="picdesc"
                   id="picdesc">$DESC</textarea>
-            <div style="clear: both;"></div>
           </div>
           <div class="row" id="printRow">
             <label class="column1" for="picprint">
@@ -120,7 +114,6 @@
             </label>
               <input type="checkbox" name="picprint" id="picprint"
                     value="1" $PRINTCHECKED>
-            <div style="clear: both;"></div>
           </div>
           <div class="row" id="soundRow">
             <label class="column1" for="picsoundnameurl">
@@ -132,7 +125,6 @@
               <button type="button" name="browseSound" id="browseSound">
                   Browse
               </button>
-            <div style="clear: both;"></div>
           </div>
           <div class="row" id="playSoundRow">
             <label class="column1">
@@ -145,7 +137,6 @@
                   Your browser does not support the audio element.
               </span>
             </audio>
-            <div style="clear: both;"></div>
           </div>
           <div class="row" id="preferredRow">
             <label class="column1" for="picpref">
@@ -153,7 +144,6 @@
             </label>
               <input type="checkbox" name="picpref" id="picpref"
                         value="1" $PREFCHECKED>
-            <div style="clear: both;"></div>
           </div>
           <div class="row" id="filingRefRow">
             <label class="column1" for="filingref">
@@ -162,7 +152,6 @@
               <input type="text" size="40" name="filingref" id="filingref"
                   maxlength="50" class="white leftnc"
                   value="$USERREF">
-            <div style="clear: both;"></div>
           </div>
         <p id="buttonRow">
           <button type="submit" id="updPicture">
@@ -265,7 +254,7 @@
       or picture and closes the dialog.  Note that pressing the Enter key while
       editting any text field in this dialog also performs this function.
     </div>
-    <script src="/jscripts/tinymce/js/tinymce/tinymce.js">
+    <script src="/jscripts/tinymce/js/tinymce/tinymce.min.js">
     </script>
     <script src="/jscripts/js20/http.js" type="application/javascript">
     </script>

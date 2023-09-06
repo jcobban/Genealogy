@@ -13,7 +13,7 @@
  *  Copyright &copy; 2020 James A. Cobban								*
  **********************************************************************-->
     <div class="hidden" id="breadcrumbs">
-      <a href="/index.html">Home</a>:
+      <a href="/home.html">Home</a>:
       <a href="/genealogy.php?lang=$LANG">Genealogy</a>:
       <a href="/FamilyTree/Services.php?lang=$LANG">Services</a>:
       <a href="/FamilyTree/editSource.php?idsr=0&lang=$LANG">
@@ -36,7 +36,6 @@
           </label>
           <input name="pattern" type="text" size="64" class="white leftnc"
                     value="$PATTERN">
-              <div style="clear: both;"></div>
         </div>
         <div class="row">
           <label class="label" for="namefld" style="width: 8em;">
@@ -44,7 +43,6 @@
           </label>
           <input name="namefld" id="namefld" type="text" size="64"
                       class="white leftnc" value="">
-          <div style="clear: both"></div>
         </div>
         <div class="row" id="buttonRow">
           <label class="label" for="Search" style="width: 8em;">
@@ -61,22 +59,20 @@
           <button type="button" class="button" id="CreateNew" accesskey="n">
               Create <u>N</u>ew Source
           </button>
-          <div style="clear: both;"></div>
         </div>
         <p class="label" id="nomatch">
             No Sources match the specified pattern.
         </p>
-        <div class="center" id="topBrowse">
-          <div class="left" id="topPrev">
+        <div class="spaceBetween" id="topBrowse">
+          <div id="topPrev">
             <a href="Sources.php?pattern=$PATTERN&amp;limit=$LIMIT&amp;offset=$PREVOFFSET&amp;lang=$LANG">
-            &lt;---
+            <img src="/Images/ArrowLeft.svg">
             </a>
           </div>
-          <div class="right" id="topNext"> 
-            <a href="Sources.php?pattern=$PATTERN&amp;limit=$LIMIT&amp;offset=$NEXTOFFSET&amp;lang=$LANG">---&gt;</a>
-          </div>
           rows $SHOWOFFSET to $LAST of $COUNT
-          <div style="clear: both;"></div>
+          <div id="topNext"> 
+            <a href="Sources.php?pattern=$PATTERN&amp;limit=$LIMIT&amp;offset=$NEXTOFFSET&amp;lang=$LANG"><img src="/Images/ArrowRight.svg"></a>
+          </div>
         </div>
         <!--- Put out the response as a table -->
         <table class="details" id="dataTable">

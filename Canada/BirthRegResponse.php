@@ -571,13 +571,13 @@ if (strlen($msg) == 0)
 	$template->set('NPPREV',	    $npprev);
     if ($npprev == '')
     {
-        $template->updateTag('topPrev', null);
-        $template->updateTag('botPrev', null);
+        $template->updateTag('topPrev', '&nbsp;');
+        $template->updateTag('botPrev', '&nbsp;');
     }
     if ($npnext == '')
     {
-        $template->updateTag('topNext', null);
-        $template->updateTag('botNext', null);
+        $template->updateTag('topNext', '&nbsp;');
+        $template->updateTag('botNext', '&nbsp;');
     }
 	$template->set('NPNEXT',	    $npnext);
     $birthRowElt        = $template->getElementById('birthRow$regyear$regnum');

@@ -24,14 +24,14 @@
       $MSG
       $TRACE
       <!--- Put out a line with links to previous and next section of table -->
-      <div class='center' id="topBrowse">
-        <span class='left' id="topPrev">
-            <a href='OcfaDoQuery.php?County=$COUNTY&amp;Township=$TOWNSHIP&amp;GivenName=$GIVENNAMES&amp;Surname=$SURNAME&amp;SurnameSoundex=$SURNAMESOUNDEX&amp;Count=$LIMIT&Offset=$PREVOFFSET' id='nextPage'>&lt;---</a>
-        </span>
-        <span class='right' id="topNext">
-            <a href='OcfaDoQuery.php?County=$COUNTY&amp;Township=$TOWNSHIP&amp;GivenName=$GIVENNAMES&amp;Surname=$SURNAME&amp;SurnameSoundex=$SURNAMESOUNDEX&amp;Count=$LIMIT&Offset=$NEXTOFFSET' id='nextPage'>---&gt;</a>
+      <div class='spaceBetween' id="topBrowse">
+        <span id="topPrev">
+            <a href='OcfaDoQuery.php?County=$COUNTY&amp;Township=$TOWNSHIP&amp;GivenName=$GIVENNAMES&amp;Surname=$SURNAME&amp;SurnameSoundex=$SURNAMESOUNDEX&amp;Count=$LIMIT&Offset=$PREVOFFSET' id='nextPage'><img src="/Images/ArrowLeft.svg"></a>
         </span>
         	displaying rows $OFFSET1 to $OFFSETLAST of $TOTALROWS 
+        <span id="topNext">
+            <a href='OcfaDoQuery.php?County=$COUNTY&amp;Township=$TOWNSHIP&amp;GivenName=$GIVENNAMES&amp;Surname=$SURNAME&amp;SurnameSoundex=$SURNAMESOUNDEX&amp;Count=$LIMIT&Offset=$NEXTOFFSET' id='nextPage'><img src="/Images/ArrowRight.svg"></a>
+        </span>
       </div>
       <!--- Put out the response as a table -->
       <table class='details' id="dataTable">
@@ -66,12 +66,12 @@
         </tbody>
 	  </table>
 	  <!--- Put out a line with links to previous and next section of table -->
-	  <div class='center'id="botBrowse">
-	    <span class='left' id="botPrev">
-            <a href='OcfaDoQuery.php?County=$COUNTY&amp;Township=$TOWNSHIP&amp;GivenName=$GIVENNAMES&amp;Surname=$SURNAME&amp;SurnameSoundex=$SURNAMESOUNDEX&amp;Count=$LIMIT&Offset=$PREVOFFSET' id='nextPage'>&lt;---</a>
+	  <div class='spaceBetween'id="botBrowse">
+	    <span id="botPrev">
+            <a href='OcfaDoQuery.php?County=$COUNTY&amp;Township=$TOWNSHIP&amp;GivenName=$GIVENNAMES&amp;Surname=$SURNAME&amp;SurnameSoundex=$SURNAMESOUNDEX&amp;Count=$LIMIT&Offset=$PREVOFFSET' id='nextPage'><img src="/Images/ArrowLeft.svg"></a>
 	    </span>
-	    <span class='right' id="botNext">
-            <a href='OcfaDoQuery.php?County=$COUNTY&amp;Township=$TOWNSHIP&amp;GivenName=$GIVENNAMES&amp;Surname=$SURNAME&amp;SurnameSoundex=$SURNAMESOUNDEX&amp;Count=$LIMIT&Offset=$NEXTOFFSET' id='nextPage'>---&gt;</a>
+	    <span id="botNext">
+            <a href='OcfaDoQuery.php?County=$COUNTY&amp;Township=$TOWNSHIP&amp;GivenName=$GIVENNAMES&amp;Surname=$SURNAME&amp;SurnameSoundex=$SURNAMESOUNDEX&amp;Count=$LIMIT&Offset=$NEXTOFFSET' id='nextPage'><img src="/Images/ArrowRight.svg"></a>
 	    </span>
 	&nbsp;
 	  </div>

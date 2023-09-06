@@ -71,8 +71,9 @@ use \Iterator;
  *                      add pseudo-field 'sexclass'                     *
  *      2020/12/02      protect against XSS                             *
  *      2020/12/12      correct invalid UTF8                            *
+ *      2023/06/14      add support for 1931 census                     *
  *                                                                      *
- *  Copyright &copy; 2020 James A. Cobban                               *
+ *  Copyright &copy; 2023 James A. Cobban                               *
  ************************************************************************/
 require_once __NAMESPACE__ . '/Record.inc';
 require_once __NAMESPACE__ . '/Census.inc';
@@ -552,6 +553,62 @@ class CensusLine extends Record
                 'idir'                  => 0);
 
     /********************************************************************
+     *  CensusLine::$drow1931                                           *
+     *                                                                  *
+     *  Default initial row for 1931 census.                            *
+     ********************************************************************/
+    private static $drow1931    = array(
+                'province'              => '',
+                'district'              => 0,
+                'subdistrict'           => 0,
+                'division'              => '',
+                'page'                  => 0,
+                'line'                  => 0,
+                'family'                => 1,
+                'surname'               => '',
+                'surnamesoundex'        => '',
+                'givennames'            => '',
+                'address'               => '',
+                'ownertenant'           => '',
+                'houserent'             => 0,
+                'houseclass'            => '',
+                'housematerial'         => '',
+                'houserooms'            => 0,
+                'radio'                 => '',
+                'relation'              => '',
+                'sex'                   => '?',
+                'mstat'                 => '',
+                'age'                   => '',
+                'byear'                 => null,
+                'bplace'                => 'Ontario',
+                'fathersbplace'         => 'Ontario',
+                'mothersbplace'         => 'Ontario',
+                'immyear'               => '',
+                'natyear'               => '',
+                'nationality'           => 'Canadian',
+                'origin'                => '[origin]',
+                'spkenglish'            => 'Y',
+                'spkfrench'             => '',
+                'spkother'              => '',
+                'religion'              => '[religion]',
+                'canread'               => 'Y',
+                'schoolmons'            => '',
+                'occupation'            => '',
+                'emptype'               => '',
+                'empwhere'              => '',
+                'earnings'              => null,
+                'employed'              => '',
+                'unempwhy'              => '',
+                'weeksnojob'            => '',
+                'weeksill'              => '',
+                'weeksaccident'         => '',
+                'weeksstrike'           => '',
+                'weekslayoff'           => '',
+                'weeksother'            => '',
+                'remarks'               => '',
+                'idir'                  => 0);
+
+    /********************************************************************
      *  CensusLine::$defaultRows                                        *
      *                                                                  *
      *  table of initial rows based upon census code                    *
@@ -583,6 +640,7 @@ class CensusLine extends Record
         self::$defaultRows['CA1911']    = self::$drow1911;
         self::$defaultRows['CA1916']    = self::$drow1916;
         self::$defaultRows['CA1921']    = self::$drow1921;
+        self::$defaultRows['CA1931']    = self::$drow1931;
     }
 
     /********************************************************************
@@ -601,7 +659,10 @@ class CensusLine extends Record
             $censusId   = 'CA' . $censusYear;
         else
             $censusId   = 'CW' . $censusYear;
-        return self::$defaultRows[$censusId];
+        if (array_key_exists($censusId, self::$defaultRows))
+            return self::$defaultRows[$censusId];
+        else
+            return self::$defaultRows['CA1881'];
     }       // function getInitRow
 
     /********************************************************************
@@ -970,6 +1031,7 @@ class CensusLine extends Record
         }       // ages is at time of enumeration
 
         // invoke constructor of base class
+        $this->row          = $dbrow;
         parent::__construct($dbrow,
                             $table);
         $this->needInsert   = $needInsert;
@@ -981,7 +1043,7 @@ class CensusLine extends Record
             if (array_key_exists($fieldLc, self::$translate))
                 $fieldLc    = self::$translate[$fieldLc];
             if ($fieldLc != 'censusid' && $fieldLc != 'line')
-        parent::set($fieldLc, $value);
+                parent::set($fieldLc, $value);
         }   // check for other initialization
 
         // diagnostic output if debug is set
@@ -1007,7 +1069,7 @@ class CensusLine extends Record
         {
             case 'district':
             {           // District number
-                $distId     = $this->row['district'];
+                $distId         = floatval($this->row['district']);
                 if ($distId == floor($distId))
                     $retval     = intval($distId);
                 else
@@ -1091,6 +1153,22 @@ class CensusLine extends Record
                 break;
             }           // yes/no flags represented as char(1)
 
+            case 'employed':
+            {           // yes/no flag represented as char(1)
+                $value                  = $this->row[$fieldLc];
+                if (array_key_exists('emptype', $this->row) &&
+                    strtoupper($this->row['emptype']) == 'W')
+                {
+                    if ($value == '0' || strtoupper($value) == 'N')
+                        $retval             = ' ';
+                    else
+                        $retval             = 'Y';
+                }
+                else
+                    $retval             = '';
+                break;
+            }           // employed flag depends upon emptype
+
             case 'school':
             case 'birth':   // birth in last 12 months
             {           // yes/no flags represented as M/F
@@ -1119,6 +1197,7 @@ class CensusLine extends Record
             case 'monthshome':
             case 'monthsother':
             case 'incomeemp':
+            case 'earnings':
             case 'incomeoth':
             case 'monthsschool':
             case 'horses':
@@ -1130,8 +1209,6 @@ class CensusLine extends Record
             case 'wksoth':
             case 'hpwemp':
             case 'hpwoth':
-            case 'incomeemp':
-            case 'incomeoth':
             case 'hourlyrate':
             case 'lifeinsurance':
             case 'accinsurance':
@@ -1141,6 +1218,11 @@ class CensusLine extends Record
             case 'houserooms':
             case 'weeksunemp':
             case 'weeksill':
+            case 'weeksnojob':
+            case 'weeksaccident':
+            case 'weeksstrike':
+            case 'weekslayoff':
+            case 'weeksother':
             case 'numfamilies':
             case 'nofamilies':
             {               // numeric values only displayed if non-zero
@@ -1230,6 +1312,7 @@ class CensusLine extends Record
             case 'hpwoth':
             case 'incomeemp':
             case 'incomeoth':
+            case 'earnings':
             case 'horses':
             case 'milkcows':
             case 'cattle':
@@ -1240,8 +1323,6 @@ class CensusLine extends Record
             case 'monthsfact':
             case 'monthshome':
             case 'monthsother':
-            case 'incomeemp':
-            case 'incomeoth':
             case 'monthsschool':
             {                   // numeric fields where blank means zero
                 if (is_string($value))
@@ -1361,6 +1442,27 @@ class CensusLine extends Record
                 return parent::set($field, $value);
             }                   // single character fields
 
+            case 'employed':
+            {           // yes/no flag represented as char(1)
+                if (is_string($value))
+                {
+                    if (array_key_exists('emptype', $this->row) &&
+                        strtoupper($this->row['emptype']) == 'W')
+                    {
+                        if ($value == '0' || strtoupper($value) == 'N')
+                            $value              = ' ';
+                        else
+                            $value              = 'Y';
+                    }
+                    else
+                        $value                  = ' ';
+                    return parent::set($field, $value);
+                }
+                else
+                    return parent::set($field, ' ');
+                break;
+            }           // employed flag depends upon emptype
+
             case 'province':
             {                   // two character fields
                 if (is_string($value))
@@ -1412,6 +1514,7 @@ class CensusLine extends Record
             }                   // six character fields
 
             case 'age':
+            case 'housematerial':
             {                   // eight character fields
                 if (is_string($value))
                 {
@@ -1627,9 +1730,9 @@ class CensusLine extends Record
                         break;
                     }           // strings limited to 48 characters
 
+                    case 'line':
                     case 'district':
                     case 'page':
-                    case 'line':
                     case 'byear':
                     {   // integer fields
                         $fldnames           .= "$comma`$fld`";
@@ -1650,11 +1753,17 @@ class CensusLine extends Record
                     case 'monthsother':
                     case 'incomeemp':
                     case 'incomeoth':
+                    case 'earnings':
                     case 'monthsschool':
                     case 'wksemp':
                     case 'weeksunemp':
                     case 'wksoth':
                     case 'weeksill':
+                    case 'weeksnojob':
+                    case 'weeksaccident':
+                    case 'weeksstrike':
+                    case 'weekslayoff':
+                    case 'weeksother':
                     case 'hpwemp':
                     case 'hpwoth':
                     case 'hourlyrate':
@@ -1722,9 +1831,6 @@ class CensusLine extends Record
                 if (strlen($insertText) > 60)
                     $insertText = substr($insertText, 0, 50) . '...' .
                                   substr($insertText, -7);
-                throw new Exception("CensusLine::save: '" .
-                                    $insertText . "', " .
-                                    print_r($stmt->errorInfo(),true));
             }       // error inserting record
         }           // create new record
         else
@@ -1775,11 +1881,17 @@ class CensusLine extends Record
                     case 'monthsother':
                     case 'incomeemp':
                     case 'incomeoth':
+                    case 'earnings':
                     case 'monthsschool':
                     case 'wksemp':
                     case 'wksoth':
                     case 'weeksunemp':
                     case 'weeksill':
+                    case 'weeksnojob':
+                    case 'weeksaccident':
+                    case 'weeksstrike':
+                    case 'weekslayoff':
+                    case 'weeksother':
                     case 'hpwemp':
                     case 'hpwoth':
                     case 'hourlyrate':

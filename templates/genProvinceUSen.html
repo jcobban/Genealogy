@@ -1,12 +1,14 @@
 <!--*********************************************************************
- *  genProvinceUSen.html						*
- *									*
- *  Template for displaying information about a US state		*
- *  History:								*
- *	2018/01/02	created						*
- *	2018/01/04	remove Template from template file names	*
- *									*
- *  Copyright &copy; 2018 James Alan Cobban				*
+ *  genProvinceUSen.html                                                *
+ *                                                                      *
+ *  Template for displaying information about a US state                *
+ *                                                                      *
+ *  History:                                                            *
+ *      2018/01/02      created                                         *
+ *      2018/01/04      remove Template from template file names        *
+ *      2023/01/15      support ES2015                                  *
+ *                                                                      *
+ *  Copyright &copy; 2023 James Alan Cobban                             *
  ***********************************************************************-->
 <div class='hidden' id='breadcrumbs'>
   <a href='/genealogy.php?lang=$LANG'>Genealogy</a>:
@@ -24,32 +26,28 @@
   $TRACE
   <p class='label'>
     <a target='_blank' 
-	href='/Canada/CountiesEdit.php?Domain=$DOMAIN&lang=$LANG'>
-		Counties
+    href='/Canada/CountiesEdit.php?Domain=$DOMAIN&lang=$LANG'>
+        Counties
     </a>
   </p>
   <p class='label'>
     <a target='_blank' 
-	href='/Canada/BirthRegQuery.php?domain=$DOMAIN&lang=$LANG'>
-		Birth Registration Query
+    href='/Canada/BirthRegQuery.php?domain=$DOMAIN&lang=$LANG'>
+        Birth Registration Query
     </a>
   </p>
   <p class='label'>
     <a target='_blank' 
-	href='/Ontario/MarriageRegQuery.php?domain=$DOMAIN&lang=$LANG'>
-		Marriage Registration Query
+    href='/Ontario/MarriageRegQuery.php?domain=$DOMAIN&lang=$LANG'>
+        Marriage Registration Query
     </a>
   </p>
   <p class='label'>
     <a target='_blank' 
-	href='/Ontario/DeathRegQuery.php?domain=$DOMAIN&lang=$LANG'>
-		Death Registration Query
+    href='/Ontario/DeathRegQuery.php?domain=$DOMAIN&lang=$LANG'>
+        Death Registration Query
     </a>
   </p>
 </div> <!-- class='body' -->
-    <script src='/jscripts/js20/http.js' type='text/javascript'>
-    </script>
-    <script src='/jscripts/util.js' type='text/javascript'>
-    </script>
-    <script src='/jscripts/default.js' type='text/javascript'>
+    <script src='/jscripts6/util.js' type='module'>
     </script>

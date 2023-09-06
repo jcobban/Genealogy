@@ -86,8 +86,10 @@ use \Templating\Template;
  *		2019/12/13      remove D_ prefix from field names               *
  *		2020/01/22      internationalize numbers                        *
  *		2020/03/13      use FtTemplate::validateLang                    *
+ *		2022/07/08      support display: flex                           *
+ *		2022/12/31      PHP 8 does not permit subtract from string      *
  *																		*
- *  Copyright &copy; 2020 James A. Cobban								*
+ *  Copyright &copy; 2022 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . "/Domain.inc";
 require_once __NAMESPACE__ . "/Country.inc";
@@ -175,7 +177,9 @@ $regTownship		= null;
 $expand				= true;
 $getParms			= array();	// parameters to new DeathSet
 $regyear			= 0;
+$regyeartext		= null;
 $regnum				= 0;
+$regnumtext         = null;
 $soundex            = false;
 $offset				= 0;
 $lang				= 'en';
@@ -254,17 +258,25 @@ foreach ($_GET as $key => $value)
 			}		// selection lists
 
 			case 'regyear':
-			{		// numeric field
-			    $regyear	        = $value;
-				$npuri	            .= "{$npand}{$key}={$value}";
-				$npand	            = '&amp;'; 
-			    $orderby	        = "RegYear,RegNum";
+            {		// numeric field
+                if (ctype_digit($value))
+                {
+			        $regyear	        = $value;
+				    $npuri	            .= "{$npand}{$key}={$value}";
+				    $npand	            = '&amp;'; 
+                    $orderby	        = "RegYear,RegNum";
+                }
+                else
+                    $regyeartext        = htmlspecialchars($value);
 			    break;
 			}		// numeric fields
 
 			case 'regnum':
-			{		// numeric field
-                $regnum	            = $value;
+            {		// numeric field
+                if (ctype_digit($value))
+                    $regnum	        = intval($value);
+                else
+                    $regnumtext     = htmlspecialchars($value);
 			    break;
 			}		// numeric fields
 
@@ -338,11 +350,11 @@ foreach ($_GET as $key => $value)
 	}	            // non-empty value
 }		            // foreach parameter>
 if ($debug)
-    $warn               .= $parmsText . "</table>\n";
+    $warn                   .= $parmsText . "</table>\n";
 
 // start the template
-$template			= new FtTemplate("DeathRegResponse$lang.html");
-$trtemplate     = $template->getTranslate();
+$template			        = new FtTemplate("DeathRegResponse$lang.html");
+$trtemplate                 = $template->getTranslate();
 
 // validate domain code
 $domainObj	            	= new Domain(array('domain'	    => $domain,
@@ -376,14 +388,14 @@ if ($regCounty)
 }                       // county code
 
 // validate regyear
+if (is_string($regyeartext))
+{
+    $text	                = $template['yearNot4Digits']->innerHTML();
+    $msg                    .= str_replace('$regyear', $regyear, $text);
+}
+else
 if ($regyear)
 {                       // regyear specified
-    if (preg_match("/^([0-9]{1,4})$/", $regyear) == 0)
-    {
-        $text	            = $template['yearNot4Digits']->innerHTML();
-        $msg                .= str_replace('$regyear', $regyear, $text);
-    }
-    else
     if (($regyear < 1800) || ($regyear > 3000))
     {
         $text	            = $template['yearOutOfRange']->innerHTML();
@@ -398,21 +410,20 @@ if ($regyear)
 }                       // regyear specified
 
 // validate regnum
+if ($regnumtext)
+{
+    $text	                = $template['regnumNotNumber']->innerHTML();
+    $msg                    .= str_replace('$regnum', $regnumtext, $text);
+    $regnum                 = 0;
+}
+else
 if ($regnum)
 {
     if (ctype_digit($regnum))
     {
 		$getParms['regnum']	= $regnum;
     }
-    else
-    {
-        $text	            = $template['regnumNotNumber']->innerHTML();
-        $msg                .= str_replace('$regnum', $regnum, $text);
-        $regnum             = 0;
-    }
 }
-else
-    $regnum                 = '';
 
 // validate limit
 if ((is_int($limit) || ctype_digit($limit)) && $limit < 100)
@@ -563,13 +574,13 @@ if (strlen($msg) == 0)
 	$template->set('NPPREV',	    $npprev);
     if ($npprev == '')
     {
-        $template->updateTag('topPrev', null);
-        $template->updateTag('botPrev', null);
+        $template->updateTag('topPrev', '&nbsp;');
+        $template->updateTag('botPrev', '&nbsp;');
     }
     if ($npnext == '')
     {
-        $template->updateTag('topNext', null);
-        $template->updateTag('botNext', null);
+        $template->updateTag('topNext', '&nbsp;');
+        $template->updateTag('botNext', '&nbsp;');
     }
 	$template->set('NPNEXT',	    $npnext);
     $deathRowElt        = $template->getElementById('deathRow$regyear$regnum');

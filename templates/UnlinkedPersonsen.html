@@ -10,14 +10,14 @@
  *  Copyright &copy; 2020 James A. Cobban								*
  **********************************************************************-->
   <div class="hidden" id="breadcrumbs">
-	<a href="/index.html">Home</a>:
+	<a href="/home.html">Home</a>:
     <a href="/genealogy.php?lang=$LANG">Genealogy</a>:
     <a href="/FamilyTree/Services.php?lang=$LANG">Services</a>:
   </div>
   <div class="body">
     <h1>
 		<span class="right">
-		  <a href="UnlinkedIndividualsHelpen.html" target="help">? Help</a>
+		  <a href="UnlinkedPersonsHelpen.html" target="help">? Help</a>
 		</span>
 		Persons who are not linked to any Families List
     </h1>
@@ -29,15 +29,14 @@
     <p class="label" id="someLinked">
 		$count individuals are not linked to any families.
     </p>
-    <div class="center" id="frontBrowse">
-	    <div class="left" id="npprev">
-	      <a href="UnlinkedIndividuals.php?limit=$limit&amp;offset=$prevoffset">&lt;---</a>
-	    </div>
-	    <div class="right" id="npnext"> 
-	      <a href="UnlinkedIndividuals.php?limit=$limit&amp;offset=$nextoffset">---&gt;</a>
+    <div class="spaceBetween" id="frontBrowse">
+	    <div id="npprev">
+	      <a href="UnlinkedPersons.php?limit=$limit&amp;offset=$prevoffset"><img src="/Images/ArrowLeft.svg"></a>
 	    </div>
 		rows $offset to $last of $count 
-        <div style="clear: both;"></div>
+	    <div id="npnext"> 
+	      <a href="UnlinkedPersons.php?limit=$limit&amp;offset=$nextoffset"><img src="/Images/ArrowRight.svg"></a>
+	    </div>
       </div>
       <!--- Put out the response as a table -->
       <table class="details" id="results">

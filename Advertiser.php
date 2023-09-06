@@ -16,8 +16,9 @@ use \NumberFormatter;
  *      2020/01/22      use NumberFormatter                             *
  *      2020/01/26      improve handling of non-authorized user         *
  *      2022/03/23      protect against script insertion                *
+ *      2023/01/19      further protect against script insertion        *
  *                                                                      *
- *  Copyright &copy; 2022 James A. Cobban                               *
+ *  Copyright &copy; 2023 James A. Cobban                               *
  ************************************************************************/
 require_once __NAMESPACE__ . '/Advertiser.inc';
 require_once __NAMESPACE__ . '/FtTemplate.inc';
@@ -67,21 +68,23 @@ if (isset($_POST) && count($_POST) > 0)
     $advertiser                     = null;
     foreach($_POST as $key => $value)
     {                       // loop through parameters
+        $safevalue          = htmlspecialchars($value);
         $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
-                            "<td class='white left'>$value</td></tr>\n"; 
+                          "<td class='white left'>$safevalue</td></tr>\n"; 
         $fieldLc                    = strtolower($key);
 
         switch($fieldLc)
         {                   // act on specific parameter
             case 'ademail':
             {               // email address
-                $ademail            = $value;
+                $ademail            = $safevalue;
                 break;
             }               // email address
 
             case 'lang':
             {               // lang
-                $lang                   = FtTemplate::validateLang($value);
+                $lang               = FtTemplate::validateLang($value,
+                                                               $langtext);
                 break;
             }               // lang
 
@@ -100,14 +103,15 @@ if (isset($_POST) && count($_POST) > 0)
         {
             foreach($file as $key => $value)
             {
+                $safevalue          = htmlspecialchars($value);
                 $parmsText  .= "<tr>" . 
                                 "<th class='detlabel'>$filename.$key</th>" .
-                                "<td class='white left'>$value</td></tr>\n";
+                                "<td class='white left'>$safevalue</td></tr>\n";
                 switch($key)
                 {
                     case 'name':
                     {
-                        $remoteName     = $value;
+                        $remoteName     = $safevalue;
                         break;
                     }
 
@@ -144,6 +148,9 @@ if (isset($_POST) && count($_POST) > 0)
 // create the Template instance
 $template           = new FtTemplate("Advertiser$lang.html");
 $formatter          = $template->getFormatter();
+
+if (is_string($langtext))
+    $warn           .= "<p>lang='$langtext' is not supported BCP47 syntax</p>\n";
 
 // check if this is an Advertiser account
 if (strlen($userid) > 0)

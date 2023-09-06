@@ -146,6 +146,7 @@ else
     $template       = new FtTemplate("deleteIndividNoauth$lang.html");
 
 $nameuri            = '';
+$name               = 'Not Found';
 $citCount           = 0;
 $eventCount         = 0;
 $personCount        = 0;

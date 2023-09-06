@@ -41,11 +41,15 @@
  *      2019/02/10      no longer need to call pageInit                 *
  *      2019/05/19      call element.click to trigger button click      *
  *      2021/03/29      correct initialization of division list         *
+ *      2023/08/23      restrict displayed districts to match Province  *
+ *                      use JSON                                        *
+ *                      use addEventListener                            *
+ *      2023/08/25      correct sort order changed by JSON              *
  *                                                                      *
- *  Copyright &copy; 2021 James A. Cobban                               *
+ *  Copyright &copy; 2023 James A. Cobban                               *
  ************************************************************************/
 
-window.onload                   = onLoadDetail;
+window.addEventListener('load', onLoadDetail);
 
 /************************************************************************
  *  function onLoadDetail                                               *
@@ -60,140 +64,132 @@ window.onload                   = onLoadDetail;
  ************************************************************************/
 function onLoadDetail()
 {
-    document.body.onkeydown     = qdKeyDown;
+    document.body.addEventListener('keydown', qdKeyDown);
 
-    var form    = document.distForm;
+    let form                    = document.distForm;
+    let censusId                = '';
+    let censusYear              = 1881;
+    let element                 = null;
     if (form)
     {       // web page has a form named distForm
         // get the census identifier from the invoking form
         // This has the format "CCYYYY" where "CC" is the administrative
         // domain, usually the country code, and "YYYY" is the census year 
-        var censusId    = form.Census.value;
-        var censusYear  = censusId.substring(2);
+        censusId                = form.Census.value;
+        censusYear              = censusId.substring(2);
 
 
         // initialize dynamic functionality of form elements
-        var elements    = form.elements;
-        var listofnames = "";
-        for (var i = 0; i < elements.length; i++)
+        let elements            = form.elements;
+        for (let i = 0; i < elements.length; i++)
         {   // loop through all form elements
-            var element     = elements[i];
-            element.onkeydown   = keyDown;
+            element             = elements[i];
+            element.addEventListener('keydown', keyDown);
 
-            var name    = element.name;
+            let name            = element.name;
             if (name.length == 0)
-                name    = element.id;
-            listofnames += name + ", ";
+                name            = element.id;
 
             switch(name)
-            {   // act on specific elements by name
+            {               // act on specific elements by name
                 case 'Coverage':
-                {
-                    element.onclick = showCoverage;
-                    break;
-                }   // display status of transcription
+                    element.addEventListener('click', showCoverage);
+                    break;  // display status of transcription
 
                 case 'Province':
-                {
                     element.addEventListener('change', changeProv);
-                    break;
-                }   // user selected different province
+                    break;  // user selected different province
 
                 case 'Page':
-                {
                     element.addEventListener('change', changePage);
-                    break;
-                }   // user selected different page
+                    break;  // user selected different page
 
                 case 'Surname':
-                {
                     element.focus();    // initial keyboard focus
-                    break;
-                }   // surname field
+                    break;  // surname field
 
                 case 'District[]':
-                {
-                    // get the district information file
-                    var distUrl = "CensusGetDistricts.php?";
-                    if (censusYear < 1867)
-                    {       // pre-confederation census by province
-                        var provSelect  = form.Province;
-                        var optIndex    = provSelect.selectedIndex;
-                        if (optIndex != -1)
-                        {       // province selected
-                            var prov    = provSelect.options[optIndex].value;
-                            distUrl += "Census=" + prov + censusYear;
-                        }       // province selected
-                        else
-                            distUrl += "Census=" + censusId;
-                    }       // pre-confederation census by province
-                    else
-                        distUrl += "Census=" + censusId;
-                    if ('lang' in args)
-                        distUrl += '&lang=' + args['lang'];
-                    // display indicator that we are waiting for
-                    // response from the server
-                    popupLoading(element);
-
-                    HTTP.getXML(distUrl,
-                                gotDistFile,
-                                noDistFile);
-                    break;
-                }           // districts selection
+                    break;           // districts selection
             }               // act on specific elements by name
         }                   // loop through all form elements
-        console.log("QueryDetail.js: onLoadDetail: listofnames=" +
-                    listofnames);
     }       // web page has a form named distForm
     else
         alert("QueryDetail.js: onLoad: invoking web page does not contain " +
                 "a <form name='distForm'>");
 
+    // get list of districts matching parameters
+    let distURL             = 'CensusGetDistrictsJSON.php';
+    let provSelect          = form.Province;
+    let optIndex            = provSelect.selectedIndex;
+    let prov                = provSelect.options[optIndex].value;
+    if (optIndex != -1)
+    {
+        if (censusYear < 1867)
+            distURL         += "?Census=" + prov + censusYear;
+        else
+        {
+            distURL         += "?Census=" + censusId + "&Province=" + prov;
+        }
+    }                   // provincial census
+    else
+        distURL             += "?Census=" + censusId;
+    if ('lang' in args)
+        distURL             += '&lang=' + args['lang'];
+
+    // display indicator that we are waiting forresponse from the server
+    popupLoading(element);
+
+    //alert("QueryDetail.js: onLoadDetail: get: distUrl=" + distURL);
+    HTTP.get(distURL,
+             gotDistFile,
+             noDistFile);
+
     // initialize dynamic functionality of labels
     elements    = document.getElementsByTagName("label");
-    for (var i = 0; i < elements.length; i++)
-    {       // loop through all labels
-        var element     = elements[i];
+    for (let i = 0; i < elements.length; i++)
+    {                       // loop through all labels
+        let element             = elements[i];
         // pop up help balloon if the mouse hovers over a label
         // for more than 2 seconds
-        element.onmouseover = eltMouseOver;
-        element.onmouseout  = eltMouseOut;
-    }       // loop through all labels
+        element.addEventListener('mouseover', eltMouseOver);
+        element.addEventListener('mouseout', eltMouseOut);
+    }                       // loop through all labels
 
 }       // function onLoadDetail
 
 /************************************************************************
  *  function gotDistFile                                                *
  *                                                                      *
- *  This method is called when the XML file, listing all the districts  *
- *  in the province, has been retrieved from the web server.            *
+ *  This method is called when the JSON document, listing all of the    *
+ *  districts in the province, has been retrieved from the web server.  *
  *                                                                      *
  *  Input:                                                              *
- *      xmlDoc              Document representing the XML file          *
+ *      jsonDoc             Document representing the XML file          *
  ************************************************************************/
-function gotDistFile(xmlDoc)
+function gotDistFile(jsonDoc)
 {
-    if (xmlDoc === null)
+    if (jsonDoc === null)
         return noDistFile();
 
     // hide the loading indicator
     hideLoading();              // hide "loading" indicator
+    //console.log("QueryDetail.js: gotDistFile: " + JSON.stringify(jsonDoc));
 
-    var form    = document.distForm;
+    let form                        = document.distForm;
     if (form)
     {                           // web page has a form named distForm
         // get the census identifier from the invoking form
         // This has the format "CCYYYY" where "CC" is the administrative
         // domain, usually the country code, and "YYYY" is the census year 
-        var censusId                = form.Census.value;
-        var censusYear              = censusId.substring(2);
+        let censusId                = form.Census.value;
+        let censusYear              = censusId.substring(2);
         if (censusYear < 1867)  // pre-confederation
             censusId                = form.Province.value + censusYear;
 
         // if the district selection list supports multiple selection
         // then the name of the element has array subscript brackets
         // appended by PHP convention.
-        var distSelect              = form.elements["District[]"];
+        let distSelect              = form.elements["District[]"];
         if (distSelect === undefined)
             distSelect              = form.District;
         distSelect.options.length   = 0;    // clear the selection
@@ -202,60 +198,58 @@ function gotDistFile(xmlDoc)
         // create a new HTML Option object and add it as the first
         // option to the Select.  This ensures that when the user selects
         // any other option that the change event handler is called
-        var opt                     = addOption(distSelect,
+        let opt                     = addOption(distSelect,
                                                 "All Districts",
                                                 "");
         opt.selected                = true;
 
-        // get the list of districts from the XML file
-        var newOptions              = xmlDoc.getElementsByTagName("option");
-
         // add the districts to the Select
-        for (var i = 0; i < newOptions.length; ++i)
+        for (let distid in jsonDoc)
         {
-            // get the source "option" node
-            // note that although this has the same contents and attributes
-            // as an HTML "option" statement, it is an XML Element object,
-            // not an HTML Option object.
-            var node                = newOptions[i];
+            if (distid == 'get')
+                continue;
 
-            // get the "value" attribute, the district number
-            var value               = node.getAttribute("value");
+            // get the district name to display to the user
+            let text                = jsonDoc[distid];
+            let result              = /[0-9.]+$/.exec(distid);
+            if (result)
+                distid              = result[0];
 
-            // get the text, district name, to display to the user
-            var text                = node.textContent;
-            if ((value == null) || (value.length == 0))
+            let textarea            = document.createElement('textarea');
+            textarea.innerHTML      = text;
+            text                    = textarea.value;
+            if ((distid == null) || (distid.length == 0))
             {                   // cover our ass
-                value               = text;
+                distid              = text;
             }                   // cover our ass
             else
             {                   // append district number to displayed text
-                text                += " [dist=" + value + "]";
+                text                += " [dist=" + distid + "]";
             }                   // append district number to displayed text
 
             // create a new HTML Option object and add it to the Select
-            var option              = addOption(distSelect,
+            let option              = addOption(distSelect,
                                                 text,
-                                                value);
+                                                distid);
         }                       // loop through source "option" nodes
 
         // if implied by the environment, set the initial selection
-        var district                = args["district"];
+        let district                = args["district"];
         if (!district)
         {                       // initial district not explicitly set
             // get the initially selected district number from a cookie
-            var cookie              = new Cookie("familyTree");
+            let cookie              = new Cookie("familyTree");
             district                = cookie[censusId];
             if (district === undefined || district === null)
                 district            = "";
         }
 
-        // select the option whose value matches the supplied district number
+        // select the option whose value matches the supplied district num
         distSelect.value            = district;
 
         // take action for change in selection
         // this populates the subdistrict selection list
-        var evt                     = new Event('change',{'bubbles':true});
+        let evt                     = new Event('change',{'bubbles':true});
         distSelect.dispatchEvent(evt);
     }                           // web page has a form named distForm
 }       // function gotDistFile
@@ -271,30 +265,30 @@ function noDistFile()
     // hide the loading indicator
     hideLoading();  // hide "loading" indicator
 
-    var form    = document.distForm;
+    let form                = document.distForm;
     if (form)
-    {       // web page has a form named distForm
+    {                   // web page has a form named distForm
         // get the census identifier from the invoking form
         // This has the format "CCYYYY" where "CC" is the administrative
         // domain, usually the country code, and "YYYY" is the census year 
-        var censusId    = form.Census.value;
-        var censusYear  = censusId.substring(2);
+        let censusId        = form.Census.value;
+        let censusYear      = censusId.substring(2);
         if (censusYear < 1867)  // pre-confederation
             censusId        = form.Province.value + censusYear;
 
         // if the district selection list supports multiple selection
         // then the name of the element has array subscript brackets
         // appended by PHP convention.
-        var distSelect      = form.elements['District[]'];
+        let distSelect      = form.elements['District[]'];
         if (distSelect === undefined)
-            distSelect          = form.District;
+            distSelect      = form.District;
         distSelect.options.length   = 0;    // clear the selection
         addOption(distSelect,
-                  "Census summary file \"CensusGetDistricts.php?Census=" +
+                  "Census summary file \"CensusGetDistrictsJSON.php?Census=" +
                     censusId +
                     "\" unavailable",
                     "");
-    }       // web page has a form named distForm
+    }                   // web page has a form named distForm
 }       // function noDistFile
 
 /************************************************************************
@@ -308,13 +302,13 @@ function noDistFile()
  ************************************************************************/
 function changeProv()
 {
-    var provSelect  = this;
-    var optIndex    = provSelect.selectedIndex;
+    let provSelect  = this;
+    let optIndex    = provSelect.selectedIndex;
     if (optIndex == -1)
         return; // nothing selected
 
     // get the two character province code
-    var optVal  = provSelect.options[optIndex].value;
+    let optVal  = provSelect.options[optIndex].value;
 
     // take action on the selected province
     onLoadProv(optVal);
@@ -349,14 +343,14 @@ function changePage()
  ************************************************************************/
 function onLoadProv(prov)
 {
-    var form    = document.distForm;
+    let form    = document.distForm;
     if (form)
     {       // web page has a form named distForm
         // get the census identifier from the invoking form
         // This has the format "CCYYYY" where "CC" is the administrative
         // domain, usually the country code, and "YYYY" is the census year 
-        var censusId    = form.Census.value;
-        var censusYear  = censusId.substring(2);
+        let censusId        = form.Census.value;
+        let censusYear      = censusId.substring(2);
         if (censusYear < 1867)  // pre-confederation
             censusId        = form.Province.value + censusYear;
 
@@ -364,7 +358,7 @@ function onLoadProv(prov)
         popupLoading();
 
         // get the district information from the server
-        var distUrl = "CensusGetDistricts.php";
+        let distUrl = "CensusGetDistrictsJSON.php";
         if (censusYear < 1867)
         {       // pre-confederation
             distUrl += "?Census=" + prov + censusYear;
@@ -377,9 +371,9 @@ function onLoadProv(prov)
         if ('lang' in args)
             distUrl += '&lang=' + args['lang'];
 
-        HTTP.getXML(distUrl,
-                    gotDistFile,
-                    noDistFile);
+        HTTP.get(distUrl,
+                 gotDistFile,
+                 noDistFile);
     }       // web page has a form named distForm
 }       // function onLoadProv
 
@@ -396,57 +390,57 @@ function onLoadProv(prov)
  ************************************************************************/
 function changeDist()
 {
-    var form    = document.distForm;
+    let form    = document.distForm;
     if (form)
-    {       // web page has a form named distForm
+    {                       // web page has a form named distForm
         // get the census identifier from the invoking form
         // This has the format "CCYYYY" where "CC" is the administrative
         // domain, usually the country code, and "YYYY" is the census year 
-        var censusId        = form.Census.value;
-        var censusYear  = censusId.substring(2);
+        let censusId            = form.Census.value;
+        let censusYear          = censusId.substring(2);
         if (censusYear < 1867)  // pre-confederation
-            censusId        = form.Province.value + censusYear;
+            censusId            = form.Province.value + censusYear;
 
         // identify the selected district
         // if the district selection list supports multiple selection
         // then the name of the element has array subscript brackets
         // appended by PHP convention.
-        var distSelect      = form.elements['District[]'];
+        let distSelect          = form.elements['District[]'];
         if (distSelect === undefined)
-            distSelect      = form.District;
+            distSelect          = form.District;
 
         // accumulate a list of selected district numbers in an array
-        var dists       = new Array();
-        var options     = distSelect.options;
-        for (var i = 0; i < options.length; ++i)
-        {       // check all options
+        let dists               = new Array();
+        let options             = distSelect.options;
+        for (let i = 0; i < options.length; ++i)
+        {                   // check all options
             if ((options[i].selected) &&
                 (options[i].value.length > 0))
                 dists.push(options[i].value);
-        }       // check all options
+        }                   // check all options
         if (dists.length == 0)
-        {       // clear subdistricts
-            var subdistSelect           = form.SubDistrict;
+        {                   // clear subdistricts
+            let subdistSelect           = form.SubDistrict;
             subdistSelect.options.length    = 0;
             return;
-        }       // clear subdistricts
+        }                   // clear subdistricts
 
         // save the first or only district number in a cookie
-        var cookie      = new Cookie("familyTree");
-        cookie[censusId]    = dists[0];
-        cookie.store(10);       // keep for 10 days
+        let cookie              = new Cookie("familyTree");
+        cookie[censusId]        = dists[0];
+        cookie.store(10);   // keep for 10 days
 
         // Create the query that obtains the subdistrict info for
         // the selected districts in an XML response
-        var parms   = new Object();
-        parms.Census    = censusId;
-        parms.District  = dists;
+        let parms               = new Object();
+        parms.Census            = censusId;
+        parms.District          = dists;
         // get the subdistrict information file
         HTTP.post("CensusGetSubDistL.php",
                   parms,
                   gotSubDist,
                   noSubDist);
-    }       // web page has a form named distForm
+    }                       // web page has a form named distForm
 }       // function changeDist
 
 /************************************************************************
@@ -465,12 +459,12 @@ function changeDist()
 function addSubDistOption(subdistSelect, name, optval, node)
 {
     // set the text value to display to the user
-    var text    = name + " [subdist=" + optval + "]";
+    let text            = name + " [subdist=" + optval + "]";
 
     // create a new HTML Option object and add it 
-    var newOption   = addOption(subdistSelect,
-                            text,
-                            optval);
+    let newOption       = addOption(subdistSelect,
+                                    text,
+                                    optval);
 
     // make the additional information in the XML Option
     // available to the application without changing the
@@ -490,10 +484,10 @@ function addSubDistOption(subdistSelect, name, optval, node)
  ************************************************************************/
 function gotSubDist(xmlDoc)
 {
-    var form                        = document.distForm;
+    let form                        = document.distForm;
     if (form)
     {                           // web page has a form named distForm
-        var subdistSelect           = form.SubDistrict;
+        let subdistSelect           = form.SubDistrict;
         subdistSelect.options.length    = 0;    // clear the selection
         // action on changing sub-dist
         subdistSelect.addEventListener('change', changeSubDist);
@@ -506,21 +500,21 @@ function gotSubDist(xmlDoc)
         if (xmlDoc.documentElement)
         {                       // input is a document
             // get the list of subdistricts to select from
-            var newOptions          = xmlDoc.getElementsByTagName("option");
+            let newOptions          = xmlDoc.getElementsByTagName("option");
         
-            var oldname             = "";   // previous sub-district name
-            var oldnode             = null;
-            var optval              = "";   // list of sub-district identifiers
-            for (var i = 0; i < newOptions.length; ++i)
+            let oldname             = "";   // previous sub-district name
+            let oldnode             = null;
+            let optval              = "";   // list of sub-district identifiers
+            for (let i = 0; i < newOptions.length; ++i)
             {                   // loop through all the subdistrict options
                 // get the source "option" node
                 // Note that although this has the same contents and attributes
                 // as an HTML "option" statement, it is an XML Element
                 // object, not an HTML Option object.
-                var node            = newOptions[i];
+                let node            = newOptions[i];
         
                 // get the sub-district name to display to the user
-                var name            = node.textContent;
+                let name            = node.textContent;
         
                 // consolidate options with the same name to simplify
                 // user access to 1911 and 1916 censuses
@@ -540,7 +534,7 @@ function gotSubDist(xmlDoc)
                 }               // new township
         
                 // get the sub-district identifier attribute
-                var value           = node.getAttribute("value");
+                let value           = node.getAttribute("value");
                 if ((value == null) || (value.length == 0))
                 {               // cover our ass
                     value           = name;
@@ -559,28 +553,28 @@ function gotSubDist(xmlDoc)
                              oldnode);
         
             // if implied by the environment, set the initial selection
-            var District            = args["district"];
-            var SubDistrict         = args["subdistrict"];
-            if (SubDistrict)
+            let district            = args["district"];
+            let subDistrict         = args["subdistrict"];
+            if (subDistrict)
             {                   // set the initial subdistrict
                 if ((subdistSelect.options.length > 1) &&
                     (subdistSelect.options[1].value.indexOf(":") > 0))
                 {               // option format <dist>:<subdist>
-                    subdistSelect.value = District + ":" + SubDistrict;
+                    subdistSelect.value = district + ":" + subDistrict;
                 }               // option format <dist>:<subdist>
                 else
                 {               // option format <subdist>
-                    subdistSelect.value = SubDistrict;
+                    subdistSelect.value = subDistrict;
                 }               // option format <subdist>
         
                 // take action for change in selection
-                var evt             = new Event('change',{'bubbles':true});
+                let evt             = new Event('change',{'bubbles':true});
                 subdistSelect.dispatchEvent(evt);
             }                   // set the initial subdistrict
         }                       // input is a document
         else
             alert("QueryDetail.js: gotSubDist: xmlDoc=" + xmlDoc);
-    }       // web page has a form named distForm
+    }                           // web page has a form named distForm
 }       // function gotSubDist
 
 /************************************************************************
@@ -592,13 +586,13 @@ function gotSubDist(xmlDoc)
  ************************************************************************/
 function noSubDist()
 {
-    var form    = document.distForm;
+    let form                            = document.distForm;
     if (form)
-    {       // web page has a form named distForm
-        var subdistSelect       = form.SubDistrict;
+    {                               // web page has a form named distForm
+        let subdistSelect               = form.SubDistrict;
         subdistSelect.options.length    = 0;    // clear the selection
-    }       // web page has a form named distForm
-}
+    }                               // web page has a form named distForm
+}       // function noSubDist
 
 /************************************************************************
  *  function changeSubDist                                              *
@@ -614,42 +608,42 @@ function noSubDist()
  ************************************************************************/
 function changeSubDist()
 {
-    var form        = this.form;
+    let form                    = this.form;
     // identify the selected SubDistrict
     // note that this code only supports a single selection model
     // but a single selection may represent multiple subdistricts
     // in censuses that do not officially support enumeration divisions
-    var subDistSelect   = form.SubDistrict;
-    var optIndex    = subDistSelect.selectedIndex;
+    let subDistSelect           = form.SubDistrict;
+    let optIndex                = subDistSelect.selectedIndex;
     if (optIndex == -1)
-    {       // none selected
+    {                       // none selected
         return; // act as if all subdistricts selected
-    }       // none selected
-    var subDistOpt  = subDistSelect.options[optIndex];
-    var subDistrict = subDistOpt.value.split(",");
+    }                       // none selected
+    let subDistOpt              = subDistSelect.options[optIndex];
+    let subDistrict             = subDistOpt.value.split(",");
        
     // if census supports divisions, display a selection list 
     // locate cell to display response in
-    var divSelect   = form.Division;
+    let divSelect               = form.Division;
     
     if (divSelect)
-    {       // form supports division selection
+    {                       // form supports division selection
         divSelect.options.length= 0;    // clear the selection
-        var subDistXml  = subDistOpt.xmlOption;
+        let subDistXml          = subDistOpt.xmlOption;
         if (subDistrict.length > 1)
-        {   // more than one subdistrict in township
+        {                   // more than one subdistrict in township
             gotMultSD(subDistrict, divSelect);
-        }   // more than one subdistrict in township
+        }                   // more than one subdistrict in township
         else
         if (subDistXml)
-        {   // may be subdivisions in XML
+        {                   // may be subdivisions in XML
             gotDivs(subDistXml, divSelect);
-        }   // may be subdivisions in XML
+        }                   // may be subdivisions in XML
         else
         {
-            divSelect.size  = 1;
+            divSelect.size      = 1;
         }
-    }   // census form supports division selection
+    }                       // census form supports division selection
 }       // function changeSubDist
 
 
@@ -664,8 +658,8 @@ function changeSubDist()
  ************************************************************************/
 function changeDiv(ev)
 {
-    console.log("QueryDetail.js: changeDiv: selectedIndex=" +
-                    this.selectedIndex);
+    //console.log("QueryDetail.js: changeDiv: selectedIndex=" +
+    //                this.selectedIndex);
     if (this.selectedIndex == -1)
     {
         this.selectedIndex  = 0;
@@ -692,36 +686,36 @@ function gotMultSD(subDistrict,
     // create a new selection element
     divSelect.size  = 5;
     divSelect.addEventListener('change', changeDiv);
-    divSelect.onkeydown = keyDown;  // support advanced editing
+    divSelect.addEventListener('keydown', keyDown);  // support advanced editing
 
     addOption(divSelect,
               "Choose a Division",
               "?");
 
     // add an HTML option for each division defined in the database
-    for (var i = 0; i < subDistrict.length; ++i)
+    for (let i = 0; i < subDistrict.length; ++i)
     {
         // get the "id" attribute
-        var value   = subDistrict[i];
-        var text    = "division " + value;
+        let value           = subDistrict[i];
+        let text            = "division " + value;
 
         // create a new HTML Option object and add it 
-        var newOption   = addOption(divSelect,
-                                text,
-                                value);
+        let newOption       = addOption(divSelect,
+                                        text,
+                                        value);
         newOption.xmlOption = null;
     }           // loop through source "option" nodes
 
     // if the environment specifies a choice of division, select it
-    var Division    = args["division"];
+    let Division            = args["division"];
     if (Division)
     {       // set the initial division
-        divSelect.value = Division;
+        divSelect.value     = Division;
     }       // set the initial division
 
     // take action for change in selection
     // because this does not happen automatically when selectedIndex is set
-    var evt                 = new Event('change',{'bubbles':true});
+    let evt                 = new Event('change',{'bubbles':true});
     divSelect.dispatchEvent(evt);
 }       // function gotMultSD
 
@@ -738,14 +732,14 @@ function gotMultSD(subDistrict,
 function gotDivs(xmlDoc, divSelect)
 {
     // get the list of divisions to select from
-    var newOptions      = xmlDoc.getElementsByTagName("div");
+    let newOptions      = xmlDoc.getElementsByTagName("div");
    
     if (newOptions.length > 1)
     {           // there are divisions in this subdistrict
         // create a new selection element
         divSelect.size  = 5;
         divSelect.addEventListener('change', changeDiv);
-        divSelect.onkeydown = keyDown;  // support advanced editing
+        divSelect.addEventListener('keydown', keyDown);  // support advanced editing
         divSelect.options.length= 0;    // clear the selection
 
         addOption(divSelect,
@@ -753,20 +747,20 @@ function gotDivs(xmlDoc, divSelect)
                   "?");
 
         // add an HTML option for each division defined in the database
-        for (var i = 0; i < newOptions.length; ++i)
+        for (let i = 0; i < newOptions.length; ++i)
         {
             // get the source "option" node
             // note that although this has the same contents and appearance
             // as an HTML "option" statement, it is an XML Element object,
             // not an HTML Option object.
-            var node    = newOptions[i];
+            let node    = newOptions[i];
 
             // get the "id" attribute
-            var value   = node.getAttribute("div");
-            var text    = "division " + value;
+            let value   = node.getAttribute("div");
+            let text    = "division " + value;
 
             // create a new HTML Option object and add it 
-            var newOption   = addOption(divSelect,
+            let newOption   = addOption(divSelect,
                                 text,
                                 value);
 
@@ -777,7 +771,7 @@ function gotDivs(xmlDoc, divSelect)
         }           // loop through source "option" nodes
 
         // if the environment specifies a choice of division, select it
-        var Division    = args["division"];
+        let Division    = args["division"];
         if (Division)
         {       // set the initial division
             divSelect.value = Division;
@@ -795,7 +789,7 @@ function gotDivs(xmlDoc, divSelect)
 
         // take action for change in selection
         // this does not happen automatically when selectedIndex is set
-        var evt                 = new Event('change',{'bubbles':true});
+        let evt                 = new Event('change',{'bubbles':true});
         divSelect.dispatchEvent(evt);
     }           // there are divisions in this subdistrict
     else
@@ -815,8 +809,8 @@ function gotDivs(xmlDoc, divSelect)
  ************************************************************************/
 function showCoverage()
 {
-    var form        = document.distForm;
-    var censusId    = form.Census.value;
+    let form        = document.distForm;
+    let censusId    = form.Census.value;
     location = "CensusUpdateStatus.php?Census=" + censusId;
 }       //function showCoverage
 
@@ -837,10 +831,10 @@ function qdKeyDown(e)
     {       // browser is not W3C compliant
         e   =  window.event;    // IE
     }       // browser is not W3C compliant
-    var code    = e.keyCode;
+    let code    = e.keyCode;
 //  if (code > 32)
 //    alert("qdKeyDown: code=" + code + ", e.altKey=" + e.altKey);
-    var form    = document.distForm;
+    let form    = document.distForm;
 
     // take action based upon code
     if (e.ctrlKey)

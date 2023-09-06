@@ -35,8 +35,9 @@ use \Exception;
  *		2018/12/02      only update those fields for whom parameters    *
  *		                have been passed because others are NULL        *
  *		2019/12/19      replace xmlentities with htmlentities           *
+ *		2023/01/23      display error message from constructor          *
  *																		*
- *  Copyright &copy; 2019 James A. Cobban								*
+ *  Copyright &copy; 2023 James A. Cobban								*
  ************************************************************************/
 header("Content-Type: text/xml");
 require_once __NAMESPACE__ . '/Source.inc';
@@ -343,8 +344,12 @@ foreach($_POST as $field => $value)
 }                   // loop through new values
 
 // save object state to server
-$source->save();
-print "<cmd>" . $source->getLastSqlCmd() . "</cmd>\n";
+$count          = $source->save();
+
+if ($count == 0)
+    print "<errors>count=$count, msg='" . $source->getErrors() . "</errors>";
+else
+    print "<cmd>" . htmlspecialchars($source->getLastSqlCmd()) . "</cmd>\n";
 
 if (strlen($msg) > 0)
     print "<p class='message'>$msg</p>\n";

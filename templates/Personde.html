@@ -13,7 +13,7 @@
  *  Copyright &copy; 2019 James A. Cobban                               *
  **********************************************************************-->
   <div id="breadcrumbs" class="hidden">
-    <a href="/index.html">Home</a>:
+    <a href="/home.html">Home</a>:
       <a href="/genealogy.php?lang=de">
                 Stammbaumforschung
       </a>:
@@ -40,7 +40,6 @@
         </span>
               $TITLE
               <span id="inTree">: in tree "$treeName"</span>
-        <div style="clear: both;"></div>
       </h1>
       $TRACE
       $MSG
@@ -146,10 +145,11 @@
                 value="$userid">
       <input type="hidden" name="idir" id="blogidir"
                 value="$idir">
-    <p>
-      <textarea name="message" id="message" placeholder="[enter message]"
-                rows='5' cols='100'></textarea>
-    </p>
+    <div style="width: 80%;">
+          <textarea name="message" id="message" 
+                    placeholder="[enter message]"
+                    rows='5' cols='100'></textarea>
+    </div>
     <div class="row" id="blogEmailRow">
       <label class='column1' for='emailAddress'>
                 Deine Emailadresse:
@@ -164,17 +164,22 @@
       </button>
     </div>
   </form> <!-- name="blogform" id="blogform" -->
-      <div class="row" id="footnotesSection">
+      <div id="footnotesSection">
         <hr class='footnotes'/>
         <p class='label'>Fußnoten:</p>
         <div id='footnote$key'>
-          <div class="column1" id="#fn$key">
-            $key
-          </div>
+          <div class="row">
+            <div class="column1" id="#fn$key">
+              $key
+            </div>
+              &nbsp;
             $text
-          <div style='clear: both;'></div>
-        </div> <!-- class='footnote$key' -->
-      </div> <!-- class="row" id="footnotesSection" -->
+          </div> <!-- class='row' -->
+          <div style="margin-left: 3em;">
+            $other
+          </div>
+        </div> <!-- id='footnote$key' -->
+      </div> <!-- id="footnotesSection" -->
     </div> <!-- class="body" -->
 
     <div class="hidden" id="messages">
@@ -190,8 +195,44 @@
       <span id="neverMarried">
         Dieses Paar war nie verheiratet. 
       </span>
+      <div id="showText$IDSX" class="row" style="white-space: normal;">
+        $TEXT 
+      </div>
+      <div id="showNote$IDSX" class="row" style="white-space: normal;">
+          <strong>Note:</strong> $NOTE 
+      </div>
     </div> <!-- id="messages" -->
 
+    <div class="hidden" id="rightColSelection">
+      <span id="rightcol1">
+        <p>
+        When used on a computer with a pointing device, for example a mouse,
+        holding the pointing device over any piece of information
+        causes an explanation of that piece of information to be 
+        displayed in a popup.  This includes:
+      </p>
+        <ol>
+          <li>The names of members of the family highlighted as hyperlinks.
+          </li>
+          <li>Locations where events took place.  This offers the ability
+              to see a map of the location.
+          </li>
+          <li>Causes of death explained by a medical dictionary.
+          </li>
+          <li>Source names
+          </li>
+          <li>Citation page identifications.
+          </li>
+        </ol>
+      </span>
+
+      <p id="rightcol2">
+        If you are signed on and you have been granted permission by an
+        existing owner of this family you can add, delete, or change
+        the information recorded.
+      </p>
+        
+    </div> <!-- id="rightColSelection" -->
     <!--*****************************************************************
      *  generate popups                                                 *
      ******************************************************************-->
@@ -230,7 +271,7 @@
   
     <div id="showLocDiv$idlr" class="balloon">
       <b>$name</b>
-      <p>
+      <p class="normal">
       $notes
       </p>
       <form name='locForm$idlr'>
@@ -290,29 +331,29 @@
      ******************************************************************-->
     <div id="eventStmt" class="hidden">
       <span data-key="1">$Pronoun $Description $onDate $atLocation.$Citations $Notes</span>
-      <span data-key="2">$Pronoun wurde adoptiert $onDate $atLocation von $Description.$Citations $Notes</span>
-      <span data-key="3">$Pronoun wurde geboren $Description $onDate $atLocation.$Citations $Notes</span>
-      <span data-key="4">$Pronoun wurde begraben $Description $onDate $atLocation.$Citations $Notes</span>
-      <span data-key="5">$Pronoun wurde getauft $Description $onDate $atLocation.$Citations $Notes</span>
+      <span data-key="2">$Pronoun wurde $onDate $atLocation von $Description adoptiert.$Citations $Notes</span>
+      <span data-key="3">$Pronoun wurde $Description $onDate $atLocation geboren.$Citations $Notes</span>
+      <span data-key="4">$Pronoun wurde $Description $onDate $atLocation begraben.$Citations $Notes</span>
+      <span data-key="5">$Pronoun wurde $Description $onDate $atLocation getauft.$Citations $Notes</span>
       <span data-key="6">$Pronoun starb $onDate $Description $atLocation.$Citations $Notes</span>
-      <span data-key="7">$Pronoun hatte eine Ehe annulliert $Description, $onDate $atLocation.$Citations $Notes</span>
-      <span data-key="8">$Pronoun wurde getauft $Description $onDate $atLocation.$Citations $Notes</span>
-      <span data-key="9">He celebrated his bar mitzvah $Description $onDate $atLocation.$Citations $Notes</span>
-      <span data-key="10">She celebrated her bas mitzvah $Description $onDate $atLocation.$Citations $Notes</span>
+      <span data-key="7">$Pronoun ließ $Description, $onDate $atLocation eine Ehe annullieren.$Citations $Notes</span>
+      <span data-key="8">$Pronoun wurde $Description $onDate $atLocation  getauft.$Citations $Notes</span>
+      <span data-key="9">$Pronoun feierte er $Description $onDate $atLocation seine Bar Mizwa.$Citations $Notes</span>
+      <span data-key="10">$Pronoun feierte er $Description $onDate $atLocation ihre Bat Mizwa.$Citations $Notes</span>
       <span data-key="11">$Pronoun was blessed $Description $onDate $atLocation.$Citations $Notes</span>
       <span data-key="12">$Pronoun appeared on the $Description Volkszählung von $onDate $atLocation.$Citations $Notes</span>
       <span data-key="13">$Pronoun was circumcised $Description $onDate $atLocation.$Citations $Notes</span>
-      <span data-key="14">$Pronoun wurde $Description Staatsbürger $onDate $atLocation.$Citations $Notes</span>
+      <span data-key="14">$Pronoun wurde ein $Description-Bürger $onDate $atLocation.$Citations $Notes</span>
       <span data-key="15">$Pronoun was confirmed $Description $onDate $atLocation.$Citations $Notes</span>
       <span data-key="16">$Pronoun was confirmed in The Church of Jesus Christ of Latter-day Saints $Description $onDate $atLocation.$Citations $Notes</span>
       <span data-key="17">$Pronoun was involved in a court case about $Description $onDate $atLocation.$Citations $Notes</span>
       <span data-key="18">$Pronoun wurde eingeäschert $Description $onDate $atLocation.$Citations $Notes</span>
       <span data-key="19">$Pronoun received a degree of $Description $onDate $atLocation.$Citations $Notes</span>
-      <span data-key="20">$Pronoun wurden geschieden $Description $onDate $atLocation.$Citations $Notes</span>
-      <span data-key="21">$Pronoun reichten die Scheidung ein $Description $onDate $atLocation.$Citations $Notes</span>
-      <span data-key="22">$Pronoun wurde an erziehen $Description $onDate $atLocation.$Citations $Notes</span>
-      <span data-key="23">$Pronoun wanderte aus $Description $onDate $atLocation aus.$Citations $Notes</span>
-      <span data-key="24">$Pronoun war angestellt als $Description $onDate $atLocation.$Citations $Notes</span>
+      <span data-key="20">$Pronoun wurden $Description $onDate $atLocation geschieden.$Citations $Notes</span>
+      <span data-key="21">Sie reichten $Description $onDate $atLocation die Scheidung ein.$Citations $Notes</span>
+      <span data-key="22">$Pronoun wurde $Description $onDate $atLocation ausgebildet.$Citations $Notes</span>
+      <span data-key="23">$Pronoun wanderte $Description $onDate $atLocation aus.$Citations $Notes</span>
+      <span data-key="24">$Pronoun war er als $Description $onDate $atLocation angestellt.$Citations $Notes</span>
       <span data-key="25">$Pronoun waren verlob $Description $onDate $atLocation.$Citations $Notes</span>
       <span data-key="26">$Pronoun received First Holy Communion $Description $onDate $atLocation.$Citations $Notes</span>
       <span data-key="27">$Pronoun machte seinen Abschluss in $Description $onDate $atLocation.$Citations $Notes</span>
@@ -439,8 +480,8 @@
         although this will not be y reflected in the description
         of this individual until the page is refreshed.
         </div>
-    <script src="/jscripts/tinymce/js/tinymce/tinymce.js" type="application/javascript">
+    <script src="/jscripts/tinymce/js/tinymce/tinymce.min.js" type="application/javascript">
     </script>
     <script src="/FamilyTree/Person.js" type="module">
     </script>
-    <script defer src="https://maps.googleapis.com/maps/api/js?v=3.43&callback=initializeMaps&region=$GOOGLECC&key=$GOOGLEKEY" type="application/javascript"></script>
+    <script defer src="https://maps.googleapis.com/maps/api/js?v=weekly&callback=initializeMaps&region=$GOOGLECC&key=$GOOGLEKEY" type="application/javascript"></script>

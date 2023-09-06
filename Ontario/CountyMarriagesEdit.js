@@ -1,8 +1,8 @@
 /************************************************************************
  *  CountyMarriagesEdit.js                                              *
  *                                                                      *
- *  This file implements the dynamic functionality of the web page      *
- *  CountyMarriagesEdit.php                                             *
+ *  This file implements the dynamic functionality of the web pages     *
+ *  CountyMarriagesEdit.php and DistrictMarriagesEdit.php               *
  *                                                                      *
  *  History:                                                            *
  *      2016/01/30      created                                         *
@@ -23,13 +23,17 @@
  *      2021/01/16      use XMLSerializer for diagnostic output         *
  *      2021/03/03      separate function of Link and Find buttons      *
  *                      use ECMA 2015 syntax                            *
- *      2922/02/06      use record identifier from individual row       *
+ *      2022/02/06      use record identifier from individual row       *
  *                      if not supplied in parameters to script         *
+ *      2023/08/10      use addEventListener                            *
+ *                      use regexp match to extract row number          *
+ *                      do not  open new windows for functions          *
+ *                      use let in place of var                         *
  *                                                                      *
- *  Copyright &copy; 2022 James A. Cobban                               *
+ *  Copyright &copy; 2023 James A. Cobban                               *
  ************************************************************************/
 
-window.onload   = onLoad;
+window.addEventListener('load', onLoad);
 
 /************************************************************************
  *  function onLoad                                                     *
@@ -41,14 +45,14 @@ function onLoad()
     // activate handling of key strokes in text input fields
     // including support for context specific help
     let element;
-    let trace   = '';
-    for (var fi = 0; fi < document.forms.length; fi++)
+    let trace               = '';
+    for (let fi = 0; fi < document.forms.length; fi++)
     {       // loop through all forms
-        let form    = document.forms[fi];
+        let form            = document.forms[fi];
 
-        for (var i = 0; i < form.elements.length; ++i)
+        for (let i = 0; i < form.elements.length; ++i)
         {   // loop through all elements of form
-            element     = form.elements[i];
+            element         = form.elements[i];
 
             initElement(element);
         }       // loop through all elements in the form
@@ -61,8 +65,8 @@ function onLoad()
     for(i = 0; i < tblHdrRow.cells.length; i++)
     {           // loop through cells of header row
         let th              = tblHdrRow.cells[i];
-        th.onclick          = columnClick;
-        th.oncontextmenu    = columnWiden;
+        th.addEventListener('click', columnClick);
+        th.addEventListener('contextmenu', columnWiden);
     }           // loop through cells of header row
 
     hideRightColumn();
@@ -79,15 +83,15 @@ function onLoad()
  ************************************************************************/
 function linkToTree()
 {
-    let form        = this.form;
-    let rownum      = this.id.substring(4);
+    let form                = this.form;
+    let rownum              = this.id.match(/\d*$/);
     let element, idir, script;
 
-    element         = document.getElementById('IDIR' + rownum);
+    element                 = document.getElementById('IDIR' + rownum);
     if (element)
-        idir        = element.value;
+        idir                = element.value;
     else
-        idir        = 0;
+        idir                = 0;
 
     window.open('../FamilyTree/Person.php?idir=' + idir);
 }       // function linkToTree
@@ -103,66 +107,66 @@ function linkToTree()
  ************************************************************************/
 function findInTree()
 {
-    let form        = this.form;
-    let rownum      = this.id.substring(4);
+    let form                = this.form;
+    let rownum              = this.id.match(/\d*$/);
     let element, idir, script;
 
-    element     = document.getElementById('IDIR' + rownum);
+    element                 = document.getElementById('IDIR' + rownum);
     if (element)
-        idir        = element.value;
+        idir                = element.value;
     else
-        idir        = 0;
+        idir                = 0;
 
-    let msgDiv      = document.getElementById('msgDiv');
+    let msgDiv              = document.getElementById('msgDiv');
     msgDiv.style.display    = 'none';
-    let role        = form.elements['Role' + rownum].value;
-    let surname     = form.elements['Surname' + rownum].value;
-    let given       = form.elements['GivenNames' + rownum].value;
+    let role                = form.elements['Role' + rownum].value;
+    let surname             = form.elements['Surname' + rownum].value;
+    let given               = form.elements['GivenNames' + rownum].value;
     if (given.substring(0,4) == 'Mary' ||
         given.substring(0,4) == 'John')
-        given       = given.substring(0,4);
+        given               = given.substring(0,4);
     else
-        given       = given.substring(0,2);
-    let date        = form.elements['Date' + rownum].value;
-    let ageElement  = form.elements['Age' + rownum];
-    let age         = '';
+        given               = given.substring(0,2);
+    let date                = form.elements['Date' + rownum].value;
+    let ageElement          = form.elements['Age' + rownum];
+    let age                 = '';
     if (ageElement)
-        age         = ageElement.value;
-    let birthmin    = 1750;
-    let birthmax    = 1856;
+        age                 = ageElement.value;
+    let birthmin            = 1750;
+    let birthmax            = 1856;
     if (date.length >= 4)
     {
         let matches         = /\d\d\d\d/.exec(date);
         if (Array.isArray(matches))
         {               // year of marriage
-	        let year        = parseInt(matches[0]);
+            let year        = parseInt(matches[0]);
 
-	        if (age.length == 0 || isNaN(age))
-	        {
-	            birthmin    = year - 80;
-	            birthmax    = year - 16;
-	        }
-	        else
-	        {
-	            birthmin    = year - (age - 0 + 5);
-	            birthmax    = year - (age - 5);
-	        }
+            if (age.length == 0 || isNaN(age))
+            {
+                birthmin    = year - 80;
+                birthmax    = year - 16;
+            }
+            else
+            {
+                birthmin    = year - (age - 0 + 5);
+                birthmax    = year - (age - 5);
+            }
         }               // year of marriage
     }
 
-    let sex             = 'M';
+    let sex                 = 'M';
     if (role == 'B')
-        sex             = 'F';
+        sex                 = 'F';
 
     let url = "/FamilyTree/getIndivNamesXml.php?Surname=" +
-		            encodeURIComponent(surname) +
-		            "&GivenName=" + encodeURIComponent(given) +
-		            "&Sex=" + sex +
-		            "&BirthMin=" + birthmin +
-		            "&BirthMax=" + birthmax +
-		            "&buttonId=" + this.id +
-		            "&includeSpouse=Y" +
-		            "&incMarried=yes&loose=yes";
+                    encodeURIComponent(surname) +
+                    "&GivenName=" + encodeURIComponent(given) +
+                    "&Sex=" + sex +
+                    "&BirthMin=" + birthmin +
+                    "&BirthMax=" + birthmax +
+                    "&buttonId=" + this.id +
+                    "&includeSpouse=Y" +
+                    "&incMarried=yes&loose=yes";
 
     HTTP.getXML(url,
                 gotIdir,
@@ -182,45 +186,40 @@ function findInTree()
  ************************************************************************/
 function gotIdir(xmlDoc)
 {
-    //alert("CountyMarriagesEdit.js: gotIdir: xmlDoc=" + new XMLSerializer().serializeToString(xmlDoc));
-    let rootNode    = xmlDoc.documentElement;
-    let buttonId    = rootNode.getAttribute("buttonId");
-    let button      = document.getElementById(buttonId);
+    let rootNode                = xmlDoc.documentElement;
+    let buttonId                = rootNode.getAttribute("buttonId");
+    let button                  = document.getElementById(buttonId);
     if (button === null)
     {
-        let msgDiv  = document.getElementById('msgDiv');
+        let msgDiv              = document.getElementById('msgDiv');
         msgDiv.style.display    = 'none';
         alert("CountyMarriagesEdit.js: gotIdir: unable to find element with id='" +
             buttonId + "' rootNode=" + new XMLSerializer().serializeToString(rootNode));
         return;
     }
 
-    let form        = button.form;
-    let line        = buttonId.substring(4);
-    let surname     = form.elements['Surname' + line].value;
-    let givennames  = form.elements['GivenNames' + line].value;
-    let birthmin    = 1750;
-    let birthmax    = 1852;
+    let form                    = button.form;
+    let line                    = buttonId.substring(4);
+    let surname                 = form.elements['Surname' + line].value;
+    let givennames              = form.elements['GivenNames' + line].value;
+    let birthmin                = 1750;
+    let birthmax                = 1852;
 
-    let parmElts    = xmlDoc.getElementsByTagName("parms");
-    let parmElt = parmElts[0];
-    for (var elt = parmElt.firstChild; elt; elt = elt.nextSibling)
+    let parmElts                = xmlDoc.getElementsByTagName("parms");
+    let parmElt                 = parmElts[0];
+    for (let elt = parmElt.firstChild; elt; elt = elt.nextSibling)
     {
         if (elt.nodeType == 1)
         {       // is an element node
             switch (elt.nodeName.toLowerCase())
             {   // act on specific parameter names
                 case 'birthmin':
-                {
                     birthmin    = elt.textContent;
                     break;
-                }
 
                 case 'birthmax':
-                {
                     birthmax    = elt.textContent;
                     break;
-                }
 
             }   // act on specific parameter names
         }       // is an element node
@@ -299,11 +298,11 @@ function displaySelectIdir(templateId,
     {
         // update the selection list with the matching individuals
         let select  = document.getElementById("chooseIdir");
-        select.onchange = idirSelected;
-        //select.onclick    = function() {alert("select.onclick");};
+        select.addEventListener('change', idirSelected);
+        //select.addEventListener('click', function)() {alert("select.onclick");};
 
         // add the matches
-        for (var i = 0; i < matches.length; ++i)
+        for (let i = 0; i < matches.length; ++i)
         {   // loop through the matches
             let indiv   = matches[i];
 
@@ -318,7 +317,7 @@ function displaySelectIdir(templateId,
             let parents     = "";
             let spouses     = "";
 
-            for (var child = indiv.firstChild;
+            for (let child = indiv.firstChild;
              child;
              child = child.nextSibling)
             {       // loop through all children of indiv
@@ -409,7 +408,7 @@ function displaySelectIdir(templateId,
         // the following is a workaround for a bug in FF 40.0 and Chromium
         // in which the onchange method of the <select> is not called when
         // the mouse is clicked on an option
-        for(var io=0; io < select.options.length; io++)
+        for(let io=0; io < select.options.length; io++)
         {
             let option  = select.options[io];
             option.addEventListener("click", function() {this.selected = true; this.parentNode.onchange();});
@@ -442,7 +441,7 @@ function idirSelected()
     }
     let form    = this.form;    // <form name='idirChooserForm'>
 
-    for(var ie = 0; ie < form.elements.length; ie++)
+    for(let ie = 0; ie < form.elements.length; ie++)
     {       // search for choose button
         let element = form.elements[ie];
         if (element != select &&
@@ -494,14 +493,14 @@ function closeIdirDialog()
                                                      parms,
                                                      null);
                 let newButton   = cell.appendChild(linkButton);
-                newButton.onclick   = linkToTree;
+                newButton.addEventListener('click', linkToTree);
                 // add "clear" button to remove link to tree
                 template        = document.getElementById('Clear$row');
                 let clearButton = createFromTemplate(template,
                                                      parms,
                                                      null);
                 newButton       = cell.appendChild(clearButton);
-                newButton.onclick   = clearFromTree;
+                newButton.addEventListener('click', clearFromTree);
             }
             else
                 alert("Cannot find element with name '" + findid + "'");
@@ -527,25 +526,25 @@ function closeIdirDialog()
  ************************************************************************/
 function clearFromTree()
 {
-    let form    = this.form;
-    let line    = this.id.substring(this.id.length - 2);
+    let form            = this.form;
+    let line            = this.id.match(/\s*$/);
     // clear linkage
     form.elements["IDIR" + line].value      = 0;
     // remove "Tree" button from cell
-    let treeButton  = form.elements["Link" + line];
-    let cell        = treeButton.parentNode;
+    let treeButton      = form.elements["Link" + line];
+    let cell            = treeButton.parentNode;
     cell.removeChild(treeButton);   
     // remove "Clear" button from cell
-    let clearButton = form.elements["Clear" + line];
+    let clearButton     = form.elements["Clear" + line];
     cell.removeChild(clearButton);  
     // add "find" linked button
-    let parms       = {'rowf'   : line};
-    let template    = document.getElementById('Link$rowf');
-    let findButton  = createFromTemplate(template,
-                         parms,
-                         null);
-    let newButton   = cell.appendChild(findButton);
-    newButton.onclick   = linkToTree;
+    let parms           = {'rowf'   : line};
+    let template        = document.getElementById('Link$rowf');
+    let findButton      = createFromTemplate(template,
+                                             parms,
+                                             null);
+    let newButton       = cell.appendChild(findButton);
+    newButton.addEventListener('click', linkToTree);
 
     // suppress default action
     return false;
@@ -564,57 +563,54 @@ function clearFromTree()
  ************************************************************************/
 function showDetails()
 {
-    let form        = this.form;
-    let rownum      = this.id.substring(7);
+    let form            = this.form;
+    let rownum          = this.id.match(/\d*$/);
     let domain, volume, reportNo, element;
 
+    element             = form.elements['Domain' + rownum];
+    if (element)
+        domain          = element.value;
+    else
     if (form.Domain && form.Domain.value != '')
-        domain      = form.Domain.value;
+        domain          = form.Domain.value;
     else
-    {
-        element     = form.elements['Domain' + rownum];
-        if (element)
-            domain  = element.value;
-        else
-            alert("showDetails: cannot find Domain field elements['Domain" +rownum + "']");
-    }
+        popupAlert("showDetails: cannot find Domain identifier",
+                   this);
 
+    element             = form.elements['Volume' + rownum];
+    if (element)
+        volume          = element.value;
+    else
     if (form.Volume && form.Volume.value != '')
-        volume      = form.Volume.value;
+        volume          = form.Volume.value;
     else
-    {
-        element     = form.elements['Volume' + rownum];
-        if (element)
-            volume  = element.value;
-        else
-            alert("showDetails: cannot find Volume field elements['Volume" +rownum + "']");
-    }
+        popupAlert("showDetails: cannot find Volume number",
+                   this);
 
+    element             = form.elements['ReportNo' + rownum];
+    if (element)
+        reportNo        = element.value;
+    else
     if (form.ReportNo && form.ReportNo.value != '')
         reportNo        = form.ReportNo.value;
     else
-    {
-        element     = form.elements['ReportNo' + rownum];
-        if (element)
-            reportNo    = element.value;
-        else
-            alert("showDetails: cannot find ReportNo field elements['ReportNo" +rownum + "']");
-    }
+        popupAlert("showDetails: cannot find ReportNo",
+                   this);
 
-    let itemNo      = form.elements['ItemNo' + rownum].value;
+    let itemNo          = form.elements['ItemNo' + rownum].value;
     let script;
     if (domain == 'CAUC')
-        script      = 'DistrictMarriagesEdit.php?Domain=' + domain +
-                            '&Volume=' + volume +
-                            '&ReportNo=' + reportNo +
-                            '&ItemNo=' + itemNo;
+        script          = 'DistrictMarriagesEdit.php?Domain=' + domain +
+                                '&Volume=' + volume +
+                                '&ReportNo=' + reportNo +
+                                '&ItemNo=' + itemNo;
     else
-        script      = 'CountyMarriagesEdit.php?Domain=' + domain +
-                            '&Volume=' + volume +
-                            '&ReportNo=' + reportNo +
-                            '&ItemNo=' + itemNo;
+        script          = 'CountyMarriagesEdit.php?Domain=' + domain +
+                                '&Volume=' + volume +
+                                '&ReportNo=' + reportNo +
+                                '&ItemNo=' + itemNo;
 
-    location        = script;
+    location            = script;
     return false;
 }       // function showDetails
 
@@ -629,55 +625,52 @@ function showDetails()
  ************************************************************************/
 function deleteRow()
 {
-    let form        = this.form;
-    let rownum      = this.id.substring(6);
+    let form                = this.form;
+    let rownum              = this.id.match(/\d*$/);
     let domain, volume, reportNo, element;
 
+    element                 = form.elements['Domain' + rownum];
+    if (element)
+        domain              = element.value;
+    else
     if (form.Domain)
-        domain      = form.Domain.value;
+        domain              = form.Domain.value;
     else
-    {
-        element     = form.elements['Domain' + rownum];
-        if (element)
-            domain  = element.value;
-        else
-            alert("showDetails: cannot find Domain field");
-    }
+        popupAlert("showDetails: cannot find Domain field",
+                    this);
 
+    element                 = form.elements['Volume' + rownum];
+    if (element)
+        volume              = element.value;
+    else
     if (form.Volume)
-        volume      = form.Volume.value;
+        volume              = form.Volume.value;
     else
-    {
-        element     = form.elements['Volume' + rownum];
-        if (element)
-            volume  = element.value;
-        else
-            alert("showDetails: cannot find Volume field");
-    }
+       popupAlert("showDetails: cannot find Volume field",
+                  this);
 
+    element                 = form.elements['ReportNo' + rownum];
+    if (element)
+        reportNo            = element.value;
+    else
     if (form.ReportNo)
-        reportNo        = form.ReportNo.value;
+        reportNo            = form.ReportNo.value;
     else
-    {
-        element     = form.elements['ReportNo' + rownum];
-        if (element)
-            reportNo    = element.value;
-        else
-            alert("showDetails: cannot find ReportNo field");
-    }
+        popupAlert("showDetails: cannot find ReportNo field",
+                    this);
 
-    let itemNo      = form.elements['ItemNo' + rownum].value;
-    let role        = form.elements['Role' + rownum].value;
+    let itemNo              = form.elements['ItemNo' + rownum].value;
+    let role                = form.elements['Role' + rownum].value;
     //alert("deleteRow: domain='" + domain + "', volume=" + volume + ", reportNo=" + report);
-    let script  = 'deleteCountyMarriageXml.php';
-    let parms   = { 'Domain'    : domain,
-                'Volume'    : volume,
-                'reportNo'  : reportNo,
-                'itemNo'    : itemNo,
-                'role'  : role,
-                'rownum'    : rownum};
+    let script              = 'deleteCountyMarriageXml.php';
+    let parms               = { 'Domain'    : domain,
+                                'Volume'    : volume,
+                                'reportNo'  : reportNo,
+                                'itemNo'    : itemNo,
+                                'role'      : role,
+                                'rownum'    : rownum};
     if (debug != 'n')
-        parms["debug"]  = debug;
+        parms["debug"]      = debug;
 
     // update the citation in the database
     HTTP.post(  script,
@@ -703,16 +696,17 @@ function gotDelete(xmlDoc)
         alert("CountyMarriagesEdit.js: gotDelete: xmlDoc is undefined!");
     }
     else
-    {           // xmlDoc is defined
-        let root    = xmlDoc.documentElement;
-        alert("gotDelete: " + new XMLSerializer().serializeToString(root));
-        let parms   = root.getElementsByTagName('parms');
+    {                   // xmlDoc is defined
+        let root            = xmlDoc.documentElement;
+        console.log("gotDelete: " +
+                    new XMLSerializer().serializeToString(root));
+        let parms           = root.getElementsByTagName('parms');
         if (parms.length > 0)
-        {       // have at least 1 parms element
-            parms   = parms[0];
-            let rownums = parms.getElementsByTagName('rownum');
+        {               // have at least 1 parms element
+            parms           = parms[0];
+            let rownums     = parms.getElementsByTagName('rownum');
             if (rownums.length > 0)
-            {       // have at least 1 rownum element
+            {           // have at least 1 rownum element
                 let child   = rownums[0];
                 let rownum  = child.textContent.trim();
                 // remove identified row
@@ -720,9 +714,9 @@ function gotDelete(xmlDoc)
                 let row     = document.getElementById(rowid);
                 let section = row.parentNode;
                 section.removeChild(row);
-            }       // have at least 1 rownum element
-        }       // have at least 1 parms element
-    }           // xmlDoc is defined
+            }           // have at least 1 rownum element
+        }               // have at least 1 parms element
+    }                   // xmlDoc is defined
 }       // function gotDelete
 
 /************************************************************************
@@ -746,22 +740,22 @@ function noDelete()
  ************************************************************************/
 function checkFlagBG()
 {
-    let elt     = this;
-    let re      = /^[BGbg ]?$/;
-    let flag        = elt.value;
-    let className   = elt.className;
+    let elt                 = this;
+    let re                  = /^[BGbg ]?$/;
+    let flag                = elt.value;
+    let className           = elt.className;
     if (className.substring(className.length - 5) == 'error')
-    {       // error currently flagged
+    {                   // error currently flagged
         // if valid value, clear the flag
         if (re.test(flag))
             elt.className   = className.substring(0, className.length - 5);
-    }       // error currently flagged
+    }                   // error currently flagged
     else
-    {       // error not currently flagged
+    {                   // error not currently flagged
         // if in error add flag to class name
         if (!re.test(flag))
             elt.className   = elt.className + "error";
-    }       // error not currently flagged
+    }                   // error not currently flagged
 }       // function checkFlagBG
 
 /************************************************************************
@@ -774,22 +768,22 @@ function checkFlagBG()
  ************************************************************************/
 function checkFlagBL()
 {
-    let elt         = this;
-    let re          = /^[BLbl ]?$/;
-    let flag        = elt.value;
-    let className   = elt.className;
+    let elt                 = this;
+    let re                  = /^[BLbl ]?$/;
+    let flag                = elt.value;
+    let className           = elt.className;
     if (className.substring(className.length - 5) == 'error')
-    {       // error currently flagged
+    {                   // error currently flagged
         // if valid value, clear the flag
         if (re.test(flag))
             elt.className   = className.substring(0, className.length - 5);
-    }       // error currently flagged
+    }                   // error currently flagged
     else
-    {       // error not currently flagged
+    {                   // error not currently flagged
         // if in error add flag to class name
         if (!re.test(flag))
             elt.className   = elt.className + "error";
-    }       // error not currently flagged
+    }                   // error not currently flagged
 }       // function checkFlagBL
 
 /************************************************************************
@@ -799,44 +793,43 @@ function checkFlagBL()
  *                                                                      *
  *  Parameters:                                                         *
  *      this    input element                                           *
- *      e       W3C compliant browsers pass an event as a parameter     *
+ *      ev      W3C compliant browsers pass an event as a parameter     *
  ************************************************************************/
-function tableKeyDown(e)
+function tableKeyDown(ev)
 {
-    if (!e)
+    if (!ev)
     {                           // browser is not W3C compliant
-        e               =  window.event;    // IE
+        ev                          =  window.event;    // IE
     }                           // browser is not W3C compliant
-    let code            = e.key;
-    let element         = e.target;
-    let form            = element.form;
+    let code                        = ev.key;
+    let element                     = ev.target;
+    let form                        = element.form;
+    let rc                          = true;
 
     // hide the help balloon on any keystroke
     if (helpDiv)
     {                           // helpDiv currently displayed
-        helpDiv.style.display   = 'none';
-        helpDiv         = null; // no longer displayed
+        helpDiv.style.display       = 'none';
+        helpDiv                     = null; // no longer displayed
     }                           // helpDiv currently displayed
     clearTimeout(helpDelayTimer);   // clear pending help display
-    helpDelayTimer      = null;
+    helpDelayTimer                  = null;
 
     // take action based upon code
     switch (code)
     {
         case "F1":              // F1
-        {
             displayHelp(this);  // display help page
-            return false;       // suppress default action
-        }                       // F1
+            rc			            = false;
+			break;              // F1
 
         case "Enter":
-        {                       // enter key
             if (element)
             {
-                let cell        = element.parentNode;
-                let row         = cell.parentNode;
-                let body        = row.parentNode;
-                let rownum      = row.sectionRowIndex;
+                let cell            = element.parentNode;
+                let row             = cell.parentNode;
+                let body            = row.parentNode;
+                let rownum          = row.sectionRowIndex;
                 if (rownum < (body.rows.length - 1))
                 {               // not the last row
                     rownum++;
@@ -844,11 +837,11 @@ function tableKeyDown(e)
                     let focusSet    = false;
                     let itemNo      = 0;
                     let names       = '';
-                    for(var itd = 0; itd < row.cells.length; itd++)
+                    for (let itd = 0; itd < row.cells.length; itd++)
                     {           // loop through <td>s
                         cell        = row.cells[itd];
-                        let children    = cell.children;
-                        for(var ic = 0; ic < children.length; ic++)
+                        let children= cell.children;
+                        for (let ic = 0; ic < children.length; ic++)
                         {       // loop through children of cell
                             let child   = children[ic];
                             if (child.nodeName.toLowerCase() == 'input' &&
@@ -869,12 +862,12 @@ function tableKeyDown(e)
                 }               // not the last row
                 else
                 {               // last row, add new row
-                    let itemNo      = 0;
-                    for(var itd = 0; itd < row.cells.length; itd++)
+                    let itemNo          = 0;
+                    for (let itd = 0; itd < row.cells.length; itd++)
                     {           // loop through <td>s
                         cell            = row.cells[itd];
                         let children    = cell.children;
-                        for(var ic = 0; ic < children.length; ic++)
+                        for (let ic = 0; ic < children.length; ic++)
                         {       // loop through children of cell
                             let child   = children[ic];
                             if (child.nodeName.toLowerCase() == 'input' &&
@@ -906,7 +899,7 @@ function tableKeyDown(e)
                                                          null);
                     newrow  = body.appendChild(newRow);
                     let inputs      = newRow.getElementsByTagName('input');
-                    for (var ii = 0; ii < inputs.length; ii++)
+                    for (let ii = 0; ii < inputs.length; ii++)
                     {
                         let element = inputs[ii];
                         initElement(element);
@@ -919,7 +912,7 @@ function tableKeyDown(e)
                                                          null);
                     newRow          = body.appendChild(newRow);
                     inputs          = newRow.getElementsByTagName('input');
-                    for (var ii = 0; ii < inputs.length; ii++)
+                    for (let ii = 0; ii < inputs.length; ii++)
                     {
                         let element = inputs[ii];
                         initElement(element);
@@ -928,11 +921,10 @@ function tableKeyDown(e)
             }                   // have element
             else
                 alert("commonMarriage.js: tableKeyDown: element is null.");
-            return false;       // suppress default action
-        }                       // enter key
+            rc			            = false;
+			break;              // enter key
 
         case "ArrowUp":
-        {                       // arrow up key
             if (element)
             {
                 let cell            = element.parentNode;
@@ -945,7 +937,7 @@ function tableKeyDown(e)
                     row             = body.rows[rownum];
                     cell            = row.cells[cell.cellIndex];
                     let children= cell.children;
-                    for(var ic = 0; ic < children.length; ic++)
+                    for (let ic = 0; ic < children.length; ic++)
                     {           // loop through children of cell
                         let child   = children[ic];
                         if (child.nodeName.toLowerCase() == 'input' &&
@@ -959,11 +951,10 @@ function tableKeyDown(e)
             }
             else
                 alert("commonMarriage.js: tableKeyDown: element is null.");
-            return false;       // suppress default action
-        }                       // arrow up key
+            rc			            = false;
+			break;              // arrow up key
 
         case "ArrowDown":
-        {                       // arrow down key
             if (element)
             {
                 let cell            = element.parentNode;
@@ -976,7 +967,7 @@ function tableKeyDown(e)
                     row             = body.rows[rownum];
                     cell            = row.cells[cell.cellIndex];
                     let children= cell.children;
-                    for(var ic = 0; ic < children.length; ic++)
+                    for (let ic = 0; ic < children.length; ic++)
                     {           // loop through children of cell
                         let child   = children[ic];
                         if (child.nodeName.toLowerCase() == 'input' &&
@@ -990,11 +981,17 @@ function tableKeyDown(e)
             }
             else
                 alert("commonMarriage.js: tableKeyDown: element is null.");
-            return false;       // suppress default action
-        }                       // arrow down key
+            rc			            = false;
+			break;              // arrow down key
+            //
     }                           // switch on key code
 
-    return;
+    if (rc)
+        return true;
+
+    ev.stopPropagation();
+    ev.preventDefault();
+    return false
 }       // function tableKeyDown
 
 /************************************************************************
@@ -1007,172 +1004,138 @@ function tableKeyDown(e)
  ************************************************************************/
 function initElement(element)
 {
-    element.onkeydown   = keyDown;          // default event handler
+    element.addEventListener('keydown', keyDown);
 
-    let namePattern     = /^([a-zA-Z_]+)(\d*)$/;
-    let id              = element.id;
+    let namePattern             = /^([a-zA-Z_]+)(\d*)$/;
+    let id                      = element.id;
     if (id.length == 0)
-        id              = element.name;
-    let rresult         = namePattern.exec(id);
-    let column          = id;
-    let rownum          = '';
+        id                      = element.name;
+    let rresult                 = namePattern.exec(id);
+    let column                  = id;
+    let rownum                  = '';
     if (rresult !== null)
     {
-        column          = rresult[1];
-        rownum          = rresult[2];
+        column                  = rresult[1];
+        rownum                  = rresult[2];
     }
 
     switch(column.toLowerCase())
-    {
+    {                           // act on column name
         case 'domain':
-        {
-            element.onkeydown   = keyDown;  // special key handling
-            element.onchange    = change;   // default handler
+            element.addEventListener('keydown', keyDown); 
+            element.addEventListener('change', change);  
             element.checkfunc   = checkText;
             element.checkfunc();
-            break;
-        }
+            break;              // domain field
 
         case 'volume':
         case 'reportno':
-        {   // numeric fields
-            element.onkeydown   = keyDown;  // special key handling
-            element.onchange    = change;   // default handler
+            element.addEventListener('keydown', keyDown); 
+            element.addEventListener('change', change);  
             element.checkfunc   = checkNumber;
             element.checkfunc();
-            break;
-        }
+            break;              // numeric fields
 
         case 'itemno':
-        {   // numeric field
-            element.onkeydown   = tableKeyDown; 
-            element.onchange    = change;
+            element.addEventListener('keydown', tableKeyDown); 
+            element.addEventListener('change', change);
             element.checkfunc   = checkNumber;
             element.checkfunc();
-            break;
-        }
+            break;              // itemno
 
         case 'role':
-        {
-            element.onkeydown   = tableKeyDown;
-            element.onchange    = change;
+            element.addEventListener('keydown', tableKeyDown);
+            element.addEventListener('change', change);
             element.checkfunc   = checkFlagBG;
             element.checkfunc();
-            break;
-        }
+            break;              // role
 
         case 'givennames':
         case 'fathername':
         case 'mothername':
         case 'witnessname':
-        {
             element.abbrTbl = GivnAbbrs;
-            element.onkeydown   = tableKeyDown;
-            element.onchange    = change;
+            element.addEventListener('keydown', tableKeyDown);
+            element.addEventListener('change', change);
             element.checkfunc   = checkName;
             element.checkfunc();
-            break;
-        }   // given names field
+            break;              // given names field
 
         case 'surname':
-        {
             element.abbrTbl = SurnAbbrs;
-            element.onchange    = change;
-            element.onkeydown   = tableKeyDown;
+            element.addEventListener('change', change);
+            element.addEventListener('keydown', tableKeyDown);
             element.checkfunc   = checkName;
             element.checkfunc();
-            break;
-        }   // surname field
+            break;              // surname field
 
         case 'age':
-        {
-            element.onchange    = change;
-            element.onkeydown   = tableKeyDown;
+            element.addEventListener('change', change);
+            element.addEventListener('keydown', tableKeyDown);
             element.checkfunc   = checkAge;
             element.checkfunc();
-            break;
-        }   // age field
+            break;              // age field
 
         case 'residence':
         case 'birthplace':
-        {
             element.abbrTbl = LocAbbrs;
-            element.onkeydown   = tableKeyDown;
-            element.onchange    = change;
+            element.addEventListener('keydown', tableKeyDown);
+            element.addEventListener('change', change);
             element.checkfunc   = checkAddress;
             element.checkfunc(); 
-            break;
-        }   // location fields
+            break;              // location fields
 
         case 'date':
-        {
             element.abbrTbl = MonthAbbrs;
-            element.onkeydown   = tableKeyDown;
-            element.onchange    = marriageDateChanged;
+            element.addEventListener('keydown', tableKeyDown);
+            element.addEventListener('change', marriageDateChanged);
             element.checkfunc   = checkDate;
             element.checkfunc();
-            break;
-        }   // date field
+            break;              // date field
 
         case 'licensetype':
-        {
-            element.onkeydown   = tableKeyDown;
-            element.onchange    = licenseTypeChanged;
+            element.addEventListener('keydown', tableKeyDown);
+            element.addEventListener('change', licenseTypeChanged);
             element.checkfunc   = checkFlagBL;
             element.checkfunc();
-            break;
-        }
+            break;              // licensetype
 
         case 'witnessname':
-        {
             element.abbrTbl     = GivnAbbrs;
-            element.onkeydown   = tableKeyDown;
-            element.onchange    = change;
+            element.addEventListener('keydown', tableKeyDown);
+            element.addEventListener('change', change);
             element.checkfunc   = checkName;
             element.checkfunc();
-            break;
-        }   // witness names field
+            break;              // witness names field
 
         case 'remarks':
-        {
-            element.onkeydown   = tableKeyDown;
-            element.onchange    = change;
+            element.addEventListener('keydown', tableKeyDown);
+            element.addEventListener('change', change);
             element.checkfunc   = checkText;
             element.checkfunc();
-            break;
-        }
+            break;              // remarks
 
         case 'link':
-        {
-            element.onclick = linkToTree;
-            break;
-        }
+            element.addEventListener('click', linkToTree);
+            break;              // link button
 
         case 'find':
-        {
-            element.onclick = findInTree;
-            break;
-        }
+            element.addEventListener('click', findInTree);
+            break;              // find button
 
         case 'clear':
-        {
-            element.onclick = clearFromTree;
-            break;
-        }
+            element.addEventListener('click', clearFromTree);
+            break;              // clear button
 
         case 'details':
-        {
-            element.onclick = showDetails;
-            break;
-        }
+            element.addEventListener('click', showDetails);
+            break;              // details button
 
         case 'delete':
-        {
-            element.onclick = deleteRow;
-            break;
-        }
+            element.addEventListener('click', deleteRow);
+            break;              // delete button
 
-    }           // act on column name
+    }                           // act on column name
 }       // function initElement
 
 /************************************************************************
@@ -1183,7 +1146,7 @@ function initElement(element)
  *  Input:                                                              *
  *      this        an instance of an HTML input element.               *
  ************************************************************************/
-function marriageDateChanged()
+function marriageDateChanged(ev)
 {
     let form        = this.form;
 
@@ -1198,7 +1161,7 @@ function marriageDateChanged()
     if (this.checkfunc)
         this.checkfunc();
 
-    let rownum      = this.name.substring(4);
+    let rownum      = this.id.match(/\d*$/);
     let roleElement = form.elements['Role' + rownum];
     if (roleElement && roleElement.value.toUpperCase() == 'G')
     {
@@ -1214,6 +1177,9 @@ function marriageDateChanged()
         else
             alert("Unable to find element with name='" + brideDateName + "'");
     }
+
+    ev.stopPropagation();
+    return false;
 }       // function marriageDateChanged
 
 /************************************************************************
@@ -1224,7 +1190,7 @@ function marriageDateChanged()
  *  Input:                                                              *
  *      this        an instance of an HTML input element.               *
  ************************************************************************/
-function licenseTypeChanged()
+function licenseTypeChanged(ev)
 {
     let form        = this.form;
     changeElt(this);    // change case and expand abbreviations
@@ -1232,15 +1198,15 @@ function licenseTypeChanged()
     if (this.checkfunc)
         this.checkfunc();
 
-    let rownum      = this.name.substring(11);
-    let roleName    = 'Role' + rownum;
-    let roleElement = form.elements[roleName];
+    let rownum              = this.id.match(/\d*$/);
+    let roleName            = 'Role' + rownum;
+    let roleElement         = form.elements[roleName];
     if (roleElement && roleElement.value.toUpperCase() == 'G')
     {
-        let brownum = (rownum - 0) + 1;
+        let brownum         = (rownum - 0) + 1;
         if (brownum < 10)
         {
-            brownum = "0" + brownum;
+            brownum         = "0" + brownum;
         }
         let brideLtName     = 'LicenseType' + brownum;
         let brideLtElement  = form.elements[brideLtName];
@@ -1249,8 +1215,7 @@ function licenseTypeChanged()
         else
             alert("Unable to find element with name='" + brideLtName + "'");
     }
+
+    ev.stopPropagation();
+    return false;
 }       // function licenseTypeChanged
-
-
-
-

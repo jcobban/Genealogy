@@ -38,29 +38,29 @@ require_once __NAMESPACE__ . "/common.inc";
 
 function compareReports($r1, $r2)
 {
-    if ($r1->get('m_regdomain') == $r2->get('m_regdomain') &&
-        $r1->get('m_volume') == $r2->get('m_volume') &&
-        $r1->get('m_reportno') == $r2->get('m_reportno'))
+    if ($r1->get('regdomain') == $r2->get('regdomain') &&
+        $r1->get('volume') == $r2->get('volume') &&
+        $r1->get('reportno') == $r2->get('reportno'))
     {
         return 0;
     }
-    if ($r1->get('m_regdomain') < $r2->get('m_regdomain'))
+    if ($r1->get('regdomain') < $r2->get('regdomain'))
     {
         return -1;
     } else
-    if ($r1->get('m_regdomain') > $r2->get('m_regdomain'))
+    if ($r1->get('regdomain') > $r2->get('regdomain'))
     {
         return 1;
     }
-    if ($r1->get('m_volume') < $r2->get('m_volume'))
+    if ($r1->get('volume') < $r2->get('volume'))
     {
         return -1;
     } else
-    if ($r1->get('m_volume') > $r2->get('m_volume'))
+    if ($r1->get('volume') > $r2->get('volume'))
     {
         return 1;
     }
-    if ($r1->get('m_reportno') < $r2->get('m_reportno'))
+    if ($r1->get('reportno') < $r2->get('reportno'))
     {
         return -1;
     }
@@ -298,7 +298,7 @@ if (strlen($msg) == 0)
         if ($volume > 1)
             $template->set('VOLUMEminus1',  $volume - 1);
         else
-            $template['topPrev']->update(null);
+            $template['topPrev']->update('&nbsp;');
     }       // display of whole volume
     else
         $template['topBrowse']->update(null);

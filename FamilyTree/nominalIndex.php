@@ -115,41 +115,32 @@ if (count($_GET) > 0)
                   "<tr><th class='colhead'>key</th>" .
                       "<th class='colhead'>value</th></tr>\n";
 	foreach($_GET as $key => $value)
-	{				// loop through parameters
+    {				// loop through parameters
+        $safevalue              = htmlspecialchars($value);
         $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
-                        "<td class='white left'>$value</td></tr>\n"; 
+                        "<td class='white left'>$safevalue</td></tr>\n"; 
 		switch (strtolower($key))
 		{			// act on specific parameters
 		    case 'birthmin':
-		    {
 				$birthmin	    = intval($value);
 				break;
-		    }
 	
 		    case 'birthmax':
-		    {
 				$birthmax	    = intval($value);
 				break;
-		    }
 	
 		    case 'name':
-            {
                 if (strlen($value) > 0)
-                    $name	        = htmlspecialchars($value);
+                    $name	    = $safevalue;
 				break;
-		    }
 	
 		    case 'treename':
-		    {
-				$treeName	    = htmlspecialchars($value);
+				$treeName	    = $safevalue;
 				break;
-		    }
 	
 		    case 'lang':
-            {		// language choice
                 $lang       = FtTemplate::validateLang($value);
 				break;
-		    }		// language choice
 	
 		}			// act on specific parameters
 	}				// loop through parameters

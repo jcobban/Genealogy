@@ -121,6 +121,8 @@ use \Templating\Template;
  *                      GROUP BY clause                                 *
  *      2022/03/23      add some multibyte string support               *
  *      2022/04/17      add method debugBacktrace                       *
+ *      2022/06/08      improve handling of REGEXP patterns             *
+ *      2022/07/30      dropped final $ from regexp pattern             *
  *                                                                      *
  *  Copyright &copy; 2022 James A. Cobban                               *
  ************************************************************************/
@@ -705,31 +707,31 @@ class RecordSet implements Iterator, Countable, ArrayAccess
         // construct the GROUP BY clause
         if (is_string($groupby) && strlen($groupby) > 0)
         {
-            $fields                         = explode(',', $groupby);
-            $groupby                        = '';
-            $and                            = '';
+            $fields                     = explode(',', $groupby);
+            $groupby                    = '';
+            $and                        = '';
             foreach($fields as $i => $field)
             {
-                $rresult                    = preg_match('/^`?(\w+)`?\.(.*)/',
-                                                         $field,
-                                                         $matches);
+                $rresult                = preg_match('/^`?(\w+)`?\.(.*)/',
+                                                     $field,
+                                                     $matches);
                 if ($rresult)
                 {
-                    $table                  = $matches[1];
-                    $column                 = $matches[2];
+                    $table              = $matches[1];
+                    $column             = $matches[2];
                     if (strlen($table) > 0)
                     {
-                        $info               = Record::getInformation($table);
+                        $info           = Record::getInformation($table);
                         if ($info)
-                            $table          = $info['table'];
+                            $table      = $info['table'];
                     }
-                    $groupby                .= "$and`$table`.$column";
+                    $groupby            .= "$and`$table`.$column";
                 }
                 else
-                    $groupby                .= "$and$field";
-                $and                        = ',';
+                    $groupby            .= "$and$field";
+                $and                    = ',';
             }           // translate external table names
-            $this->query                    .= " GROUP BY " . $groupby;
+            $this->query                .= " GROUP BY " . $groupby;
         }
 
         // construct the ORDER BY clause
@@ -1550,6 +1552,7 @@ class RecordSet implements Iterator, Countable, ArrayAccess
 
         $matches            = array();
         $where              = '';
+        $and                = '';
         if (is_array($pattern))
             $parms          = $pattern;
         else
@@ -1572,6 +1575,7 @@ class RecordSet implements Iterator, Countable, ArrayAccess
 
         // process parameters
         $or             = '';
+        $and            = '';
         $i              = 1;
 
         foreach($parms as $pattern)
@@ -1723,6 +1727,10 @@ class RecordSet implements Iterator, Countable, ArrayAccess
                                           $rest;
                         }
                     }
+                    else
+                    {
+                        $rest           = "$body$rest";
+                    }
 
 //                    $warn    .= "<p>RecordSet::getWherePattern: " . __LINE__ . " \$frstch='$frstch', \$rest='$rest', \$leading='$leading', \$body='$body'</p>\n"; 
                     if (is_string($refname))
@@ -1740,35 +1748,53 @@ class RecordSet implements Iterator, Countable, ArrayAccess
                     {
                         if ($leadingl)
                         {
-                            $where          .= 
-                                        "(LEFT($fldname,$leadingl)=? AND ";
+                                $where          .= 
+                                "(LEFT($fldname,$leadingl)=?";
+                            $and                = ' AND ';
                             $this->sqlParms[]   = $leading;
                         }
-                        $startpos           = $leadingl + 1;
+                        $startpos               = $leadingl + 1;
                         if (substr($rest, 0, 2) == '[^')
                         {
                             $clbr           = strpos($rest, ']');
                             $neglen         = $clbr - 2;
                             $negpat         = substr($rest, 2, $neglen);
-                            $where          .=
+                            $where          .= $and .
                         "SUBSTRING($fldname,$startpos,$neglen) != ?";
                             $this->sqlParms[]   = $negpat;
+                            $rest           = substr($rest, $clbr + 1);
+                            $startpos       += 1;
                         }
+                        else
                         if (substr($rest, 0, 3) == '(?!')
                         {
                             $clbr           = strpos($rest, ')');
                             $neglen         = $clbr - 3;
                             $negpat         = substr($rest, 3, $neglen);
-                            $where          .=
+                            if (preg_match("/^[a-zA-Z']+$/",$negpat))
+                            {
+                                $where          .= $and .
                         "SUBSTRING($fldname,$startpos,$neglen) != ?";
-                            $this->sqlParms[]   = $negpat;
+                                $this->sqlParms[]   = $negpat;
+                                $rest           = substr($rest, $clbr + 1);
+                                $startpos       += $neglen;
+                            }
                         }
-                        else
-                        {
-                            $where          .= 
-                                "SUBSTRING($fldname,$startpos) REGEXP ?";
-                            $this->sqlParms[]   = $rest;
-                        }
+
+                        if (strlen($rest) > 0)
+                        {               // use server REGEXP support
+                            if ($startpos > 1)
+                            {
+                                $where              .= $and .
+                        "SUBSTRING($fldname,$startpos) REGEXP ?";
+                                $this->sqlParms[]   = "^$rest$lastch";
+                            }
+                            else
+                            {
+                                $where              .= "$and$fldname REGEXP ?";
+                                $this->sqlParms[]   = "$frstch$rest$lastch";
+                            }
+                        }               // use server REGEXP support
                     }
                     if ($leadingl)
                         $where          .= ')';
@@ -2045,7 +2071,10 @@ require_once __NAMESPACE__ . '/Surname.inc';
 
         // process parameters
         $translate              = null;
-        $initRow                = $this->information['initrow'];
+        if (array_key_exists('initrow', $this->information))
+            $initRow            = $this->information['initrow'];
+        else
+            $initRow            = array();
         $className              = $this->information['classname'];
         $nsclass                = __NAMESPACE__ . "\\" . $className;
 
@@ -2109,7 +2138,10 @@ require_once __NAMESPACE__ . '/Surname.inc';
                     $subtable       = $matches[1];
                     $info           = Record::getInformation($subtable);
                     $subclass       = $info['classname'];
-                    $initRow        = $info['initrow'];
+                    if (array_key_exists('initrow', $info))
+                        $initRow            = $info['initrow'];
+                    else
+                        $initRow            = array();
                     $fieldLc        = strtolower($matches[2]);
                 }
                 else
@@ -2624,9 +2656,10 @@ require_once __NAMESPACE__ . '/Surname.inc';
      *  Returns:                                                        *
      *      count of records                                            *
      ********************************************************************/
-    public function count()
+    public function count(): int
     {
-        if (array_key_exists('count', $this->information))
+        if (is_array($this->information) && 
+            array_key_exists('count', $this->information))
             $totalCount = $this->information['count'];
         else
             $totalCount = 0;
@@ -2919,11 +2952,12 @@ require_once __NAMESPACE__ . '/Surname.inc';
                                     $censusId != $oldCensusId)
                                 {
                                     $censusObj      =
-                                new Census(array('censusid' => $censusId));
+                                        new Census(array('censusid' => $censusId));
                                     $oldCensusId    = $censusId;
                                 }
-                                $object     = new $nsclass(array('Census' => $censusObj),
-                                                 $row);
+                                $object     = new $nsclass(
+                                    array('Census' => $censusObj),
+                                          $row);
                             }           // census
                             else
                             {

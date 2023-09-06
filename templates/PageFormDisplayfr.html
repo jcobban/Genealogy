@@ -37,7 +37,6 @@
 	        Help?
 	      </a>
         </span>
-        <div style="clear: both;"></div>
       </h1>
 	  <p class="warning">
         La base de données ne sera pas mise à jour car vous n'êtes pas
@@ -45,17 +44,18 @@
       </p>
       $TRACE
       $MSG
-      <div class="center" id="topBrowse">
-        <span class="left" id="topPrev">
-    	    <a href="PageForm.php$NPPREV">&lt;---</a>
+      <div class="spaceBetween" id="topBrowse">
+        <span id="topPrev">
+    	    <a href="PageForm.php$NPPREV"><img src="/Images/ArrowLeft.svg"></a>
         </span>
-        <span class="right" id="topNext">
-	        <a href="PageForm.php$NPNEXT">---&gt;</a>
-        </span>
+        <span>
           Recensement=$CENSUSID, Province=$PROVINCE, Dist $DISTID $DISTNAME,
           Sous-Dist $SUBDISTID $SUBDISTNAME
             <span id="topDiv">, Div $DIVISION</span>
-        <span style="clear: both;"></span>
+        </span>
+        <span id="topNext">
+	        <a href="PageForm.php$NPNEXT"><img src="/Images/ArrowRight.svg"></a>
+        </span>
       </div>
       <!--- Put out the response as a table -->
       <form name="censusForm"
@@ -139,17 +139,18 @@
           </tbody>
         </table>
       </form>
-      <div class="center" id="botBrowse">
-        <span class="left" id="botPrev">
-	      <a href="$NPURI$NPPREV">&lt;---</a>
+      <div class="spaceBetween" id="botBrowse">
+        <span id="botPrev">
+	      <a href="$NPURI$NPPREV"><img src="/Images/ArrowLeft.svg"></a>
         </span>
-        <span class="right" id="botNext">
-	      <a href="$NPURI$NPNEXT">---&gt;</a>
-        </span>
+        <span>
           Recensement=$CENSUSID, Province=$PROVINCE, Dist $DISTID $DISTNAME,
           Sous-Dist $SUBDISTID $SUBDISTNAME
             <span id="botDiv">, Div $DIVISION</span>
-        <span style="clear: both;"></span>
+        </span>
+        <span id="botNext">
+	      <a href="$NPURI$NPNEXT"><img src="/Images/ArrowRight.svg"></a>
+        </span>
       </div>
     </div> <!-- end of <div id="body"> -->
     <!-- templates for dynamic HTML -->
@@ -163,6 +164,9 @@
         <span id="censusMissing">
             Recensement identifier parameter is missing.
         </span>
+        <span id="provinceInvalid">
+            Province '$province' is syntactically invalid.
+        </span>  
         <span id="provinceUndefined">
             Province '$PROVINCE' not supported for '$CENSUSID' census.
         </span>  

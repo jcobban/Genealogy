@@ -7,8 +7,9 @@
  *	    2017/11/25	    created						                    *
  *	    2018/01/04	    remove Template from template file names	    *
  *      2019/11/17      move CSS to <head>                              *
+ *      2023/01/19      add message texts                               *
  *									                                    *
- *  Copyright &copy; 2019 James A. Cobban				                *
+ *  Copyright &copy; 2023 James A. Cobban				                *
  **********************************************************************-->
 	<div id='breadcrumbs' class='hidden'>
 	    <a href="/genealogy.php?lang=$LANG">Genealogy</a>:
@@ -41,12 +42,18 @@
 	  </div> <!-- id='displayForm'-->
     </div> <!-- class='body' -->
     <div class="hidden">
-        <span id="censusMissing">
-            The Census parameter is missing.
-        </span>
-        <span id="censusUnsupported">
-            Census='$censusId' is not defined. 
-        </span>
+      <span id="censusInvalid">
+        The identifier value $value for Census is syntactically invalid.
+      </span>
+      <span id="provinceInvalid">
+        Identifier value $value for Province is syntactically invalid.
+      </span>
+      <span id="censusMissing">
+        The Census parameter is missing.
+      </span>
+      <span id="censusUnsupported">
+        Census='$censusId' is not defined. 
+      </span>
     </div>
 	<div id='mouseprevCensusLink' class='popup'>
 	  <p class='label'>

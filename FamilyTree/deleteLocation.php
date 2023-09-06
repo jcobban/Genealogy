@@ -34,8 +34,9 @@ use \Exception;
  *		2018/11/19      change Helpen.html to Helpen.html               *
  *		2019/02/18      use new FtTemplate constructor                  *
  *      2020/12/05      correct XSS vulnerabilities                     *
+ *      2023/01/23      Get message texts from template                 *
  *																		*
- *  Copyright &copy; 2020 James A. Cobban								*
+ *  Copyright &copy; 2023 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . "/Location.inc";
 require_once __NAMESPACE__ . "/Person.inc";
@@ -44,16 +45,12 @@ require_once __NAMESPACE__ . "/PersonSet.inc";
 require_once __NAMESPACE__ . '/FtTemplate.inc';
 require_once __NAMESPACE__ . '/common.inc';
 
-// determine if permitted to update records
-if (!canUser('edit'))
-{		        // take no action
-	$msg	        .= 'User not authorized to delete location. ';
-}		        // take no action
-
 // validate parameters
 $idlr               = null;
 $idlrtext           = null;
 $lang               = 'en';
+$langtext           = null;
+$name               = '';
 $namePref           = '';
 
 if (isset($_POST) && count($_POST) > 0)
@@ -64,15 +61,16 @@ if (isset($_POST) && count($_POST) > 0)
                           "<th class='colhead'>value</th></tr>\n";
     foreach($_POST as $key => $value)
     {		        // loop through all parameters
+        $safevalue  = htmlspecialchars($value);
         $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
-                            "<td class='white left'>$value</td></tr>\n"; 
+                            "<td class='white left'>$safevalue</td></tr>\n"; 
 		switch(strtolower($key))
 		{	        // act on specific key
 
 		    case 'lang':
 		    {
-				if (strlen($value) == 2)
-				    $lang	= strtolower($value);
+                $lang       = FtTemplate::validateLang($value,
+                                                       $langtext);
 				break;
 		    }	    // presentation language
 
@@ -80,19 +78,20 @@ if (isset($_POST) && count($_POST) > 0)
             {
                 if (is_int($value) && $value > 0)
                 {
-                    $idlr	= $value;
+                    $idlr	        = $value;
                 }
 				else
                 if (is_string($value) &&
-                    strlen($value) > 0 && 
                     ctype_digit($value))
                 {
-                    $idlr	= intval($value);
+                    $idlr	        = intval($value);
                 }
 				else
                 {	// invalid format
-                    $idlrtext       = htmlspecialchars($value);
-				    $name	= "Invalid Value of idlr='$idlrtext'";
+                    if (strlen($safevalue) > 0)
+                        $idlrtext       = $safevalue;
+                    else
+                        $idlr           = null;
 				}	// invalid format
 				break;
 		    }	    // idlr
@@ -104,15 +103,25 @@ if (isset($_POST) && count($_POST) > 0)
 
 $template           = new FtTemplate("deleteLocation$lang.html");
 
+// determine if permitted to update records
+if (!canUser('edit'))
+{		        // take no action
+	$msg	        .= $template['notAuthorized']->innerHTML;
+}		        // take no action
+
 if (is_string($idlrtext))
-    $msg	        = "Invalid Value of idlr='$idlrtext'";
+{
+    $msg	    .= $template['invalidIdlr']->replace('$idlrtext',$idlrtext);
+}
 else
 if (is_null($idlr))
 {
-    $msg	        .= 'Missing mandatory parameter idlr. ';
-    $name           = 'IDLR not Specified';
-    $namePref       = 'IDLR';
+    $name       = $template['missingIdlr']->innerHTML;
+    $msg	    .= $name;
+    $namePref   = 'IDLR';
 }
+else
+    $warn       .= "<p>IDLR is " . var_export($idlr, true) . "</p>\n";
 
 if (strlen($msg) == 0)
 {		        // no problems encountered

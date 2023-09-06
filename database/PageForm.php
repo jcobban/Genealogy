@@ -255,16 +255,18 @@ if ($censusId)
 	    $censusYear			= intval(substr($censusId, 2));
 	
         // validate province
-	    $provs	            = $censusRec->get('provinces');
-        if (strpos($provs, $province) === false)
-            $provincetext       = $province;
-        if (is_string($provincetext))
+        if (is_string($province))
         {
-            $msg    .= $template['provinceInvalid']->replace('$province', 
-                                                            $province);
-        }
-        if ($province)
-        {               // province specified
+	        $provs	        = $censusRec->get('provinces');
+            if (strlen($province) > 0 && 
+                strpos($provs, $province) === false)
+                $provincetext= $province;
+            if (is_string($provincetext))
+            {
+                $msg        .=
+                    $template['provinceInvalid']->replace('$province', 
+                                                            $provincetext);
+            }
             if ($censusRec['collective'])
             {           // collection of censuses
                 $ppos		= strpos($censusRec->get('provinces'), $province);
@@ -424,16 +426,18 @@ if (strlen($msg) == 0)
     // search arguments to URL for current instance
 	if (strlen($npprev) == 0)
     {
-        $template['topPrev']->update(null);
-        $template['botPrev']->update(null);
+        $template['topPrev']->update('&nbsp;');
+        $template['botPrev']->update('&nbsp;');
     }
     else
         $template->set('NPPREV', $npprev);
 
 	if (strlen($npnext) == 0)
     {
-        $template['topNext']->update(null);
-        $template['botNext']->update(null);
+        $template['topNext']->update('&nbsp;');
+        $template['botNext']->update('&nbsp;');
+
+
     }
     else
         $template->set('NPNEXT', $npnext);

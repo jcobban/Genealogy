@@ -39,8 +39,10 @@ use Templating\escape;
  *      2022/02/15      issue warning from validateLang                 *
  *                      by returning a syntactically invalid parameter  *
  *                      in the optional second parameter                *
+ *      2022/06/09      initialize $RIGHTCOL                            *
+ *      2023/08/03      warn for unsupported languages                  *
  *                                                                      *
- *  Copyright &copy; 2022 James A. Cobban All Rights Reserved           *
+ *  Copyright &copy; 2023 James A. Cobban All Rights Reserved           *
  ************************************************************************/
 
 /************************************************************************
@@ -224,24 +226,32 @@ class FtTemplate extends Template
                        $value,
                        $matches))
         {                       // supported syntax
+            $langCode       = $matches[1];
             if (strlen($matches[2]) > 0)
-                $lang       = strtolower($matches[1]) . '-' .
+                $lang       = strtolower($langCode) . '-' .
                               strtoupper($matches[3]);
             else
-                $lang       = strtolower($matches[1]);
+                $lang       = strtolower($langCode);
+            $langObj        = new Language(array('code' => $langCode));
+            if (!$langObj->isExisting())
+                $warn       .= "<p>Language code '$langCode' is not supported.</p>\n";
         }                       // supported syntax
         else
         if (preg_match('/^([a-zA-Z]{3})(-([a-zA-Z0-9]{2,3})|)$/',
                        $value,
                        $matches))
         {                       // partial support for ISO 639-2
+            $langCode       = substr($matches[1],0,2);
             if (strlen($matches[2]) > 0)
-                $lang       = strtolower(substr($matches[1],0,2)) . '-' .
+                $lang       = strtolower($langCode) . '-' .
                               strtoupper($matches[3]);
             else
-                $lang       = strtolower(substr($matches[1],0,2));
+                $lang       = strtolower($langCode);
             if (func_num_args() > 1)
                 $valuetext      = htmlspecialchars($value);
+            $langObj        = new Language(array('code' => $langCode));
+            if (!$langObj->isExisting())
+                $warn       .= "<p>Language code '$langCode' is not supported.</p>\n";
         }                       // partial support for ISO 639-2
         else
         if (func_num_args() > 1)
@@ -332,12 +342,13 @@ class FtTemplate extends Template
         {
             $namelen        = strlen($filename);
             $suffix         = $matches[0];
+        print "<p>595 \$suffix='$suffix'</p>\n";
             $suflen         = strlen($suffix);
             $oldfilename    = $filename;
             $filename       = substr($filename, 0, $namelen - $suflen) .
                               'en.html';
-            error_log("FtTemplate::includeSub: " . __LINE__ .
-                    " filename='$oldfilename' replaced by '$filename'\n");
+            //error_log("FtTemplate::includeSub: " . __LINE__ .
+            //        " filename='$oldfilename' replaced by '$filename'\n");
         }
 
         return parent::includeSub($tempBase . $filename,
@@ -596,14 +607,9 @@ class FtTemplate extends Template
         $langtiny                   = str_replace('-','_',$lang);
         $langBase                   = $document_root .
                                 '/jscripts/tinymce/js/tinymce/langs/';
-        if (!file_exists($langBase . "$langtiny.js"))
+        if (!file_exists("$langBase$langtiny.js"))
         {
-            if (strlen($langtiny) > 2)
-            {
-                $langtiny           = substr($langtiny, 0, 2);
-                if (!file_exists($langBase . "$langtiny.js"))
-                    $langtiny       = 'en';
-            }
+            $langtiny       = 'en';
         }
         $this->set('LANGTINY',      $langtiny);
 
@@ -815,6 +821,7 @@ class FtTemplate extends Template
 
             // add contact author link
             $footSection    = $this['footSection'];
+            if ($footSection)
             foreach($footSection->childNodes() as $child)
             {           // loop through children of footer
                 if ($child->tagName == 'div' &&
@@ -838,6 +845,13 @@ class FtTemplate extends Template
                         \Templating\escape($breadcrumbs) . "</p>\n";
 
         $this->set('BREADCRUMBS',   $breadcrumbs, true);
+        if ($this->get('RIGHTCOL') == null)
+        {
+            $rightCol               = $this['rightCol'];
+            if ($rightCol)
+                $this->set('RIGHTCOL',      
+                            "<p>" . $rightCol->innerHTML . "</p>\n");
+        }
 
         // invoke parent functionality
         parent::displayBegin();

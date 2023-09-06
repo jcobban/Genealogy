@@ -303,8 +303,9 @@ if (count($_GET) > 0)
                       "<th class='colhead'>value</th></tr>\n";
     foreach ($_GET as $key => $value)
     {                       // loop through parameters
+        $safevalue              = htmlspecialchars($value);
         $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
-                        "<td class='white left'>$value</td></tr>\n"; 
+                        "<td class='white left'>$safevalue</td></tr>\n"; 
         switch (strtolower($key))
         {
             case 'email':
@@ -332,8 +333,9 @@ if (count($_POST) > 0)
                           "<th class='colhead'>value</th></tr>\n";
     foreach ($_POST as $key => $value)
     {                       // loop through parameters
+        $safevalue              = htmlspecialchars($value);
         $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
-            "<td class='white left'>$value</td></tr>\n";
+            "<td class='white left'>$safevalue</td></tr>\n";
         switch (strtolower($key))
         {
             case 'idir':
@@ -341,7 +343,7 @@ if (count($_POST) > 0)
                 if (ctype_digit($value) && $value > 0)
                     $idir           = $value;
                 else
-                    $idirtext       = htmlspecialchars($value);
+                    $idirtext       = $safevalue;
                 break;
             }               // identifier of root individual
        

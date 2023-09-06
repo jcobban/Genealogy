@@ -1,53 +1,52 @@
 <!--*********************************************************************
- *  DistFormUpdatefr.html												*
- *																		*
- *  Display form for editting district information for a				*
- *  Census in French.        											*
- *																		*
- *  History:															*
- *		2017/09/15		created											*
- *		2017/11/04		add id="distForm" on form						*
- *		2018/01/04		remove Template from template file names		*
- *		2018/01/17		support new class composition					*
+ *  DistFormUpdatefr.html                                               *
+ *                                                                      *
+ *  Display form for editting district information for a                *
+ *  Census in French.                                                   *
+ *                                                                      *
+ *  History:                                                            *
+ *      2017/09/15      created                                         *
+ *      2017/11/04      add id="distForm" on form                       *
+ *      2018/01/04      remove Template from template file names        *
+ *      2018/01/17      support new class composition                   *
  *      2019/02/21      support more countries                          *
  *                      support paging                                  *
  *                      split into Display and Update templates         *
- *																		*
- *  Copyright &copy; 2019 James A. Cobban								*
+ *                                                                      *
+ *  Copyright &copy; 2019 James A. Cobban                               *
  **********************************************************************-->
-	<div class="hidden" id="breadcrumbs">
-	  <span><a href="/genealogy.php?lang=fr">Généalogie</a>:</span>
-	  <span><a href="/genCountry.php?cc=$CC&amp;lang=fr">$COUNTRYNAME</a>:</span>
-	  <span><a href="/database/genCensuses.php?cc=$CC&amp;lang=fr">Recensements</a>:</span>
-	  <span><a href="/database/EditCensuses.php?cc=$CC&amp;lang=fr">Administration des Recensements</a>:</span>
-	  <span><a href="/database/ReqUpdateDists.php?Census=$CENSUSID&amp;Province=$PROVINCE&amp;lang=fr">Choisir Nouveau District</a>:</span>
-	</div>
-	<div class="body">
-	  <h1>
-	    <span class="right">
-		<a href="/database/DistFormHelpfr.html" target="help">? Aide</a>
-	    </span>
-	    Administration des Recensements: $COUNTRYNAME: Recensement $CENSUSYEAR:
+    <div class="hidden" id="breadcrumbs">
+      <span><a href="/genealogy.php?lang=fr">Généalogie</a>:</span>
+      <span><a href="/genCountry.php?cc=$CC&amp;lang=fr">$COUNTRYNAME</a>:</span>
+      <span><a href="/database/genCensuses.php?cc=$CC&amp;lang=fr">Recensements</a>:</span>
+      <span><a href="/database/EditCensuses.php?cc=$CC&amp;lang=fr">Administration des Recensements</a>:</span>
+      <span><a href="/database/ReqUpdateDists.php?Census=$CENSUSID&amp;Province=$PROVINCE&amp;lang=fr">Choisir Nouveau District</a>:</span>
+    </div>
+    <div class="body">
+      <h1>
+        <span class="right">
+        <a href="/database/DistFormHelpfr.html" target="help">? Aide</a>
+        </span>
+        Administration des Recensements: $COUNTRYNAME: Recensement $CENSUSYEAR:
         $PROVINCENAME Table des Districts Mise a Jour
-	    <div style="clear: both;"></div>
-	  </h1>
-	
-	  $TRACE
-	  $MSG
-      <div id="noStateId">
-	    <form name='refreshForm' id='refreshForm'
-	    	    action='DistForm.php' 
+      </h1>
+    
+      $TRACE
+      $MSG
+      <div id="noStateId" style="display: flex;">
+        <form name='refreshForm' id='refreshForm'
+                action='DistForm.php' 
                 method='get'> 
-	      <input type='hidden' name='Census' id='refreshCensus'
-			    value='$CENSUSID'>
-	      <input type="hidden" name="offset" id="refreshoffset" 
-			    value="$OFFSET">
-	      <input type="hidden" name="limit" id="refreshlimit" 
-			    value="$LIMIT">
-	      <input type="hidden" name="lang" id="refreshlang" 
-			    value="$LANG">
+          <input type='hidden' name='Census' id='refreshCensus'
+                value='$CENSUSID'>
+          <input type="hidden" name="offset" id="refreshoffset" 
+                value="$OFFSET">
+          <input type="hidden" name="limit" id="refreshlimit" 
+                value="$LIMIT">
+          <input type="hidden" name="lang" id="refreshlang" 
+                value="$LANG">
           <label for="refreshProv" class="label">
-              Province ou État n'est pas specifié:
+              Province ou État:
           </label>
           <select name="Province" id="refreshProv">
             <option value=''>Choisir une Province</option>
@@ -56,163 +55,169 @@
           <button type="submit" id="refreshSubmit">Rafraîchir</button>
         </form>
       </div>
-	  <p class="warning" id="countzero">
-		Il n'y a actuellement aucun district de recensement défini
+      <p class="warning" id="countzero">
+        Il n'y a actuellement aucun district de recensement défini
         dans le tableau pour ce domaine administratif.
-	  </p>
-	  <div class="center" id="topBrowse">
-	    <span class="left" id="topPrev">
-	      <a href="/database/DistForm.php$npPrev">&lt;---</a>
-	    </span>
-	    <span class="right" id="topNext">
-	      <a href="/database/DistForm.php$npNext">---&gt;</a>
-	    </span>
-        Rangs $FIRST a $LAST de $TOTAL
-	  </div>
-	  <!--- Put out the response as a table -->
-	  <form name="distForm" id="distForm"
-		    action="DistForm.php" 
-		    method="post" 
-		    autocomplete="off" 
-		    enctype="multipart/form-data">
-	    <input type="hidden" name="Census" id="Census"
-			value="$CENSUSID">
-	    <input type="hidden" name="Province" id="Province" 
-			value="$PROVINCE">
-	    <input type="hidden" name="offset" id="offset" 
-			value="$OFFSET">
-	    <input type="hidden" name="limit" id="limit" 
-			value="$LIMIT">
-	    <input type="hidden" name="lang" id="lang" 
-			value="$LANG">
-	    <input type="hidden" name="Debug" id="Debug" value="$DEBUG">
-	  <table class="form" id="dataTable">
-	    <thead> <!--- Put out the column headers -->
-	      <tr id="hdrRow">
-		<th class="colhead">
-		No
-		</th>
-		<th class="colhead">
-		Name
-		</th>
-		<th class="colhead">
-		Nom
-		</th>
-		<th class="colhead">
-		Prov
-		</th>
-		<th class="colhead">
-		  Compte
-		</th>
-		<th class="colhead">
-		  %Fait
-		</th>
-		<th class="colhead">
-		  Population
-		</th>
-		<th class="colhead">
-		  Transcrit
-		</th>
-		<th class="colhead">
-		  Ecraser
-		</th>
-		<th class="colhead">
-		  Sous-Districts
-		</th>
-	      </tr>
-	    </thead>
-	    <tbody>
-	      <tr id="Row$line">
-			<td class="right">
-			  <input type="text" name="D_Id$line" id="D_Id$line"
-				value="$distId"
-				class="white rightnc" style="font-weight: bold;"
-				size="3" readonly="readonly">
-			</td>
-			<td class="left">
-			  <input type="text" name="D_Name$line" id="D_Name$line" 
-				value="$name" 
-				class="white leftnc" size="24" maxlength="48">
-			</td>
-			<td class="left">
-			  <input type="text" name="D_Nom$line" id="D_Nom$line" 
-				value="$nom" 
-				class="white leftnc" size="24" maxlength="48">
-			</td>
-			<td class="left">
-			  <input type="text" name="D_Province$line" id="D_Province$line" 
-				value="$prov" 
-				class="white left" size="2" maxlength="2">
-			</td>
-			<td class="$numclass right">
-			    $sdcount 
-			</td>
-			<td class="$fpctclass">
-			    $fpct
-			</td>
-			<td class="$numclass right">
-			    $pop
-			</td>
-			<td class="$donepctclass">
-			    $done
-			</td>
-			<td class="left">
+      </p>
+      <div class="spaceBetween" id="topBrowse">
+        <span id="topPrev">
+          <a href="/database/DistForm.php$npPrev">
+              <img src="/Images/ArrowLeft.svg"></a>
+        </span>
+        <span>
+          Rangs $FIRST à $LAST de $TOTAL
+        </span>
+        <span id="topNext">
+          <a href="/database/DistForm.php$npNext">
+              <img src="/Images/ArrowRight.svg"></a>
+        </span>
+      </div>
+      <!--- Put out the response as a table -->
+      <form name="distForm" id="distForm"
+            action="DistForm.php" 
+            method="post" 
+            autocomplete="off" 
+            enctype="multipart/form-data">
+        <input type="hidden" name="Census" id="Census"
+            value="$CENSUSID">
+        <input type="hidden" name="Province" id="Province" 
+            value="$PROVINCE">
+        <input type="hidden" name="offset" id="offset" 
+            value="$OFFSET">
+        <input type="hidden" name="limit" id="limit" 
+            value="$LIMIT">
+        <input type="hidden" name="lang" id="lang" 
+            value="$LANG">
+        <input type="hidden" name="Debug" id="Debug" value="$DEBUG">
+      <table class="form" id="dataTable">
+        <thead> <!--- Put out the column headers -->
+          <tr id="hdrRow">
+        <th class="colhead">
+        No
+        </th>
+        <th class="colhead">
+        Name
+        </th>
+        <th class="colhead">
+        Nom
+        </th>
+        <th class="colhead">
+        Prov
+        </th>
+        <th class="colhead">
+          Compte
+        </th>
+        <th class="colhead">
+          %Fait
+        </th>
+        <th class="colhead">
+          Population
+        </th>
+        <th class="colhead">
+          Transcrit
+        </th>
+        <th class="colhead">
+          Ecraser
+        </th>
+        <th class="colhead">
+          Sous-Districts
+        </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr id="Row$line">
+            <td class="right">
+              <input type="text" name="D_Id$line" id="D_Id$line"
+                value="$distId"
+                class="white rightnc" style="font-weight: bold;"
+                size="3" readonly="readonly">
+            </td>
+            <td class="left">
+              <input type="text" name="D_Name$line" id="D_Name$line" 
+                value="$name" 
+                class="white leftnc" size="24" maxlength="48">
+            </td>
+            <td class="left">
+              <input type="text" name="D_Nom$line" id="D_Nom$line" 
+                value="$nom" 
+                class="white leftnc" size="24" maxlength="48">
+            </td>
+            <td class="left">
+              <input type="text" name="D_Province$line" id="D_Province$line" 
+                value="$prov" 
+                class="white left" size="2" maxlength="2">
+            </td>
+            <td class="$numclass right">
+                $sdcount 
+            </td>
+            <td class="$fpctclass">
+                $fpct
+            </td>
+            <td class="$numclass right">
+                $pop
+            </td>
+            <td class="$donepctclass">
+                $done
+            </td>
+            <td class="left">
               <button type="button" name="Delete$line" id="Delete$line">
                   Ecraser
               </button>
-			</td>
-			<td class='button' style="padding-top: 3px; padding-bottom: 3px;">
-			  <a id="ShowSubDists$line" 
-	                style="text-decoration: none; color: black;"
-				href="/database/SubDistForm.php?Census=$tcensusId&amp;Province=$prov&amp;District=$distId&amp;lang=fr">
-				    Sous-Districts
-			  </a> 
-			</td>
-	      </tr>
-	    </tbody>
-	  </table>
-	  <div class="center" id="botBrowse">
-	    <span class="left" id="botPrev">
-	      <a href="/database/DistForm.php$npPrev">&lt;---</a>
-	    </span>
-	    <span class="right" id="botNext">
-	      <a href="/database/DistForm.php$npNext">---&gt;</a>
-	    </span>
-        Rangs $FIRST a $LAST de $TOTAL
-	  </div>
-	    <p>
+            </td>
+            <td class='button' style="padding-top: 3px; padding-bottom: 3px;">
+              <a id="ShowSubDists$line" 
+                    style="text-decoration: none; color: black;"
+                href="/database/SubDistForm.php?Census=$tcensusId&amp;Province=$prov&amp;District=$distId&amp;lang=fr">
+                    Sous-Districts
+              </a> 
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="spaceBetween" id="botBrowse">
+        <span class="left" id="botPrev">
+          <a href="/database/DistForm.php$npPrev"><img src="/Images/ArrowLeft.svg"></a>
+        </span>
+        <span class='bold'>
+        Rangs $FIRST à $LAST de $TOTAL
+        </span>
+        <span id="botNext">
+          <a href="/database/DistForm.php$npNext"><img src="/Images/ArrowRight.svg"></a>
+        </span>
+      </div>
+        <p>
           <input type="hidden" name="D_Id999" id="D_Id999" value="">
-	      <button type="submit" id="Submit">mettre a jour la base de données</button>
-	    </p>
-	  </form>
-	  </div> <!-- end of <div id="body"> -->
-	<div class="balloon" id="HelpD_Id">
-	Identificateur de district dans le recensement.  
-	This is normally a sequential integer, however in a couple of censuses
-	somehow a district was overlooked in assigning the numbers.
-	As a result in the 1881 census Manitoba Extension is district 186½, 
-	and in the 1891 census Nipissing is district 93½.
-	</div>
-	<div class="balloon" id="HelpD_Name">
-	Le nom du district en anglais.
-	</div>
-	<div class="balloon" id="HelpD_Nom">
-	Le nom du district en français..
-	</div>
-	<div class="balloon" id="HelpD_Province">
-	Le code à deux caractères de la province contenant le district.
-	</div>
-	<div class="balloon" id="HelpSubmit">
-	Cliquez sur ce bouton pour appliquer les modifications à la base de données.
-	</div>
-	<div class="balloon" id="HelpShowSubDists">
-	Click on this button to view the detailed information on the
-	sub-districts within this district.
-	</div>
-	<div class='balloon' id='HelpDelete'>
-	Cliquez sur ce bouton pour supprimer le sous-district spécifique
+          <button type="submit" id="Submit">mettre a jour la base de données</button>
+        </p>
+      </form>
+      </div> <!-- end of <div id="body"> -->
+    <div class="balloon" id="HelpD_Id">
+    Identificateur de district dans le recensement.  
+    This is normally a sequential integer, however in a couple of censuses
+    somehow a district was overlooked in assigning the numbers.
+    As a result in the 1881 census Manitoba Extension is district 186½, 
+    and in the 1891 census Nipissing is district 93½.
+    </div>
+    <div class="balloon" id="HelpD_Name">
+    Le nom du district en anglais.
+    </div>
+    <div class="balloon" id="HelpD_Nom">
+    Le nom du district en français..
+    </div>
+    <div class="balloon" id="HelpD_Province">
+    Le code à deux caractères de la province contenant le district.
+    </div>
+    <div class="balloon" id="HelpSubmit">
+    Cliquez sur ce bouton pour appliquer les modifications à la base de données.
+    </div>
+    <div class="balloon" id="HelpShowSubDists">
+    Click on this button to view the detailed information on the
+    sub-districts within this district.
+    </div>
+    <div class='balloon' id='HelpDelete'>
+    Cliquez sur ce bouton pour supprimer le sous-district spécifique
     de ce district.
-	</div>
+    </div>
     <div class="hidden" id="noCensusId">
         L'identifiant de récensement n'a pas été spécifié. 
     </div>

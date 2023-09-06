@@ -592,8 +592,8 @@ class Address extends RecordPic
                         "internal logic error value $value out of range");
         $ddd        = floor($uvalue/10000); // degrees
         $uvalue     = $uvalue - ($ddd * 10000);
-        $mm     = floor($uvalue/100);   // minutes
-        $ss     = $uvalue - ($mm * 100);
+        $mm         = floor($uvalue/100);   // minutes
+        $ss         = $uvalue - ($mm * 100);
         $uvalue     = $ddd + ($mm / 60) + ($ss / 3600);
         if ($negative)
             $value  = -$uvalue;
@@ -776,8 +776,6 @@ class Address extends RecordPic
         {
             case 'kind':
             case 'style':
-            case 'latitude':
-            case 'longitude':
             case 'list1':
             case 'list2':
             case 'list3':
@@ -812,6 +810,16 @@ class Address extends RecordPic
                     $retval = '';
                 return $retval;
             }           // text fields
+
+            case 'latitude':
+            {
+                return self::getLatitude();
+            }           // latitude
+
+            case 'longitude':
+            {
+                return self::getLongitude();
+            }           // longitude
 
             case 'zoom':
             {           // simulated field to match Location

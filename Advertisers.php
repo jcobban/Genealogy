@@ -246,7 +246,7 @@ foreach($duplicates as $name)
 if (is_string($patterntext))
     $warn           .= "<p>pattern='$patterntext' unsupported regular expression</p>\n";
 if (is_string($langtext))
-    $warn           .= "<p>lang='$langtext' is not support BCP47 syntax</p>\n";
+    $warn           .= "<p>lang='$langtext' is not supported BCP47 syntax</p>\n";
 
 // if not the administrator do nothing
 if ($administrator)
@@ -300,7 +300,7 @@ if ($administrator)
                              array('prevoffset'     => $offset - $limit,
                                    'limit'          => $limit));
     else
-        $template->updateTag('topPrev',         null);
+        $template->updateTag('topPrev',         '&nbsp;');
     if ($offset + $limit < $count)
     {
         $template->updateTag('topNext',
@@ -308,7 +308,7 @@ if ($administrator)
                                    'limit'          => $limit));
     }
     else
-        $template->updateTag('topNext',         null);
+        $template->updateTag('topNext',         '&nbsp;');
 
     $rowTag                 = $template['Row$id'];
     $rowText                = $rowTag->outerHTML;

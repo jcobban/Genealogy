@@ -89,8 +89,9 @@ use \Templating\Template;
  *      2020/05/09      set all fields in parameters to feedbackFunc    *
  *		2020/12/05      correct XSS vulnerabilities                     *
  *		2021/03/17      handle missing birth event for second Person    *
+ *		2022/08/12      do not fail if no old death event to copy from  *
  *                                                                      *
- *  Copyright &copy; 2021 James A. Cobban                               *
+ *  Copyright &copy; 2022 James A. Cobban                               *
  ************************************************************************/
 require_once __NAMESPACE__ . '/Person.inc';
 require_once __NAMESPACE__ . '/LegacyDate.inc';
@@ -137,8 +138,9 @@ if (isset($_POST) && count($_POST) > 0)
     // process parameters
     foreach($_POST as $key => $value)
     {               // loop through all parameters
+        $safevalue                  = htmlspecialchars($value);
         $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
-                        "<td class='white left'>$value</td></tr>\n"; 
+                        "<td class='white left'>$safevalue</td></tr>\n"; 
         switch($key)
         {           // act on specific parameters
             case 'idir1':
@@ -154,7 +156,7 @@ if (isset($_POST) && count($_POST) > 0)
                     $isOwner        = $isOwner && $person1->isOwner();
                 }
                 else
-                    $idir1text      = htmlspecialchars($value);
+                    $idir1text      = $safevalue;
                 break;
             }       // idir1
 
@@ -172,7 +174,7 @@ if (isset($_POST) && count($_POST) > 0)
                     $isOwner        = $isOwner && $person2->isOwner();
                 }
                 else
-                    $idir2text      = htmlspecialchars($value);
+                    $idir2text      = $safevalue;
                 break;
             }       // idir2
 
@@ -307,10 +309,10 @@ if (isset($_POST) && count($_POST) > 0)
         $warn                   .= $parmsText . "</table>\n";
 }                   // invoked by method=post
 
-$template                       = new FtTemplate("mergeUpdIndivid$lang.html");
-$translate                      = $template->getTranslate();
-$t                              = $translate['tranTab'];
-$template->set('LANG',          $lang);
+$template                   = new FtTemplate("mergeUpdIndivid$lang.html");
+$translate                  = $template->getTranslate();
+$t                          = $translate['tranTab'];
+$template->set('LANG',      $lang);
 
 // get the identifiers of the two individuals
 if ($idir1 !== null && $idir2 !== null && $idir1 != $idir2)
@@ -417,7 +419,9 @@ if (strlen($msg) == 0)
     // merge birth information
     // the following is to retain the true event when we try to
     // merge a true event with a simulated event (IDER=0)
-    if ($evBirth1['ider'] == 0 && $evBirth2['ider'] > 0)
+    if ((is_null($evBirth1) && !is_null($evBirth2)) || 
+        (!is_null($evBirth1) && !is_null($evBirth2) &&
+         $evBirth1['ider'] == 0 && $evBirth2['ider'] > 0))
     {       // second is instance of Event
        $newEvent    = $evBirth2;
        $newEvent['idir']            = $idir1;
@@ -429,25 +433,27 @@ if (strlen($msg) == 0)
        $oldEvent    = $evBirth2;
     }       // first is instance of Event or neither
 
-    $birthDate2     = new LegacyDate($evBirth2['eventd']);
-    if ($useBthDate2)
-    {       // take birth date from second
+    if ($evBirth2 instanceof Event && $useBthDate2)
+    {
+        $birthDate2     = new LegacyDate($evBirth2['eventd']);
         $newEvent->set('eventd',
                        $birthDate2);
-    }       // take birth date from second
+    }
     else
+    if ($evBirth1 instanceof Event)
     {       // take birth date from first
         $newEvent->set('eventd',
                        new LegacyDate($evBirth1['eventd']));
         $template['replaceBirthDate']->update(null);
     }       // take birth date from first
 
-    if ($useBthLoc2)
+    if ($evBirth2 instanceof Event && $useBthLoc2)
     {       // take birth location from second
         $newEvent->set('idlrevent',
                        $evBirth2['idlrevent']);
     }       // take birth location from second
     else
+    if ($evBirth1 instanceof Event)
     {       // take birth location from first
         $newEvent->set('idlrevent',
                        $evBirth1['idlrevent']);
@@ -524,16 +530,28 @@ if (strlen($msg) == 0)
 
     // the following is to retain the true event when we try to
     // merge a true event with a simulated event (IDER=0)
-    if ($evDeath1['ider'] == 0 && $evDeath2['ider'] > 0)
+    if ($evDeath1 && $evDeath2)
     {
-       $newEvent                = $evDeath2;
-       $newEvent->set('idir', $evDeath1['idir']);
-       $oldEvent                = $evDeath1;
+        if ($evDeath1['ider'] == 0 && $evDeath2['ider'] > 0)
+        {
+           $newEvent                = $evDeath2;
+           $newEvent->set('idir', $evDeath1['idir']);
+           $oldEvent                = $evDeath1;
+        }
+        else
+        {
+           $newEvent                = $evDeath1;
+           $oldEvent                = $evDeath2;
+        }
     }
     else
     {
-       $newEvent                = $evDeath1;
-       $oldEvent                = $evDeath2;
+        if (is_null($evDeath1))
+            error_log("mergeUpdIndivid.php: " . __LINE__ .
+                        "\$evDeath1 is null");
+        if (is_null($evDeath2))
+            error_log("mergeUpdIndivid.php: " . __LINE__ .
+                        "\$evDeath2 is null");
     }
 
     if ($useDthDate2)
@@ -559,14 +577,22 @@ if (strlen($msg) == 0)
     }       // take death location from first
 
     // copy citations from second death date
-    $citations      = $oldEvent->getCitations();
-    if (count($citations) > 0)
-    {       // have citations to copy
-        $template->set('DEATHCITATIONSCOUNT',   count($citations));
-        $newEvent->addCitations($citations);
-    }       // have citations to copy
+    if ($oldEvent)
+    {
+        $citations      = $oldEvent->getCitations();
+        if (count($citations) > 0)
+        {       // have citations to copy
+            $template->set('DEATHCITATIONSCOUNT',   count($citations));
+            $newEvent->addCitations($citations);
+        }       // have citations to copy
+        else
+            $template['deathCount']->update(null);
+    }
     else
+    {
+        error_log("mergeUpdIndivid.php: " . __LINE__ . " \$oldevent is null, \$evDeath1=" . ($evDeath1?'null':'Event') . ", \$evDeath2=" . ($evDeath2?'null':'Event'));
         $template['deathCount']->update(null);
+    }
     $template->set('DEATHD',        $newEvent->getDate(9999, $t));
     $template->set('DEATHLOC',      $newEvent->getLocation()->getName());
 
@@ -780,7 +806,7 @@ if (strlen($msg) == 0)
         $template['deathRegUpdated']->update(null);
 
     // check for Marriage registration records to update
-    $marrSet                = new RecordSet('MarriageIndi',
+    $marrSet                = new RecordSet('MarriageParticipant',
                                             array('idir'    => $idir2));
     $result                 = $marrSet->update(array('idir' => $idir1));
     if ($result == 0)

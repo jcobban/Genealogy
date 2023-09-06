@@ -236,6 +236,8 @@ if (is_string($langtext))
                                                   array($langtext,
                                                         $lang));
 
+$rowtemplate    = $template['Row$line']->outerHTML;
+$template->set('TEMPROW',   $rowtemplate);
 if (strlen($msg) == 0)
 {                       // no errors detected in parameters
     // get the censuses in the correct order
@@ -252,7 +254,7 @@ if (strlen($msg) == 0)
     $template->set('FIRST',     $offset+1);
     $template->set('LAST',      $offset + $count);
     if ($offset == 0)
-        $template['topPrev']->update(null);
+        $template['topPrev']->update('&nbsp;');
     else
     {
         $npPrev         = "EditCensuses.php?cc=$cc&limit=$limit&offset=" .
@@ -263,7 +265,7 @@ if (strlen($msg) == 0)
     }
     $last                   = $offset + $limit;
     if ($last >= $total)
-    $template['topNext']->update(null);
+        $template['topNext']->update('&nbsp;');
     else
     {
         $npNext         = "EditCensuses.php?cc=$cc&limit=$limit&offset=" .
@@ -297,7 +299,7 @@ if (strlen($msg) == 0)
     $template->set('LANG',              $lang);
     $template->set('CONTACTTABLE',      'Censuses');
     $template->set('CONTACTSUBJECT',    '[FamilyTree]' . 
-                                    urlencode($_SERVER['REQUEST_URI']));
+                                        urlencode($_SERVER['REQUEST_URI']));
     $template->updateTag('Row$line',
                          $censuses);
 }                       // no errors detected in parameters

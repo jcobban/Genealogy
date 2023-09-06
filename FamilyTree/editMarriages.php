@@ -165,8 +165,10 @@ use \Templating\escape;
  *      2020/03/19      misspelled $urname                              *
  *      2020/12/05      correct XSS vulnerabilities                     *
  *      2020/12/12      improve output when errors present              *
+ *      2022/07/31      copy given name and surname from parameters     *
+ *                      when creating marriage                          *
  *                                                                      *
- *  Copyright &copy; 2020 James A. Cobban                               *
+ *  Copyright &copy; 2022 James A. Cobban                               *
  ************************************************************************/
 require_once __NAMESPACE__ . '/FamilyTree.inc';
 require_once __NAMESPACE__ . '/Person.inc';
@@ -618,12 +620,15 @@ if (strlen($msg) == 0 || $family instanceof Family)
     if ($idirhusb)
     {
         $husb               = $family->getHusband();
-        $husbgivenname      = $husb['givenname'];
-        if (strlen($husbgivenname) == 0)
-        $warn           .= "<p>editMarriages.php: " . __LINE__ .
-            " husbgivenname='$husbgivenname'</p>\n";
+        if ($idir == $idirhusb && strlen($given) > 0)
+            $husbgivenname  = $given;
+        else
+            $husbgivenname      = $husb['givenname'];
         $husbgivenname      = str_replace('"','&quot;',$husbgivenname);
-        $husbsurname        = $husb['surname'];
+        if ($idir == $idirhusb && strlen($surname) > 0)
+            $husbsurname    = $surname;
+        else
+            $husbsurname    = $husb['surname'];
         $husbsurname        = str_replace('"','&quot;',$husbsurname);
         $husbbirthsd        = $husb['birthsd'];
         $husborder          = $family['husborder'];
@@ -642,9 +647,15 @@ if (strlen($msg) == 0 || $family instanceof Family)
     if ($idirwife)
     {
         $wife               = $family->getWife();
-        $wifegivenname      = $wife['givenname'];
+        if ($idir == $idirwife && strlen($given) > 0)
+            $wifegivenname  = $given;
+        else
+            $wifegivenname  = $wife['givenname'];
         $wifegivenname      = str_replace('"','&quot;',$wifegivenname);
-        $wifesurname        = $wife['surname'];
+        if ($idir == $idirwife && strlen($surname) > 0)
+            $wifesurname    = $surname;
+        else
+            $wifesurname    = $wife['surname'];
         $wifesurname        = str_replace('"','&quot;',$wifesurname);
         $wifebirthsd        = $wife['birthsd'];
         $wifeorder          = $family['wifeorder'];

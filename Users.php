@@ -57,8 +57,9 @@ use \Exception;
  *      2018/10/15      get language apology text from Languages        *
  *      2019/02/18      use new FtTemplate constructor                  *
  *      2019/04/11      add broadcast to pending users                  *
+ *      2023/01/19      further protect against script insertion        *
  *                                                                      *
- *  Copyright &copy; 2019 James A. Cobban                               *
+ *  Copyright &copy; 2023 James A. Cobban                               *
  ************************************************************************/
 require_once __NAMESPACE__ . '/User.inc';
 require_once __NAMESPACE__ . '/UserSet.inc';
@@ -66,15 +67,18 @@ require_once __NAMESPACE__ . '/Language.inc';
 require_once __NAMESPACE__ . '/FtTemplate.inc';
 require_once __NAMESPACE__ . '/common.inc';
 
-$lang               = 'en';
-$pattern            = '';
-$authPattern        = '';
-$mailPattern        = '';
-$offset             = 0;
-$limit              = 20;
-$id                 = '';
-$mainParms          = array();
-$bccParms           = array('options'   => "1");
+$lang                       = 'en';
+$langtext                   = null;
+$pattern            		= '';
+$authPattern        		= '';
+$mailPattern        		= '';
+$offset             		= 0;
+$offsettext                 = null;
+$limit              		= 20;
+$limittext                  = null;
+$id                 		= '';
+$mainParms          		= array();
+$bccParms           		= array('options'   => "1");
 
 if (isset($_GET) && count($_GET) > 0)
 {                   // invoked by method=get
@@ -84,16 +88,16 @@ if (isset($_GET) && count($_GET) > 0)
                       "<th class='colhead'>value</th></tr>\n";
     foreach($_GET as $key => $value)
     {               // loop through parameters
+        $safevalue  = htmlspecialchars($value);
         $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
-                        "<td class='white left'>" .
-                        htmlspecialchars($value) . "</td></tr>\n"; 
+                            "<td class='white left'>$safevalue</td></tr>\n";
         $fieldLc    = strtolower($key);
         switch($fieldLc)
         {       // act on specific parameter
             case 'lang':
             {       // lang
-                if (strlen($value) >= 2)
-                    $lang           = strtolower(substr($value,0,2));
+                $lang               = FtTemplate::validateLang($value,
+                                                               $langtext);
                 break;
             }       // lang
 
@@ -101,7 +105,7 @@ if (isset($_GET) && count($_GET) > 0)
             {
                 if (strlen($value) > 0)
                 {
-                    $pattern        = $value;
+                    $pattern        = $safevalue;
                     $mainParms['username']  = $pattern;
                     $bccParms['username']   = $pattern;
                         $warn   .= "<p>" . __LINE__ . " \$bccParms['username']='" . $bccParms['username'] . "'</p>\n";
@@ -113,7 +117,7 @@ if (isset($_GET) && count($_GET) > 0)
             {
                 if (strlen($value) > 0)
                 {
-                    $authPattern        = $value;
+                    $authPattern        = $safevalue;
                     $mainParms['auth']  = $authPattern;
                     $bccParms['auth']   = $authPattern;
                 }
@@ -124,7 +128,7 @@ if (isset($_GET) && count($_GET) > 0)
             {
                 if (strlen($value) > 0)
                 {
-                    $mailPattern        = $value;
+                    $mailPattern        = $safevalue;
                     $mainParms['email'] = $mailPattern;
                     $bccParms['email']  = $mailPattern;
                 }
@@ -133,13 +137,19 @@ if (isset($_GET) && count($_GET) > 0)
 
             case 'offset':
             {
-                $offset         = (int)$value;
+                if (ctype_digit($value))
+                    $offset             = (int)$value;
+                else
+                    $offsettext         = $safevalue;
                 break;
             }
 
             case 'limit':
             {
-                $limit          = (int)$value;
+                if (ctype_digit($value))
+                    $limit              = (int)$value;
+                else
+                    $limittext          = $safevalue;
                 break;
             }
         }           // act on specific parameter
@@ -203,7 +213,6 @@ if (canUser('all'))
                         $pattern        = $value;
                         $mainParms['username']  = $pattern;
                         $bccParms['username']   = $pattern;
-                        $warn   .= "<p>" . __LINE__ . " \$bccParms['username']='" . $bccParms['username'] . "'</p>\n";
                     }
                     break;
                 }
@@ -354,7 +363,7 @@ if (canUser('all'))
                                'prevoffset'     => $offset - $limit,
                                'limit'          => $limit));
     else
-        $template->updateTag('topPrev',         null);
+        $template['topPrev']->update('&nbsp;');
     if ($offset + $limit < $count)
     {
         $template->updateTag('topNext',
@@ -365,7 +374,7 @@ if (canUser('all'))
                                'limit'          => $limit));
     }
     else
-        $template->updateTag('topNext',         null);
+        $template['topNext']->update('&nbsp;');
 
     // display matching users
     $template->updateTag('Row$id',

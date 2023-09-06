@@ -38,22 +38,20 @@
             $CENSUSYEAR Census of $COUNTRYNAME: District $DISTID $DNAME: 
             <span id="titleSubdist">SubDistrict '$SUBDISTID' $SDNAME:
             <span id="titleDivision">Division $DIVISION:</span></span>
-  	        Surname Index
-        <div style="clear: both;"></div>
       </h1>
       $TRACE
       $MSG
+      <h2>Surname Index</h2>
       <!--- Put out a line with links to previous and next section of table -->
-      <div class="fullwidth" style="text-align: center;" id="frontPager">
+      <div class="fullwidth" style="text-align: center;" id="topBrowse">
         <span class="left">
-    		<a href="/database/QuerySurnames.php?$NPURI&Surname=$USURNAME&Count=$COUNT&Offset=$PREVOFFSET">&lt;---</a>
+    		<a href="/database/QuerySurnames.php?$NPURI&Surname=$USURNAME&Count=$COUNT&Offset=$PREVOFFSET"><img src="/Images/ArrowLeft.svg"></a>
         </span>
         <span class="right">
-    		<a href="/database/QuerySurnames.php?$NPURI&Surname=$USURNAME&Count=$COUNT&Offset=$NEXTOFFSET">---&gt;</a>
+    		<a href="/database/QuerySurnames.php?$NPURI&Surname=$USURNAME&Count=$COUNT&Offset=$NEXTOFFSET"><img src="/Images/ArrowRight.svg"></a>
         </span>
     		returned surnames $OFFSETSTART to $LAST
     		of $TOTALCOUNT surnames
-        <div style="clear: both;"></div>
       </div>
       <!--- Put out the response as a table -->
       <table class="summary" id="response" cellspacing="0px">
@@ -102,14 +100,13 @@
         </tbody>
       </table>
       <!--- Put out a line with links to previous and next section of table -->
-      <div class="fullwidth" style="text-align: center;" id="backPager">
+      <div class="fullwidth" style="text-align: center;" id="botBrowse">
         <span class="left">
-    		<a href="/database/QuerySurnames.php?$NPURI&Surname=$USURNAME&Count=$COUNT&Offset=$PREVOFFSET">&lt;---</a>
+    		<a href="/database/QuerySurnames.php?$NPURI&Surname=$USURNAME&Count=$COUNT&Offset=$PREVOFFSET"><img src="/Images/ArrowLeft.svg"></a>
         </span>
         <span class="right">
-    		<a href="/database/QuerySurnames.php?$NPURI&Surname=$USURNAME&Count=$COUNT&Offset=$NEXTOFFSET">---&gt;</a>
+    		<a href="/database/QuerySurnames.php?$NPURI&Surname=$USURNAME&Count=$COUNT&Offset=$NEXTOFFSET"><img src="/Images/ArrowRight.svg"></a>
         </span>
-        <div style="clear: both;"></div>
       </div>
     </div> <!-- class="body" -->
     <div class="hidden" id="templates">
@@ -131,6 +128,9 @@
 	  <span id="censusMissing">
 		Census identifier not provided. 
 	  </span>
+	  <span id="districtInvalid">
+		Invalid District identifier '$distId' provided.  
+	  </span>
 	  <span id="districtUndefined">
 		District identifier '$id' not defined for Census '$censusId'. 
 	  </span>
@@ -143,6 +143,9 @@
 	  </span>
 	  <span id="districtMissing">
 		District id not provided to qualify subdistrict. 
+	  </span>
+	  <span id="subdistrictInvalid">
+		Invalid SubDistrict identifier '$subdistId' provided.  
 	  </span>
 	  <span id="subdistrictUndefined">
         SubDistrict identifier '$firstSdId' is not defined within District '$distId' within Census '$censusId'.

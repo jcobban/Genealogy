@@ -172,7 +172,7 @@ function addCensus()
 {
     var table       = document.getElementById('dataTable');
     var body        = table.tBodies[0];
-    var template    = document.getElementById('newRow');
+    var template    = document.getElementById('Row$line');
     var newRow      = template.cloneNode(true);
     var rowNum      = body.rows.length + 1;
     if (rowNum < 10)

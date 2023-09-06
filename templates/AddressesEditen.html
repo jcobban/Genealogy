@@ -7,8 +7,9 @@
  *  History:															*
  *		2018/02/12		created											*
  *      2019/09/26      missing and misplaced end tags in popup help    *
+ *      2023/07/30      migrate to ES2015                               *
  *																		*
- *  Copyright &copy; 2019 James A. Cobban								*
+ *  Copyright &copy; 2023 James A. Cobban								*
  **********************************************************************-->
 <div id="breadcrumbs" class="hidden">
     <a href="/genealogy.php?lang=$LANG">Genealogy</a>:
@@ -35,7 +36,6 @@
   		size="64" class="black white leftnc"
   		value="$PATTERN">
 	<input type="hidden" name="lang" id="lang" value="$LANG">
-        <div style="clear: both;"></div>
       </div>
       <div class="row">
         <div class="column1" id="repoCheck">
@@ -59,7 +59,6 @@
   	<input type="checkbox" name="mailing" id="mailing"
   		value="1" $MAILCHECKED>
         </div>
-        <div style="clear: both;"></div>
       </div>
       <p>
   	<button type="submit" id="Submit">
@@ -70,17 +69,16 @@
   	    <u>A</u>dd a New Address
   	</button>
     </p>
-  <div class="center" id="topBrowse">
-    <div class="left" id="topPrev">
-      <a href="/FamilyTree/Addresses.php?pattern=$pattern&amp;limit=$limit&amp;offset=$prevoffset&lang=$LANG">&lt;---</a>
-    </div>
-    <div class="right" id="topNext"> 
-      <a href="/FamilyTree/Addresses.php?pattern=$pattern&amp;limit=$limit&amp;offset=$nextoffset&lang=$LANG">---&gt;</a>
+  <div class="spaceBetween" id="topBrowse">
+    <div id="topPrev">
+      <a href="/FamilyTree/Addresses.php?pattern=$pattern&amp;limit=$limit&amp;offset=$prevoffset&lang=$LANG"><img src="/Images/ArrowLeft.svg"></a>
     </div>
     <span id="summary">
 	rows $first to $last of $count 
     </span>
-    <div style="clear: both;"></div>
+    <div id="topNext"> 
+      <a href="/FamilyTree/Addresses.php?pattern=$pattern&amp;limit=$limit&amp;offset=$nextoffset&lang=$LANG"><img src="/Images/ArrowRight.svg"></a>
+    </div>
   </div>
   <!--- Put out the response as a table -->
   <table class="details" id="dataTable">
@@ -199,7 +197,4 @@
 	Note that although the table row is removed from visibility, 
 	the record is not deleted until you click on the Search button.
   </div>
-    <script src="/jscripts/js20/http.js" type="text/javascript"></script>
-    <script src="/jscripts/util.js" type="text/javascript"></script>
-    <script src="/jscripts/CommonForm.js" type="text/javascript"></script>
-    <script src="/FamilyTree/Addresses.js" type="text/javascript"></script>
+    <script src="/FamilyTree/Addresses.js" type="module"></script>

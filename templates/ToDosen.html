@@ -9,7 +9,7 @@
  *  Copyright &copy; 2019 James A. Cobban								*
  **********************************************************************-->
   <div class="hidden" id="breadcrumbs">
-	<a href="/index.html">Home</a>:
+	<a href="/home.html">Home</a>:
     <a href="/genealogy.php?lang=$LANG">Genealogy</a>:
     <a href="/FamilyTree/Services.php?lang=$LANG">Services</a>:
   </div>
@@ -32,7 +32,6 @@
 		</label>
 		<input name="pattern" id="pattern" type="text" size="64"
 				    class="white leftnc" value="$PATTERN">
-        <div style="clear: both"></div>
 	  </div>
       <p class="label">
 		<button type="button" class="button" id="Search" accesskey="s">
@@ -55,16 +54,15 @@
 	  <p class="label" id="countmatches">
 		  $COUNT ToDos match the specified pattern.
 	  </p>
-      <div class="center" id="topBrowse">
-        <div class="left" id="topPrev">
-	        <a href="ToDos.php?pattern=$UPATTERN&amp;limit=$LIMIT&amp;offset=$PREVOFFSET&amp;lang=$LANG">&lt;---</a>
-	    </div>
-	    <div class="right" id="topNext"> 
-	        <a href="ToDos.php?pattern=$UPATTERN&amp;limit=$LIMIT&amp;offset=$NEXTOFFSET&amp;lang=$LANG">---&gt;</a>
+      <div class="spaceBetween" id="topBrowse">
+        <div id="topPrev">
+	        <a href="ToDos.php?pattern=$UPATTERN&amp;limit=$LIMIT&amp;offset=$PREVOFFSET&amp;lang=$LANG"><img src="/Images/ArrowLeft.svg"></a>
 	    </div>
 		  rows $FIRST to $LAST of $COUNT 
-        <div style="clear: both;"></div>
-	  </div> <!-- class="center" -->
+	    <div id="topNext"> 
+	        <a href="ToDos.php?pattern=$UPATTERN&amp;limit=$LIMIT&amp;offset=$NEXTOFFSET&amp;lang=$LANG"><img src="/Images/ArrowRight.svg"></a>
+	    </div>
+	  </div> <!-- id="topBrowse" -->
 	  <!--- Put out the response as a table -->
 	  <table class="details" id="dataTable">
 		<!--- Put out the column headers -->

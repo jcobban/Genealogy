@@ -1,190 +1,179 @@
 <!--*********************************************************************
- *  AddressesEditen.html												*
- *																		*
- *  Template for a web page containing all of the addresses matching a	*
- *  pattern.															*
- *																		*
- *  History:															*
- *		2018/02/12		created											*
- *																		*
- *  Copyright &copy; 2018 James A. Cobban								*
+ *  AddressesEditen.html                                                *
+ *                                                                      *
+ *  Template for a web page containing all of the addresses matching a  *
+ *  pattern.                                                            *
+ *                                                                      *
+ *  History:                                                            *
+ *      2018/02/12      created                                         *
+ *      2023/07/30      migrate to ES2015                               *
+ *                                                                      *
+ *  Copyright &copy; 2023 James A. Cobban                               *
  **********************************************************************-->
-<div id="breadcrumbs" class="hidden">
-    <a href="/genealogy.php?lang=$LANG">Genealogy</a>:
-    <a href="/FamilyTree/Services.php?lang=$LANG">Services</a>:
-</div>
-  <div class="body">
-    <h1>
-      <span class="right">
-	<a href="/FamilyTree/AddressesHelpen.html" target="help">? Help</a>
-      </span>
-	Addresses Master List
-    </h1>
-    $MSG
-    $TRACE
-    <p>
-	$COUNT Addresses match the specified pattern and kind[s].
-    </p>
-    <form name="locForm" action="Addresses.php">
-      <div class="row">
-        <label class="label" for="pattern">
-  	Pattern:
-        </label>
-        <input name="pattern" id="pattern" type="text" 
-  		size="64" class="black white leftnc"
-  		value="$PATTERN">
-	<input type="hidden" name="lang" id="lang" value="$LANG">
-        <div style="clear: both;"></div>
-      </div>
-      <div class="row">
-        <div class="column1" id="repoCheck">
-  	<label class="label" for="repositories">
-  	    Repositories:
-  	</label>
-  	<input type="checkbox" name="repositories" id="repositories" 
-  		value="1" $REPOCHECKED>
-        </div>
-        <div class="column1" id="eventCheck">
-  	<label class="label" for="event">
-  	    Event:
-  	</label>
-  	<input type="checkbox" name="event" id="event"
-  		value="1" $EVENTCHECKED>
-        </div>
-        <div class="column1" id="mailCheck">
-  	<label class="label" for="mailing">
-  	    Mailing:
-  	</label>
-  	<input type="checkbox" name="mailing" id="mailing"
-  		value="1" $MAILCHECKED>
-        </div>
-        <div style="clear: both;"></div>
-      </div>
+    <div id="breadcrumbs" class="hidden">
+      <a href="/genealogy.php?lang=$LANG">Genealogy</a>:
+      <a href="/FamilyTree/Services.php?lang=$LANG">Services</a>:
+    </div>
+    <div class="body">
+      <h1>
+        <span class="right">
+          <a href="/FamilyTree/AddressesHelpen.html" target="help">? Help</a>
+        </span>
+        Addresses Master List
+      </h1>
+      $MSG
+      $TRACE
       <p>
-  	    <button type="submit" id="Submit">
-  	        <u>S</u>earch
-  	    </button>
+        $COUNT Addresses match the specified pattern and kind[s].
       </p>
-  </form>
-  <div class="center" id="topBrowse">
-    <div class="left" id="topPrev">
-      <a href="/FamilyTree/Addresses.php?pattern=$pattern&amp;limit=$limit&amp;offset=$prevoffset&lang=$LANG">&lt;---</a>
+      <form name="locForm" action="Addresses.php">
+        <div class="row">
+          <label class="label" for="pattern">
+              Pattern:
+          </label>
+          <input name="pattern" id="pattern" type="text" 
+                  size="64" class="black white leftnc"
+                  value="$PATTERN">
+          <input type="hidden" name="lang" id="lang" value="$LANG">
+        </div>
+        <div class="row">
+          <div class="column1" id="repoCheck">
+            <label class="label" for="repositories">
+              Repositories:
+            </label>
+            <input type="checkbox" name="repositories" id="repositories" 
+                  value="1" $REPOCHECKED>
+          </div>
+          <div class="column1" id="eventCheck">
+            <label class="label" for="event">
+              Event:
+            </label>
+            <input type="checkbox" name="event" id="event"
+                  value="1" $EVENTCHECKED>
+          </div>
+          <div class="column1" id="mailCheck">
+            <label class="label" for="mailing">
+              Mailing:
+            </label>
+            <input type="checkbox" name="mailing" id="mailing"
+                  value="1" $MAILCHECKED>
+          </div>
+        </div>
+        <p>
+          <button type="submit" id="Submit">
+              <u>S</u>earch
+          </button>
+        </p>
+      </form>
+      <div class="spaceBetween" id="topBrowse">
+        <div id="topPrev">
+          <a href="/FamilyTree/Addresses.php?pattern=$pattern&amp;limit=$limit&amp;offset=$prevoffset&lang=$LANG"><img src="/Images/ArrowLeft.svg"></a>
+        </div>
+        <span id="summary">
+        rows $first to $last of $count 
+        </span>
+        <div id="topNext"> 
+          <a href="/FamilyTree/Addresses.php?pattern=$pattern&amp;limit=$limit&amp;offset=$nextoffset&lang=$LANG"><img src="/Images/ArrowRight.svg"></a>
+        </div>
+      </div>
+      <!--- Put out the response as a table -->
+      <table class="details" id="dataTable">
+        <!--- Put out the column headers -->
+        <thead>
+          <tr>
+            <th class="colhead">
+              IDAR
+            </th>
+  	      <th class="colhead">
+  	          Kind
+  	      </th>
+  	      <th class="colhead">
+  	          Address
+  	      </th>
+  	    </tr>
+  	  </thead>
+  	  <tbody>
+  	    <tr id="addr$idar">
+  	      <td class="odd right">
+  	        <a href="/FamilyTree/Address.php?idar=$idar&amp;lang=$lang">
+  	          $idar
+  	        </a>
+  	      </td>
+  	      <td class="$addrClass left">
+  	          $kindtext 
+  	      </td>
+  	      <td class="$addrClass left">
+  	          $addrname
+  	      </td>
+          </tr>
+        </tbody>
+      </table>
+    </div> <!-- id="body" -->
+    <div class="balloon" id="Helppattern">
+      <p>
+      This is a regular expression, as supported by MySQL, which is used
+      to limit the addresses to be displayed.
+      See <a href="http://www.tin.org/bin/man.cgi?section=7&topic=regex">Henry Spencer"s regex page</a>.
+      </p>
+      <ul>
+        <li>If the pattern contains no special 
+          characters then only addresses containing that string will be included.
+          For example the pattern "London" will match addresses containing
+          the string "London".  Note that the search ignores case,
+          so that pattern will also match "LONDON" and "london".
+        </li>
+        <li>If the pattern begins with a caret '^' then only addresses that
+          <b>begin</b> with the remainder of the pattern are included.  
+          For example the pattern
+          "^Ba" displays addresses starting with "Ba" (or "ba" or "BA").
+        </li>
+        <li>
+          If the pattern ends with a dollar sign '$', then only addresses
+          that <b>end</b> with the preceding pattern are included.  
+          For example the pattern
+          "CA$" matches addresses that end with "CA" (or "ca" or "Ca").
+        </li>
+        <li>
+          In a pattern a period '.' matches any single character.  
+          For example
+          the pattern "B.b" matches any address that contains
+          two letter Bs separated by one character,
+          for example "Bab", "Beb", "Bib", "Bob", or "Bub" 
+          anywhere in the address name.
+        </li>
+        <li>
+          In a pattern an asterisk '*' matches zero or more of the preceding
+          character; "bo*b" matches "bb", "bob", and "boob"
+          anywhere in the address name.
+        </li>
+      </ul>
     </div>
-    <div class="right" id="topNext"> 
-      <a href="/FamilyTree/Addresses.php?pattern=$pattern&amp;limit=$limit&amp;offset=$nextoffset&lang=$LANG">---&gt;</a>
+    <div class="balloon" id="Helprepositories">
+      If this checkbox is selected then the report contains
+      addresses of repositories of source documents.
     </div>
-    <span id="summary">
-	rows $first to $last of $count 
-    </span>
-    <div style="clear: both;"></div>
-  </div>
-  <!--- Put out the response as a table -->
-  <table class="details" id="dataTable">
-    <!--- Put out the column headers -->
-    <thead>
-      <tr>
-	<th class="colhead">
-	    IDAR
-	</th>
-	<th class="colhead">
-	    Kind
-	</th>
-	<th class="colhead">
-	    Address
-	</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr id="addr$idar">
-	<td class="odd right">
-	    <a href="/FamilyTree/Address.php?idar=$idar&amp;lang=$lang">
-		$idar
-	    </a>
-	</td>
-	<td class="$addrClass left">
-	    $kindtext 
-	</td>
-	<td class="$addrClass left">
-	    $addrname
-	</td>
-      </tr>
-      </tbody>
-    </table>
-  </div> <!-- id="body" -->
-  <div class="balloon" id="Helppattern">
-    <p>
-	This is a regular expression, as supported by MySQL, which is used
-	to limit the addresses to be displayed.
-	See <a href="http://www.tin.org/bin/man.cgi?section=7&topic=regex">Henry Spencer"s regex page</a>.
-    </p>
-    <ul>
-      <li>If the pattern contains no special 
-    	characters then only addresses containing that string will be included.
-    	For example the pattern "London" will match addresses containing
-    	the string "London".  Note that the search ignores case,
-    	so that pattern will also match "LONDON" and "london".
-      </li>
-      <li>If the pattern begins with a caret '^' then only addresses that
-    	<b>begin</b> with the remainder of the pattern are included.  
-    	For example the pattern
-    	"^Ba" displays addresses starting with "Ba" (or "ba" or "BA").
-      </li>
-      <li>If the pattern ends with a dollar sign '$', then only addresses that
-    	<b>end</b> with the remainder of the pattern are included.  
-    	For example the pattern
-    	"CA$" matches addresses that end with "CA" (or "ca" or "Ca").
-      </li>
-      <li>In a pattern a period '.' matches any single character.  For example
-    	the pattern "B.b" matches any address that contains
-    	two letter Bs separated
-    	by one character, for example "Bab", "Beb", "Bib", "Bob", or "Bub" 
-    	anywhere in the address name.
-      </li>
-      <li>In a pattern an asterisk '*' matches zero or more of the preceding
-    	character; "bo*b" matches "bb", "bob", and "boob"
-    	anywhere in the address name.
-      </li>
-    </ul>
-  </div>
-  <div class="balloon" id="Helprepositories">
-    <p>
-	If this checkbox is selected then the report contains
-	addresses of repositories of source documents.
-    </p>
-  </div>
-  <div class="balloon" id="Helpevent">
-    <p>
-	If this checkbox is selected then the report contains
-	addresses of events.
-    </p>
-  </div>
-  <div class="balloon" id="Helpmailing">
-    <p>
-	If this checkbox is selected then the report contains mailing
-	addresses of individuals in the database.
-    </p>
-  </div>
-  <div class="balloon" id="HelpSubmit">
-    <p>
-	Clicking on this button updates the report based upon changes
-	you have made to the search options.
-    </p>
-  </div>
-  <div class="balloon" id="HelpAdd">
-    <p>
-	Clicking on this button permits you to explicitly add a
-	repository address.
-	Note that event addresses are added in the event dialog,
-	and mailing addresses
-	are added in the edit individual dialog.
-    </p>
-  </div>
-  <div class="balloon" id="HelpDelete">
-	Click on this button to delete an address from the table.
-	Note that although the table row is removed from visibility, 
-	the record is not deleted until you click on the Search button.
-  </div>
-    <script src="/jscripts/js20/http.js" type="text/javascript"></script>
-    <script src="/jscripts/util.js" type="text/javascript"></script>
-    <script src="/jscripts/CommonForm.js" type="text/javascript"></script>
-    <script src="/FamilyTree/Addresses.js" type="text/javascript"></script>
+    <div class="balloon" id="Helpevent">
+      If this checkbox is selected then the report contains
+      addresses of events.
+    </div>
+    <div class="balloon" id="Helpmailing">
+      If this checkbox is selected then the report contains mailing
+      addresses of individuals in the database.
+    </div>
+    <div class="balloon" id="HelpSubmit">
+      Clicking on this button updates the report based upon changes
+      you have made to the search options.
+    </div>
+    <div class="balloon" id="HelpAdd">
+      Clicking on this button permits you to explicitly add a
+      repository address.
+      Note that event addresses are added in the event dialog,
+      and mailing addresses
+      are added in the edit individual dialog.
+    </div>
+    <div class="balloon" id="HelpDelete">
+      Click on this button to delete an address from the table.
+      Note that although the table row is removed from visibility, 
+      the record is not deleted until you click on the Search button.
+    </div>
+    <script src="/FamilyTree/Addresses.js" type="module"></script>

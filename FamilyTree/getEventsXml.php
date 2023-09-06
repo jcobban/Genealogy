@@ -38,8 +38,9 @@ use \Exception;
  *		2015/07/02		access PHP includes using include_path			*
  *		2017/09/28		change class LegacyEvent to class Event			*
  *		2017/10/31		use class RecordSet instead of Event::getEvents	*
+ *		2023/01/24      protect against XSS                             *
  *																		*
- *  Copyright &copy; 2017 James A. Cobban								*
+ *  Copyright &copy; 2023 James A. Cobban								*
  ************************************************************************/
 header("Content-Type: text/xml");
 require_once __NAMESPACE__ . "/Event.inc";
@@ -86,7 +87,7 @@ print("<events>\n");
 // can apply the response information to the specific element
 print "    <parms>\n";
 foreach($_GET as $fldname => $value)
-    print "    <$fldname>$value</$fldname>\n";
+    print "    <$fldname>" . htmlspecialchars($value) . "</$fldname>\n";
 print "    </parms>\n";
 
 if (strlen($msg) > 0)

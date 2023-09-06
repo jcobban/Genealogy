@@ -1,0 +1,74 @@
+<!--*********************************************************************
+ *  CensusReqDisplayCAfr.html											*
+ *																		*
+ *  Request a page of the census to be editted.							*
+ *																		*
+ *  History:															*
+ *		2019/02/26      created                                         *
+ *																		*
+ *  Copyright &copy; 2019 James A. Cobban								*
+ **********************************************************************-->
+    <div id="breadcrumbs">
+      <a href="/genealogy.php?lang=$LANG">Génealogie</a>:
+      <a href="/genCountry.php?cc=$CC&amp;lang=$LANG">$COUNTRYNAME</a>:
+      <a href="/database/genCensuses.php?lang=$LANG">Récensements</a>:
+    </div> <!-- id="breadcrumbs" -->
+    <div class='body'>
+      <h1>
+        <span class='right'>
+            <a href='ReqUpdate$CENSUSYEARHelpen.html' target='help'>? Aide</a>
+        </span>
+            Récensement $CENSUSYEAR de $COUNTRYNAME: 
+            Voir la Base de Données
+      </h1>
+      $TRACE
+      $MSG
+    <p class='label' id="Province$province">
+      <a href='CensusUpdateStatus.php?Census=$censusid&Province=$province&lang=$LANG'>
+        Voir le Récensement $CENSUSYEAR de $provincename
+      </a>
+    </p>
+    <p class='label'>
+      <a href='CensusUpdateStatus.php?Census=$CENSUSID&lang=$LANG'>
+        Résumé des Transcriptions Complétées
+      </a>
+    </p>
+    </div> <!-- class="body"-->
+    <div class='balloon' id='HelpProvince'>
+      Use this selection list to limit the response to a single province
+      within the census.
+    </div>
+    <div class='balloon' id='HelpDistrict'>
+      Use this selection list to limit the response to a census district.
+    </div>
+    <div class='balloon' id='HelpSubDistrict'>
+      Use this selection list to limit the response to
+      an enumeration sub-district.
+    </div>
+    <div class='balloon' id='HelpDivision'>
+      Use this selection list to limit the response to an enumeration division.
+    </div>
+    <div class='balloon' id='HelpPage'>
+      Use this selection list to limit the response to a specific page.
+    </div>
+    <div class='balloon' id='HelpshowForm'>
+      Click on this button to display a form for viewing or updating the field
+      level transcription of the selected page.
+    </div>
+    <div class='balloon' id='Helpprogress'>
+      Click on this button to display a summary of the progress of the project
+      to transcribe the $CENSUSYEAR census.
+    </div>
+    <div class='popup' id='loading'>
+      loading
+    </div>
+    <div class="hidden" id="templates">
+        <p id='censusInvalid'>
+            Census='$censusText' invalid, par défaut à 'CA1881'
+        </p>
+        <p id='langInvalid'>
+            Identifiant de langue invalide '$langtext', anglais supposé.
+        </p>
+    </div>
+    <script src="/jscripts/js20/http.js" type="text/javascript"></script>
+    <script src="/jscripts/util.js" type="text/javascript"></script>

@@ -55,8 +55,9 @@ use \Iterator;
  *      2019/05/18      add $info                                       *
  *      2919/12/95      support ISO format Domain                       *
  *      2019/12/19      replace xmlentities with htmlentities           *
+ *      2023/01/12      only 5 fields in record                         *
  *                                                                      *
- *  Copyright &copy; 2019 James A. Cobban                               *
+ *  Copyright &copy; 2023 James A. Cobban                               *
  ************************************************************************/
 require_once __NAMESPACE__ . '/Domain.inc';
 
@@ -92,7 +93,7 @@ class County extends Record
                 'name'              => 'Counties',
                 'prime'             => array('domain', 'code'),
                 'srvmg'             => false,
-                'fldcount'          => 6,
+                'fldcount'          => 5,
                 'order'             => 'Name',
                 'classname'         => 'County');
 
@@ -114,7 +115,7 @@ class County extends Record
     protected static $defaultOrder  = "`Name`";
 
     /********************************************************************
-     *  County->domain                                              *
+     *  County->domain                                                  *
      *                                                                  *
      *  save the associated instance of Domain to avoid recreating it   *
      ********************************************************************/
@@ -285,9 +286,6 @@ class County extends Record
                 $this->lastSqlCmd   = $queryText;
                 if ($stmt->execute($sqlParms))
                 {           // successful query
-                    if ($debug)
-                        $warn       .= "<p>$queryText</p>\n";
-
                     $result         = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     if (count($result) > 0)
                     {       // existing record

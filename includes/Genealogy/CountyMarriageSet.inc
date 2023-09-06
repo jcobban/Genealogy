@@ -19,8 +19,9 @@ use \Iterator;
  *      2019/01/06      move to namespace Genealogy                     *
  *      2020/01/26      add method getVolumeSummary                     *
  *      2020/04/16      correct repair for missing bride                *
+ *      2022/12/13      remove field name prefixes                      *
  *                                                                      *
- *  Copyright &copy; 2020 James A. Cobban                               *
+ *  Copyright &copy; 2022 James A. Cobban                               *
  ************************************************************************/
 require_once __NAMESPACE__ . '/RecordSet.inc';
 require_once __NAMESPACE__ . '/CountyMarriage.inc';
@@ -61,7 +62,7 @@ class CountyMarriageSet extends RecordSet
      ********************************************************************/
     function __construct($parms = null,
                          $order =
-                "M_RegDomain, M_Volume, M_ReportNo, M_ItemNo, M_Role DESC")
+                        "RegDomain, Volume, ReportNo, ItemNo, `Role` DESC")
     {
         $parms['order']     = $order;
         parent::__construct('CountyMarriages',
@@ -91,7 +92,7 @@ class CountyMarriageSet extends RecordSet
             $pname      = substr($fieldLc, 2);
             switch($fieldLc)
             {
-                case 'm_regdomain':
+                case 'regdomain':
                 {       // text fields full match
                     $where              .= "$and `$fieldLc`=:domain";
                     $this->sqlParms['domain']       = $value;
@@ -100,8 +101,8 @@ class CountyMarriageSet extends RecordSet
                     break;
                 }       // text fields
 
-                case 'm_date':
-                case 'm_licensetype':
+                case 'date':
+                case 'licensetype':
                 {       // text fields full match
                     $where              .= "$and `$fieldLc`=:$pname";
                     $this->sqlParms[$pname]     = $value;
@@ -110,15 +111,15 @@ class CountyMarriageSet extends RecordSet
                     break;
                 }       // text fields
 
-                case 'm_givennames':
-                case 'm_surname':
-                case 'm_age':
-                case 'm_residence':
-                case 'm_birthplace':
-                case 'm_fathername':
-                case 'm_mothername':
-                case 'm_witnessname':
-                case 'm_remarks':
+                case 'givennames':
+                case 'surname':
+                case 'age':
+                case 'residence':
+                case 'birthplace':
+                case 'fathername':
+                case 'mothername':
+                case 'witnessname':
+                case 'remarks':
                 {       // text fields pattern match
                     $expr           = $this->getWherePattern($fieldLc,
                                                              $value,
@@ -132,7 +133,7 @@ class CountyMarriageSet extends RecordSet
                     break;
                 }       // text fields
 
-                case 'm_surnamesoundex':
+                case 'surnamesoundex':
                 {       // text fields soundex
                     $where          .= "$and `$fldname`=LEFT(SOUNDEX(:$pname),4)";
                     $this->sqlParms[$pname] = $value;
@@ -141,7 +142,7 @@ class CountyMarriageSet extends RecordSet
                     break;
                 }       // text fields
 
-                case 'm_volume':
+                case 'volume':
                 {       // numeric fields
                     if ((is_int($value) || ctype_digit($value))
                         && $value >= 0)
@@ -157,8 +158,8 @@ class CountyMarriageSet extends RecordSet
                     break;
                 }       // numeric fields
 
-                case 'm_itemno':
-                case 'm_idir':
+                case 'itemno':
+                case 'idir':
                 {       // numeric fields
                     if ((is_int($value) || ctype_digit($value))
                         && $value >= 0)
@@ -174,9 +175,9 @@ class CountyMarriageSet extends RecordSet
                     break;
                 }       // numeric fields
 
-                case 'm_reportno':
+                case 'reportno':
                 {       // numeric fields
-                    $where          .= "$and `M_ReportNo`=:$pname";
+                    $where          .= "$and `ReportNo`=:$pname";
                     if (is_numeric($value))
                         $this->sqlParms[$pname] = $value;
                     else
@@ -231,9 +232,9 @@ class CountyMarriageSet extends RecordSet
         if ($this->fullReport)
         {           // check for issues with whole report
             $conParmsG              = $this->parms;
-            $conParmsG['m_role']    = 'G';
+            $conParmsG['role']    = 'G';
             $conParmsB              = $this->parms;
-            $conParmsB['m_role']    = 'B';
+            $conParmsB['role']    = 'B';
             $expectedItem           = 1;
             $expectedRole           = 'G';
             $added                  = 0;
@@ -245,7 +246,7 @@ class CountyMarriageSet extends RecordSet
                 {       // missing spouse
                     if ($expectedRole == 'B')
                     {   // missing bride
-                        $conParmsB['m_itemno']  = $expectedItem;
+                        $conParmsB['itemno']  = $expectedItem;
                         $bride          = new CountyMarriage($conParmsB);
                         $repaired[]     = $bride;
                         $added++;
@@ -255,10 +256,10 @@ class CountyMarriageSet extends RecordSet
                 }       // missing spouse
                 while ($item > $expectedItem)
                 {
-                    $conParmsG['m_itemno']  = $expectedItem;
+                    $conParmsG['itemno']  = $expectedItem;
                     $groom          = new CountyMarriage($conParmsG);
                     $repaired[]     = $groom;
-                    $conParmsB['m_itemno']  = $expectedItem;
+                    $conParmsB['itemno']  = $expectedItem;
                     $bride          = new CountyMarriage($conParmsB);
                     $repaired[]     = $bride;
                     $added          += 2;
@@ -307,11 +308,11 @@ class CountyMarriageSet extends RecordSet
         global  $connection;
 
         // execute the query
-        $query  = 'SELECT M_Volume AS Volume, COUNT(M_ItemNo)/2 AS Number, SUM(M_IDIR>0)/2 AS Linked ' .
+        $query  = 'SELECT Volume AS Volume, COUNT(ItemNo)/2 AS Number, SUM(IDIR>0)/2 AS Linked ' .
                             'FROM CountyMarriages ' .
-                            "WHERE M_RegDomain=:domain " .
-                            'GROUP BY M_Volume ' .
-                            'ORDER BY M_Volume';
+                            "WHERE RegDomain=:domain " .
+                            'GROUP BY Volume ' .
+                            'ORDER BY Volume';
         $stmt           = $connection->prepare($query);
         $queryText      = debugPrepQuery($query, $this->sqlParms);
         if ($stmt->execute($this->sqlParms))

@@ -340,7 +340,7 @@ if ($count > 0)
                                     'prevoffset'	=> $prevOffset,
                                     'LANG'          => $lang));
 	else
-	    $template->updateTag('topPrev', null);
+	    $template->updateTag('topPrev', '&nbsp;');
 
 	if ($nextOffset < $count)
 	    $template->updateTag('topNext',
@@ -349,7 +349,7 @@ if ($count > 0)
 						            'nextoffset'	=> $nextOffset,
                                     'LANG'          => $lang));
 	else
-	    $template->updateTag('topNext', null);
+	    $template->updateTag('topNext', '&nbsp;');
 	$first	= $offset + 1;
 	$last	= min($nextOffset, $count);
 	$template->updateTag('summary',

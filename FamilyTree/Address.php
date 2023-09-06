@@ -135,7 +135,8 @@ if (isset($_GET) && count($_GET) > 0)
 		{	                    // act on specific key
 		    case 'formname':
 		    {
-                if (preg_match('/^[a-zA-Z_][a-zA-Z0-9_.-]*$/', $value))
+                if (strlen($value) == 0 ||
+                    preg_match('/^[a-zA-Z_][a-zA-Z0-9_.-]*$/', $value))
                     $formname	= $value;
                 else
                     $msg        .= "Formname value '$safevalue' invalid. ";
@@ -191,7 +192,8 @@ if (isset($_GET) && count($_GET) > 0)
 
 		    case 'lang':
 		    {
-                $lang       = FtTemplate::validateLang($value);
+                $lang       = FtTemplate::validateLang($value,
+                                                       $langtext);
 				break;
 		    }	                // presentation language
 
@@ -219,7 +221,8 @@ if (isset($_POST) && count($_POST) > 0)
 		{	                    // act on specific key
 		    case 'formname':
             {
-                if (preg_match('/^[a-zA-Z_][a-zA-Z0-9_.-]*$/', $value))
+                if (strlen($value) == 0 ||
+                    preg_match('/^[a-zA-Z_][a-zA-Z0-9_.-]*$/', $value))
                     $formname	= $value;
                 else
                     $msg        .= "Formname value '$safevalue' invalid. ";
@@ -455,6 +458,7 @@ $template->updateTag('otherStylesheets',
     		         array('filename'   => '/FamilyTree/Address'));
 $translate              = $template->getTranslate();
 $t                      = $translate['tranTab'];
+$formatter              = $template->getFormatter();
 
 // handle idiosyncracies of Google geocoder implementation
 $searchName				= $name;
@@ -521,8 +525,8 @@ if (strlen($msg) == 0)
 	$template->set('PHONE2',		$address['phone1']);
 	$template->set('EMAIL',			$address['phone2']);
 	$template->set('HOMEPAGE',		$address['homepage']);
-	$template->set('LATITUDE',		$address['latitude']);
-	$template->set('LONGITUDE',		$address['longitude']);
+    $template->set('LATITUDE',		$formatter->format($address->get('latitude')));
+    $template->set('LONGITUDE',		$formatter->format($address->get('longitude')));
 	$template->set('ZOOM',			$address['zoom']);
 	$template->set('NOTES',			'');
     $template->set('STYLE',			$style);

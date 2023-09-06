@@ -5,12 +5,14 @@
  *  during a given week in French.										*
  *																		*
  *  History:															*
- *		2019/08/30	created 											*
+ *		2019/08/30	    created 										*
+ *      2022/07/07      use display flex                                *
+ *                      add paging of results                           *
  *																		*
- *  Copyright &copy; 2019 James A. Cobban								*
+ *  Copyright &copy; 2022 James A. Cobban								*
  **********************************************************************-->
     <div class="hidden" id="breadcrumbs">
-	    <a href="/index.html">Accueil</a>:
+	    <a href="/home.html">Accueil</a>:
         <a href="/genealogy.php?lang=$LANG">Généalogie</a>:
         <a href="/FamilyTree/nominalIndex.php?lang=$LANG">
 		    Indice Nominale
@@ -26,33 +28,45 @@
       </h1>
       $TRACE
       $MSG
-      <div class="center">
-		<div class="left" id="toPrevWeek">
+      <div class="spaceBetween" id="topBrowse" style="width: 80%;">
+		<span id="toPrevWeek">
             <a href="showAddedIndividuals.php?week=$prev&lang=$LANG">
-                &lt;---
+                <img src="/Images/ArrowLeft.svg">
             </a>
-		</div>
-		<div class="right" id="toNextWeek">
+		</span>
+        <span>
+            <span id="noMatches">
+                Aucune personne correspondante pour cette période
+            </span>
+            <span id="someMatches">
+                $first a $last de $count personnes correspondantes pour cette période
+            </span>
+        </span>
+		<span id="toNextWeek">
             <a href="showAddedIndividuals.php?week=$next&lang=$LANG">
-                ---&gt;
+                <img src="/Images/ArrowRight.svg">
             </a>
-        </div>
-        <span id="noMatches">
-            Aucune personne correspondante pour cette période
         </span>
-        <span id="someMatches">
-            $count personnes correspondantes pour cette période
-        </span>
-		<div style="clear: both;"></div>
       </div>
-      <p class="person" id="person">
-        <a href="Person.php?idir=$idir&lang=$LANG"
-                class="$gender" target="_blank">
-			$surname, $givenname ($birthd&mdash;$deathd)
-	    </a>
-			$parentsStr
-			$spouseStr 
-	  </p>
+      <div style="display: flex;">
+          <div style="display: flex; flex-direction: column; width: 2em;">
+            <a href="showAddedIndividuals.php?week=$week&offset=$prvoff&lang=$LANG" id="prevPage">
+                <img src="/Images/ArrowUp.svg">
+            </a>
+            <a href="showAddedIndividuals.php?week=$week&offset=$nxtoff&lang=$LANG" id="nextPage">
+                <img src="/Images/ArrowDown.svg">
+            </a>
+          </div>
+          <div>
+		      <p class="person" id="person$idir">
+                <a href="Person.php?idir=$idir&lang=$LANG"
+                        class="$gender" target="_blank">
+			        $surname, $givenname ($birthd&mdash;$deathd)
+	            </a>
+			    $parentsStr
+			    $spouseStr 
+		      </p> <!-- id="person$idir" -->
+          </div>
       </div> <!-- class="body" -->
     <div id="mousetoPrevWeek" class="popup">
       <p class="label">Aller à la semaine précédente
@@ -60,6 +74,14 @@
     </div>
     <div id="mousetoNextWeek" class="popup">
       <p class="label">Aller à la semaine prochaine
+      </p>
+    </div>
+    <div id="mouseprevPage" class="popup">
+      <p class="label">Page des Correspondants précédente 
+      </p>
+    </div>
+    <div id="mousenextPage" class="popup">
+      <p class="label">Page des Correspondants prochaine 
       </p>
     </div>
     <script src="/jscripts/js20/http.js" type="application/javascript">

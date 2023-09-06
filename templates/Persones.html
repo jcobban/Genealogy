@@ -10,7 +10,7 @@
  *  Copyright &copy; 2019 James A. Cobban                               *
  **********************************************************************-->
   <div id="breadcrumbs" class="hidden">
-    <a href="/index.html">Home</a>:
+    <a href="/home.html">Home</a>:
     <a href="/genealogy.php?lang=$LANG">
             Genealogia
     </a>:
@@ -37,7 +37,6 @@
             </span>
                   $TITLE
                   <span id="inTree">: in tree "$treeName"</span>
-            <div style="clear: both;"></div>
           </h1>
           $TRACE
           $MSG
@@ -143,10 +142,11 @@
                         value="$USERID">
           <input type="hidden" name="idir" id="blogidir"
                         value="$IDIR">
-        <p>
-          <textarea name="message" id="message" placeholder="[enter message]"
-                        rows='5' cols='100'></textarea>
-        </p>
+        <div style="width: 80%;">
+          <textarea name="message" id="message"
+                    placeholder="[enter message]"
+                    rows='5' cols='100'></textarea>
+        </div>
         <div class="row" id="blogEmailRow">
           <label class='column1' for='emailAddress'>
                         Su Dirección de Correo Electrónico:
@@ -161,17 +161,21 @@
           </button>
         </div>
       </form> <!-- name="blogform" id="blogform" -->
-      <div class="row" id="footnotesSection">
+      <div id="footnotesSection">
         <hr class='footnotes'/>
         <p class='label'>Notas al pie:</p>
         <div id='footnote$key'>
-          <div class="column1" id="#fn$key">
-            $key
+          <div class="row">
+            <div class="column1" id="#fn$key">
+              $key
+            </div>
+              $text
+          </div> <!-- class='row' -->
+          <div style="margin-left: 3em;">
+            $other
           </div>
-            $text
-          <div style='clear: both;'></div>
-        </div> <!-- class='footnote$key' -->
-      </div> <!-- class="row" id="footnotesSection" -->
+        </div> <!-- id='footnote$key' -->
+      </div> <!-- id="footnotesSection" -->
     </div> <!-- class="body" -->
 
     <div class="hidden" id="messages">
@@ -187,8 +191,44 @@
       <span id="neverMarried">
         Esta pareja nunca se casó. 
       </span>
+      <div id="showText$IDSX" class="row" style="white-space: normal;">
+        $TEXT 
+      </div>
+      <div id="showNote$IDSX" class="row" style="white-space: normal;">
+          <strong>Note:</strong> $NOTE 
+      </div>
     </div> <!-- id="messages" -->
 
+    <div class="hidden" id="rightColSelection">
+      <span id="rightcol1">
+        <p>
+        When used on a computer with a pointing device, for example a mouse,
+        holding the pointing device over any piece of information
+        causes an explanation of that piece of information to be 
+        displayed in a popup.  This includes:
+        </p>
+        <ol>
+          <li>The names of members of the family highlighted as hyperlinks.
+          </li>
+          <li>Locations where events took place.  This offers the ability
+              to see a map of the location.
+          </li>
+          <li>Causes of death explained by a medical dictionary.
+          </li>
+          <li>Source names
+          </li>
+          <li>Citation page identifications.
+          </li>
+        </ol>
+      </span>
+
+      <p id="rightcol2">
+        If you are signed on and you have been granted permission by an
+        existing owner of this family you can add, delete, or change
+        the information recorded.
+      </p>
+        
+    </div> <!-- id="rightColSelection" -->
     <!--*****************************************************************
      *  generate popups                                                 *
      *****************************************************************-->
@@ -228,12 +268,12 @@
     </p>
   </div> 
 
-  <div id="showLocDiv$idlr" class="balloon">
-    <b>$name</b>
-    <p>
-    $notes
-    </p>
-    <form name='locForm$idlr'>
+    <div id="showLocDiv$idlr" class="balloon">
+      <b>$name</b>
+      <p class="normal">
+        $notes
+      </p>
+      <form name='locForm$idlr'>
             <input type="hidden" name="searchName" value="$searchName">
             <input type="hidden" name="county" value="$county">
             <input type="hidden" name="Location" value="$location">
@@ -248,8 +288,8 @@
             <button type="button" id="editLoc$idlr" class="button">
                     Editar ubicación
             </button>
-    </form>
-  </div>
+      </form>
+    </div>
 
   <div id="showTplDiv$idtr" class="balloon">
     <b>Templo: $name</b>
@@ -439,8 +479,8 @@ $DEATHCAUSES
         although this will not be y reflected in the description
         of this individual until the page is refreshed.
     </div>
-    <script src="/jscripts/tinymce/js/tinymce/tinymce.js" type="application/javascript">
+    <script src="/jscripts/tinymce/js/tinymce/tinymce.min.js" type="application/javascript">
     </script>
     <script src="/FamilyTree/Person.js" type="module">
     </script>
-    <script defer src="https://maps.googleapis.com/maps/api/js?v=3.43&callback=initializeMaps&region=$GOOGLECC&key=$GOOGLEKEY" type="application/javascript"></script>
+    <script defer src="https://maps.googleapis.com/maps/api/js?v=weekly&callback=initializeMaps&region=$GOOGLECC&key=$GOOGLEKEY" type="application/javascript"></script>

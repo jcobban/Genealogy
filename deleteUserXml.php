@@ -23,8 +23,9 @@ use \Exception;
  *      2017/09/13      use class User                                  *
  *      2019/12/19      replace xmlentities with htmlentities           *
  *      2021/06/08      method delete no longer prints output           *
+ *      2023/01/19      protect against script insertion                *
  *                                                                      *
- *  Copyright &copy; 2021 James A. Cobban                               *
+ *  Copyright &copy; 2023 James A. Cobban                               *
  ************************************************************************/
     header("Content-Type: text/xml");
     require_once __NAMESPACE__ . "/User.inc";
@@ -39,15 +40,16 @@ use \Exception;
     print "    <parms>\n";
     foreach($_POST as $key => $value)
     {               // loop through all parameters
-    print "\t<$key>$value</$key>\n";
-    switch(strtolower($key))
-    {           // act on specific parameteres
-        case 'clientid':
-        {           // clientid to be deleted
-            $clientid     = $value;
-            break;
-        }           // clientid to be deleted
-    }           // act on specific parameteres
+        $safevalue  = htmlspecialchars($value);
+        print "\t<$key>$safevalue</$key>\n";
+        switch(strtolower($key))
+        {           // act on specific parameteres
+            case 'clientid':
+            {       // clientid to be deleted
+                $clientid     = $safevalue;
+                break;
+            }       // clientid to be deleted
+        }           // act on specific parameteres
     }               // loop through all parameters
     print "    </parms>\n";
 

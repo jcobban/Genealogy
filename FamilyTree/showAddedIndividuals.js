@@ -10,8 +10,9 @@
  *		2019/02/11      scroll just the main section, leaving header    *
  *		                and footer visible always                       *
  *		                calling pageInit no longer required             *
+ *		2022/07/07      add paging of results                           *
  *																		*
- *  Copyright &copy; 2019 James A. Cobban								*
+ *  Copyright &copy; 2022 James A. Cobban								*
  ************************************************************************/
 
 // identify function to invoke when page loaded
@@ -28,13 +29,25 @@ window.onload	= onLoad;
 function onLoad()
 {
     // add mouseover actions for forward and backward links
-    var element	= document.getElementById('toPrevWeek');
+    let element	= document.getElementById('toPrevWeek');
     if (element)
     {		// defined
 		element.onmouseover	= linkMouseOver;
 		element.onmouseout	= linkMouseOut;
     }		// defined
-    var element	= document.getElementById('toNextWeek');
+    element	= document.getElementById('toNextWeek');
+    if (element)
+    {		// defined
+		element.onmouseover	= linkMouseOver;
+		element.onmouseout	= linkMouseOut;
+    }		// defined
+    element	= document.getElementById('prevPage');
+    if (element)
+    {		// defined
+		element.onmouseover	= linkMouseOver;
+		element.onmouseout	= linkMouseOut;
+    }		// defined
+    element	= document.getElementById('nextPage');
     if (element)
     {		// defined
 		element.onmouseover	= linkMouseOver;
@@ -42,13 +55,13 @@ function onLoad()
     }		// defined
 
     // scroll main portion of page if it does not fit without scrolling
-    var headSection         = document.getElementById('headSection');
-    var headHeight          = headSection.offsetHeight;
-    var mainSection         = document.getElementById('mainSection');
-    var mainHeight          = mainSection.offsetHeight;
-    var footSection         = document.getElementById('footSection');
-    var footHeight          = footSection.offsetHeight;
-    var windHeight          = window.innerHeight;
+    let headSection         = document.getElementById('headSection');
+    let headHeight          = headSection.offsetHeight;
+    let mainSection         = document.getElementById('mainSection');
+    let mainHeight          = mainSection.offsetHeight;
+    let footSection         = document.getElementById('footSection');
+    let footHeight          = footSection.offsetHeight;
+    let windHeight          = window.innerHeight;
     if (mainHeight + headHeight + footHeight > windHeight)
     {
         mainSection.style.height    = (windHeight - headHeight - footHeight - 12) + 'px';
@@ -67,7 +80,7 @@ function onLoad()
  ************************************************************************/
 function linkMouseOver()
 {
-    var	msgDiv	= document.getElementById('mouse' + this.id);
+    let	msgDiv	= document.getElementById('mouse' + this.id);
     if (msgDiv)
     {		// support for dynamic display of messages
 		// display the messages balloon in an appropriate place on the page
@@ -78,7 +91,7 @@ function linkMouseOver()
 		msgDiv.style.top	= (getOffsetTop(this) - 30) + 'px';
 //alert("msgDiv.style.left=" + msgDiv.style.left + " msgDiv.style.top=" + msgDiv.style.top);
 		// so key strokes will close window
-		helpDiv			= msgDiv;
+		helpDiv			    = msgDiv;
 		helpDiv.onkeydown	= keyDown;
 		show(msgDiv);
 

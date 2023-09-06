@@ -47,14 +47,14 @@ class CountyMarriageReportSet extends RecordSet
      *  Throws Exception if unable to complete function                 *
      ********************************************************************/
     function __construct($parms = array(),
-                         $order = "M_RegDomain, M_Volume, M_ReportNo")
+                         $order = "RegDomain, Volume, ReportNo")
     {
         $parms['order']     = $order;
         parent::__construct('CountyMarriageReports',
                 $parms,
                 "CountyMarriageReports.*," .
-                "(SELECT COUNT(*) FROM CountyMarriages  where CountyMarriages.m_regdomain=CountyMarriageReports.m_regdomain and CountyMarriages.m_volume=CountyMarriageReports.m_volume and CountyMarriages.m_reportno=CountyMarriageReports.m_reportno) as transcribed ," .
-                "(SELECT COUNT(*) FROM CountyMarriages  where CountyMarriages.m_regdomain=CountyMarriageReports.m_regdomain and CountyMarriages.m_volume=CountyMarriageReports.m_volume and CountyMarriages.m_reportno=CountyMarriageReports.m_reportno and CountyMarriages.m_idir>0) as linked ");
+                "(SELECT COUNT(*) FROM CountyMarriages  where CountyMarriages.regdomain=CountyMarriageReports.regdomain and CountyMarriages.volume=CountyMarriageReports.volume and CountyMarriages.reportno=CountyMarriageReports.reportno) as transcribed ," .
+                "(SELECT COUNT(*) FROM CountyMarriages  where CountyMarriages.regdomain=CountyMarriageReports.regdomain and CountyMarriages.volume=CountyMarriageReports.volume and CountyMarriages.reportno=CountyMarriageReports.reportno and CountyMarriages.idir>0) as linked ");
     }       // CountyMarriageReportSet::__construct
 
     /********************************************************************
@@ -78,7 +78,7 @@ class CountyMarriageReportSet extends RecordSet
             $fieldLc    = CountyMarriage::getRealFieldName($fldname);
             switch($fieldLc)
             {
-                case 'm_regdomain':
+                case 'regdomain':
                 {       // text fields full match
                     $where          .= "$and `$fieldLc`=?";
                     $this->sqlParms[]       = $value;
@@ -86,7 +86,7 @@ class CountyMarriageReportSet extends RecordSet
                     break;
                 }       // text fields
 
-                case 'm_volume':
+                case 'volume':
                 {       // numeric fields
                     if ((is_int($value) || ctype_digit($value))
                         && $value >= 0)

@@ -30,8 +30,10 @@ use \Templating\TemplateTag;
  *      2019/11/17      include relevant CSS                            *
  *		2021/01/03      correct XSS vulnerability                       *
  *		2021/04/02      use ES2015                                      *
+ *		2023/01/11      support articles with <div class="topcrumbs">   *
+ *      2023/01/19      further protect against script insertion        *
  *                                                                      *
- *  Copyright &copy; 2021 James A. Cobban                               *
+ *  Copyright &copy; 2023 James A. Cobban                               *
  ************************************************************************/
 require_once __NAMESPACE__ . '/FtTemplate.inc';
 require_once __NAMESPACE__ . '/Language.inc';
@@ -104,6 +106,7 @@ function createPopups($text)
  ***********************************************************************/
 $templateName   = null;
 $lang           = 'en';     // default english
+$langtext       = null;
 
 // process parameters
 if (count($_GET) > 0)
@@ -114,20 +117,22 @@ if (count($_GET) > 0)
                       "<th class='colhead'>value</th></tr>\n";
     foreach ($_GET as $key => $value)
     {           // loop through all parameters
+        $safevalue  = htmlspecialchars($value);
         $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
-                            "<td class='white left'>$value</td></tr>\n"; 
+                           "<td class='white left'>$safevalue</td></tr>\n"; 
         switch(strtolower($key))
         {
             case 'template':
             {       // requested template
                 if (strlen($value) > 0)
-                    $templateName   = $value;
+                    $templateName   = $safevalue;
                 break;
             }       // requested template
 
             case 'lang':
             {       // requested language
-                $lang               = FtTemplate::validateLang($value);
+                $lang               = FtTemplate::validateLang($value,
+                                                               $langtext);
                 break;
             }       // requested language
 
@@ -159,8 +164,31 @@ if (substr($templateName, 0, 1) == '/')
             if (strtolower($tag->tagName) == 'body')
             {       // <body> tag
                 $body       = $tag;
+                $bodytags   = $body->childNodes();
                 $bodyText   = $body->innerHTML();
-                break;
+                foreach($bodytags as $tag)
+                {                   // examine children of <body>
+                    if ($tag->tagName == 'div')
+                    {               // <div>
+                        foreach($tag->attributes as $name => $value)
+                        {           // loop through attributes
+                            if ($name == 'class')
+                            {
+                                if ($value == 'topcrumbs')
+                                {
+                                    $crumbs     = $tag->innerHTML;
+                                    $template->set('BREADCRUMBS', $crumbs);
+                                }
+                                else
+                                if ($value == 'article')
+                                {
+                                    $bodyText   = $tag->innerHTML;
+                                }
+                            }       // tag 
+                        }           // loop through attributes
+                    }               // <div>
+                }                   // examine children of <body>
+                break;              // ignore all subsequent tags
             }       // <body> tag
         }           // loop through children of <html>
         $bodyText   .= "\n\t<script src=\"/jscripts/util.js\" type=\"application/javaScript\">\n</script>\n";

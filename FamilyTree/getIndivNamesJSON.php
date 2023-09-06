@@ -33,6 +33,7 @@ use \Exception;
  *		2020/04/13      correct order of persons                        *
  *		2021/01/01      correct poor performance if only 1 surname      *
  *		2022/03/23      feedback next surname                           *
+ *		2022/07/28      correct names containing quote mark             *
  *																		*
  *  Copyright &copy; 2022 James A. Cobban								*
  ************************************************************************/
@@ -604,9 +605,9 @@ if (strlen($msg) == 0)
     				    }	// loop through all sets of families
     				}
                 }		    // include spouse's name
-                $name           = str_replace('"', '\\"', $name);
     		}		        // information is public
-            print ",\n        \"name\" : \"$name\"}";
+            $name               = json_encode($name);
+            print ",\n        \"name\" : $name}";
         }		            // existence of individual visible
     }			            // loop through all result rows
     print "\n}";

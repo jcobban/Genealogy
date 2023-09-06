@@ -133,11 +133,11 @@ if ($count > 0)
     $template->updateTag('temple$idtr', $temples);
 
 	if ($prevoffset < 0)
-		$template->updateTag('topPrev', null);
+        $template->updateTag('topPrev',         '&nbsp;');
 	if ($last >= $count)
 	{
 	    $last                   = $count;
-		$template->updateTag('topNext', null);
+        $template['topNext']->update('&nbsp;');
 	}
 }	// query issued
 else

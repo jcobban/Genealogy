@@ -4,116 +4,116 @@
  *  Global stylesheet for the web-site www.jamescobban.net              *
  *                                                                      *
  *  History:                                                            *
- *		2010/08/21      add button.width100                             *
- *		2010/11/20      set padding 0 in th.cell and th.underline to    *
+ *      2010/08/21      add button.width100                             *
+ *      2010/11/20      set padding 0 in th.cell and th.underline to    *
  *                      avoid padding between lines in census forms     *
- *		2010/12/10      improve appearance of children in main web page *
- *		2011/03/05      insert left and right padding in th and td cells*
- *		2011/04/04      add gender based label styles for th cells      *
- *		2011/05/06      add th class 'colheadSmall'                     *
- *		2011/05/22      adjust details of button style for span to more *
+ *      2010/12/10      improve appearance of children in main web page *
+ *      2011/03/05      insert left and right padding in th and td cells*
+ *      2011/04/04      add gender based label styles for th cells      *
+ *      2011/05/06      add th class 'colheadSmall'                     *
+ *      2011/05/22      adjust details of button style for span to more *
  *                      closely match default Firefox button.           *
- *		2011/05/28      support for framed images                       *
- *		2011/06/06      add fixed serif input field                     *
- *		2011/06/12      add span classes male and female                *
+ *      2011/05/28      support for framed images                       *
+ *      2011/06/06      add fixed serif input field                     *
+ *      2011/06/12      add span classes male and female                *
  *                      add option classes male and female              *
- *		2011/07/02      add inalabel style for input tag                *
- *		2011/09/24      explicitly set text color for span to black     *
- *		2011/09/26      add map style for div                           *
- *		2011/10/16      increase distinctiveness of percentage colors   *
+ *      2011/07/02      add inalabel style for input tag                *
+ *      2011/09/24      explicitly set text color for span to black     *
+ *      2011/09/26      add map style for div                           *
+ *      2011/10/16      increase distinctiveness of percentage colors   *
  *                      and make them all pure red to green shades      *
- *		2011/11/18      add td.cellRight, td.cellCenter,                *
+ *      2011/11/18      add td.cellRight, td.cellCenter,                *
  *                      td.underlineRight, and td.underlineCenter       *
  *                      add inacenter, inacenternc, actcenter, and      *
  *                      actcenternc styles for input tag                *
- *		2011/12/17      add p.large (p.label without indent)            *
+ *      2011/12/17      add p.large (p.label without indent)            *
  *                      add p.warning                                   *
- *		2011/12/22      highlight input fiel d classes                  *
- *		2012/01/02      add classes for input cells that are selected   *
- *		2012/01/16      add <div class='hidden'> for templates          *
- *		2012/02/26      add message style for span,                     *
+ *      2011/12/22      highlight input fiel d classes                  *
+ *      2012/01/02      add classes for input cells that are selected   *
+ *      2012/01/16      add <div class='hidden'> for templates          *
+ *      2012/02/26      add message style for span,                     *
  *                      img.example, p.picdesc                          *
  *                      add bottom margin to div class='picture' to     *
  *                      visually separate successive pictures           *
- *		2012/03/28      add td.oddcenter and td.evencenter              *
- *		2012/03/31      indent subsequent lines of text in td.odd,      *
+ *      2012/03/28      add td.oddcenter and td.evencenter              *
+ *      2012/03/31      indent subsequent lines of text in td.odd,      *
  *                      td.oddleft, td.even, and td.evenleft            *
  *                      add td.oddmale and td.oddfemale                 *
  *                      add td.evenmale and td.evenfemale               *
- *		2012/05/06      provide default style for buttons               *
+ *      2012/05/06      provide default style for buttons               *
  *                      add styles actcode, and inacode styles for      *
  *                      input tag and display the field value in        *
  *                      monospace font                                  *
- *		2012/05/28      add option.unknown for unknown sex              *
+ *      2012/05/28      add option.unknown for unknown sex              *
  *                      add td.evenunknown and td.oddunknown for        *
  *                      unknown sex                                     *
  *                      add a.unknown for unknown sex                   *
- *		2012/06/23      add vertical padding to button style for span   *
- *		2012/07/30      correct td.colheadSmall to have same borders as *
+ *      2012/06/23      add vertical padding to button style for span   *
+ *      2012/07/30      correct td.colheadSmall to have same borders as *
  *                      colhead                                         *
- *		2012/09/17      change appearance of actrightfixed style for    *
+ *      2012/09/17      change appearance of actrightfixed style for    *
  *                      input tag                                       *
- *		2012/10/23      add error reporting highlighting classes        *
- *		2013/01/26      add male, female, and unknown styles for        *
+ *      2012/10/23      add error reporting highlighting classes        *
+ *      2013/01/26      add male, female, and unknown styles for        *
  *                      input tag                                       *
- *		2013/02/24      change text alignment in th.label to right      *
- *		2013/03/04      add hyperlink style for input tag to underline  *
+ *      2013/02/24      change text alignment in th.label to right      *
+ *      2013/03/04      add hyperlink style for input tag to underline  *
  *                      in blue                                         *
- *		2013/03/28      change button.width100 to button.width110       *
- *		2013/04/05      add right450 style for span to accomodate       *
+ *      2013/03/28      change button.width100 to button.width110       *
+ *      2013/04/05      add right450 style for span to accomodate       *
  *                      Facebook button                                 *
- *		2013/05/17      shrink vertical size of button.button           *
- *		2013/05/29      button.button:disabled                          *
- *		2013/06/10      change th.label and th.labelsmall so the label  *
+ *      2013/05/17      shrink vertical size of button.button           *
+ *      2013/05/29      button.button:disabled                          *
+ *      2013/06/10      change th.label and th.labelsmall so the label  *
  *                      is vertically aligned                           *
- *		2013/06/13      add td.pad10 for a cell that has width 10%      *
- *		2013/07/01      add style a.button to make anchors look like    *
+ *      2013/06/13      add td.pad10 for a cell that has width 10%      *
+ *      2013/07/01      add style a.button to make anchors look like    *
  *                      buttons                                         *
- *		2013/07/04      there is no way to have a single style that     *
+ *      2013/07/04      there is no way to have a single style that     *
  *                      allows an anchor to look like a button          *
  *                      containingeither text or an image.              *
  *                      You have to have two different classes!         *
- *		2013/06/17      capitalize subdistrict and division identifiers *
- *		2013/12/19      add text-align: right to right style for span   *
+ *      2013/06/17      capitalize subdistrict and division identifiers *
+ *      2013/12/19      add text-align: right to right style for span   *
  *                      add iframe.facebook                             *
- *		2013/12/24      make left and right styles for span consistent  *
+ *      2013/12/24      make left and right styles for span consistent  *
  *                      in appearance                                   *
- *		2013/12/27      add center style for div for 3-way split        *
- *		2014/01/01      move styles used only by usstates.html          *
+ *      2013/12/27      add center style for div for 3-way split        *
+ *      2014/01/01      move styles used only by usstates.html          *
  *                      to usstates.css                                 *
- *		2014/01/10      move styles used only by MarriageRegDetail.php  *
+ *      2014/01/10      move styles used only by MarriageRegDetail.php  *
  *                      to MarriageRegDetail.css                        *
- *		2014/01/14      adjust styles for summary status tables         *
- *		2014/02/12      add fieldset styles                             *
- *		2014/02/25      align attribute values for clarity              *
- *		2014/03/05      add warning style for span                      *
- *		2014/03/27      add row style for div                           *
- *		2014/05/30      add select.actleftcit                           *
- *		2014/05/30      add right368 style for span                     *
+ *      2014/01/14      adjust styles for summary status tables         *
+ *      2014/02/12      add fieldset styles                             *
+ *      2014/02/25      align attribute values for clarity              *
+ *      2014/03/05      add warning style for span                      *
+ *      2014/03/27      add row style for div                           *
+ *      2014/05/30      add select.actleftcit                           *
+ *      2014/05/30      add right368 style for span                     *
  *                      add iframe.advert                               *
  *                      add advert style for div                        *
- *		2014/11/29      add warning style for div                       *
- *		2015/01/13      add unknown style for span                      *
+ *      2014/11/29      add warning style for div                       *
+ *      2015/01/13      add unknown style for span                      *
  *                      add span.note                                   *
- *		2015/01/23      add margin-bottom: 1em; to list items           *
- *		2015/02/05      move tab styles from index.css                  *
- *		2015/02/17      add a border between left and right iframes     *
- *		2015/05/13      add article style for div                       *
- *		2015/06/02      use same size font in TinyMCE editor as for     *
+ *      2015/01/23      add margin-bottom: 1em; to list items           *
+ *      2015/02/05      move tab styles from index.css                  *
+ *      2015/02/17      add a border between left and right iframes     *
+ *      2015/05/13      add article style for div                       *
+ *      2015/06/02      use same size font in TinyMCE editor as for     *
  *                      other input fields                              *
- *		2015/06/22      missing input.unknownerror                      *
- *		2015/07/17      set width of advert border explicitly to        *
+ *      2015/06/22      missing input.unknownerror                      *
+ *      2015/07/17      set width of advert border explicitly to        *
  *                      avoid browser interpretations of "thick"        *
- *		2016/01/19      add p style notes                               *
- *		2016/07/03      only print the body of the page                 *
- *		2017/12/05      separate styles into separate classes for       *
+ *      2016/01/19      add p style notes                               *
+ *      2016/07/03      only print the body of the page                 *
+ *      2017/12/05      separate styles into separate classes for       *
  *                      text color, including gender, error, warning    *
  *                      background color                                *
- *		2017/12/08      remove rounded corners from select and option   *
- *		2018/05/22      change "grey" from #404040 to #606060           *
- *		2018/11/30      remove obsolete composite styles                *
- *		2019/01/30      add style div.menu for popup menu               *
- *		2019/03/02      add .left, .center, .right                      *
+ *      2017/12/08      remove rounded corners from select and option   *
+ *      2018/05/22      change "grey" from #404040 to #606060           *
+ *      2018/11/30      remove obsolete composite styles                *
+ *      2019/01/30      add style div.menu for popup menu               *
+ *      2019/03/02      add .left, .center, .right                      *
  *                      remove div.right450                             *
  *      2019/04/18      brighten up body background                     *
  *      2019/06/25      change div.menu, add a.menuitem, hr.menubar     *
@@ -128,6 +128,8 @@
  *      2021/06/19      add more background colors                      *
  *      2022/01/17      only override display mode for class button     *
  *                      on inline elements such as <button>             *
+ *      2022/07/03      use display: flex in class row to eliminate     *
+ *                      need for extra div with clear: both or hack     *
  *                                                                      *
  *  Copyright &copy; 2022 James A. Cobban                               *
  ************************************************************************/
@@ -151,6 +153,13 @@
                 }
 
     .smaller   {font-size:          smaller;}
+
+    .bold { 
+                font-family:        sans-serif;
+                font-weight:        bold;
+                }
+    .normal    {font-weight:        normal;
+                font-size:          inherit; }
 
    /*********************************************************************
     *    styles for background color                                    *
@@ -241,7 +250,7 @@
                 font-weight:        normal;
                 }
     .link:visited    {              
-                color:		        rgb(0,0,128);   /* dark blue */
+                color:              rgb(0,0,128);   /* dark blue */
                 text-decoration:    underline;
                 border:             none;
                 background-color:   transparent;
@@ -252,7 +261,43 @@
    /*********************************************************************
     *   Styles for displaying tags that have button behavior            *
     *********************************************************************/
-    span.button, button.button, a.button    { 
+    button {    font-family:        sans-serif;
+                font-weight:        bold;
+                font-size:          80%;
+                text-align:         center;
+                background-color:   #E0E0E0;
+                color:              black;
+                border-top:         2px solid white;
+                border-left:        2px solid white;
+                border-bottom:      3px solid #606060;
+                border-right:       3px solid #606060;
+                border-radius:      5px;
+                padding:            2px 12px 2px 12px;
+                }
+    button:disabled {    
+                color:              #606060; };
+
+    button[disabled] {
+                color:              #804040;
+                }
+
+    button.clear { font-family:        sans-serif;
+                font-weight:        bold;
+                font-size:          80%;
+                text-align:         center;
+                background-color:   transparent;
+                color:              black;
+                padding:            2px 12px 2px 12px;
+                }
+
+    button.width110 {    
+                font-family:        sans-serif;
+                font-weight:        bold;
+                text-align:         center;
+                color:              black;
+                width:              110px;
+                }
+    .button    { 
                 font-family:        sans-serif;
                 font-weight:        bold;
                 font-size:          80%;
@@ -264,10 +309,11 @@
                 border-left:        2px solid white;
                 border-bottom:      3px solid #606060;
                 border-right:       3px solid #606060;
+                border-radius:      5px;
                 padding:            2px 12px 2px 12px;
                 display:            inline-block;
                 }
-    button.button:disabled {
+    .button:disabled {
                 font-family:        sans-serif;
                 font-weight:        bold;
                 font-size:          80%;
@@ -278,22 +324,9 @@
                 border-left:        2px solid white;
                 border-bottom:      3px solid #606060;
                 border-right:       3px solid #606060;
+                border-radius:      5px;
                 padding:            0px 12px 0px 12px;
                 display:            inline-block;
-                }
-    .button     { 
-                font-family:        sans-serif;
-                font-weight:        bold;
-                font-size:          80%;
-                text-align:         center;
-                text-decoration:    none;
-                background-color:   #E0E0E0;
-                color:              #000000;
-                border-top:         2px solid white;
-                border-left:        3px solid white;
-                border-bottom:      3px solid #606060;
-                border-right:       3px solid #606060;
-                padding:            2px 12px 2px 12px;
                 }
 
    /*********************************************************************
@@ -305,6 +338,7 @@
                 padding:            0px;
                 font-family:        sans-serif;
                 font-size:          16px;
+                height:             100%;
                 }
 
    /*********************************************************************
@@ -384,13 +418,19 @@
     *   Display information in columnar format without using table      *
     *********************************************************************/
     div.row {   white-space:        nowrap;
-                clear:		        both; 
-                float:              left;
                 width:              100%;
+                display:            flex;
+            }
+
+    div.spaceBetween {
+                width:              100%;
+                display:            flex;
+                font-weight:        bold;
+                justify-content:    space-between;
             }
 
     div.last {  
-                margin-bottom:		1ex;	/* letter height */
+                margin-bottom:      1ex;    /* letter height */
             }
 
    /*********************************************************************
@@ -515,6 +555,19 @@
                 font-weight:        bold;
                 border-bottom:      thick solid #008000;
                 width:              100%;
+                display:            flex;
+                justify-content:    space-between;
+                }
+
+   /*********************************************************************
+    *   div class='advertSpace' is used to display an advertisement     *
+    *   in the page header. Note that this allocates the space to       *
+    *   hold the advertisement.                                         *
+    *********************************************************************/
+    div.advertspace {
+                width:              728px;
+                height:             auto;
+                display:            inline-block;       
                 }
 
    /*********************************************************************
@@ -539,6 +592,7 @@
     div.body  { background-color:   #FFFDF0;    /* aged vellum */
                 padding:            4px;
                 font-family:        sans-serif;
+                height:             100%;
                 }
 
    /*********************************************************************
@@ -547,10 +601,10 @@
     *********************************************************************/
     div.article  {
                 background-color:   white;
-                padding-top:		4px;
-                padding-left:		1cm;
-                padding-right:		1cm;
-                padding-bottom:		4px;
+                padding-top:        4px;
+                padding-left:       1cm;
+                padding-right:      1cm;
+                padding-bottom:     4px;
                 font-family:        sans-serif;
                 }
 
@@ -582,9 +636,9 @@
     div.warning {
                 font-family:        sans-serif;
                 font-weight:        bold;
-                color:			    rgb(128,96,0);	/* dark yellow */
-                margin-top:		    0;
-                margin-bottom:		0.5ex;	/* half letter height */
+                color:              rgb(128,96,0);  /* dark yellow */
+                margin-top:         0;
+                margin-bottom:      0.5ex;  /* half letter height */
                 }
 
    /*********************************************************************
@@ -599,7 +653,7 @@
                 border-left:        thick solid #402000;
                 border-bottom:      thick solid #A05000;
                 border-right:       thick solid #A05000;
-                margin-bottom:		0.5ex;	/* half letter height */
+                margin-bottom:      0.5ex;  /* half letter height */
                 }
 
    /*********************************************************************
@@ -610,6 +664,7 @@
                 height: 5px;
                 background-color: black;
                 margin: 6px 0;
+                border-radius: 2.5px;
                 }
 
    /*********************************************************************
@@ -622,16 +677,16 @@
                 padding:            0px;
     }
     span.tabs { background-color:   #F7E2B8;
-                border-top:         3px solid #FEF0E0;	
+                border-top:         3px solid #FEF0E0;  
                 border-left:        3px solid #FEF0E0;
                 border-right:       3px solid brown;
                 border-bottom:      2px solid brown;
-                border-top-left-radius:		10px;
-                border-top-right-radius:	10px;
-                padding-top:		2px;
-                padding-bottom:		2px;
-                padding-left:		7px;	
-                padding-right:		7px;	
+                border-top-left-radius:     10px;
+                border-top-right-radius:    10px;
+                padding-top:        2px;
+                padding-bottom:     2px;
+                padding-left:       7px;    
+                padding-right:      7px;    
                 float:              left;
                 font-family:        sans-serif;
                 font-size:          larger;
@@ -639,16 +694,16 @@
     }
     span.tabsFront {
                 background-color:   #FFFDF0;            /* brighter*/
-                border-top:         3px solid white;    /* brighter*/	
+                border-top:         3px solid white;    /* brighter*/   
                 border-left:        3px solid white;    /* brighter*/
                 border-right:       3px solid brown;
-                border-bottom:      0px;	            /* none */
-                border-top-left-radius:		10px;
-                border-top-right-radius:	10px;
-                padding-top:		2px;
-                padding-bottom:		4px;
-                padding-left:		7px;	
-                padding-right:		7px;	
+                border-bottom:      0px;                /* none */
+                border-top-left-radius:     10px;
+                border-top-right-radius:    10px;
+                padding-top:        2px;
+                padding-bottom:     4px;
+                padding-left:       7px;    
+                padding-right:      7px;    
                 float:              left;
                 font-family:        sans-serif;
                 font-weight:        bold;
@@ -661,8 +716,14 @@
     *********************************************************************/
     h1        { font-family:        sans-serif;
                 }
+    h1.flex   { font-family:        sans-serif;
+                display:            flex;
+                justify-content:    space-between;
+                }
     h1.big    { font-family:        sans-serif;
                 font-size:          160px;
+                display:            flex;
+                justify-content:    space-between;
                 }
     h2        { font-family:        sans-serif;
                 }
@@ -671,8 +732,8 @@
     p         { font-family:        sans-serif;
                 }
     p.notes   { font-family:        sans-serif;
-                padding-left:		2em;
-                padding-right:		2em;
+                padding-left:       2em;
+                padding-right:      2em;
                 }
     li        { font-family:        sans-serif;
                 margin-bottom:      1em;
@@ -684,11 +745,11 @@
     p.label   { font-family:        sans-serif;
                 font-size:          larger;
                 font-weight:        bold;
-                margin-left:		6em;
-                text-indent:		-3em;
+                margin-left:        6em;
+                text-indent:        -3em;
                 margin-top:         0;
-                margin-bottom:		0.5ex;	/* half letter height */
-                clear:		        both; 
+                margin-bottom:      0.5ex;  /* half letter height */
+                clear:              both; 
                 }
 
    /*********************************************************************
@@ -698,8 +759,8 @@
     p.large   { font-family:        sans-serif;
                 font-size:          larger;
                 font-weight:        bold;
-                margin-top:		    0;
-                margin-bottom:		0.5ex;	/* half letter height */
+                margin-top:         0;
+                margin-bottom:      0.5ex;  /* half letter height */
                 }
    /*********************************************************************
     *   p class='labelSmall' is the same as class='label' but with      *
@@ -708,15 +769,15 @@
     p.labelSmall {
                 font-family:        sans-serif;
                 font-weight:        bold;
-                margin-left:		6em;
-                text-indent:		-3em;
+                margin-left:        6em;
+                text-indent:        -3em;
                 margin-top:         0;
-                margin-bottom:		0.5ex;	/* half letter height */
+                margin-bottom:      0.5ex;  /* half letter height */
                 }
     p.indent {  font-family:        sans-serif;
-                margin-left:		6em;
+                margin-left:        6em;
                 margin-top:         0;
-                margin-bottom:		0;
+                margin-bottom:      0;
                 }
     p.left    { font-family:        sans-serif;
                 font-weight:        bold;
@@ -724,21 +785,21 @@
                 }
     p.message { font-family:        sans-serif;
                 font-weight:        bold;
-                color:		        rgb(192,0,0);	/* dark red */
+                color:              rgb(192,0,0);   /* dark red */
                 margin-top:         0;
-                margin-bottom:		0.5ex;	/* half letter height */
+                margin-bottom:      0.5ex;  /* half letter height */
                 }
     p.warning { font-family:        sans-serif;
                 font-weight:        bold;
-                color:		        rgb(128,96,0);	/* dark yellow */
-                margin-top:		    0;
-                margin-bottom:		0.5ex;	/* half letter height */
+                color:              rgb(128,96,0);  /* dark yellow */
+                margin-top:         0;
+                margin-bottom:      0.5ex;  /* half letter height */
                 }
-    p.clear   { margin-top:         0.5ex;	/* half letter height */
-                margin-bottom:		0.5ex;	/* half letter height */ 
+    p.clear   { margin-top:         0.5ex;  /* half letter height */
+                margin-bottom:      0.5ex;  /* half letter height */ 
                 font-weight:        bold;
                 font-family:        sans-serif;
-                clear:		        both; 
+                clear:              both; 
                 }
 
    /*********************************************************************
@@ -746,8 +807,8 @@
     *********************************************************************/
     p.picdesc { font-family:        sans-serif;
                 font-size:          smaller;
-                margin-top:		    0.5ex;	/* half letter height */
-                margin-bottom:		0.5ex;	/* half letter height */
+                margin-top:         0.5ex;  /* half letter height */
+                margin-bottom:      0.5ex;  /* half letter height */
                 }
 
    /*********************************************************************
@@ -759,7 +820,7 @@
                 font-family:        sans-serif;
                 font-weight:        bold;
                 text-align:         right;
-                vertical-align:		top;
+                vertical-align:     top;
                 padding:            0px 3px 0px 3px;
                 float:              left;
                 width:              15em;
@@ -769,7 +830,7 @@
                 font-weight:        bold;
                 font-size:          smaller;
                 text-align:         right;
-                vertical-align:		top;
+                vertical-align:     top;
                 padding:            0px 3px 0px 3px;
                 float:              left;
                 width:              15em;
@@ -785,9 +846,9 @@
                 font-family:        sans-serif;
                 font-weight:        bold;
                 text-align:         right;
-                vertical-align:		top;
+                vertical-align:     top;
                 padding:            0px 3px 0px 3px;
-                margin-top:		    1px;
+                margin-top:         1px;
                 float:              left;
                 width:              15em;
                 }
@@ -802,9 +863,9 @@
                 font-family:        sans-serif;
                 font-weight:        bold;
                 text-align:         right;
-                vertical-align:		top;
+                vertical-align:     top;
                 padding:            0px 3px 0px 3px;
-                margin-top:		    1px;
+                margin-top:         1px;
                 float:              left;
                 width:              15em;
                 }
@@ -815,9 +876,12 @@
     a.menuitem { 
                 font-family:        sans-serif;
                 font-weight:        bold;
+                font-size:          150%;
                 background-color:   #E0E0E0;
                 color:              #404040;
                 text-decoration:    none;
+                padding-top:        3px;
+                padding-bottom:     3px;
                 }
     a.menuitem:focus { 
                 font-family:        sans-serif;
@@ -828,27 +892,27 @@
                 }
     a.male:link    { 
                 font-family:        sans-serif;
-                color:			    blue;
+                color:              blue;
                 }
     a.male:visited    { 
                 font-family:        sans-serif;
-                color:		        rgb(0,0,128);   /* dark blue */
+                color:              rgb(0,0,128);   /* dark blue */
                 }
     a.female:link { 
                 font-family:        sans-serif;
-                color:		        red;
+                color:              red;
                 }
     a.female:visited    { 
                 font-family:        sans-serif;
-                color:		        rgb(128,0,0);   /* dark red */
+                color:              rgb(128,0,0);   /* dark red */
                 }
     a.unknown:link { 
                 font-family:        sans-serif;
-                color:		        green;
+                color:              green;
                 }
     a.unknown:visited    { 
                 font-family:        sans-serif;
-                color:			    rgb(0,128,0);   /* dark green */
+                color:              rgb(0,128,0);   /* dark green */
                 }
 
    /*********************************************************************
@@ -896,16 +960,6 @@
                 }
 
    /*********************************************************************
-    *   span class='advert' is used to display an advertisement         *
-    *   in the page header. Note that this allocates the space to       *
-    *   hold the advertisement.                                         *
-    *********************************************************************/
-    span.advert {
-                width:              728px;
-                height:             auto;
-                }
-
-   /*********************************************************************
     *   span class='facebook' is used to display an advertisement       *
     *   in the page header. Note that this allocates the space to       *
     *   hold the facebook like button.                                  *
@@ -922,17 +976,17 @@
                 }
     span.note { font-family:        sans-serif;
                 font-weight:        bold;
-                color:			    rgb(0,128,0);	/* dark green */
+                color:              rgb(0,128,0);   /* dark green */
                 }
     span.message {
                 font-family:        sans-serif;
                 font-weight:        bold;
-                color:			    rgb(192,0,0);	/* dark red */
+                color:              rgb(192,0,0);   /* dark red */
                 }
     span.warning {
                 font-family:        sans-serif;
                 font-weight:        bold;
-                color:			    rgb(128,96,0);	/* dark yellow */
+                color:              rgb(128,96,0);  /* dark yellow */
                 }
 
    /*********************************************************************
@@ -943,14 +997,14 @@
                 border-left:        2px solid #C00000;
                 border-bottom:      2px solid #400000;
                 border-right:       2px solid #400000;
-                border-spacing:		2px;
+                border-spacing:     2px;
                 }
     img.figure {
                 border-top:         4px solid white;
                 border-left:        4px solid white;
                 border-bottom:      4px solid #808080;
                 border-right:       4px solid #808080;
-                border-spacing:		2px;
+                border-spacing:     2px;
                 }
 
    /*********************************************************************
@@ -958,7 +1012,7 @@
     *********************************************************************/
     table.details {
                 border:             2px solid black; 
-                border-spacing:		0px;
+                border-spacing:     0px;
                 }
     table.summary {
                 border:             2px solid black; 
@@ -968,7 +1022,7 @@
                 width:              100%
                 }
     table.form {
-                border-spacing:		0px;
+                border-spacing:     0px;
                 padding:            0px;
                 border:             2px solid black; 
                 }
@@ -984,19 +1038,19 @@
     th.list {   font-family:        sans-serif;
                 font-weight:        bold;
                 text-align:         center;
-                vertical-align:		top;
+                vertical-align:     top;
                 }
     th.label {  font-family:        sans-serif;
                 font-weight:        bold;
                 text-align:         right;
-                vertical-align:		top;
+                vertical-align:     top;
                 padding:            0px 3px 0px 3px;
                 }
     th.labelSmall {    
                 font-family:        sans-serif;
                 font-weight:        bold;
                 text-align:         right;
-                vertical-align:		top;
+                vertical-align:     top;
                 font-size:          smaller;
                 padding:            0px 3px 0px 5px;
                 }
@@ -1020,7 +1074,7 @@
                 font-weight:        bold;
                 text-align:         right;
                 width:              7%;
-                padding-right:		6px;
+                padding-right:      6px;
                 }
     th.detlabel {    
                 font-family:        sans-serif;
@@ -1066,14 +1120,14 @@
                 text-align:         center;
                 padding:            0px;
                 border-width:              0px 0px 0px 0px;
-                empty-cells:		show;
+                empty-cells:        show;
                 }
     th.form {   font-family:        sans-serif;
                 font-weight:        bold;
                 text-align:         left;
                 padding:            0px 3px 0px 3px;
                 border-width:              0px 0px 0px 0px;
-                empty-cells:		show;
+                empty-cells:        show;
                 }
     th.underline {
                 font-family:        sans-serif;
@@ -1089,7 +1143,7 @@
                 border-bottom:      thin solid black;
                 border-top:         2px double black;
                 padding:            2px 2px 2px 2px;
-                empty-cells:		show;
+                empty-cells:        show;
                 font-family:        sans-serif;
                 font-weight:        bold;
                 }
@@ -1135,8 +1189,8 @@
                 font-family:        sans-serif;
                 text-align:         left;
                 background-color:   white;
-                padding-left:		4px;
-                padding-right:		4px;
+                padding-left:       4px;
+                padding-right:      4px;
                 }
     td.data {
                 font-family:        sans-serif;
@@ -1179,7 +1233,7 @@
                 border-bottom:      thin solid black;
                 border-top:         2px double black;
                 padding:            2px 2px 2px 2px;
-                empty-cells:		show;
+                empty-cells:        show;
                 font-family:        sans-serif;
                 font-weight:        bold;
                 }
@@ -1193,49 +1247,49 @@
                 font-family:        sans-serif;
                 font-weight:        bold;
                 text-align:         right;
-                background-color:   #e00000;	/* brilliance 0e0 */
+                background-color:   #e00000;    /* brilliance 0e0 */
                 }
     td.p01right {
                 font-family:        sans-serif;
                 font-weight:        bold;
                 text-align:         right;
-                background-color:   #f03000;	/* brilliance 120 */
+                background-color:   #f03000;    /* brilliance 120 */
                 }
     td.p05right {
                 font-family:        sans-serif;
                 font-weight:        bold;
                 text-align:         right;
-                background-color:   #e85800;	/* brilliance 140 */
+                background-color:   #e85800;    /* brilliance 140 */
                 }
     td.p15right {
                 font-family:        sans-serif;
                 font-weight:        bold;
                 text-align:         right;
-                background-color:   #c89800;	/* brilliance 160 */
+                background-color:   #c89800;    /* brilliance 160 */
                 }
     td.p25right {
                 font-family:        sans-serif;
                 font-weight:        bold;
                 text-align:         right;
-                background-color:   #b8b800;	/* brilliance 180 */
+                background-color:   #b8b800;    /* brilliance 180 */
                 }
     td.p50right {
                 font-family:        sans-serif;
                 font-weight:        bold;
                 text-align:         right;
-                background-color:   #98d800;	/* brilliance 170 */
+                background-color:   #98d800;    /* brilliance 170 */
                 }
     td.p75right {
                 font-family:        sans-serif;
                 font-weight:        bold;
                 text-align:         right;
-                background-color:   #78f800;	/* brilliance 170 */
+                background-color:   #78f800;    /* brilliance 170 */
                 }
     td.p100right {
                 font-family:        sans-serif;
                 font-weight:        bold;
                 text-align:         right;
-                background-color:   #31ff30;	/* brilliance 160 */
+                background-color:   #31ff30;    /* brilliance 160 */
                 }
 
     /* add border to two sides of a cell so the entire table
@@ -1256,32 +1310,32 @@
                 border-right:       thin solid black;
                 border-bottom:      thin solid black;
                 padding:            2px 2px 2px 2px;
-                empty-cells:		show;
+                empty-cells:        show;
                 }
     td.odd {    font-family:        sans-serif;
                 background-color:   #F8F8F8;
                 border-right:       thin solid black;
                 border-bottom:      thin solid black;
                 padding:            2px 2px 2px 2px;
-                empty-cells:		show;
+                empty-cells:        show;
                 }
     td.even {   font-family:        sans-serif;
                 background-color:   #E0E0E0;
                 border-right:       thin solid black;
                 border-bottom:      thin solid black;
                 padding:            2px 2px 2px 2px;
-                empty-cells:		show;
+                empty-cells:        show;
                 }
     td.cell {   font-family:        sans-serif;
                 border-width:       0px;
                 padding:            0px;
-                empty-cells:		show;
+                empty-cells:        show;
                 }
     td.underline {
                 font-family:        sans-serif;
                 border-width:       0px;
                 padding:            0px;
-                empty-cells:		show;
+                empty-cells:        show;
                 border-bottom:      medium solid black;
                 }
 
@@ -1293,23 +1347,23 @@
                 border-bottom:      0px none;
                 background-color:   #902525;
                 width:              50%;
-                margin-top:		    10mm;
-                }	
+                margin-top:         10mm;
+                }   
     hr.menubar {
                 height:             0px;
                 border-top:         2px solid #C0C0C0;
                 border-bottom:      2px solid #FFFFFF;
                 width:              100%;
-                margin-top:		    0px;
-                }	
+                margin-top:         0px;
+                }   
     hr.footnotes {
                 height:             2px;
                 border-top:         2px solid black;
                 border-bottom:      0px none;
                 background-color:   #902525;
                 width:              50%;
-                margin-top:		    10mm;
-                margin-left:		0px;
+                margin-top:         10mm;
+                margin-left:        0px;
                 }
 
    /*********************************************************************
@@ -1318,39 +1372,39 @@
     fieldset.female    {
                 background-color:   #FFE0E0;
                 border:             1px solid red;
-                padding-left:		1px;
-                padding-bottom:		1px;
-                padding-right:		1px;
+                padding-left:       1px;
+                padding-bottom:     1px;
+                padding-right:      1px;
                 }
     fieldset.male    {
                 background-color:   #E0E0FF;
                 border:             1px solid blue;
-                padding-left:		1px;
-                padding-bottom:		1px;
-                padding-right:		1px;
+                padding-left:       1px;
+                padding-bottom:     1px;
+                padding-right:      1px;
                 }
     fieldset.other    {
                 border:             1px solid #808000;
-                padding-left:		1px;
-                padding-bottom:		1px;
-                padding-right:		1px;
+                padding-left:       1px;
+                padding-bottom:     1px;
+                padding-right:      1px;
                 }
     legend.label {
                 font-family:        sans-serif;
                 font-weight:        bold;
                 text-align:         left;
-                vertical-align:		top;
+                vertical-align:     top;
                 padding:            0px 3px 0px 3px;
-                margin-top:		    1px;
+                margin-top:         1px;
                 }
     legend.labelSmall {
                 font-family:        sans-serif;
                 font-weight:        bold;
                 font-size:          smaller;
                 text-align:         left;
-                vertical-align:		top;
+                vertical-align:     top;
                 padding:            0px 3px 0px 3px;
-                margin-top:		    1px;
+                margin-top:         1px;
                 }
 
    /*********************************************************************
@@ -1360,12 +1414,12 @@
                 font-family:        sans-serif;
                 font-weight:        bold;
                 text-align:         center;
-                text-transform:		capitalize;
+                text-transform:     capitalize;
                 }
     input.left {
                 font-family:        sans-serif;
                 text-align:         left;
-                text-transform:		capitalize;
+                text-transform:     capitalize;
                 padding:            0px;
                 border-top:         1px solid black;
                 border-left:        1px solid black;
@@ -1373,16 +1427,16 @@
                 border-right:       1px solid white;
                 }
     input[type='checkbox'].left {
-					font-family:	sans-serif;
-					text-align:	    left;
-					text-transform:	capitalize;
-					padding:	    0px;
-					border-top:	    1px solid black;
-					border-left:	1px solid black;
-					border-bottom:	1px solid white;
-					border-right:	1px solid white;
-					width:		    25px;
-		        }
+                    font-family:    sans-serif;
+                    text-align:     left;
+                    text-transform: capitalize;
+                    padding:        0px;
+                    border-top:     1px solid black;
+                    border-left:    1px solid black;
+                    border-bottom:  1px solid white;
+                    border-right:   1px solid white;
+                    width:          25px;
+                }
     input.leftnc {
                 font-family:        sans-serif;
                 text-align:         left;
@@ -1399,7 +1453,7 @@
                 margin-left:        auto;
                 margin-right:       auto;
                 float:              left;
-                text-transform:		capitalize;
+                text-transform:     capitalize;
                 padding:            0px;
                 border-top:         1px solid black;
                 border-left:        1px solid black;
@@ -1420,7 +1474,7 @@
                 font-family:        sans-serif;
                 text-align:         right;
                 float:              left;
-                text-transform:		capitalize;
+                text-transform:     capitalize;
                 padding:            0px;
                 border-top:         1px solid black;
                 border-left:        1px solid black;
@@ -1442,7 +1496,7 @@
                 text-align:         right;
                 float:              left;
                 background-color:   white;
-                text-transform:		capitalize;
+                text-transform:     capitalize;
                 font-weight:        bold;
                 padding:            0px;
                 border-top:         1px solid black;
@@ -1459,7 +1513,7 @@
                 font-family:        sans-serif;
                 background-color:   white;
                 color:              blue;
-                text-transform:		capitalize;
+                text-transform:     capitalize;
                 padding:            0px;
                 border-top:         1px solid black;
                 border-left:        1px solid black;
@@ -1470,7 +1524,7 @@
                 font-family:        sans-serif;
                 background-color:   white;
                 color:              red;
-                text-transform:		capitalize;
+                text-transform:     capitalize;
                 padding:            0px;
                 border-top:         1px solid black;
                 border-left:        1px solid black;
@@ -1481,7 +1535,7 @@
                 font-family:        sans-serif;
                 background-color:   white;
                 color:              green;
-                text-transform:		capitalize;
+                text-transform:     capitalize;
                 padding:            0px;
                 border-top:         1px solid black;
                 border-left:        1px solid black;
@@ -1497,7 +1551,7 @@
                 float:              left;
                 }
     input.inalabelSelected {
-                color:              #F0F0F0;	/* bright gray */
+                color:              #F0F0F0;    /* bright gray */
                 font-family:        sans-serif;
                 font-size:          larger;
                 text-align:         center;
@@ -1508,8 +1562,8 @@
                 font-family:        sans-serif;
                 text-align:         left;
                 float:              left;
-                color:              #F0F0F0;	/* bright gray */
-                text-transform:		capitalize;
+                color:              #F0F0F0;    /* bright gray */
+                text-transform:     capitalize;
                 padding:            0px;
                 border-top:         1px solid black;
                 border-left:        1px solid black;
@@ -1520,7 +1574,7 @@
                 font-family:        sans-serif;
                 text-align:         left;
                 float:              left;
-                color:              #F0F0F0;	/* bright gray */
+                color:              #F0F0F0;    /* bright gray */
                 padding:            0px;
                 border-top:         1px solid black;
                 border-left:        1px solid black;
@@ -1531,8 +1585,8 @@
                 font-family:        sans-serif;
                 text-align:         center;
                 float:              left;
-                color:              #F0F0F0;	/* bright gray */
-                text-transform:		capitalize;
+                color:              #F0F0F0;    /* bright gray */
+                text-transform:     capitalize;
                 padding:            0px;
                 border-top:         1px solid black;
                 border-left:        1px solid black;
@@ -1543,7 +1597,7 @@
                 font-family:        sans-serif;
                 text-align:         center;
                 float:              left;
-                color:              #F0F0F0;	/* bright gray */
+                color:              #F0F0F0;    /* bright gray */
                 padding:            0px;
                 border-top:         1px solid black;
                 border-left:        1px solid black;
@@ -1554,8 +1608,8 @@
                 font-family:        sans-serif;
                 text-align:         right;
                 float:              left;
-                color:              #F0F0F0;	/* bright gray */
-                text-transform:		capitalize;
+                color:              #F0F0F0;    /* bright gray */
+                text-transform:     capitalize;
                 padding:            0px;
                 border-top:         1px solid black;
                 border-left:        1px solid black;
@@ -1566,7 +1620,7 @@
                 font-family:        sans-serif;
                 text-align:         right;
                 float:              left;
-                color:              #F0F0F0;	/* bright gray */
+                color:              #F0F0F0;    /* bright gray */
                 padding:            0px;
                 border-top:         1px solid black;
                 border-left:        1px solid black;
@@ -1577,7 +1631,7 @@
                 font-family:        sans-serif;
                 text-align:         left;
                 color:              white;
-                text-transform:		capitalize;
+                text-transform:     capitalize;
                 padding:            0px;
                 border-top:         1px solid black;
                 border-left:        1px solid black;
@@ -1600,7 +1654,7 @@
                 text-align:         center;
                 float:              left;
                 color:              white;
-                text-transform:		capitalize;
+                text-transform:     capitalize;
                 padding:            0px;
                 border-top:         1px solid black;
                 border-left:        1px solid black;
@@ -1623,7 +1677,7 @@
                 text-align:         right;
                 float:              left;
                 color:              white;
-                text-transform:		capitalize;
+                text-transform:     capitalize;
                 padding:            0px;
                 border-top:         1px solid black;
                 border-left:        1px solid black;
@@ -1635,7 +1689,7 @@
                 text-align:         right;
                 float:              left;
                 color:              white;
-                text-transform:		capitalize;
+                text-transform:     capitalize;
                 padding:            0px;
                 border-top:         1px solid black;
                 border-left:        1px solid black;
@@ -1658,10 +1712,10 @@
                 font-weight:        bold;
                 text-align:         left;
                 float:              left;
-                text-transform:		capitalize;
+                text-transform:     capitalize;
                 padding:            0px;
-                padding-left:		2px;
-                padding-right:		2px;
+                padding-left:       2px;
+                padding-right:      2px;
                 border-top:         1px solid black;
                 border-left:        1px solid black;
                 border-bottom:      1px solid white;
@@ -1673,8 +1727,8 @@
                 text-align:         left;
                 float:              left;
                 padding:            0px;
-                padding-left:		2px;
-                padding-right:		2px;
+                padding-left:       2px;
+                padding-right:      2px;
                 border-top:         1px solid black;
                 border-left:        1px solid black;
                 border-bottom:      1px solid white;
@@ -1686,7 +1740,7 @@
                 float:              left;
                 background-color:   white;
                 color:              #606060;
-                text-transform:		capitalize;
+                text-transform:     capitalize;
                 padding:            0px;
                 border-top:         1px solid black;
                 border-left:        1px solid black;
@@ -1699,7 +1753,7 @@
                 float:              left;
                 background-color:   white;
                 color:              #606060;
-                text-transform:		capitalize;
+                text-transform:     capitalize;
                 padding:            0px;
                 border-top:         1px solid black;
                 border-left:        1px solid black;
@@ -1743,9 +1797,12 @@
                 border-bottom:      1px solid white;
                 border-right:       1px solid white;
                 }
+    input.height20 {
+                height:             20px;
+                }
 
 /************************************************************************
- *        styles for displaying <select> tags								*
+ *        styles for displaying <select> tags                               *
  ************************************************************************/
     select {
                 font-family:        sans-serif;
@@ -1768,7 +1825,7 @@
                 }
 
 /************************************************************************
- *      styles for displaying <option> tags								*
+ *      styles for displaying <option> tags                             *
  ************************************************************************/
     option {
                 font-family:        sans-serif;
@@ -1790,36 +1847,7 @@
                 }
 
 /************************************************************************
- *      styles for displaying <button> tags								*
- ************************************************************************/
-    button {    font-family:        sans-serif;
-                font-weight:        bold;
-                font-size:          80%;
-                text-align:         center;
-                background-color:   #E0E0E0;
-                color:              black;
-                border-top:         2px solid white;
-                border-left:        2px solid white;
-                border-bottom:      3px solid #606060;
-                border-right:       3px solid #606060;
-                padding:            2px 12px 2px 12px;
-                }
-    button:disabled {    
-                color:              #606060; };
-
-    button[disabled] {
-                color:              #804040;
-                }
-    button.width110 {    
-                font-family:        sans-serif;
-                font-weight:        bold;
-                text-align:         center;
-                color:              black;
-                width:              110px;
-                }
-
-/************************************************************************
- *      styles for displaying <textarea> tags							*
+ *      styles for displaying <textarea> tags                           *
  ************************************************************************/
     textarea   {
                 font-family:        serif;

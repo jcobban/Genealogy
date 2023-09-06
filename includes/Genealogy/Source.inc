@@ -186,8 +186,9 @@ use \Iterator;
  *                      report constructor errors through $this->msg    *
  *      2019/04/15      replace is_a with instanceof                    *
  *      2022/03/27      replace xmlentities with htmlentities           *
+ *      2023/01/23      correct handling of string values of IDSR       *
  *                                                                      *
- *  Copyright &copy; 2022 James A. Cobban                               *
+ *  Copyright &copy; 2023 James A. Cobban                               *
  ************************************************************************/
 require_once __NAMESPACE__ . '/Record.inc';
 require_once __NAMESPACE__ . '/Address.inc';
@@ -441,7 +442,7 @@ class Source extends RecordPic
         $dbrow  = null;
 
         // action depends upon type of first parameter
-        $idsr               = null;
+        $idsr               = 0;
         $name               = null;
         if (is_null($parms))
         {                   // no parameters specified
@@ -495,16 +496,23 @@ class Source extends RecordPic
         $sqlParms           = array();
 
         foreach($parms as $field => $value)
-        {                   // loop through all field names
-            $fieldLc        = strtolower($field);
+        {                           // loop through all field names
+            $fieldLc                    = strtolower($field);
             if (array_key_exists($fieldLc, self::$translate))
-                $fieldLc    = self::$translate[$fieldLc];
+                $fieldLc                = self::$translate[$fieldLc];
             switch($fieldLc)
-            {               // check specific field names
+            {                       // check specific field names
                 case 'idsr':
-                {
-                    if (is_int($value) || ctype_digit($value))
-                    {       // have a number
+                    if (is_string($value))
+                    {
+                        if (strlen($value) == 0)
+                            $value      = 0;
+                        else
+                        if (ctype_digit($value))
+                            $value      = intval($value);
+                    }
+                    if (is_int($value))
+                    {               // have a number
                         $idsr           = intval($value);
                         if ($idsr > 0)
                         {
@@ -512,20 +520,17 @@ class Source extends RecordPic
                             $and        = ' AND ';
                             $sqlParms['idsr']   = $idsr;
                         }
-                    }       // have a number
+                    }               // have a number
                     else
                         $this->msg  .= "Source::__construct: invalid IDSR='$value'. ";
                     break 2;
-                }
 
                 case 'srcname':
-                {
                     $name               = $value;
                     $where              .= $and . "`SrcName`=:srcname";
                     $and                = ' AND ';
                     $sqlParms['srcname']= $name;
                     break 2;
-                }
 
             }               // check specific field names
         }                   // loop through all field names

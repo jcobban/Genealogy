@@ -27,8 +27,10 @@
  *      2020/04/23      increase generated password length to 32        *
  *      2021/06/02      add support for account language preference     *
  *                      validate userid, email, and phone number        *
+ *      2022/06/10      reduce generated password to 12 characters      *
+ *                      copy generated password to new password fields  *
  *                                                                      *
- *  Copyright &copy; 2021 James A. Cobban                               *
+ *  Copyright &copy; 2022 James A. Cobban                               *
  ************************************************************************/
 import {HTTP} from "../jscripts6/js20/http.js";
 import {eltMouseOver, eltMouseOut, keyDown, args}
@@ -72,8 +74,8 @@ function onLoad()
 
             // pop up help balloon if the mouse hovers over a field
             // for more than 2 seconds
-            element.onmouseover     = eltMouseOver;
-            element.onmouseout      = eltMouseOut;
+            element.addEventListener('mouseover',	eltMouseOver);
+            element.addEventListener('mouseout',	eltMouseOut);
             element.onkeydown       = keyDown;
 
             switch(name)
@@ -400,7 +402,7 @@ function scorePassword(pass)
 const charset     = "!#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[]^_`abcdefghijklmnopqrstuvwxyz{|}~";
 function generatePassword()
 {
-    let randArray       = new Uint32Array(16);
+    let randArray       = new Uint32Array(12);
     window.crypto.getRandomValues(randArray);
     let password        = '';
     for(let i = 0; i < randArray.length; i++)
@@ -409,6 +411,10 @@ function generatePassword()
         password        += charset.substr(code, 1);
     }
     let outputElement   = document.getElementById('randomPassword');
+    outputElement.value = password;
+    outputElement       = document.getElementById('newPassword');
+    outputElement.value = password;
+    outputElement       = document.getElementById('newPassword2');
     outputElement.value = password;
     return false;
 }       // function generatePassword

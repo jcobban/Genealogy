@@ -26,11 +26,17 @@
  *      2016/01/18      signoff set wrong field to logoff               *
  *      2018/10/18      pass language to scripts initiated by buttons   *
  *      2019/05/18      call element.click() to simulate button click   *
+ *      2022/06/13      use addEventListener                            *
+ *                      fix password forgot                             *
+ *      2022/06/24      support ES2015                                  *
  *                                                                      *
- *  Copyright &copy; 2019 James A. Cobban                               *
+ *  Copyright &copy; 2022 James A. Cobban                               *
  ************************************************************************/
+import {Cookie} from "../jscripts6/Cookie.js";
+import {keyDown, args}
+            from "../jscripts6/util.js";
 
-window.onload   = onLoad;
+window.addEventListener("load", onLoad);
 
 /************************************************************************
  *  onLoad                                                              *
@@ -40,62 +46,59 @@ window.onload   = onLoad;
  ************************************************************************/
 function onLoad()
 {
-    document.body.onkeydown = soKeyDown;
-    var cookie  = new Cookie('rememberme');
-    for(var i = 0; i < document.forms.length; i++)
+    document.body.addEventListener("keydown", soKeyDown);
+
+    let cookie              = new Cookie('rememberme');
+    for(let i = 0; i < document.forms.length; i++)
     {
-        var form    = document.forms[i];
-        form.onsubmit   = onSubmit;
-        for(var j = 0; j < form.elements.length; j++)
+        let form            = document.forms[i];
+        form.addEventListener("submit", onSubmit);
+        for(let j = 0; j < form.elements.length; j++)
         {
-            var element     = form.elements[j];
-            var name        = element.name;
+            let element     = form.elements[j];
+            let name        = element.name;
             if(!name || name.length == 0)
                 name        = element.id;
 
             // activate keystroke support
-            element.onkeydown   = keyDown;
-
-            switch(name)
+            element.addEventListener("keydown", keyDown);
+            switch(name.toLowerCase())
             {       // act on specific element
                 case 'userid':
-                {
                     element.focus();    // put focus in userid field
                     if (cookie.username)
                         element.value   = cookie.username;
-                    break;
-                }
+                    break;              // userid
 
                 case 'password':
-                {
                     if (cookie.password)
                         element.value   = cookie.password;
-                    break;
-                }       // password
+                    break;              // password
 
-                case 'Signoff':
-                {
+                case 'signoff':
                     element.onclick = signoff;
                     break;
-                }
 
-                case 'ForgotPassword':
-                {
+                case 'forgotpassword':
                     element.onclick = forgotPassword;
                     break;
-                }
 
-                case 'Register':
-                {
+                case 'register':
                     element.onclick = register;
                     break;
-                }
 
-                case 'Close':
-                {
+                case 'close':
                     element.onclick = finish;
                     break;
-                }
+
+                case 'redirect':
+                    if (element.value == 'forgotPassword.php')
+                    {
+                        form.action = element.value;
+                        form.submit();
+                    }
+                    break;      // redirect
+
             }       // act on specific element
         }           // loop through elements in form
     }               // loop through all form elements
@@ -111,10 +114,10 @@ function onLoad()
  ************************************************************************/
 function signoff()
 {
-    var lang            = 'en';
+    let lang            = 'en';
     if ('lang' in args)
         lang            = args.lang;
-    var form            = this.form;
+    let form            = this.form;
     form.action         = 'Signon.php?lang=' + lang;
     form.userid.value   = '';   // clear userid and password
     form.password.value = '';
@@ -132,10 +135,10 @@ function signoff()
  ************************************************************************/
 function register()
 {
-    var lang            = 'en';
+    let lang            = 'en';
     if ('lang' in args)
         lang            = args.lang;
-    var form            = this.form;
+    let form            = this.form;
 
     // change the action so the values are submitted to the
     // registration function instead of the sign-on function
@@ -154,15 +157,11 @@ function register()
  ************************************************************************/
 function forgotPassword()
 {
-    var lang            = 'en';
-    if ('lang' in args)
-        lang            = args.lang;
-    var form            = this.form;
+    let form                = this.form;
 
-    // change the action so the values are submitted to the
     // password reset function instead of the sign-on function
-    form.password.value = '';
-    form.action         = 'forgotPassword.php?lang=' + lang;
+    form.password.value     = '';
+    form.act.value          = 'forgotPassword';
     form.submit();
 }       // function forgotPassword
 
@@ -177,10 +176,10 @@ function forgotPassword()
  ************************************************************************/
 function onSubmit()
 {
-    var form        = this;
+    let form        = this;
     if (form.remember.checked)
     {
-        var cookie  = new Cookie('rememberme');
+        let cookie  = new Cookie('rememberme');
         cookie.username = form.userid.value;
         cookie.password = form.password.value;
         cookie.store(30*24*60*60);  // remember for 30 days
@@ -218,8 +217,8 @@ function soKeyDown(e)
     {       // browser is not W3C compliant
         e       =  window.event;    // IE
     }       // browser is not W3C compliant
-    var code    = e.keyCode;
-    var form    = document.signonForm;
+    let code    = e.keyCode;
+    let form    = document.signonForm;
 
     // take action based upon code
     if (e.ctrlKey)
@@ -271,9 +270,3 @@ function soKeyDown(e)
     return;
 }       // function soKeyDown
 
-
-function checkLoginState() {
-  FB.getLoginStatus(function(response) {
-    statusChangeCallback(response);
-  });
-}

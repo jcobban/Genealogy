@@ -563,8 +563,8 @@ else
 
 if (strlen($msg) > 0)
 {
-    $template['frontPager']->update(null);
-    $template['backPager']->update(null);
+    $template['topBrowse']->update(null);
+    $template['botBrowse']->update(null);
     $template['censusForm']->update(null);
 }
 else
@@ -578,8 +578,8 @@ else
     }
     else
     {
-        $template['npPrevFront']->update(null);
-        $template['npPrevBack']->update(null);
+        $template['npPrevFront']->update('&nbsp;');
+        $template['npPrevBack']->update('&nbsp;');
     }
     if (strlen($npNext) > 0)
     {
@@ -590,8 +590,8 @@ else
     }
     else
     {
-        $template['npNextFront']->update(null);
-        $template['npNextBack']->update(null);
+        $template['npNextFront']->update('&nbsp;');
+        $template['npNextBack']->update('&nbsp;');
     }
 }           // no errors
 

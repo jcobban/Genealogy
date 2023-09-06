@@ -143,11 +143,14 @@ use \Exception;
  *      2021/04/04      escape CONTACTSUBJECT                           *
  *      2021/04/16      handle subdistrict id with colon better         *
  *      2022/04/17      handle invocation with collective Census        *
+ *      2022/07/06      use display: flex                               *
+ *      2023/07/03      detect missing division where required          *
  *                                                                      *
- *  Copyright &copy; 2022 James A. Cobban                               *
+ *  Copyright &copy; 2023 James A. Cobban                               *
  ************************************************************************/
 require_once __NAMESPACE__ . '/FtTemplate.inc';
 require_once __NAMESPACE__ . '/SubDistrict.inc';
+require_once __NAMESPACE__ . '/SubDistrictSet.inc';
 require_once __NAMESPACE__ . '/Page.inc';
 require_once __NAMESPACE__ . '/CensusLineSet.inc';
 require_once __NAMESPACE__ . '/common.inc';
@@ -173,7 +176,7 @@ $DName                  = '';
 $subDistId              = '';           // default all subdistricts
 $subdisttext            = null;
 $subDistrict            = null;         // instance of SubDistrict
-$divId                  = '';           // default all subdistricts
+$divId                  = '';           // default all enumeration divs
 $divisiontext           = null;
 $limit                  = 20;           // default max lines per page
 $limittext              = null;
@@ -705,7 +708,7 @@ if (strlen($msg) == 0)
             $dist_id                = reset($district);
         else
             $dist_id                = $district;
-        if (!is_null($dist_id) && $dist_id != 0)
+        if (!is_null($dist_id) && $dist_id != 0 && $dist_id != '')
         {
             $getParms['d_id']       = $dist_id;
             $districtObj            = new District($getParms);
@@ -740,6 +743,7 @@ if (strlen($msg) == 0)
     // add additional data to result rows
     if ($count > 0)
     {                       // have a response
+
         $class      = 'odd';
         foreach($result as $i => $row)
         {                   // loop through lines of response
@@ -845,34 +849,51 @@ if (strlen($msg) == 0)
             if ($matches[1] == $dId)
                 $subdId     = $matches[2];
         }
-        $sdParms            = array(
-                                'census'    => $censusId,
-                                'distId'    => $dId,
-                                'SD_Id'     => $subdId,
-                                'SD_Div'    => $divId);
-        $subDistrict        = new SubDistrict($sdParms);
-        if (!$subDistrict->isExisting())
-            $msg            .=  "SubDistrict census='$censusId', distId=$dId, SD_Id='$subdId', SD_Div='$divId' does not exist. ";
-        if ($lang == 'fr')
-            $DName          = $subDistrict->get('d_nom');
-        else
-            $DName          = $subDistrict->get('d_name');
-        $SubDName           = $subDistrict->get('sd_name');
-        $page1              = $subDistrict->get('sd_page1');
-        $imageBase          = $subDistrict->get('sd_imagebase');
-        $relFrame           = $subDistrict->get('sd_relframe');
-        $pages              = $subDistrict->get('sd_pages');
-        $bypage             = $subDistrict->get('sd_bypage');
-        if ($page)
-        {
-            $lastpage       = $page1 + $bypage * ($pages - 1);
-            if ($page < $page1 ||
-                $page > $lastpage ||
-                (($bypage == 2) && (($page - $page1) % $bypage) != 0))
+
+        if ($divId == '')
+        {               // empty division only if not subdivisions
+            $sdParms        = array('census'    => $censusId,
+                                    'distId'    => $dId,
+                                    'SD_Id'     => $subdId);
+            $set            = new SubDistrictSet($sdParms);
+            if ($set->count() != 1)
+                $msg        .= $template['divisionOmitted']->innerHTML();
+        }               // empty division only if not subdivisions
+
+        if (strlen($msg) == 0)
+        {               // no errors detected
+            $sdParms        = array('census'    => $censusId,
+                                    'distId'    => $dId,
+                                    'SD_Id'     => $subdId,
+                                    'SD_Div'    => $divId);
+            $subDistrict    = new SubDistrict($sdParms);
+            if (!$subDistrict->isExisting())
+                $msg        .=  $template['subdistNotExist']->
+                  replace(array('$censusId', '$dId', '$subdId', '$divId'),
+                          array( $censusId,   $dId,   $subdId,   $divId));
+            if ($lang == 'fr')
+                $DName      = $subDistrict->get('d_nom');
+            else
+                $DName      = $subDistrict->get('d_name');
+            $SubDName       = $subDistrict->get('sd_name');
+            $page1          = $subDistrict->get('sd_page1');
+            $imageBase      = $subDistrict->get('sd_imagebase');
+            $relFrame       = $subDistrict->get('sd_relframe');
+            $pages          = $subDistrict->get('sd_pages');
+            $bypage         = $subDistrict->get('sd_bypage');
+            if ($page)
             {
-                $msg        .= "$page is not a valid page number within SubDistrict ($censusId,$dId,$subdId,$divId).\n";
+                $lastpage   = $page1 + $bypage * ($pages - 1);
+                if ($page < $page1 ||
+                    $page > $lastpage ||
+                    (($bypage == 2) && (($page - $page1) % $bypage) != 0))
+                {
+                    $msg        .= $template['pageUnsupp']->
+                      replace(array('$censusId','$dId','$subdId','$divId'),
+                              array( $censusId,  $dId,  $subdId,  $divId));
+                }
             }
-        }
+        }               // no errors detected
 
         // identify requested page or family
         $respDescSub        = array('dId'       => $dId,
@@ -960,14 +981,14 @@ $template->set('COUNTRYNAME',       $countryName);
 $template->set('CENSUSID',          $censusId);
 $template->set('PROVINCE',          $province);
 $template->set('PROVINCENAME',      $provinceName);
-$template->set('LANG',          $lang);
+$template->set('LANG',              $lang);
 if (isset($dId))
 {
-    $template->set('DISTRICT',      $dId);
+    $template->set('DISTRICT',          $dId);
     $template->set('DISTRICTNAME',      $DName);
     $template->set('SUBDISTRICT',       $subdId);
     $template->set('SUBDISTRICTNAME',   $SubDName);
-    $template->set('DIVISION',      $divId);
+    $template->set('DIVISION',          $divId);
 }
 $template->set('CENSUS',            $censusYear);
 $template->set('SEARCH',            $search);
@@ -1000,8 +1021,8 @@ if (strlen($msg) == 0)
     }
     else
     {
-        $template['topPrev']->update(null);
-        $template['botPrev']->update(null);
+        $template['topPrev']->update('&nbsp;');
+        $template['botPrev']->update('&nbsp;');
     }
     if (strlen($npNext) > 0)
     {
@@ -1012,8 +1033,8 @@ if (strlen($msg) == 0)
     }
     else
     {
-        $template['topNext']->update(null);
-        $template['botNext']->update(null);
+        $template['topNext']->update('&nbsp');
+        $template['botNext']->update('&nbsp');
     }
 
     // update the popup for explaining the action taken by arrows

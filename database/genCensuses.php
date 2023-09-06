@@ -177,7 +177,7 @@ $stmt               = $connection->prepare($query);
 $sqlParms           = array('cc' => $cc);
 $queryText          = debugPrepQuery($query, $sqlParms);
 if ($stmt->execute($sqlParms))
-{       // success
+{               // success
     if ($debug)
         $warn       .= "<p>genCensuses.php: " . __LINE__ .
                         " $queryText</p>\n";
@@ -197,13 +197,13 @@ if ($stmt->execute($sqlParms))
             $cenpop[$cenyear]   = $row['population'];
         $totalTranscribed       += $row['transcribed'];
         $totalPopulation        += $row['population'];
-    }       // success
-}       // loop through each census
+    }           // loop through each census
+}               // success
 else
-{
+{               // error on request
     $msg            .= "query='$queryText': message=" .
                         print_r($stmt->errorInfo(), true) . ". ";
-}       // error on request
+}               // error on request
 
 $title              = $countryName . ": Censuses";
 

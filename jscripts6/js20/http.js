@@ -240,7 +240,7 @@ HTTP.post = function(url,
                      callback, 
                      errorHandler) 
 {
-    console.log("HTTP.post('" + url + "',values=" + JSON.stringify(values));
+    //console.log("HTTP.post('" + url + "',values=" + JSON.stringify(values));
     if (values.length == 0)
         console.log("HTTP.post: no values passed" + new Error().stack);
     if (callback == 0)

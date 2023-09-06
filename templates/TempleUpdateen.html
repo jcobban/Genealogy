@@ -11,7 +11,7 @@
  *  Copyright &copy; 2020 James A. Cobban								*
  **********************************************************************-->
     <div class="hidden" id="breadcrumbs">
-      <a href="/index.html">Home</a>:
+      <a href="/home.html">Home</a>:
       <a href="/genealogy.php?lang=$LANG">Genealogy</a>:
       <a href="/FamilyTree/Services.php?lang=$LANG">Services</a>:
       <a href="/FamilyTree/Temples.php?lang=$LANG">Temples</a>:
@@ -41,7 +41,6 @@
                     class="white left"
                     value="$CODE2">
           </div>
-          <div style="clear: both;"></div>
         </div>
         <div class="row">
             <label class="column1" for="Temple">Location:</label>
@@ -49,7 +48,6 @@
                     size="50" maxlength="50"
                     class="white leftnc"
                     value="$NAME">
-            <div style="clear: both;"></div>
         </div>
         <div class="row">
             <label class="column1" for="Temple">Address:</label>
@@ -57,7 +55,6 @@
                     size="50" maxlength="255"
                     class="white leftnc"
                     value="$ADDRESS">
-            <div style="clear: both;"></div>
         </div>
         <div class="row">
           <div class="column1">
@@ -74,7 +71,6 @@
                     class="white leftnc"
                     value="$TEMPLEEND">
           </div>
-          <div style="clear: both;"></div>
         </div>
         <div class="row">
           <div class="column1">
@@ -87,13 +83,11 @@
               <input type="checkbox" name="Tag1" id="Tag1" value="1"
                     $TAG1CHECKED>
           </div>
-          <div style="clear: both;"></div>
         </div>
         <div class="row">
           <label class="column1" for="qsTag">qsTag:</label>
             <input type="checkbox" name="qsTag" id="qsTag" value="1"
                     $QSCHECKED>
-          <div style="clear: both;"></div>
         </div>
         <div class="row">
             <button type="submit" id="Submit" class="button">
@@ -220,7 +214,7 @@
       Click this button to open a dialog for managing the pictures associated
       with the temple.
     </div>
-    <script src="/jscripts/tinymce/js/tinymce/tinymce.js" type="application/javascript">
+    <script src="/jscripts/tinymce/js/tinymce/tinymce.min.js" type="application/javascript">
     </script>
     <script src="/jscripts/js20/http.js" type="application/javascript">
     </script>
@@ -230,5 +224,5 @@
     </script>
     <script src="/FamilyTree/Temple.js" type="application/javascript">
     </script>
-    <script async defer src="https://maps.googleapis.com/maps/api/js?v=3.43&region=$GOOGLECC&key=$GOOGLEKEY" type="application/javascript">
+    <script defer src="https://maps.googleapis.com/maps/api/js?v=3.43&region=$GOOGLECC&key=$GOOGLEKEY" type="application/javascript">
     </script>

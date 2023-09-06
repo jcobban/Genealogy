@@ -427,7 +427,7 @@ class UserAgent extends Record
                             $agent              = $value;
                         $fldnames               .= "$comma`$field`";
                         $values                 .= "$comma:$field";
-                        $sqlParms[$field]       = $value;
+                        $sqlParms[$field]       = $agent;
                         break;
                     }       // primary key
 
@@ -471,9 +471,6 @@ class UserAgent extends Record
             else
             {                   // error inserting record
                 $errorInfo  =  print_r($stmt->errorInfo(),true);
-                $warn   .= "<p>UserAgent::save: " . __LINE__ .
-                                " insert='$insertText'," .
-                                " errorInfo=$errorInfo<p>\n";
                 error_log("UserAgent.inc: " . __LINE__ .
                                 " insert='$insertText', " .
                                 "errorInfo=$errorInfo\n");

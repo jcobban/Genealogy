@@ -280,13 +280,13 @@ $template->set('NEXTOFFSET',			$nextoffset);
 
 if ($prevoffset < 0)
 {
-    $template['topPrev']->update(null);
-    $template['botPrev']->update(null);
+    $template['topPrev']->update('&nbsp;');
+    $template['botPrev']->update('&nbsp;');
 }
 if ($nextoffset >= $totalrows)
 {
-    $template['topNext']->update(null);
-    $template['botNext']->update(null);
+    $template['topNext']->update('&nbsp;');
+    $template['botNext']->update('&nbsp;');
 }
 
 if ($count > 0)

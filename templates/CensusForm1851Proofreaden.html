@@ -37,7 +37,6 @@
 		<span class="right">
 		  <a href="/database/CensusForm1851Helpen.html" target="help">? Help</a>
 		</span>
-		<div style="clear: both;"></div>
       </h1>
       $MSG
       $TRACE
@@ -46,15 +45,10 @@
 		Any changes you make will be recorded as field notes.
       </p>
       <!--- Put out a line with links to previous and next section of table -->
-      <div class="center" id="frontPager">
-		<span class="left" id="npPrevFront">
+      <div class="spaceBetween" id="topBrowse">
+		<span id="npPrevFront">
 		    <a href="/database/CensusForm.php$npPrev" id="prenpprev">
-			&lt;---
-		    </a>
-		</span>
-		<span class="right" id="npNextFront">
-		    <a href="/database/CensusForm.php$npNext" id="prenpnext">
-			---&gt;
+			<img src="/Images/ArrowLeft.svg">
 		    </a>
 		</span>
         <span>
@@ -64,7 +58,12 @@
 		    <span id="frontDiv">div $DIVISION </span>
 		    page $PAGE
 		</span>
-      </div> <!-- id="frontPager"-->
+		<span id="npNextFront">
+		    <a href="/database/CensusForm.php$npNext" id="prenpnext">
+			<img src="/Images/ArrowRight.svg">
+		    </a>
+		</span>
+      </div> <!-- id="topBrowse"-->
 
       <!--- Put out the response as a table -->
       <form name="censusForm" id="censusForm"
@@ -455,15 +454,10 @@
 		  </p>
       </form>
       <!--- Put out a line with links to previous and next section of table -->
-      <div class="center" id="backPager">
-		<span class="left" id="npPrevBack">
+      <div class="spaceBetween" id="botBrowse">
+		<span id="npPrevBack">
 		    <a href="/database/CensusForm.php$npPrev" id="prenpprev">
-			&lt;---
-		    </a>
-		</span>
-		<span class="right" id="npNextBack">
-		    <a href="/database/CensusForm.php$npNext" id="prenpnext">
-			---&gt;
+			<img src="/Images/ArrowLeft.svg">
 		    </a>
 		</span>
         <span>
@@ -473,7 +467,12 @@
 		    <span id="backDiv">div $DIVISION </span>
 		    page $PAGE
 		</span>
-      </div> <!-- id="backPager" -->
+		<span id="npNextBack">
+		    <a href="/database/CensusForm.php$npNext" id="prenpnext">
+			<img src="/Images/ArrowRight.svg">
+		    </a>
+		</span>
+      </div> <!-- id="botBrowse" -->
 
       <div id="comments">
         <h2>User Comments on the Transcription</h2>
@@ -489,13 +488,7 @@
   </div> <!-- id="transcription" -->
   $POPUPS
 
-    <script src= '/jscripts/CommonForm.js' type="text/javascript">
-    </script>
     <script src= '/jscripts/js20/http.js' type="text/javascript">
     </script>
-    <script src= '/jscripts/util.js' type="text/javascript">
-    </script>
-    <script src= '/jscripts/Cookie.js' type="text/javascript">
-    </script>
-    <script src= '/database/CensusForm.js' type="text/javascript">
+    <script src= '/database/CensusForm.js' type="module">
     </script>

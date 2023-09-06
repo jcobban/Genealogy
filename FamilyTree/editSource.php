@@ -241,7 +241,6 @@ if (strlen($msg) == 0)
     // get all names of authors as an array of strings for selection list
     $sourceSet              = new RecordSet('tblSR');
     $authorResult           = $sourceSet->getDistinct('SrcAuthor');
-    $debug                  = $saveDebug;
 }
 else
     $idsr                   = 'Failed';

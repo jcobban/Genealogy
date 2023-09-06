@@ -20,7 +20,6 @@
 	      <span class='right'>
 		<a href='/database/QueryDetail1881Helpen.html' target='help'>? Help</a>
 	      </span>
-	    <div style='clear: both;'></div>
 	  </h1>
 	  $TRACE
 	  $MSG
@@ -67,7 +66,6 @@
                       name='Count' id='Count' 
 			          maxlength='4' value='20'/>
 	      </div>
-	      <div style='clear: both;'></div>
 	    </div>
 	    <div class='row' id='divRow'>
 	      <div class='column1'>
@@ -92,7 +90,6 @@
 		<input type='text' class='white rightnc' size='2' name='Page' id='Page' 
 			  maxlength='2'/>
 	      </div>
-	      <div style='clear: both;'></div>
 	    </div>
 	    <div class='row'>
 	      <div class='column1'>
@@ -116,7 +113,6 @@
 		<input type='checkbox' name='SurnameSoundex' id='SurnameSoundex' 
 			  value='yes'/>
 	      </div>
-	      <div style='clear: both;'></div>
 	    </div>
 	    <div class='row'>
 	      <div class='column1'>
@@ -141,7 +137,6 @@
 		  <option value='W'>Widowed
 		</select>
 	      </div>
-	      <div style='clear: both;'></div>
 	    </div>
 	    <div class='row'>
 	      <div class='column1'>
@@ -158,7 +153,6 @@
 		<input type='text' class='white left' size='20'
 			name='BPlace' id='BPlace' maxlength='32'/>
 	      </div>
-	      <div style='clear: both;'></div>
 	    </div>
 	    <div class='row'>
 	      <div class='column1'>
@@ -168,7 +162,6 @@
 		<input type='text' class='white left' size='20'
 			name='Religion' id='Religion' maxlength='32'/>
 	      </div>
-	      <div style='clear: both;'></div>
 	    </div>
 	    <div class='row'>
 	      <div class='column1'>
@@ -185,9 +178,22 @@
 		<input type='text' class='white rightnc' size='4' 
 			name='Range' id='Range' maxlength='8'/>
 	      </div>
-	      <div style='clear: both;'></div>
 	    </div>
 	  </form>
+      <div id="messages" class="hidden">
+          <span id='censusInvalid'>
+              Census $censusId is syntactically invalid.
+          </span>
+          <span id='censusUndefined'>
+              Census $censusId is not defined.
+          </span>
+          <span id='stateInvalid'>
+              Province $province is syntactically invalid.
+          </span>
+          <span id='stateUndefined'>
+              Province $province is not defined.
+          </span>
+      </div>
 	</div> <!-- class='body' -->
     $POPUPS
     <script src= '/jscripts/js20/http.js' type="text/javascript">

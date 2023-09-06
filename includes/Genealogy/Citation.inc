@@ -229,11 +229,15 @@ use Templating\Template;
  *      2021/05/19      add support for 'page' as a county marriage     *
  *                      identifier                                      *  
  *      2021/11/20      undefined variable $id                          *
+ *      2023/09/04      add Canadian Military Records by id number      *
+ *                      if srcdetail contains URL place it around       *
+ *                      whatever else is there and ignore IDSR          *
  *                                                                      *
- *  Copyright &copy; 2021 James A. Cobban                               *
+ *  Copyright &copy; 2023 James A. Cobban                               *
  ************************************************************************/  
 require_once __NAMESPACE__ . '/RecordPic.inc';
 require_once __NAMESPACE__ . '/Source.inc';
+require_once __NAMESPACE__ . '/Language.inc';
 
 /************************************************************************
  *  class Citation                                                      *
@@ -447,6 +451,7 @@ class Citation extends RecordPic
     protected static    $translate  = array(
                         'stype'                 => 'type',
                         'detail'                => 'srcdetail',
+                        'page'                  => 'srcdetail',
                         'printdetail'           => 'srcprintdetail',
                         'dettext'               => 'srcdettext',
                         'printtext'             => 'srcprinttext',
@@ -2056,6 +2061,9 @@ class Citation extends RecordPic
         global $msg;
         global $document_root;
 
+        $language           = new Language(array('code' => $lang));
+        $lang3              = $language['code3'];
+
         // extract fields from citation
         $idsx               = $this->row['idsx'];
         $idsr               = $this->row['idsr'];
@@ -2063,8 +2071,6 @@ class Citation extends RecordPic
         $title              = trim($source->getTitle());
         $callnum            = trim($source->get('srccallnum'));
         $detail             = trim($this->getDetail());
-        $text               = trim($this->getDetailText());
-        $note               = trim($this->getDetailNote());
 
         $patternCountyReport = '/(vol[^0-9]*([0-9]+)|).*(#|No|sect|sched|report|page)[^0-9]*([0-9]+\x{00BD}?)[^0-9]+([0-9]+|)/ui';
         // start the template
@@ -2076,6 +2082,23 @@ class Citation extends RecordPic
         }
         $template           = new Template($tempBase . $includeSub);
 
+        $URLmatches         = array();
+        $URLfound           = preg_match('#^(.*)(https?://\S*)(.*)$#', 
+                                         $detail, 
+                                         $URLmatches);
+        if ($URLfound == 1)
+        {                   // page citation includes URL
+            $id                 = 'hyperlink$IDSX';
+            $prefix             = $URLmatches[1];
+            $link               = $URLmatches[2];
+            $postfix            = $URLmatches[3];
+            if (strlen($prefix) == 0)
+                $prefix         = $link;
+            $updates            = array('URL'       => $link,
+                                        'PREFIX'    => $prefix,
+                                        'POSTFIX'   => $postfix);
+        }                   // page citation includes URL
+        else
         switch($title)
         {               // act on selected sources
             case 'Birth Register, CA, Ontario':
@@ -2220,12 +2243,6 @@ class Citation extends RecordPic
                     }
                 }       // detail matches pattern
                 else
-                if (preg_match('#https?://\S*#', $detail, $matches) == 1)
-                {       // detail matches hyperlink
-                    $updates    = array('URL'       => $detail,
-                                        'DETAIL'    => $detail);
-                }
-                else
                     $updates    = array('DETAIL'    => $detail);
                 break;
             }       // 'Marriage Register, CA, CW, County Registers':
@@ -2344,6 +2361,7 @@ class Citation extends RecordPic
             case '1911 Census of Canada':
             case '1916 Census of Canada, Prairies':
             case '1921 Census of Canada':
+            case '1931 Census of Canada':
             {       // use detail to build link
                 $id             = 'sourceCensus$IDSX';
                 $cenyear        = substr($title, 0, 4);
@@ -2474,153 +2492,131 @@ class Citation extends RecordPic
             }   // 'Wesleyan Methodist Baptisms, Ontario':
 
             case 'Canada, Post Offices and Postmasters':
-            {       // Canada, Post Offices and Postmasters
+            {           // Canada, Post Offices and Postmasters
                 $id             = 'sourcePostOffices$IDSX';
                 $count          = preg_match('/[0-9]+/',
                                              $detail,
                                              $matches);
                 if ($count == 1)
-                {   // detail matches pattern
+                {       // detail matches pattern
                     $item       = $matches[0];
                     $updates    = array('ITEM'      => $item,
-                                        'LANG'      => $lang,
+                                        'LANG3'     => $lang3,
                                         'DETAIL'    => $detail);
-                }   // detail matches pattern
+                }       // detail matches pattern
                 else
                     $updates    = array('DETAIL'    => $detail);
                 break;
-            }       // 'Canada, Post Offices and Postmasters':
+            }           // 'Canada, Post Offices and Postmasters':
 
             case 'Find a Grave Website':
-            {       // Find a Grave Website
+            {           // Find a Grave Website
                 $id             = 'sourceFindAGrave$IDSX';
                 $count          = preg_match('/[0-9]+/',
                                              $detail,
                                              $matches);
                 if ($count == 1)
-                {   // detail matches pattern
+                {       // detail matches pattern
                     $item       = $matches[0];
                     $updates    = array('ITEM'      => $item,
                                         'LANG'      => $lang,
                                         'DETAIL'    => $detail);
-                }   // detail matches pattern
+                }       // detail matches pattern
                 else
                     $updates    = array('DETAIL'    => $detail);
                 break;
-            }       // Find a Grave Website
+            }           // Find a Grave Website
 
             case 'Canadian Military Records':
-            {       // Canadian Military Records
-                $count          = preg_match('/([0-9]+)/',
+            {           // Canadian Military Records
+                $countId        = preg_match('/idNumber=([0-9]+)/i',
                                              $detail,
-                                             $matches);
-                if ($count == 1)
-                {   // detail matches pattern
-                    $id         = 'sourceCanMilRegtNum$IDSX';
-                    $item       = $matches[1];
-                    $updates    = array('ITEM'      => $item,
-                                        'LANG'      => $lang,
-                                        'DETAIL'    => $detail);
-                }   // detail matches pattern
+                                             $matchesId);
+                $countRn        = preg_match('/([0-9]+)/',
+                                             $detail,
+                                             $matchesRn);
+                if ($countId == 1)
+                {               // detail contains a record set id number
+                    $id             = 'sourceCanMilIdNum$IDSX';
+                    $item           = $matchesId[1];
+                    $updates        = array('ITEM'      => $item,
+                                            'LANG'      => $lang,
+                                            'DETAIL'    => $detail);
+                }               // detail contains a record set id number
+                else
+                if ($countRn == 1)
+                {               // detail contains a regimental number
+                    $id             = 'sourceCanMilRegtNum$IDSX';
+                    $item           = $matchesRn[1];
+                    $updates        = array('ITEM'      => $item,
+                                            'LANG'      => $lang,
+                                            'DETAIL'    => $detail);
+                }               // detail contains a regimental number
                 else
                 {
-                    $updates    = array('DETAIL'    => $detail);
+                    $id             = 'detail$IDSX';
+                    $updates        = array('DETAIL'    => $detail);
                 }
                 break;
-            }       // Canadian Military Records
+            }                   // Canadian Military Records
 
             default:
-            {   // does not match any interpreted pattern
-                $matches        = array();
-                $result         = preg_match('#^https?://\S*#', $detail, $matches);
+            {                   // does not match any interpreted pattern
                 if (substr($title,0,23) == 'Cemetery Transcription,')
-                {
-                    $id         = 'sourceCemetery$IDSX';
-                    $updates    = array('IDSR'      => $idsr,
-                                        'LANG'      => $lang,
-                                        'DETAIL'    => $detail);
-                }       // cemetery transcription
+                {               // reference to cemetery transcription
+                    $id             = 'sourceCemetery$IDSX';
+                    $updates        = array('IDSR'      => $idsr,
+                                            'LANG'      => $lang,
+                                            'DETAIL'    => $detail);
+                }               // cemetery transcription
                 else
-                if ($result)
-                {
-                    $id         = 'hyperlink$IDSX';
-                    $updates    = array('URL'       => $detail,
-                                        'DETAIL'    => $detail);
-                }
-                else
-                if (substr($callnum, 0, 4) == 'http')
-                {
-                    $id         = 'hyperlink$IDSX';
-                    $tag            = $template[$id];
-                    $updates    = array('URL'       => $callnum,
-                                        'DETAIL'    => $detail);
-                }
-                else
-                {
-                    $id         = 'detail$IDSX';
+                {               // anything else
+                    $id             = 'detail$IDSX';
                     if ($debug)
                     {
-                        $text   = $template['unrecTitle']->innerHTML();
-                        $warn   .= str_replace(array('$LINE','$TITLE'),
-                                               array(__LINE__, $title),
-                                               $text);
+                        $text       = $template['unrecTitle']->innerHTML();
+                        $warn       .= str_replace(array('$LINE','$TITLE'),
+                                                   array(__LINE__, $title),
+                                                   $text);
                     }
-                    $updates    = array('DETAIL'    => $detail);
-                }
+                    $updates        = array('DETAIL'    => $detail);
+                }               // anything else
                 break;
-            }   // does not match any interpreted pattern
-        }       // act on selected sources
+            }                   // does not match any interpreted pattern
+        }                       // act on selected sources
 
-        $tag                = $template['source'];
-        $subTemplate        = new Template($tag->outerHTML());
+        $tag                        = $template['source$IDSX'];
+        $subTemplate                = new Template($tag->outerHTML());
         $subTemplate->set('IDSX',      $idsx);
         $subTemplate->set('IDSR',      $idsr);
         $subTemplate->set('LANG',      $lang);
         $subTemplate->set('TITLE',     $title);
-        $html               = $subTemplate->compile();
+        $html                   = $subTemplate->compile();
 
         if (isset($id) && is_string($id) && strlen($id) > 0)
-            $tag            = $template[$id];
+            $tag                = $template[$id];
         else
         {
-            $tag            = null;
-            $id             = "no match for source '$title' detail='$detail'";
+            $tag                = null;
+            $id                 =
+                "no match for source '$title' detail='$detail'";
         }
         if ($tag)
-        {
-            $subTemplate    = new Template($tag->outerHTML());
+        {                   // have a template for displaying citation
+            $subTemplate        = new Template($tag->outerHTML());
             $subTemplate->setFields($updates);
             $subTemplate->set('IDSX',      $idsx);
             $subTemplate->set('IDSR',      $idsr);
             $subTemplate->set('LANG',      $lang);
-            $html           .= $subTemplate->compile();
+            $html               .= $subTemplate->compile();
             $html           = preg_replace('/^[ \t]*[\r\n]+/m', '', $html);
-        }
+        }                   // have a template for displaying citation
         else
+        {                   // no matching template
+            $warn   .= "<p>2648 \$id='$id', \$detail='$detail'</p>\n";
             error_log("Citation::toHTML: " . __LINE__ .
-        " could not resolve tag with id='$id' for detail='$detail'");
-
-        // interpret text quotation from source
-        if (strlen($text) > 0)
-        {
-            if (preg_match('#^\s*<p>([^<]*)</p>\s*$#', $text, $matches))
-                $text       = $matches[1];
-            $tag            = $template['showText$IDSX'];
-            $subTemplate    = new Template($tag->outerHTML());
-            $subTemplate->set('TEXT',      $text);
-            $html           .= $subTemplate->compile();
-        }
-
-        // interpret comments about the citation
-        if (strlen($note) > 0)
-        {
-            if (preg_match('#^\s*<p>([^<]*)</p>\s*$#', $note, $matches))
-                $note               = $matches[1];
-            $tag            = $template['showNote$IDSX'];
-            $subTemplate    = new Template($tag->outerHTML());
-            $subTemplate->set('NOTE',      $note);
-            $html           .= $subTemplate->compile();
-        }
+                " could not resolve tag with id='$id' for detail='$detail'");
+        }                   // no matching template
 
         return $html;
     }       // function Citation::toHTML

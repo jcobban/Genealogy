@@ -25,19 +25,17 @@
 		<a href="/database/CensusDetailsHelpen.html" target="help">? Help</a>
       </span>
 		1901 Census of Canada: Details
-      <div style="clear: both;"></div>
     </h1>
     $MSG
     $TRACE
     <div class="center">
       <span class="left">
-		<a href="/database/Census<?php print $cyear; ?>Details.php?Province=<?php print $province; ?>&amp;District=<?php print $distId; ?>&amp;SubDistrict=<?php print $subdistId; ?>&amp;Division=<?php print $division; ?>&amp;Page=<?php print $prevPage; ?>&amp;Line=<?php print $prevLine; ?>">&lt;---</a>
+		<a href="/database/Census<?php print $cyear; ?>Details.php?Province=<?php print $province; ?>&amp;District=<?php print $distId; ?>&amp;SubDistrict=<?php print $subdistId; ?>&amp;Division=<?php print $division; ?>&amp;Page=<?php print $prevPage; ?>&amp;Line=<?php print $prevLine; ?>"><img src="/Images/ArrowLeft.svg"></a>
       </span>
       <span class="right">
-		<a href="/database/Census<?php print $cyear; ?>Details.php?Province=<?php print $province; ?>&amp;District=<?php print $distId; ?>&amp;SubDistrict=<?php print $subdistId; ?>&amp;Division=<?php print $division; ?>&amp;Page=<?php print $nextPage; ?>&amp;Line=<?php print $nextLine; ?>">---&gt;</a>
+		<a href="/database/Census<?php print $cyear; ?>Details.php?Province=<?php print $province; ?>&amp;District=<?php print $distId; ?>&amp;SubDistrict=<?php print $subdistId; ?>&amp;Division=<?php print $division; ?>&amp;Page=<?php print $nextPage; ?>&amp;Line=<?php print $nextLine; ?>"><img src="/Images/ArrowRight.svg"></a>
       </span>
 		<?php print $heading; ?>
-      <div style="clear: both;"></div>
     </div>
     <table class="details" <?php print $cellspacing; ?>>
      <thead>

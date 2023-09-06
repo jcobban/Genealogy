@@ -56,9 +56,9 @@ if (count($_GET) > 0)
                           "<th class='colhead'>value</th></tr>\n";
     foreach($_GET as $key => $value)
     {                   // loop through all parameters
+        $safevalue          = htmlspecialchars($value);
         $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
-                        "<td class='white left'>" .
-                        htmlspecialchars($value) . "</td></tr>\n"; 
+                        "<td class='white left'>$safevalue</td></tr>\n"; 
         switch(strtolower($key))
         {               // act on specific parameter
             case 'lang':
@@ -85,8 +85,9 @@ if (count($_POST) > 0)
                                   "<th class='colhead'>value</th></tr>\n";
     foreach($_POST as $key => $value)
     {                       // check each field value
+        $safevalue          = htmlspecialchars($value);
         $parmsText          .= "<tr><th class='detlabel'>$key</th>" .
-                                "<td class='white left'>$value</td></tr>\n";
+                                "<td class='white left'>$safevalue</td></tr>\n";
 
         if (preg_match('/^([a-zA-Z]+)(\*)$/', $key, $matches))
         {

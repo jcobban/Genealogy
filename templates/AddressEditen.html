@@ -8,8 +8,10 @@
  *  History:															*
  *		2018/02/10		created											*
  *		2018/11/02      pass authentication key to GoogleApis           *
+ *      2023/07/29      migrate to ES2015                               *
+ *                      use callback from Google maps initialization    (
  *																		*
- *  Copyright &copy; 2018 James A. Cobban								*
+ *  Copyright &copy; 2023 James A. Cobban								*
  **********************************************************************-->
 	<div id="breadcrumbs" class="hidden">
 	    <a href="/genealogy.php?lang=$LANG">Genealogy</a>:
@@ -39,7 +41,6 @@
 			value="update">
 		<input type="hidden" name="to" id="to"
 			value="$IDAR">
-	      <div style="clear: both;"></div>
 	    </div>
 	    <div class="row">
 	      <div class="column1">
@@ -69,7 +70,6 @@
 		  </option>
 		</select>
 	      </div>
-	      <div style="clear: both;"></div>
 	    </div>
 	    <div class="row">
 		<label class="column1" for="AddrName">Address Name:</label>
@@ -79,42 +79,36 @@
 			>
 		<input type="hidden" name="searchName" id="searchName" 
 			value="$SEARCHNAME">
-	      <div style="clear: both;"></div>
 	    </div>
 	    <div class="row">
 		<label class="column1" for="AddrSort">Sort Key:</label>
 		<input type="text" name="AddrSort" id="AddrSort" size="64"
 			class="black white leftnc"
 			value="$SORTKEY" >
-	      <div style="clear: both;"></div>
 	    </div>
 	    <div class="row">
 		<label class="column1" for="Address1">Address line 1:</label>
 		<input type="text" name="Address1" id="Address1" 
 			size="64" class="black white leftnc"
 			value="$ADDRESS1" >
-	      <div style="clear: both;"></div>
 	    </div>
 	    <div class="row">
 		<label class="column1" for="Address2">Address line 2:</label>
 		<input type="text" name="Address2" id="Address2"
 			size="64" class="black white leftnc"
 			value="$ADDRESS2" >
-	      <div style="clear: both;"></div>
 	    </div>
 	    <div class="row">
 		<label class="column1" for="City">City:</label>
 		    <input type="text" name="City" id="City" size="32"
 			class="black white left"
 			value="$CITY" >
-	      <div style="clear: both;"></div>
 	    </div>
 	    <div class="row">
 		<label class="column1" for="State">State:</label>
 		<input type="text" name="State" id="State"
 			size="32" class="black white left"
 			value="$STATE" >
-	      <div style="clear: both;"></div>
 	    </div>
 	    <div class="row">
 	      <div class="column1">
@@ -124,12 +118,11 @@
 			value="$ZIPCODE" >
 	      </div>
 	      <div class="column1">
-		<label class="column1" for="Country">Country:</label>
+		<label class="column2" for="Country">Country:</label>
 		<input type="text" name="Country" id="Country"
 			size="24" class="black white left"
 			value="$COUNTRY" >
 	      </div>
-	      <div style="clear: both;"></div>
 	    </div>
 	    <div class="row">
 	      <div class="column1">
@@ -139,74 +132,70 @@
 			value="$PHONE1" >
 	      </div>
 	      <div class="column1">
-		<label class="column1" for="Phone2">Phone Number 2:</label>
+		<label class="column2" for="Phone2">Phone Num 2:</label>
 		<input type="text" name="Phone2" id="Phone2"
 			size="12" class="black white leftnc"
 			value="$PHONE2" >
 	      </div>
-	      <div style="clear: both;"></div>
 	    </div>
 	    <div class="row">
 		<label class="column1" for="Email">E-Mail Address:</label>
 		    <input type="text" name="Email" id="Email"
 			size="64" class="black white leftnc"
 			value="$EMAIL" >
-	      <div style="clear: both;"></div>
 	    </div>
 	    <div class="row">
 		<label class="column1" for="HomePage">Home Page:</label>
 		    <input type="text" name="HomePage" id="HomePage"
 			size="64" class="hyperlink"
 			value="$HOMEPAGE" >
-	      <div style="clear: both;"></div>
 	    </div>
 	    <div class="row">
-	      <div class="column1">
-		<label class="column1" for="Latitude">Latitude:</label>
-		<input type="text" name="Latitude" id="Latitude" 
-			size="12" class="black white right"
-			value="$LATITUDE" >
+	      <div class="column1" style="flex-shrink: 0">
+    		<label class="column1" for="Latitude">Latitude:</label>
+	    	<input type="text" name="Latitude" id="Latitude" 
+		    	size="9" class="black white right"
+			    value="$LATITUDE" >
 	      </div>
-	      <div class="column1">
-		<label class="column1" for="Longitude">Longitude:</label>
-		<input type="text" name="Longitude" id="Longitude" 
-			size="12" class="black white right"
-			value="$LONGITUDE" >
+	      <div class="column1" style="flex-shrink: 0">
+    		<label class="column2" for="Longitude">Longitude:</label>
+	    	<input type="text" name="Longitude" id="Longitude" 
+		    	size="9" class="black white right"
+			    value="$LONGITUDE" >
 	      </div>
-	      <div class="column1">
-		<button type="button" id="showMap" class="button">
-		  Show Map
-		</button>
+	      <div class="column2">
+    		<button type="button" id="showMap" class="button">
+	    	  Show Map
+		    </button>
 	      </div>
-	      <div style="clear: both;"></div>
 	    </div>
 	    <div class="row">
-	      <div class="column1">
-		<label class="column1" for="Preposition">
-		    Preposition:
-		</label>
-		<input type="text" name="Preposition" id="Preposition"
-			style="width: 8em;" class="black white leftnc"
-			value="in" readonly disabled="disabled">
+	      <div class="column1" style="flex-shrink: 0">
+    		<label class="column1" for="Preposition">
+	    	    Preposition:
+		    </label>
+    		<input type="text" name="Preposition" id="Preposition"
+	    		style="width: 8em;" class="black white leftnc"
+		    	value="in" readonly disabled="disabled">
 	      </div>
-	      <div class="column1">
-		<label class="column1" for="Zoom">Zoom:</label>
-		<input type="text" name="Zoom" id="Zoom" size="3"
-			class="black white right"
-			value="$ZOOM" >
+	      <div class="column1" style="flex-shrink: 0">
+    		<label class="column2" for="Zoom">Zoom:</label>
+	    	<input type="text" name="Zoom" id="Zoom" size="3"
+		    	class="black white right"
+			    value="$ZOOM" >
 	      </div>
-	      <div class="column1">
-		<button type="button" id="getMap" class="button">
-		  Get Map Info
-		</button>
+	      <div class="column2">
+    		<button type="button" id="getMap" class="button">
+	    	  Get Map Info
+		    </button>
 	      </div>
-	      <div style="clear: both;"></div>
 	    </div>
 	    <div class="row">
 		<label class="column1" for="AddrNotes">Notes:</label>
+          <span style="flex-grow: 1;">
 		    <textarea name="AddrNotes" id="AddrNotes" rows="5" cols="64"
 			>$NOTES</textarea>
-	      <div style="clear: both;"></div>
+          </span>
 	    </div>
 	    <div class="row">
 	      <div class="column1">
@@ -224,7 +213,6 @@
 		<input type="hidden" name="List3[]" value="0"> 
 		<input type="checkbox" name="List3[]" id="List3" $LIST3CHECKED>
 	      </div>
-	      <div style="clear: both;"></div>
 	    </div>
 	    <div class="row">
 	      <div class="column1">
@@ -242,7 +230,6 @@
 		<input type="hidden" name="List6[]" value="0"> 
 		<input type="checkbox" name="List6[]" id="List6" $LIST6CHECKED>
 	      </div>
-	      <div style="clear: both;"></div>
 	    </div>
 	    <div class="row">
 	      <div class="column1">
@@ -263,7 +250,6 @@
 		<input type="checkbox" name="Verified[]" id="Verified" value="1"
 			$VERIFIEDCHECKED>
 	      </div>
-	      <div style="clear: both;"></div>
 	    </div>
 	    <div class="row">
 	      <div class="column1">
@@ -303,19 +289,17 @@
 		<input type="checkbox" id="qsTag" name="qsTag[]" value="1"
 			$QSTAGCHECKED>
 	      </div>
-	      <div style="clear: both;"></div>
 	    </div>
 	    <div id="duplicates">
 	      <p class="label">
 		Duplicates of current row:
 	      </p>
-	      <div class="duprow$idar">
+	      <div id="duprow$idar">
 		  <label class="column1" for="Dup$idar">
 		  </label>
 		  <input type="text" class="ina rightnc" readonly="readonly"
 			name="Dup$idar" id="Dup$idar" 
 			value="$idar">
-		<div style="clear: both;"></div>
 	      </div>
 	      <div class="row">
 		  <button type="button" id="Merge">
@@ -323,7 +307,6 @@
 		  </button>
 		  <input type="hidden" name="from" id="from"
 			value="$dupidars">
-		<div style="clear: both;"></div>
 	      </div>
 	    </div> <!-- id="duplicates" -->
 		$PICTURES
@@ -463,11 +446,12 @@
 	  centered at the location.
 	</div>
 	<div class="balloon" id="HelpgetMap">
-	  Clicking on this button extracts information from the Google map display
-	  about the center of the map and its zoom level and stores that information
-	  into the latitude, longitude, and zoom level input fields.  This permits you
-	  to use the zoom and pan functions of the Google map to adjust the display
-	  appropriately, and then save those settings for subsequent users.
+	  Clicking on this button extracts information from the Google map
+      display about the center of the map and its zoom level and stores 
+      that information into the latitude, longitude, and zoom level 
+      input fields.  This permits you to use the zoom and pan functions 
+      of the Google map to adjust the display appropriately, and then 
+      save those settings for subsequent users.
 	</div>
 	<div class="balloon" id="HelpList">
 	  This is a flag used by Legacy.
@@ -516,13 +500,24 @@
 	  reflect the changes you have made to this record.
 	</div>
 	<div class="balloon" id="HelpPictures">
-	  Click this button to open a dialog for managing the pictures associated
-	  with the address.
+	  Click this button to open a dialog for managing the pictures
+      associated with the Address.
 	</div>
-    <script src="/jscripts/tinymce/js/tinymce/tinymce.js" type="application/javascript">
+	<div class="balloon" id="HelpSubmit">
+	  Clicking on this button causes the database to be updated to
+	  reflect the changes you have made to this record.
+	</div>
+	<div class="balloon" id="HelpDelete">
+	  Clicking on this button causes the database to be updated to
+	  remove the displayed Address.
+	</div>
+	<div class="balloon" id="HelpClose">
+	  Clicking on this button causes the page to close
+	  without updating the database.
+	</div>
+    <script src="/jscripts/tinymce/js/tinymce/tinymce.min.js"
+            type="application/javascript">
     </script>
-    <script src="/jscripts/js20/http.js" type="text/javascript"></script>
-    <script src="/jscripts/CommonForm.js" type="text/javascript"></script>
-    <script src="/jscripts/util.js" type="text/javascript"></script>
-    <script async defer src="https://maps.googleapis.com/maps/api/js?v=3.43&region=$GOOGLECC&key=$GOOGLEKEY" type="text/javascript"></script>
-    <script src="Address.js" type="text/javascript"></script>
+    <script src="Address.js" type="module"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?v=weekly&region=$GOOGLECC&key=$GOOGLEKEY&callback=initMap" 
+            type="text/javascript" defer></script>

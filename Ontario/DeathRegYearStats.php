@@ -49,8 +49,10 @@ use \NumberFormatter;
  *      2021/05/29      $highest, $totcount, $totlinked undefined       *
  *      2021/10/18      display linked relative to transcribed          *
  *      2022/02/08      avoid divide by zero                            *
+ *      2022/07/08      do not show deaths before 1869                  *
+ *                      do not flag missing county code as error        *
  *                                                                      *
- *  Copyright &copy; 2021 James A. Cobban                               *
+ *  Copyright &copy; 2022 James A. Cobban                               *
  ************************************************************************/
 require_once __NAMESPACE__ . "/Domain.inc";
 require_once __NAMESPACE__ . "/Country.inc";
@@ -113,10 +115,13 @@ if (count($_GET) > 0)
             case 'county':
             case 'regcounty':
             {
-                if (preg_match('/^[a-zA-Z]+$/', $value))
-                    $countyCode         = $value;
-                else
-                    $countycodetext     = htmlspecialchars($value);
+                if (strlen($value) > 0)
+                {
+	                if (preg_match('/^[a-zA-Z]+$/', $value))
+	                    $countyCode         = $value;
+	                else
+	                    $countycodetext     = htmlspecialchars($value);
+                }
                 break;
             }       // county
     
@@ -231,6 +236,8 @@ if (strlen($msg) == 0)
     $template->set('REGYEAR',       $regYear);
     $template->set('PREVREGYEAR',   $regYear - 1);
     $template->set('NEXTREGYEAR',   $regYear + 1);
+    if ($regYear <= 1869)
+        $template['topPrev']->update('&nbsp;');
 
     if (is_null($county))
     {

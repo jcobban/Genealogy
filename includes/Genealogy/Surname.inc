@@ -69,6 +69,7 @@ use \Exception;
  *      2021/09/15      add method getCount                             *
  *      2022/03/23      add method next, remove method getIdnr          *
  *                      add static method getInitials                   *
+ *      2022/09/15      method next failed for surname containing apos  *
  *                                                                      *
  *  Copyright &copy; 2022 James A. Cobban                               *
  ************************************************************************/
@@ -607,12 +608,13 @@ class Surname extends Record
         global  $msg;
         global  $connection;
 
-        $query              = "SELECT * FROM tblNR WHERE `surname` > '" . 
-                                $this->row['surname'] ."' LIMIT 1";
+        $query          = "SELECT * FROM tblNR WHERE `surname`>? LIMIT 1";
+        $sqlParms           = array($this->row['surname']);
+        $stmt               = $connection->prepare($query);
+        $queryText          = debugPrepQuery($query, $sqlParms);
 
         // query the database
-        $stmt               = $connection->query($query);
-        if ($stmt)
+        if ($stmt->execute($sqlParms))
         {               // execute successful
             $result         = $stmt->fetch(PDO::FETCH_ASSOC);
             if ($result)
@@ -627,6 +629,11 @@ class Surname extends Record
                 $next       = new Surname($result);
             }           // no match on surname
         }               // execute successful
+        else
+        {
+            throw new Exception("Surname::next: " .                                                         " execute '$queryText' failed, result=" .
+                                print_r($stmt->errorInfo(),true) . ". ");
+        }
         return $next;
     }       // function Surname::next
 

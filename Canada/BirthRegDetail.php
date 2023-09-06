@@ -143,8 +143,9 @@ use \Exception;
  *		2020/11/28      correct XSS errors                              *
  *		2021/04/04      escape CONTACTSUBJECT                           *
  *		2021/05/13      correct regular expression for citation match   *
+ *		2023/01/14      do not search for new blank records             *
  *																		*
- *  Copyright &copy; 2021 James A. Cobban								*
+ *  Copyright &copy; 2023 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . '/FtTemplate.inc';
 require_once __NAMESPACE__ . '/County.inc';
@@ -450,7 +451,10 @@ if (strlen($msg) == 0)
 	// if this registration is not already linked to
 	// look for individuals who match
 
-	if ($idir == 0 && $update)
+    if ($idir == 0 && 
+        $update && 
+        strlen($surname) > 0 &&
+        strlen($givennames) > 0)
 	{				// no existing link to this reg
 	    // check for existing citations to this registration
         $pattern        = "^$regYear-0*{$regNum}($|[^0-9])";

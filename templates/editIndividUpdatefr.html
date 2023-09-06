@@ -11,7 +11,7 @@
  *  Copyright &copy; 2019 James A. Cobban								*
  **********************************************************************-->
     <div id="breadcrumbs" class="hidden">
-	  <a href="/index.html">Accueil</a>:
+	  <a href="/home.html">Accueil</a>:
       <a href="/genealogy.php?lang=fr">
 			Génealogie
       </a>:
@@ -40,7 +40,6 @@
           <span style="flow: left" id="title">
             Mise à Jour $NAME<span id="inTree">: en arbre '$TREENAME'</span>
           </span>
-          <div style="clear: both;"></div>
         </h1>
         $TRACE
         $MSG
@@ -129,7 +128,6 @@
 		        </label>
 		        <input type="text" name="idir" id="idir" value="$IDIR"
 		                class="ina rightnc" style="width: 4em;" readonly="readonly">
-		        <div style="clear: both;"></div>
 		      </div>
 		      <div class="row">
 		        <label class="column1" for="Surname">
@@ -139,7 +137,6 @@
 		                placeholder="Supply Surname of new Individual"
 		                class="leftname" maxlength="120"
 		                value="$SURNAME">
-		        <div style="clear: both;"></div>
 		      </div>
 		      <div class="row">
                 <div class="column1">
@@ -155,8 +152,29 @@
                         id="editName$IDNX">
 		            Détailles
 		        </button>
-		        <div style="clear: both;"></div>
 		      </div>
+              <div class="row" id="altNameRow">
+		        <div class="column1">
+		          <label class="column1">
+                      Nom alternatif:
+		          </label>
+                  $ALTNAME
+                </div>
+                <button type="button" class="button"
+                            id="altName$IDNX">
+                      Detailles
+                </button>
+              </div>
+              <div class="row" id="addNameRow">
+		        <div class="column1">
+		          <label class="column1">
+		          </label>
+                  <button type="button" class="button"
+                            id="addName">
+                      Ajouter Nom
+                  </button>
+                </div>
+              </div>
 		      <div class="row">
 		        <div class="column1short">
 		          <label class="column1" for="Gender">
@@ -175,7 +193,6 @@
 		                Inconnu
 		            </option>
 		          </select>
-		          <div style="clear: both;"></div>
 		        </div>
 		      </div>
 		      </fieldset>
@@ -202,7 +219,6 @@
  		Illegitime
             </option>
           </select>
-        <div style="clear: both;"></div>
       </div>
       <div class="row" id="fatherRow">
         <div class="column1">
@@ -260,7 +276,6 @@
                 value="1"
                 $DADPRIVATECHECKED>
         </div>
-        <div style="clear: both;"></div>
       </div>
       <div class="row" id="motherRow">
         <div class="column1">
@@ -316,7 +331,6 @@
           <input type="checkbox" name="CPMomPrivate" id="CPMomPrivate" value="1"
                 $MOMPRIVATECHECKED>
         </div>
-        <div style="clear: both;"></div>
       </div>
       <div class="row" id="SealingRow">
         <div class="column1">
@@ -342,7 +356,6 @@
         <button type="button" class="button" id="Clear17">
                 Écraser
         </button>
-        <div style="clear: both;"></div>
       </div>
       </fieldset>
       <fieldset id="EventFields" class="other">
@@ -350,17 +363,16 @@
         <div class="row"
                 id="EventColHeadersRow">
           <span class="labelSmall"
-                style="width: 9em; padding-left: 16em; padding-right: 6em;">
+                style="width: 9em; padding-left: 10em; padding-right: 6em;">
                 Date:
           </span>
           <span class="labelSmall"
-                style="width: 11em; padding-left: 5em; padding-right: 22em;">
+                style="width: 11em; padding-left: 5em; padding-right: 12em;">
                 Lieu:
           </span>
           <span class="labelSmall">
                 Preferré:
           </span>
-          <div style="clear: both;"></div>
         </div>
         <div id="EventBody">
             $EVENTS
@@ -375,7 +387,6 @@
           <button type="button" class="button" id="Order">
                 C<u>o</u>mmander des événements par date
           </button>
-          <div style="clear: both;"></div>
         </div>
       </fieldset>
       <fieldset id="OtherFields" class="other">
@@ -409,7 +420,6 @@
                 value="1"
                 $NEVERMARRIEDRO $NEVERMARRIEDCHECKED>  
           </div>
-          <div style="clear: both;"></div>
         </div>
         <div class="row" id="RefRow">
           <div class="column1short">
@@ -430,7 +440,6 @@
                 class="white left"
                 value="$ANCESTRALREF">
           </div>
-          <div style="clear: both;"></div>
         </div>
         <div class="row" id="InterestRow">
           <div class="column1short">
@@ -473,7 +482,6 @@
               </option>
             </select>
           </div>
-          <div style="clear: both;"></div>
         </div>
       </fieldset>
       <fieldset id="ButtonFields" class="other">
@@ -486,7 +494,6 @@
               Mise à Jour <u>N</u>otes Generales
           </button>
           </div>
-          <div style="clear: both;"></div>
         </div>
         <div class="row">
           <button type="button" class="buttonCol1" id="Parents">
@@ -507,7 +514,6 @@
           </button>
           <input type="hidden" name="IDMRPref" id="IDMRPref" 
                 value="$IDMRPREF">
-          <div style="clear: both;"></div>
         </div>
         <div class="row" id="PicturesRow">
             <button type="button" class="buttonCol1" id="Pictures">
@@ -521,7 +527,6 @@
                   Mise à Jour  <u>A</u>ddresse
               </span>
             </button>
-          <div style="clear: both;"></div>
         </div>
           <!-- row allowing edit of some notes fields -->
         <div class="row" id="NotesRow">
@@ -531,7 +536,6 @@
             <button type="button" class="buttonCol2" id="Detail8">
                 Mise à Jour Notes Medicaux
             </button>
-          <div style="clear: both;"></div>
         </div>
       </fieldset>
   </form>
@@ -663,7 +667,6 @@
           <input type="hidden" name="EventChanged$rownum"
                           id="EventChanged$rownum"
                           value="$changed">
-          <div style="clear: both;"></div>
         </div> <!-- id="BirthRow"-->
         <div class="row" id="ChristeningRow">
         <input type="hidden" id="ChristeningRowAlwaysShow">
@@ -709,7 +712,6 @@
           <input type="hidden" name="EventChanged$rownum"
                           id="EventChanged$rownum"
                           value="$changed">
-          <div style="clear: both;"></div>
         </div><!-- id="ChristeningRow" -->
         <div class="row" id="BaptismRow">
 		<div class="column1">
@@ -762,7 +764,6 @@
           <input type="hidden" name="EventChanged$rownum"
                           id="EventChanged$rownum"
                           value="$changed">
-          <div style="clear: both;"></div>
         </div><!-- id="BaptismRow" -->
         <div class="row" id="EndowmentRow">
 		<div class="column1">
@@ -810,7 +811,6 @@
           <input type="hidden" name="EventChanged$rownum"
                           id="EventChanged$rownum"
                           value="$changed">
-          <div style="clear: both;"></div>
         </div><!-- id="EndowmentRow" -->
         <div class="row" id="ConfirmationRow">
 		<div class="column1">
@@ -858,7 +858,6 @@
           <input type="hidden" name="EventChanged$rownum"
                           id="EventChanged$rownum"
                           value="$changed">
-          <div style="clear: both;"></div>
         </div><!-- id="ConfirmationRow" -->
         <div class="row" id="InitiatoryRow">
 		<div class="column1">
@@ -907,7 +906,6 @@
           <input type="hidden" name="EventChanged$rownum"
                           id="EventChanged$rownum"
                           value="$changed">
-          <div style="clear: both;"></div>
         </div><!-- id="InitiatoryRow" -->
         <div class="row" id="DeathRow">
         <input type="hidden" id="DeathRowAlwaysShow">
@@ -952,7 +950,6 @@
           <input type="hidden" name="EventChanged$rownum"
                           id="EventChanged$rownum"
                           value="$changed">
-          <div style="clear: both;"></div>
         </div><!-- id="DeathRow" -->
         <div id="DeathCauseRow" class="row">
           <label class="column1" for="DeathCause">
@@ -968,7 +965,6 @@
           <button type="button" class="button" id="Clear9">
                   Écraser
           </button>
-          <div style="clear: both;"></div>
         </div> <!-- id="DeathCauseRow" -->
         <div class="row" id="BuriedRow">
         <input type="hidden" id="BuriedRowAlwaysShow">
@@ -1013,7 +1009,6 @@
           <input type="hidden" name="EventChanged$rownum"
                           id="EventChanged$rownum"
                           value="$changed">
-          <div style="clear: both;"></div>
       </div><!-- id="BuriedRow" -->
       <div class="row" id="EventRow$rownum">
 		<div class="column1">
@@ -1070,7 +1065,6 @@
           <input type="hidden" name="EventChanged$rownum"
                           id="EventChanged$rownum"
                           value="$changed">
-          <div style="clear: both;"></div>
         </div><!-- id="EventRow$rownum" -->
 	  <!-- template for confirming the deletion of an event-->
 	  <form name="ClrInd$template" id="ClrInd$template">

@@ -37,8 +37,9 @@ use \Exception;
  *      2020/01/13      fix change adname column                        *
  *      2020/12/02      protect against XSS                             *
  *      2021/04/01      add virtual field 'total'                       *
+ *      2022/09/12      add method getId so it returns an integer       *
  *                                                                      *
- *  Copyright &copy; 2021 James A. Cobban                               *
+ *  Copyright &copy; 2022 James A. Cobban                               *
  ************************************************************************/
 require_once __NAMESPACE__ . '/Record.inc';
 
@@ -341,6 +342,19 @@ class Advertiser extends Record
     }           // function Advertiser::get
 
     /********************************************************************
+     *  function Advertiser::getId                                      *
+     *                                                                  *
+     *  Obtain a unique integer identifier of this record.              *
+     ********************************************************************/
+    function getId()
+    {
+        if (is_null($this->row['row']))
+            return 0;
+        else
+            return $this->row['row'];
+    }       // function Advertiser::getId
+
+    /********************************************************************
      *  function Advertiser::getName                                    *
      *                                                                  *
      *  Get the name of the advertising statistic.                      *
@@ -486,7 +500,7 @@ class Advertiser extends Record
             try {
                 $this->log($update, $parms);
             } catch (Exception $e) {
-                $msg    .= "<p>Advertiser::increment: failed for adname='$adname'</p>\n";
+                $msg    .= "<p>Advertiser::increment: failed for adname='$adname' " . $e->getMessage() . ", stmt='$updateText'</p>\n";
                 print $this->dump('increment');
             }
         }               // successful update

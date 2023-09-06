@@ -9,6 +9,7 @@
  *		2010/12/07		created											*
  *		2015/05/11		use contactAuthor.php to contact administrator	*
  *						add pointer to list of articles in head/foot	*
+ *      2023/01/11      clean up tables                                 *
  **********************************************************************-->
     <link rel="stylesheet" type="text/css" href="/styles.css"/>
   </head>
@@ -168,110 +169,88 @@
 		formatted as “text” or as “custom” with a format string of “#
         ?/12”.  Note that any fractional value is displayed as the closest
 		fraction with a denominator of 12.</p>
-      <table width="236" cellpadding="0" cellspacing="0">
+      <table width="236" class="details">
       	<col width="64">
       	<col width="73">
       	<col width="99">
       	<tr>
-      		<td width="64" height="18" style="border: none; padding: 0cm">
-      			<p>text</p>
+      		<th width="64" class="colhead">
+      			text
+      		</th>
+      		<th width="73" class="colhead"> 
+      			general
+      		</th>
+      		<th width="99" class="colhead"> 
+      			custom # ?/12
+      		</th>
+      	</tr>
+      	<tr>
+            <td width="64" height="17" class="first">
+      			1.5
       		</td>
-      		<td width="73" style="border: none; padding: 0cm">
-      			<p>
-      			general</p>
+            <td width="73" class="border">
+      			1.5
       		</td>
-      		<td width="99" style="border: none; padding: 0cm">
-      			<p>
-      			custom # ?/12</p>
+            <td width="99" class="border">
+      			1 6/12
       		</td>
       	</tr>
       	<tr>
-      		<td width="64" height="17" style="border: none; padding: 0cm">
-      			<p>1.5</p>
+      		<td width="64" height="17"  class="first">
+      			5
       		</td>
-      		<td width="73" style="border: none; padding: 0cm">
-      			<p>
-      			1.5</p>
+      		<td width="73"  class="border">
+      			5
       		</td>
-      		<td width="99" style="border: none; padding: 0cm">
-      			<p>
-      			1 6/12</p>
-      		</td>
-      	</tr>
-      	<tr>
-      		<td width="64" height="17" style="border: none; padding: 0cm">
-      			<p>
-      			5</p>
-      		</td>
-      		<td width="73" style="border: none; padding: 0cm">
-      			<p>
-      			5</p>
-      		</td>
-      		<td width="99" style="border: none; padding: 0cm">
-      			<p>
+      		<td width="99" class="border">
       			5&nbsp;&nbsp;&nbsp;&nbsp; 
-      			</p>
       		</td>
       	</tr>
       	<tr>
-      		<td width="64" height="17" style="border: none; padding: 0cm">
-      			<p>
-      			3/12</p>
+      		<td width="64" height="17" class="first">
+      			3/12
       		</td>
-      		<td width="73" style="border: none; padding: 0cm">
-      			<p>
-      			12-Mar</p>
+      		<td width="73" class="border">
+      			12-Mar
       		</td>
-      		<td width="99" style="border: none; padding: 0cm">
-      			<p>
-      			&nbsp;3/12</p>
+      		<td width="99" class="border">
+      			&nbsp;3/12
       		</td>
       	</tr>
       	<tr>
-      		<td width="64" height="17" style="border: none; padding: 0cm">
-      			<p>
-      			1 1/2</p>
+      		<td width="64" height="17" class="first">
+      			1 1/2
       		</td>
-      		<td width="73" style="border: none; padding: 0cm">
-      			<p>
-      			1 1/2</p>
+      		<td width="73" class="border">
+      			1 1/2
       		</td>
-      		<td width="99" style="border: none; padding: 0cm">
-      			<p>
-      			1 6/12</p>
+      		<td width="99" class="border">
+      			1 6/12
       		</td>
       	</tr>
       	<tr>
-      		<td width="64" height="17" style="border: none; padding: 0cm">
-      			<p>
-      			11/12</p>
+      		<td width="64" height="17" class="first">
+      			11/12
       		</td>
-      		<td width="73" style="border: none; padding: 0cm">
-      			<p>
-      			12-Nov</p>
+      		<td width="73" class="border">
+      			12-Nov
       		</td>
-      		<td width="99" style="border: none; padding: 0cm">
-      			<p>
-      			&nbsp;11/12</p>
+      		<td width="99" class="border">
+      			&nbsp;11/12
       		</td>
       	</tr>
       	<tr>
-      		<td width="64" height="18" style="border: none; padding: 0cm">
-      			<p>
-      			3.95</p>
+      		<td width="64" height="18" class="first">
+      			3.95
       		</td>
-      		<td width="73" style="border: none; padding: 0cm">
-      			<p>
-      			3.95</p>
+      		<td width="73" class="border">
+      			3.95
       		</td>
-      		<td width="99" style="border: none; padding: 0cm">
-      			<p>
-      			3 11/12</p>
+      		<td width="99" class="border">
+      			3 11/12
       		</td>
       	</tr>
       </table>
-      <p>
-      </p>
       <p>Many genealogical data sources
 		contain dates.  These cause a problem for all spreadsheet programs
 		because, by default, they are recognized as dates and internally
@@ -420,266 +399,208 @@
       <p>
 		The overall effectiveness of
 		the three algorithms are compared in the following table.</p>
-      <table width="405" cellpadding="4" cellspacing="0">
+      <table width="405" class="details">
       	<col width="46">
       	<col width="107">
       	<col width="116">
       	<col width="102">
       	<thead>
       		<tr valign="top">
-      			<td width="46" style="border-top: 1px solid #000000; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: none; padding-top: 0.1cm; padding-bottom: 0.1cm; padding-left: 0.1cm; padding-right: 0cm">
-      				<p>
-      				<br/>
-      
-      				</p>
-      			</td>
-      			<td width="107" style="border-top: 1px solid #000000; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: none; padding-top: 0.1cm; padding-bottom: 0.1cm; padding-left: 0.1cm; padding-right: 0cm">
-      				<p>
-      				<b>Quattro Pro</b></p>
-      			</td>
-      			<td width="116" style="border-top: 1px solid #000000; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: none; padding-top: 0.1cm; padding-bottom: 0.1cm; padding-left: 0.1cm; padding-right: 0cm">
-      				<p>
-      				<b>Excel</b></p>
-      			</td>
-      			<td width="102" style="border: 1px solid #000000; padding: 0.1cm">
-      				<p>
-      				<b>OpenOffice</b></p>
-      			</td>
+      			<th width="46" class="colhead">
+      				&nbsp;
+      			</th>
+      			<th width="107" class="colhead">
+      				Quattro Pro
+      			</th>
+      			<th width="116" class="colhead">
+      				Excel
+      			</th>
+      			<th width="102" class="colhead">
+      				OpenOffice
+      			</th>
       		</tr>
       	</thead>
       	<tbody>
       		<tr valign="top">
-      			<td width="46" style="border-top: none; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: none; padding-top: 0cm; padding-bottom: 0.1cm; padding-left: 0.1cm; padding-right: 0cm">
-      				<p>
-      				<b>Jan</b></p>
+      			<td width="46" class="first">
+      				Jan
       			</td>
-      			<td width="107" style="border-top: none; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: none; padding-top: 0cm; padding-bottom: 0.1cm; padding-left: 0.1cm; padding-right: 0cm">
-      				<p>
-      				3 (shift, “Ja”)</p>
+      			<td width="107" class="border">
+      				3 (shift, “Ja”)
       			</td>
-      			<td width="116" style="border-top: none; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: none; padding-top: 0cm; padding-bottom: 0.1cm; padding-left: 0.1cm; padding-right: 0cm">
-      				<p>
-      				3 (“Jan”)</p>
+      			<td width="116" class="border">
+      				3 (“Jan”)
       			</td>
-      			<td width="102" style="border-top: none; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: 1px solid #000000; padding-top: 0cm; padding-bottom: 0.1cm; padding-left: 0.1cm; padding-right: 0.1cm">
-      				<p>
-      				1 (“J”)</p>
+      			<td width="102" class="border">
+      				1 (“J”)
       			</td>
       		</tr>
       		<tr valign="top">
-      			<td width="46" style="border-top: none; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: none; padding-top: 0cm; padding-bottom: 0.1cm; padding-left: 0.1cm; padding-right: 0cm">
-      				<p>
-      				<b>Feb</b></p>
+      			<td width="46" class="first">
+      				Feb
       			</td>
-      			<td width="107" style="border-top: none; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: none; padding-top: 0cm; padding-bottom: 0.1cm; padding-left: 0.1cm; padding-right: 0cm">
-      				<p>
-      				2 (shift, “F”)</p>
+      			<td width="107" class="border">
+      				2 (shift, “F”)
       			</td>
-      			<td width="116" style="border-top: none; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: none; padding-top: 0cm; padding-bottom: 0.1cm; padding-left: 0.1cm; padding-right: 0cm">
-      				<p>
-      				1 ( “F”)</p>
+      			<td width="116" class="border">
+      				1 ( “F”)
       			</td>
-      			<td width="102" style="border-top: none; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: 1px solid #000000; padding-top: 0cm; padding-bottom: 0.1cm; padding-left: 0.1cm; padding-right: 0.1cm">
-      				<p>
-      				1 ( “F”)</p>
+      			<td width="102" class="border">
+      				1 ( “F”)
       			</td>
       		</tr>
       		<tr valign="top">
-      			<td width="46" style="border-top: none; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: none; padding-top: 0cm; padding-bottom: 0.1cm; padding-left: 0.1cm; padding-right: 0cm">
-      				<p>
-      				<b>Mar</b></p>
+      			<td width="46" class="first">
+      				Mar
       			</td>
-      			<td width="107" style="border-top: none; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: none; padding-top: 0cm; padding-bottom: 0.1cm; padding-left: 0.1cm; padding-right: 0cm">
-      				<p>
-      				4 (shift, “Mar”)</p>
+      			<td width="107" class="border">
+      				4 (shift, “Mar”)
       			</td>
-      			<td width="116" style="border-top: none; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: none; padding-top: 0cm; padding-bottom: 0.1cm; padding-left: 0.1cm; padding-right: 0cm">
-      				<p>
-      				3 (“Mar”)</p>
+      			<td width="116" class="border">
+      				3 (“Mar”)
       			</td>
-      			<td width="102" style="border-top: none; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: 1px solid #000000; padding-top: 0cm; padding-bottom: 0.1cm; padding-left: 0.1cm; padding-right: 0.1cm">
-      				<p>
-      				1 (“M”)</p>
+      			<td width="102" class="border">
+      				1 (“M”)
       			</td>
       		</tr>
       		<tr valign="top">
-      			<td width="46" style="border-top: none; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: none; padding-top: 0cm; padding-bottom: 0.1cm; padding-left: 0.1cm; padding-right: 0cm">
-      				<p>
-      				<b>Apr</b></p>
+      			<td width="46" class="first">
+      				Apr
       			</td>
-      			<td width="107" style="border-top: none; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: none; padding-top: 0cm; padding-bottom: 0.1cm; padding-left: 0.1cm; padding-right: 0cm">
-      				<p>
-      				3 (shift, “Ap”)</p>
+      			<td width="107" class="border">
+      				3 (shift, “Ap”)
       			</td>
-      			<td width="116" style="border-top: none; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: none; padding-top: 0cm; padding-bottom: 0.1cm; padding-left: 0.1cm; padding-right: 0cm">
-      				<p>
-      				2 (“Ap”)</p>
+      			<td width="116" class="border">
+      				2 (“Ap”)
       			</td>
-      			<td width="102" style="border-top: none; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: 1px solid #000000; padding-top: 0cm; padding-bottom: 0.1cm; padding-left: 0.1cm; padding-right: 0.1cm">
-      				<p>
-      				1 (“A”)</p>
+      			<td width="102" class="border">
+      				1 (“A”)
       			</td>
       		</tr>
       		<tr valign="top">
-      			<td width="46" style="border-top: none; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: none; padding-top: 0cm; padding-bottom: 0.1cm; padding-left: 0.1cm; padding-right: 0cm">
-      				<p>
-      				<b>May</b></p>
+      			<td width="46" class="first">
+      				May
       			</td>
-      			<td width="107" style="border-top: none; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: none; padding-top: 0cm; padding-bottom: 0.1cm; padding-left: 0.1cm; padding-right: 0cm">
-      				<p>
-      				2 (shift, “M”)</p>
+      			<td width="107" class="border">
+      				2 (shift, “M”)
       			</td>
-      			<td width="116" style="border-top: none; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: none; padding-top: 0cm; padding-bottom: 0.1cm; padding-left: 0.1cm; padding-right: 0cm">
-      				<p>
-      				4 (shift, “May”)</p>
+      			<td width="116" class="border">
+      				4 (shift, “May”)
       			</td>
-      			<td width="102" style="border-top: none; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: 1px solid #000000; padding-top: 0cm; padding-bottom: 0.1cm; padding-left: 0.1cm; padding-right: 0.1cm">
-      				<p>
-      				2 (“M”, Tab)</p>
+      			<td width="102" class="border">
+      				2 (“M”, Tab)
       			</td>
       		</tr>
       		<tr valign="top">
-      			<td width="46" style="border-top: none; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: none; padding-top: 0cm; padding-bottom: 0.1cm; padding-left: 0.1cm; padding-right: 0cm">
-      				<p>
-      				<b>June</b></p>
+      			<td width="46" class="first">
+      				June
       			</td>
-      			<td width="107" style="border-top: none; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: none; padding-top: 0cm; padding-bottom: 0.1cm; padding-left: 0.1cm; padding-right: 0cm">
-      				<p>
-      				4 (shift, “Jun”)</p>
+      			<td width="107" class="border">
+      				4 (shift, “Jun”)
       			</td>
-      			<td width="116" style="border-top: none; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: none; padding-top: 0cm; padding-bottom: 0.1cm; padding-left: 0.1cm; padding-right: 0cm">
-      				<p>
-      				3 (“Jun”)</p>
+      			<td width="116" class="border">
+      				3 (“Jun”)
       			</td>
-      			<td width="102" style="border-top: none; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: 1px solid #000000; padding-top: 0cm; padding-bottom: 0.1cm; padding-left: 0.1cm; padding-right: 0.1cm">
-      				<p>
-      				3 (“Jun”)</p>
+      			<td width="102" class="border">
+      				3 (“Jun”)
       			</td>
       		</tr>
       		<tr valign="top">
-      			<td width="46" style="border-top: none; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: none; padding-top: 0cm; padding-bottom: 0.1cm; padding-left: 0.1cm; padding-right: 0cm">
-      				<p>
-      				<b>July</b></p>
+      			<td width="46" class="first">
+      				July
       			</td>
-      			<td width="107" style="border-top: none; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: none; padding-top: 0cm; padding-bottom: 0.1cm; padding-left: 0.1cm; padding-right: 0cm">
-      				<p>
-      				2 (shift, “J”)</p>
+      			<td width="107" class="border">
+      				2 (shift, “J”)
       			</td>
-      			<td width="116" style="border-top: none; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: none; padding-top: 0cm; padding-bottom: 0.1cm; padding-left: 0.1cm; padding-right: 0cm">
-      				<p>
-      				3 (“Jul”)</p>
+      			<td width="116" class="border">
+      				3 (“Jul”)
       			</td>
-      			<td width="102" style="border-top: none; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: 1px solid #000000; padding-top: 0cm; padding-bottom: 0.1cm; padding-left: 0.1cm; padding-right: 0.1cm">
-      				<p>
-      				2 (“Ju”)</p>
+      			<td width="102" class="border">
+      				2 (“Ju”)
       			</td>
       		</tr>
       		<tr valign="top">
-      			<td width="46" style="border-top: none; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: none; padding-top: 0cm; padding-bottom: 0.1cm; padding-left: 0.1cm; padding-right: 0cm">
-      				<p>
-      				<b>Aug</b></p>
+      			<td width="46" class="first">
+      				Aug
       			</td>
-      			<td width="107" style="border-top: none; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: none; padding-top: 0cm; padding-bottom: 0.1cm; padding-left: 0.1cm; padding-right: 0cm">
-      				<p>
-      				2 (shift, “A”)</p>
+      			<td width="107" class="border">
+      				2 (shift, “A”)
       			</td>
-      			<td width="116" style="border-top: none; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: none; padding-top: 0cm; padding-bottom: 0.1cm; padding-left: 0.1cm; padding-right: 0cm">
-      				<p>
-      				2 (“Au”)</p>
+      			<td width="116" class="border">
+      				2 (“Au”)
       			</td>
-      			<td width="102" style="border-top: none; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: 1px solid #000000; padding-top: 0cm; padding-bottom: 0.1cm; padding-left: 0.1cm; padding-right: 0.1cm">
-      				<p>
-      				2 (“Au”)</p>
+      			<td width="102" class="border">
+      				2 (“Au”)
       			</td>
       		</tr>
       		<tr valign="top">
-      			<td width="46" style="border-top: none; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: none; padding-top: 0cm; padding-bottom: 0.1cm; padding-left: 0.1cm; padding-right: 0cm">
-      				<p>
-      				<b>Sept</b></p>
+      			<td width="46" class="first">
+      				Sept
       			</td>
-      			<td width="107" style="border-top: none; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: none; padding-top: 0cm; padding-bottom: 0.1cm; padding-left: 0.1cm; padding-right: 0cm">
-      				<p>
-      				2 (shift, “S”)</p>
+      			<td width="107" class="border">
+      				2 (shift, “S”)
       			</td>
-      			<td width="116" style="border-top: none; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: none; padding-top: 0cm; padding-bottom: 0.1cm; padding-left: 0.1cm; padding-right: 0cm">
-      				<p>
-      				1 (“S”)</p>
+      			<td width="116" class="border">
+      				1 (“S”)
       			</td>
-      			<td width="102" style="border-top: none; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: 1px solid #000000; padding-top: 0cm; padding-bottom: 0.1cm; padding-left: 0.1cm; padding-right: 0.1cm">
-      				<p>
-      				1 (“S”)</p>
+      			<td width="102" class="border">
+      				1 (“S”)
       			</td>
       		</tr>
       		<tr valign="top">
-      			<td width="46" style="border-top: none; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: none; padding-top: 0cm; padding-bottom: 0.1cm; padding-left: 0.1cm; padding-right: 0cm">
-      				<p>
-      				<b>Oct</b></p>
+      			<td width="46" class="first">
+      				Oct
       			</td>
-      			<td width="107" style="border-top: none; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: none; padding-top: 0cm; padding-bottom: 0.1cm; padding-left: 0.1cm; padding-right: 0cm">
-      				<p>
-      				2 (shift, “O”)</p>
+      			<td width="107" class="border">
+      				2 (shift, “O”)
       			</td>
-      			<td width="116" style="border-top: none; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: none; padding-top: 0cm; padding-bottom: 0.1cm; padding-left: 0.1cm; padding-right: 0cm">
-      				<p>
-      				1 (“O”)</p>
+      			<td width="116" class="border">
+      				1 (“O”)
       			</td>
-      			<td width="102" style="border-top: none; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: 1px solid #000000; padding-top: 0cm; padding-bottom: 0.1cm; padding-left: 0.1cm; padding-right: 0.1cm">
-      				<p>
-      				1 (“O”)</p>
+      			<td width="102" class="border">
+      				1 (“O”)
       			</td>
       		</tr>
       		<tr valign="top">
-      			<td width="46" style="border-top: none; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: none; padding-top: 0cm; padding-bottom: 0.1cm; padding-left: 0.1cm; padding-right: 0cm">
-      				<p>
-      				<b>Nov</b></p>
+      			<td width="46" class="first">
+      				Nov
       			</td>
-      			<td width="107" style="border-top: none; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: none; padding-top: 0cm; padding-bottom: 0.1cm; padding-left: 0.1cm; padding-right: 0cm">
-      				<p>
-      				2 (shift, “N”)</p>
+      			<td width="107" class="border">
+      				2 (shift, “N”)
       			</td>
-      			<td width="116" style="border-top: none; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: none; padding-top: 0cm; padding-bottom: 0.1cm; padding-left: 0.1cm; padding-right: 0cm">
-      				<p>
-      				1 (“N”)</p>
+      			<td width="116" class="border">
+      				1 (“N”)
       			</td>
-      			<td width="102" style="border-top: none; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: 1px solid #000000; padding-top: 0cm; padding-bottom: 0.1cm; padding-left: 0.1cm; padding-right: 0.1cm">
-      				<p>
-      				1 (“N”)</p>
+      			<td width="102" class="border">
+      				1 (“N”)
       			</td>
       		</tr>
       		<tr valign="top">
-      			<td width="46" style="border-top: none; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: none; padding-top: 0cm; padding-bottom: 0.1cm; padding-left: 0.1cm; padding-right: 0cm">
-      				<p>
-      				<b>Dec</b></p>
+      			<td width="46" class="first">
+      				Dec
       			</td>
-      			<td width="107" style="border-top: none; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: none; padding-top: 0cm; padding-bottom: 0.1cm; padding-left: 0.1cm; padding-right: 0cm">
-      				<p>
-      				2 (shift, “D”)</p>
+      			<td width="107" class="border">
+      				2 (shift, “D”)
       			</td>
-      			<td width="116" style="border-top: none; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: none; padding-top: 0cm; padding-bottom: 0.1cm; padding-left: 0.1cm; padding-right: 0cm">
-      				<p>
-      				1 (“D”)</p>
+      			<td width="116" class="border">
+      				1 (“D”)
       			</td>
-      			<td width="102" style="border-top: none; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: 1px solid #000000; padding-top: 0cm; padding-bottom: 0.1cm; padding-left: 0.1cm; padding-right: 0.1cm">
-      				<p>
-      				1 (“D”)</p>
+      			<td width="102" class="border">
+      				1 (“D”)
       			</td>
       		</tr>
       		<tr valign="top">
-      			<td width="46" style="border-top: none; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: none; padding-top: 0cm; padding-bottom: 0.1cm; padding-left: 0.1cm; padding-right: 0cm">
-      				<p>
-      				<b>Total</b></p>
+      			<td width="46" class="first">
+      				Total
       			</td>
-      			<td width="107" style="border-top: none; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: none; padding-top: 0cm; padding-bottom: 0.1cm; padding-left: 0.1cm; padding-right: 0cm">
-      				<p>
-      				30 keystrokes</p>
+      			<td width="107" class="border">
+      				30 keystrokes
       			</td>
-      			<td width="116" style="border-top: none; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: none; padding-top: 0cm; padding-bottom: 0.1cm; padding-left: 0.1cm; padding-right: 0cm">
-      				<p>
-      				25 keystrokes</p>
+      			<td width="116" class="border">
+      				25 keystrokes
       			</td>
-      			<td width="102" style="border-top: none; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: 1px solid #000000; padding-top: 0cm; padding-bottom: 0.1cm; padding-left: 0.1cm; padding-right: 0.1cm">
-      				<p>
-      				17 keystrokes</p>
+      			<td width="102" class="border">
+      				17 keystrokes
       			</td>
       		</tr>
       	</tbody>
@@ -767,10 +688,10 @@
 		competing branches of the Methodist church.  Some enumerators
 		entered, for example:</p>
       <ol>
-      	<li>Meth.
-      	<li>Meth. N.C.
-      	<li>Meth. E.
-      	<li>Meth. W.
+      	<li>Meth.</li>
+      	<li>Meth. N.C.</li>
+      	<li>Meth. E.</li>
+      	<li>Meth. W.</li>
       </ol>
       <p>However the second represents the
         “New Connexion Methodist Church”, and therefore should be
@@ -781,9 +702,9 @@
       <p>In the “Profession, occupation, trade ...” column of a census you
 		frequently see the following values:</p>
       <ul>
-      	<li>Farmer
-      	<li>Farmer's son
-      	<li>Farmer ret.
+      	<li>Farmer</li>
+      	<li>Farmer's son</li>
+      	<li>Farmer ret.</li>
       </ul>
       <p>In Microsoft® Excel you will be forced to type the entire word
         “Farmer” every time.  It will only autocomplete the entry when

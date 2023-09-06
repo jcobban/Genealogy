@@ -10,7 +10,7 @@
  *  Copyright &copy; 2018 James A. Cobban								*
  **********************************************************************-->
   <div id="breadcrumbs" class="hidden">
-	<a href="/index.html">Home</a>:
+	<a href="/home.html">Home</a>:
     <a href="/genealogy.php?lang=$LANG">
 			Stammbaumforschung
     </a>:
@@ -46,28 +46,24 @@
 	      IDNR:
         </label>
 	       $IDNR
-        <div style="clear: both;"></div>
       </div>
       <div class="row" id="SurnameRow">
         <label class="column1" for="Surname">
 	      achname:
         </label>
 	      $SURNAME
-        <div style="clear: both;"></div>
       </div>
       <div class="row" id="SoundsLikeRow">
         <label class="column1" for="SoundsLike">
 	      SOUNDEX-Code:
         </label>
 	      $SOUNDSLIKE
-        <div style="clear: both;"></div>
       </div>
       <div class="row" id="PatternRow">
         <label class="column1" for="Pattern">
 	      Muster:
         </label>
 	      $PATTERN
-        <div style="clear: both;"></div>
       </div>
       <div class="row" id="NotesRow">
         <label class="column1" for="Notes">
@@ -76,7 +72,6 @@
         <div style="float: left; width: 80%; white-space: normal;">
         $NOTES
         </div>
-        <div style="clear: both;"></div>
       </div>
     <form name="surnameForm" id="surnameForm"
 	        action="/FamilyTree/Names.php" method="get">
@@ -108,18 +103,17 @@
   <div class="center" id="showActualCount" >
     <span class="left" id="npPrevFront">
 	<a href="/FamilyTree/Names.php?Surname=$SURNAME&lang=$LANG&offset=$PREV&limit=$LIMIT" id="prenpprev">
-	&lt;---
+	<img src="/Images/ArrowLeft.svg">
 	</a>
     </span>
     <span class="right" id="npNextFront">
 	<a href="/FamilyTree/Names.php?Surname=$SURNAME&lang=$LANG&offset=$NEXT&limit=$LIMIT" id="prenpnext">
-	    ---&gt;
+	    <img src="/Images/ArrowRight.svg">
 	</a>
     </span>
       <span id="respdescrows">
         Nachnamen $FIRST bis $LAST von $COUNT
       </span>
-    <div style="clear: both;"></div>
   </div> <!-- left and right arrow links -->
     <p id="deletedUnused">Nicht verwendeten Datensatz für Nachnamen '$SURNAME' gelöscht </p>
     <!--- Put out the response as a grid -->
@@ -208,7 +202,7 @@
 	against this individual.
 	The application also supports the keyboard shortcut Alt-B.
   </div>
-    <script src="/jscripts/tinymce/js/tinymce/tinymce.js">
+    <script src="/jscripts/tinymce/js/tinymce/tinymce.min.js">
     </script>
 	<script src="/jscripts/js20/http.js" type="text/javascript">
     </script>

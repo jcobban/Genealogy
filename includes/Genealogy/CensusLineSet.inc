@@ -45,6 +45,8 @@ use \mb_substr;
  *      2020/04/16      support exact match on surname                  *
  *      2020/04/23      fill in new 1911 page from AutomatedGenealogy   *
  *      2020/12/02      protect against XSS                             *
+ *      2022/09/03      do not crash or display error information if    *
+ *                      cannot reach automatedancestry.org              *
  *                                                                      *
  *  Copyright &copy; 2020 James A. Cobban                               *
  ************************************************************************/
@@ -1037,7 +1039,10 @@ class CensusLineSet extends RecordSet
         $document                       = $agdist->getDocument();
         $tables                         = $document->getElementsByTagName('table');
         if (count($tables) == 0)
-            print "<p>" . str_replace('<','&lt;',$agdist->getRawTemplate()) ."</p>\n";
+        {
+            error_log("CensusLineSet.inc: page is not a census page: " . $agdist->getRawTemplate());
+            return;
+        }
         $table                          = $tables[1];
         $rows                           = $table->getElementsByTagName('tr');
         foreach($rows as $ir => $row)

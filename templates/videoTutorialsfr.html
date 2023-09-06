@@ -8,37 +8,43 @@
  *																		*
  *  Copyright &copy; 2018 James A. Cobban								*
  **********************************************************************-->
-  <div id="breadcrumbs" class="hidden">
-    <a href="/genealogy.php?lang=fr">Généalogie</a>:
-  </div>	
-<div class="body">
-  <h1>
-    <span class="right">
-	<a href="/videoTutorialsHelpfr.html" target="help">? Help</a>
-    </span>
-	Didacticiels en Vidéo
-  </h1>
-  <ul id="listOfVideos">
-    <li id="$filename">
-      <span style="text-decoration: underline; color: blue;">
-	  <span id="Show$filename">Montrer</span>
-	  <span id="Hide$filename" style="display: none">Cacher</span>
-	  $description
-      </span>
-      <div class="hidden" id="display$filename">
-        <video controls>
-          <source src="/Videos/$filename.webm" type="video/webm">
-          <source src="/Videos/$filename.mp4" type="video/mp4">
-	    Desolé, votre navigateur ne supporte pas les vidéos intégréés, 
-	    vous pouvez
-	    <a href="/Videos/$filename.webm">le télécharger</a>
-	    et le regarder avec votre lecteur de vidéo favori!
-        </video>
+    <div id="breadcrumbs" class="hidden">
+      <a href="/genealogy.php?lang=fr">Généalogie</a>:
+    </div>	
+    <div class="body">
+      <h1>
+        <span class="right">
+    	<a href="/videoTutorialsHelpfr.html" target="help">? Help</a>
+        </span>
+    	Didacticiels en Vidéo
+      </h1>
+      <div class="row">
+        <a href="https://www.youtube.com/channel/UCRlV8grtf_3ZCB4bFvcXtgw">
+          <img src="Images/icons8-youtube-48.png">
+          Chaîne YouTube
+        </a>
       </div>
-    </li>
-  </ul>
-</div> <!-- body -->
-    <script src="/jscripts/util.js" type="text/javaScript">
+      <ul id="listOfVideos">
+        <li id="$filename">
+          <span style="text-decoration: underline; color: blue;">
+    	  <span id="Show$filename">Montrer</span>
+    	  <span id="Hide$filename" style="display: none">Cacher</span>
+    	  $description
+          </span>
+          <div class="hidden" id="display$filename">
+            <video controls>
+              <source src="/Videos/$filename.webm" type="video/webm">
+              <source src="/Videos/$filename.mp4" type="video/mp4">
+    	    Desolé, votre navigateur ne supporte pas les vidéos intégréés, 
+    	    vous pouvez
+    	    <a href="/Videos/$filename.webm">le télécharger</a>
+    	    et le regarder avec votre lecteur de vidéo favori!
+            </video>
+          </div>
+        </li>
+      </ul>
+    </div> <!-- body -->
+    <script src="/jscripts6/util.js" type="module">
     </script>
     <script src="/videoTutorials.js" type="text/javaScript">
     </script>

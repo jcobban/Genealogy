@@ -1,13 +1,13 @@
 /************************************************************************
- *  matchCitations.js														*
+ *  matchCitations.js													*
  *																		*
  *  This file contains the JavaScript functions that implement the		*
  *  dynamic functionality of the matchCitations.php script used to		*
  *  update a census form to link to individuals in the family tree.		*
  *																		*
- *  History:																*
+ *  History:															*
  *		2012/04/19		created.										*
- *		2013/07/30		defer facebook initialization until after load		*
+ *		2013/07/30		defer facebook initialization until after load	*
  *		2019/02/10      no longer need to call pageInit                 *
  *																		*
  *  Copyright &copy; 2019 James A. Cobban								*

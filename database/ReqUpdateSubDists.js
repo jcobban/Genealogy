@@ -25,8 +25,9 @@
  *      2019/02/10      no longer need to call pageInit                 *
  *      2020/03/08      fix infinite loop                               *
  *      2020/04/05      fix reference to undefined element Census       *
+ *      2023/01/22      tolerate PHP script deleting entire form        *
  *                                                                      *
- *  Copyright &copy; 2020 James A. Cobban                               *
+ *  Copyright &copy; 2023 James A. Cobban                               *
  ************************************************************************/
 
 // define the function to be called when the page is loaded
@@ -44,17 +45,32 @@ window.onload   = loadDistricts;
  *      this            window                                          *
  *      ev              Javascript load Event                           *
  ************************************************************************/
-var lang            = 'en';
-function loadDistricts(ev)
+var lang                    = 'en';     // used in multiple functions
+
+function loadDistricts()
 {
-    if ('lang' in args)
-        lang        = args.lang;
+    let province            = ''
+    for (const key in args)
+    {                   // process arguments on URL
+        const value         = args[key];
+        switch(key.toLowerCase())
+        {
+            case 'lang':
+                lang                = value;
+                break;
+
+            case 'province':
+                province            = value;
+                break;
+
+        }
+    }                   // process arguments on URL
 
     // scan through all forms and set dynamic functionality
     // for specific elements
     for(var i = 0; i < document.forms.length; i++)
     {                                   // loop through all forms
-        var form        = document.forms[i];
+        var form                = document.forms[i];
         for(var j = 0; j < form.elements.length; j++)
         {                               // loop through elements in form
             var element         = form.elements[j];
@@ -66,36 +82,30 @@ function loadDistricts(ev)
             switch(name)
             {                           // act on specific elements
                 case "CensusYear":
-                {
                     element.addEventListener('change', changeCensus);
-                    break;
-                }                       // CensusYear
+                    break;              // CensusYear
 
                 case "Province":
-                {
                     element.addEventListener('change', changeProv);
-                    break;
-                }                       // Province
+                    if (strlen(province) > 0)
+                    {
+                        element.value   = province;
+                        let evt         = new Event('change',
+                                                    {'bubbles' : true});
+                        element.dispatchEvent(evt);
+                    }
+                    break;              // Province
 
                 case "District":
-                {
-                    element.addEventListener('change', changeDist);
-                    element.ondblclick      = showForm;
-                    break;
-                }                       // District
+                    element.addEventListener('change',  changeDist);
+                    element.addEventListener('dblclick', showForm);
+                    break;              // District
 
             }                           // act on specific elements
+
         }                               // loop through elements in form
     }                                   // loop through all forms
 
-    // province passed as a parameter
-    let province            = ''
-    if ('province' in args)
-        province            = args.province;
-    let provSelect          = document.distForm.Province;
-    provSelect.value        = province;
-    let evt                 = new Event('change',{'bubbles':true});
-    provSelect.dispatchEvent(evt);
 }       // function loadDistricts
 
 /************************************************************************
@@ -107,7 +117,7 @@ function loadDistricts(ev)
  *      this            <select name='CensusYear'>                      *
  *      ev              Javascript change Event                         *
  ************************************************************************/
-function changeCensus(ev)
+function changeCensus()
 {
     let censusSelect        = this;
     let censusOptions       = this.options;
@@ -183,7 +193,7 @@ function gotCensus(census)
             addOption(provSelect,   domains[code], provCode);
         }       // loop through provinces
         provSelect.value        = province;
-    
+
         // update districts 
         loadDistsProv(province);    // load districts
     }
@@ -370,7 +380,7 @@ function noDistFile()
  *      this            <select name='District'>                        *
  *      ev              Javascript change Event                         *
  ************************************************************************/
-function changeDist(ev)
+function changeDist()
 {
     // identify the selected district
     var distSelect  = document.distForm.District;
@@ -392,7 +402,7 @@ function changeDist(ev)
  *      this            <select name='District'>                        *
  *      ev              Javascript click Event                          *
  ************************************************************************/
-function showForm(ev)
+function showForm()
 {
     document.distForm.submit();
 }       // function showForm

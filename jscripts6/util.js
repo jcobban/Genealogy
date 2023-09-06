@@ -227,8 +227,14 @@
  *      2021/03/30      remove changeDiv, it was obsoleted years ago    *
  *      2021/07/03      correct vertical position of popup dialogs      *
  *      2022/05/21      update global debug flag from args              *
+ *      2022/06/11      scale advertisement for narrow screens          *
+ *      2022/06/12      only activate tinyMCE if textareas are present  *
+ *      2023/01/13      add ARIA support for hamburger menu             *
+ *      2023/06/01      do not start audio context                      *
+ *      2023/07/18      function stopProp was not exported              *
+ *      2023/09/01      add parameter to eltMouseOver                   *
  *                                                                      *
- *  Copyright &copy; 2022 James A. Cobban                               *
+ *  Copyright &copy; 2023 James A. Cobban                               *
  ************************************************************************/
 
 /************************************************************************
@@ -294,7 +300,8 @@ export const KEY_F11        = 122;
 export const KEY_F12        = 123;
 
 // set global defaults
-var activateMCE             = true;
+let textareas               = document.getElementsByTagName('textarea');
+var activateMCE             = textareas.length > 0;
 var lang                    = 'en';
 
 /************************************************************************
@@ -318,28 +325,11 @@ export function isUnicodeSupported()
 export var audioContext         = null;
 if ("AudioContext" in window)
 {
-    audioContext                = new AudioContext();
+//    audioContext                = new AudioContext();
 }
 else
 {
     alert("AudioContext not supported.  Upgrade your browser.")
-}
-
-/************************************************************************
- * specify the style for tinyMCE editing                                *
- *                                                                      *
- *  tinyMCEparms is a configuration structure which is defined in the   *
- *  common page and dialog templates.  tinyMCE is defined by the        *
- *  tinyMCE script, so this is a test for the presence of that script.  *
- ************************************************************************/
-
-if (tinyMCEparms == null)
-    alert('tinyMCEparms is null');
-if (activateMCE && (typeof tinyMCE) == 'undefined')
-    alert('tinyMCE is undefined');
-if (activateMCE && tinyMCEparms && typeof tinyMCE !== 'undefined')
-{
-    tinyMCE.init(tinyMCEparms);
 }
 
 /************************************************************************
@@ -457,6 +447,30 @@ export function getArgs()
  *  scripts.                                                            *
  ************************************************************************/
 export var args     = getArgs();
+
+/************************************************************************
+ * specify the style for tinyMCE editing                                *
+ *                                                                      *
+ *  tinyMCEparms is a configuration structure which is defined in the   *
+ *  common page and dialog templates.  tinyMCE is defined by the        *
+ *  tinyMCE script, so this is a test for the presence of that script.  *
+ ************************************************************************/
+
+/* global tinyMCE, tinyMCEparms */
+if (activateMCE)
+{
+    if ((typeof tinyMCE) !== 'undefined')
+    {
+        if (tinyMCEparms)
+        {
+            tinyMCE.init(tinyMCEparms);
+        }
+        else
+            alert('tinyMCEparms is null');
+    }
+    else
+        alert('tinyMCE is undefined');
+}
 
 /************************************************************************
  *  helpDiv                                                             *
@@ -643,10 +657,11 @@ export function show(id)
 
     if (element)
     {
+        element.style.zIndex        = 5;
         element.style.display       = 'block';
         element.style.visibility    = 'visible';
         element.scrollIntoView();
-    
+
         // set the focus on the first button in the dialog
         // displayDialog ensures that even if the dialog designer forgot
         // to include any buttons at least one is always present
@@ -790,6 +805,13 @@ export function showHelp(newDiv)
 {
     //console.log("util.js: showHelp: newDiv=" + newDiv.outerHTML);
     helpDiv             = newDiv;
+
+    // move popup to front
+    let tinyEditor          = document.body.getElementsByClassName('tox-editor-header').item(0);
+    if (tinyEditor)
+        helpDiv.style.zIndex= tinyEditor.style.zIndex + 2;
+    else
+        helpDiv.style.zIndex= 4;
     show.call(newDiv)
 }       // function showHelp
 
@@ -920,15 +942,24 @@ export function displayHelp()
             helpDiv.style.left  = (getOffsetLeft(elt) + 50) + 'px';
         else
             helpDiv.style.left  = (getOffsetLeft(elt) -
-                                Math.floor(tableWidth/2)) + 'px';
+                                        Math.floor(tableWidth/2)) + 'px';
         helpDiv.style.top       = (getOffsetTop(elt) +
-                                       elt.offsetHeight + 5) + 'px';
+                                        elt.offsetHeight + 5) + 'px';
+
+        // move popup to front
+        let tinyEditor          = document.body.getElementsByClassName('tox-editor-header').item(0);
+        if (tinyEditor)
+            helpDiv.style.zIndex= tinyEditor.style.zIndex + 2;
+        else
+            helpDiv.style.zIndex= 4;
+
         // so key strokes in balloon will close window
         helpDiv.onkeydown       = keyDown;
+        helpDiv.style.display   = 5;
         helpDiv.style.display   = 'block';
         helpDiv.style.visibility= 'visible';
         helpDiv.scrollIntoView();
-    
+
         // set the focus on the first button in the dialog
         // displayDialog ensures that even if the dialog designer forgot
         // to include any buttons at least one is always present
@@ -971,11 +1002,15 @@ export function openSignon()
  *  Input:                                                              *
  *      this        HTML element                                        *
  *      ev          MouseOver Event                                     *
+ *      msgDiv      popup div associated with this element              *
  ************************************************************************/
-export function eltMouseOver(ev)
+export function eltMouseOver(ev, msgDiv)
 {
     //console.log("util.js: eltMouseOver: this=" + this.outerHTML);
     ev.stopPropagation();
+    if (msgDiv)
+        helpDiv                 = msgDiv;   // so mouse out can cancel
+
     if (popupHelpOption)
     {           // this user wants help
         //console.log("util.js: eltMouseOver: this=" + this.outerHTML);
@@ -1025,6 +1060,7 @@ export function eltMouseOver(ev)
  ************************************************************************/
 export function simpleMouseOver(ev, callback)
 {
+    console.log("simpleMouseOver: " + this.outerHTML);
     if (callback)
         helpDelayTimer  = setTimeout(callback.bind(this), 2000);
     else
@@ -1044,7 +1080,7 @@ export function simpleMouseOver(ev, callback)
  *      this        HTML tag                                            *
  *      ev          MouseOver Event                                     *
  ************************************************************************/
-export function popupHelpHandler(ev)
+export function popupHelpHandler(ev) // eslint-disable-line no-unused-vars
 {
     if (popupHelpOption)
     {                           // user accepts popup help
@@ -1107,7 +1143,7 @@ export function actMouseOverHelp(divName)
     {               // textareas are disabled by TinyMCE
         element         = this.parentNode;
     }               // textareas are disabled by TinyMCE
-        
+
     element.addEventListener('mouseover',   eltMouseOver);
     element.addEventListener('mouseout',    eltMouseOut);
     element.addEventListener('click',       popupHelpHandler);
@@ -1158,7 +1194,7 @@ export function actMouseOverHelp(divName)
                     helpDiv         = document.getElementById(helpDivName);
                 }
             }                   // first choice not found
-            
+
             if (helpDiv)
             {
                 element.helpDivName     = helpDivName;
@@ -1205,6 +1241,10 @@ export function displayMenu(ev)
 
     // display the menu offset from the main menu button
     let element                 = document.getElementById('menuButton');
+    element.removeEventListener('click', displayMenu);
+    element.addEventListener('click', closeMenu);
+    element.ariaExpanded        = true;
+    element.ariaLabel           = document.getElementById('closeTheMenu').innerText.trim();
     let leftOffset              = getOffsetLeft(element);
     let rightOffset             = getOffsetRight(element);
 
@@ -1226,6 +1266,7 @@ export function displayMenu(ev)
         previous                = anchor;
         anchor.addEventListener("keydown", keyDownMenu);
     }           // loop through children
+    menu.style.zIndex           = 5;
     menu.style.display          = 'block';
     menu.style.visibility       = 'visible';
     menu.scrollIntoView();
@@ -1237,6 +1278,32 @@ export function displayMenu(ev)
 
     return dialogDiv;
 }       // function displayMenu
+
+/************************************************************************
+ *  function closeMenu                                                  *
+ *                                                                      *
+ *  This function closes the page menu in a popup                       *
+ *                                                                      *
+ *  Input:                                                              *
+ *      this        element with id="menuButton" or id="logo"           *
+ *      ev          click event                                         *
+ ************************************************************************/
+export function closeMenu(ev)
+{
+    ev.stopPropagation();
+    let menu                    = document.getElementById('menu');
+    let element                 = document.getElementById('menuButton');
+    element.removeEventListener('click', closeMenu);
+    element.addEventListener('click', displayMenu);
+
+    // hide the menu 
+    element.ariaExpanded        = false;
+    element.ariaLabel           = document.getElementById('displayTheMenu').innerText.trim();
+    menu.style.display          = 'none';
+    menu.style.visibility       = 'hidden';
+
+    return null;
+}       // function closeMenu
 
 /************************************************************************
  *  function displayDialog                                              *
@@ -1419,7 +1486,8 @@ export function displayDialog(templateId,
 
         // show the dialog if not requested to defer this until dialog complete
         if (defer === undefined)
-            defer               = false;
+            defer                       = false;
+        dialog.style.zIndex             = 5;
         if (!defer)
         {       // display the dialog immediately
             dialog.style.visibility     = 'visible';
@@ -1444,7 +1512,7 @@ export function displayDialog(templateId,
  *  Input:                                                              *
  *      this        the HTML element                                    *
  ************************************************************************/
-function stopProp(ev)
+export function stopProp(ev)
 {
     ev.stopPropagation();
     return false;
@@ -1480,7 +1548,7 @@ export function hideDialog(ev)
  *      this    the top element of the dialog                           *
  *      ev      instance of MouseDown Event                             *
  ************************************************************************/
-function dialogMouseDown(ev)
+function dialogMouseDown(ev) // eslint-disable-line no-unused-vars  
 {
     console.log('util.js: dialogMouseDown: this=' + this.outerHTML);
     if (!ev)
@@ -1503,7 +1571,7 @@ function dialogMouseDown(ev)
  *      this    the top element of the dialog                           *
  *      ev      instance of MouseMove Event                             *
  ************************************************************************/
-function dialogMouseMove(ev)
+function dialogMouseMove(ev) // eslint-disable-line no-unused-vars
 {
     console.log('util.js: dialogMouseMove: this=' + this.outerHTML);
     if (!ev)
@@ -1542,7 +1610,7 @@ function dialogMouseUp()
  *      this    the top element of the dialog                           *
  *      ev      mouse click Event                                       *
  ************************************************************************/
-export function documentOnClick(ev)
+export function documentOnClick(ev) // eslint-disable-line no-unused-vars
 {
     if (dialogDiv)
     {       // a dialog balloon is displayed
@@ -1596,6 +1664,8 @@ export function keyDownPaging(ev)
         case "PageDown":    // page down
         {
             let element     = document.getElementById('topNext');
+            if (element === null)
+                element     = document.getElementById('npNextFront');
             if (element)
             {               // topNext exists
                 for(let child   = element.firstChild;
@@ -1615,6 +1685,8 @@ export function keyDownPaging(ev)
         case "PageUp":      // page up
         {
             let element     = document.getElementById('topPrev');
+            if (element === null)
+                element     = document.getElementById('npPrevFront');
             if (element)
             {               // topPrev exists
                 for(let child   = element.firstChild;
@@ -1729,10 +1801,12 @@ export function statusChangeCallback(response)
 window.addEventListener("load",     commonInit);
 window.addEventListener("resize",   commonResize);
 
-export function commonInit(ev)
+export function commonInit(ev) // eslint-disable-line no-unused-vars
 {
     document.addEventListener("click", documentOnClick);
     document.addEventListener("keydown", keyDownPaging);
+
+    let windowWidth         = document.body.clientWidth - 8;
 
     // set onclick action for the menu button
     let menuButton          = document.getElementById('menuButton');
@@ -1781,6 +1855,21 @@ export function commonInit(ev)
         {
             mainSection.style.height    = (windHeight - headHeight - 12) + 'px';
             headSection.style.width     = (headWidth - 10) + 'px';
+        }
+
+        let adverts             = document.getElementsByClassName('advert');
+        for (let i = 0; i < adverts.length; i++) {
+            let advert          = adverts[i];
+            if (advert.offsetWidth > 0.8 * windowWidth)
+            {
+                let ratio       = (0.8 * headWidth) / advert.offsetWidth;
+                advert.style.transform  = "scale(" + ratio + ")";
+            }
+            else
+            if (advert.offsetWidth < 0.5 * windowWidth)
+            {
+                advert.style.transform  = "scale(1.0)";
+            }
         }
     }                           // headSection defined in template
 
@@ -1847,7 +1936,10 @@ export function commonInit(ev)
             // for more than 2 seconds
             let element     = form.elements[j];
             if (!element.type || element.type != 'hidden')
-                actMouseOverHelp.call(form.elements[j]);
+                if (element.tagName != 'FIELDSET' && element.id !== '')
+                {
+                    actMouseOverHelp.call(element);
+                }
         }               // loop through elements in form
     }                   // iterate through all forms
 
@@ -1859,7 +1951,6 @@ export function commonInit(ev)
         if (topBrowse || botBrowse)
         {               // page contains pagination row
             let dataWidth           = dataTable.offsetWidth;
-            let windowWidth         = document.body.clientWidth - 8;
             if (dataWidth > windowWidth)
                 dataWidth           = windowWidth;
             if (topBrowse)
@@ -1897,14 +1988,14 @@ export function commonInit(ev)
         let httpRequest         = new XMLHttpRequest();
         httpRequest.addEventListener('load', advertLoaded);
         httpRequest.addEventListener('error', advertError);
-        httpRequest.addEventListener('abort', advertAbort);
+        //httpRequest.addEventListener('abort', advertAbort);
         httpRequest.open('GET', adurl, true);
         httpRequest.send();
     }
 
 }       // function commonInit
 
-function advertLoaded (evt){
+export function advertLoaded (evt){ // eslint-disable-line no-unused-vars 
     let pattern         = new RegExp('<body[^>]*>([^]*)</body>', 'im');
     let results         = this.responseText.match(pattern);
     let contents        = results[1];
@@ -1913,11 +2004,11 @@ function advertLoaded (evt){
         frame.outerHTML = contents;
 }       // function advertLoaded
 
-function advertError(evt){
+export function advertError(evt){ // eslint-disable-line no-unused-vars
     console.log("advertError: ");
 }
 
-function advertAbort(evt){
+export function advertAbort(evt){ // eslint-disable-line no-unused-vars
     console.log("advertAbort: ");
 }
 
@@ -1933,8 +2024,10 @@ function advertAbort(evt){
  ************************************************************************/
 window.addEventListener("resize",   commonResize);
 
-export function commonResize(ev)
+export function commonResize(ev) // eslint-disable-line no-unused-vars
 {
+    let windowWidth         = document.body.clientWidth - 8;
+
     // let topCrumbs           = null;
     let menuButton          = document.getElementById('menuButton');
     // let menuWidth           = 0
@@ -1951,12 +2044,19 @@ export function commonResize(ev)
         //logoWidth           = logo.offsetWidth;
     }
 
-    let advert              = document.getElementById('advertSpan');
-    //let advertWidth         = 0
-    if (advert)
-    {
-        //topCrumbs           = advert.parentNode;
-        //advertWidth         = Math.max(advert.offsetWidth, 500);
+    let adverts             = document.getElementsByClassName('advert');
+    for (let i = 0; i < adverts.length; i++) {
+        let advert          = adverts[i];
+        if (advert.offsetWidth > 0.8 * windowWidth)
+        {
+            let ratio       = (0.8 * windowWidth) / advert.offsetWidth;
+            advert.style.transform  = "scale(" + ratio + ")";
+        }
+        else
+        if (advert.offsetWidth < 0.5 * windowWidth)
+        {
+            advert.style.transform  = "scale(1.0)";
+        }
     }
 
     //let menusWidth          = menuWidth + logoWidth + advertWidth;
@@ -1969,7 +2069,6 @@ export function commonResize(ev)
         if (topBrowse || botBrowse)
         {               // page contains pagination row
             let dataWidth           = dataTable.offsetWidth;
-            let windowWidth         = document.body.clientWidth - 8;
             if (dataWidth > windowWidth)
                 dataWidth           = windowWidth;
             if (topBrowse)
@@ -2035,7 +2134,7 @@ export function commonResize(ev)
  ************************************************************************/
 window.addEventListener("orientationchange",   commonOrientation);
 
-function commonOrientation(ev)
+function commonOrientation(ev) // eslint-disable-line no-unused-vars
 {
 
 }       // function commonOrientation
@@ -2058,7 +2157,7 @@ var scrolling               = false;
 //var lastScrollY             = 0;
 var lastScrollX             = 0
 
-function commonScroll(ev)
+function commonScroll(ev) // eslint-disable-line no-unused-vars
 {
     //lastScrollY             = Math.round(window.scrollY);
     lastScrollX             = Math.round(window.scrollX);
@@ -2477,20 +2576,20 @@ export function popupLoading(element, text)
 {
     if (loaddiv == null)
     {               // indicator not currently displayed
-        loaddiv                 = document.getElementById('loading');
+        loaddiv                     = document.getElementById('loading');
 
         // if there is no "loading" division, create a default one
         if (loaddiv === null || loaddiv === undefined)
         {           // create missing division
-            let body            = document.body;
+            let body                = document.body;
             if (body)
             {
-                let div         = document.createElement('div');
-                div.id          = 'loading';
-                div.className   = 'popup';
+                let div             = document.createElement('div');
+                div.id              = 'loading';
+                div.className       = 'popup';
                 div.appendChild(document.createTextNode("Loading..."));
                 body.appendChild(div);
-                loaddiv         = div;
+                loaddiv             = div;
             }
         }           // create missing division
 
@@ -2503,14 +2602,15 @@ export function popupLoading(element, text)
                 loaddiv.appendChild(document.createTextNode(text));
             }       // replace text in loading division
             if (element === null)
-                element         = loadelt;
+                element             = loadelt;
             else
-                loadelt         = element;
-            let leftOffset      = getOffsetLeft(element);
+                loadelt             = element;
+            let leftOffset          = getOffsetLeft(element);
             if (leftOffset > 500)
-                leftOffset      -= 200;
-            loaddiv.style.left  = leftOffset + "px";
-            loaddiv.style.top   = (getOffsetTop(element) - 30) + 'px';
+                leftOffset          -= 200;
+            loaddiv.style.left      = leftOffset + "px";
+            loaddiv.style.top       = (getOffsetTop(element) - 30) + 'px';
+            loaddiv.style.zIndex    = 5;
             loaddiv.style.display   = 'block';
         }           // display load indicator to user
     }               // indicator not currently displayed
@@ -2655,7 +2755,7 @@ export function createFromTemplate(template,
     if (messages != '')
         alert("util.js: createFromTemplate: templateName=" + templateName +
                 " template='" + text + "'" +
-                ' ' + messages +
+                "\nmessages=" + messages +
                 ' parms=' + parmsText);
     let newdiv;
     if (retval.substring(0,3) == '<tr')
@@ -2861,71 +2961,65 @@ export function closeFrame(lastChoice)
  *      this            <button id='ShowImage'>                         *
  *      ev              instance of 'click' Event                       *
  ************************************************************************/
-export function showImage(ev)
+const urlPattern        = new RegExp('^(http|https)://([a-zA-Z0-9_.]+)');
+export function showImage(ev) // eslint-disable-line no-unused-vars
 {
-    let form                        = this.form;
+    let form                            = this.form;
     if (form.Image)
     {                       // Image field defined
         // previous and next request image
-        args.showimage              = 'yes';
-        let useiframe               = args.useiframe;
-        if (typeof useiframe === 'string')
-        {
-            if (useiframe.toLowerCase() == 'y')
-                useiframe           = true;
+        args.showimage                  = 'yes';
+        let imageUrl                    = form.Image.value;
+        if (imageUrl.length > 0)
+        {                   // have an image reference
+            let found                   = imageUrl.match(urlPattern);
+            let useiframe               = args.useiframe;
+            if (typeof useiframe === 'string')
+            {
+                if (useiframe.toLowerCase() == 'y')
+                    useiframe           = true;
+                else
+                    useiframe           = false;
+            }
+            else 
+                useiframe               = false;
+
+            if (found)
+            {               // URL
+                //let proto     = found[1];
+                let domain      = found[2];
+                let w           = document.documentElement.clientWidth/2;
+                w               = Math.floor(w);
+                let h           = document.documentElement.clientHeight;
+                let options     = "width=" + w +
+                                    ",height=" + h +
+                                    ",left=" + w;
+
+                if (!useiframe &&
+                    (domain == "www.ancestry.ca" ||
+                     domain == "interactive.ancestry.ca" ||
+                     domain == "www.familysearch.org"))
+                    window.open(imageUrl, 
+                                "_blank", 
+                                options);
+                else
+                    openFrame("Images",
+                              imageUrl,
+                              "right");
+            }               // URL
             else
-                useiframe           = false;
-        }
-        else 
-            useiframe               = false;
-
-        let imageUrl                = form.Image.value;
-        if (imageUrl.length == 0)
-            popupAlert("util.js: showImage: " +
-                            "no image URL defined for this registration",
-                       this);
+            if (imageUrl.substring(0, 1) == '/')
+                openFrame("Images",
+                          '/DisplayImage.php?src=' + imageUrl,
+                          "right");
+            else
+                openFrame("Images",
+                          '/DisplayImage.php?src=/Images/' + imageUrl,
+                          "right");
+        }                   // no image name
         else
-        if (!useiframe &&
-            imageUrl.length > 23 &&
-            (imageUrl.substring(0,23) == "http://www.ancestry.ca/" ||
-             imageUrl.substring(0,23) == "https://www.ancestry.ca" ||
-             imageUrl.substring(0,23) == "http://interactive.ance" ||
-             imageUrl.substring(0,23) == "https://interactive.anc"))
-        {                   // external website does not support iframe
-            // use the dimensions of the root window to limit size
-            // of image display window
-            // locate the window and document instances for the top window
-            // of the application
-            let win                 = window;
-            while(win.frameElement)
-                win                 = win.parent;
-            let doc                 = win.document;
-    
-            let w                   = doc.documentElement.clientWidth/2;
-            w                       = Math.floor(w);
-            let h                   = doc.documentElement.clientHeight;
-            let options             = "width=" + w +
-                                      ",height=" + h +
-                                      ",left=" + w;
-
-            window.open(imageUrl, "ImageFrame", options);
-        }                   // external website does not support iframe
-        else
-        if (imageUrl.length > 5 &&
-            (imageUrl.substring(0,5) == "http:" ||
-             imageUrl.substring(0,6) == "https:"))
-            openFrame("Images",
-                      imageUrl,
-                      "right");
-        else
-        if (imageUrl.substring(0, 1) == '/')
-            openFrame("Images",
-                      '/DisplayImage.php?src=' + imageUrl,
-                      "right");
-        else
-            openFrame("Images",
-                      '/DisplayImage.php?src=/Images/' + imageUrl,
-                      "right");
+            alert("util.js: showImage: " +
+                  "no image defined for this registration");
     }       // Image field defined
     else
         popupAlert('util.js: ShowImage: ' +

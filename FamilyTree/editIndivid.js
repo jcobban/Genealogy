@@ -318,6 +318,9 @@
  *      2021/03/04      avoid creating duplicate events                 *
  *      2022/02/01      replace calls to onchange with dispatchEvent    *
  *      2022/04/06      add ability to edit and add alternate names     *
+ *      2022/08/05      pass modified name fields to editName dialog    *
+ *      2022/09/27      fix error where adding parents to new spouse    *
+ *                      causes creation of duplicate spouse             *
  *                                                                      *
  *  Copyright &copy; 2022 James A. Cobban                               *
  ************************************************************************/
@@ -644,7 +647,7 @@ function loadEdit()
                 form.onsubmit       = validateForm;
             }
             else
-                console.log('editIndivid.js: loadEdit: 637 testSubmit is true');
+                console.log('editIndivid.js: loadEdit: 648 testSubmit is true');
             form.onreset            = resetForm;
             form.setIdar            = setIdar;
 
@@ -1143,7 +1146,7 @@ function validateForm()
                     default:
                     {   // unexpected
                         if (key.substring(0,4) != 'init')
-                            console.log("editIndivid.js: 1129: validateForm: " +
+                            console.log("editIndivid.js: validateForm: 1147: " +
                               "unexpected parameter " + key +
                               "='" + val + "'");
                         break;
@@ -1161,7 +1164,7 @@ function validateForm()
         }               // opener does not contain a form
     }                   // invoked from another window
 
-    console.log("editIndivid.js: validateForm: call update");
+    console.log("editIndivid.js: validateForm: 1165 call update");
     update();           // use AJAX to update the database record
 
     return false;       // do not submit
@@ -1222,6 +1225,14 @@ function refresh()
  ************************************************************************/
 function gotRefreshed(jsonObj)
 {
+    let opener          = null;
+    let idir            = 0;
+
+    if (window.frameElement && window.frameElement.opener)
+        opener          = window.frameElement.opener;
+    else
+        opener          = window.opener;
+
     if (typeof(jsonObj) == "object")
     {
         if (typeof(newSearch) == "string")
@@ -1231,18 +1242,33 @@ function gotRefreshed(jsonObj)
         else
         if (typeof(newSearch) == "object")
         {               // have a pending button click to issue
-            let indiv               = jsonObj.person;
-            let idir                = indiv.idir;
+            let person              = jsonObj.person;
+            let idir                = person.idir;
+            let gender              = person.gender;
+            let name                = null;
+            if (gender == 'M')
+                name                = 'IDIRHusb';
+            else
+                name                = 'IDIRWife';
+            let spouseIdir          = opener.document.getElementById(name);
+            if (spouseIdir)
+            {
+                spouseIdir.value   = idir;
+            }
+            else
+                console.log("editIndivid.js: gotRefreshed: 1257: could not find '" +
+                                            name + "' in opener");
 
             if ((idir - 0) == 0)
-                console.log("editIndivid.js: 1219: gotRefreshed: idir=" + idir);
-            let id                  = indiv.id;
+                console.log("editIndivid.js: gotRefreshed: 1261: gotRefreshed: idir=" +
+                                            idir);
+            let id                  = person.id;
 
             let form                = document.indForm;
             form.idir.value         = idir; // is now set
             form.id.value           = id;   // is now set
 
-            let names               = indiv.names;
+            let names               = person.names;
             if (names)
             {
                 for (let prop in names)
@@ -1255,7 +1281,7 @@ function gotRefreshed(jsonObj)
                 }
             }
             else
-                console.log("editIndivid.js: gotRefreshed: 1239: names is null");
+                console.log("editIndivid.js: gotRefreshed: 1282: names is null");
             if (newSearch.type == 'submit')
                 form.submit();
             else
@@ -1264,7 +1290,7 @@ function gotRefreshed(jsonObj)
         }               // have a pending button click to issue
         else
         {               // unexpected object
-            console.log("editIndivid.js: gotRefreshed: 1248: " +
+            console.log("editIndivid.js: gotRefreshed: 1291: " +
                             "typeof(newSearch)=" +
                             typeof(newSearch));
         }               // unexpected object
@@ -1272,7 +1298,7 @@ function gotRefreshed(jsonObj)
     }                   // valid response
     else
     {                   // error response
-        console.log("editIndivid.js: gotRefreshed: 1259: " + JSON.stringify(jsonObj));
+        console.log("editIndivid.js: gotRefreshed: 1299: " + JSON.stringify(jsonObj));
     }                   // error response
 
 }       // function gotRefreshed
@@ -1350,7 +1376,7 @@ function update()
     }                   // loop through all form elements
     msg                     = msg.substring(0,msg.length - 2) + "}";
     locTrace                += " editIndivid.js: 1339 update: " + msg + "\n";
-    console.log("editIndivid.js:update 1340 locTrace=" + locTrace);
+    console.log("editIndivid.js:update: 1377 locTrace=" + locTrace);
 
     // invoke script to update Event and return JSON result
     parms['caller']         = 'editIndivid.js: 1341';
@@ -1379,11 +1405,12 @@ function gotUpdated(jsonObj)
         opener          = window.frameElement.opener;
     else
         opener          = window.opener;
+
     if (typeof(jsonObj) == "object")
     {           // valid response
         let srcform     = document.indForm;
-        let indiv       = jsonObj.person;
-        if (typeof(indiv) === "undefined")
+        let person       = jsonObj.person;
+        if (typeof(person) === "undefined")
         {
             alert("editIndivid.js: gotUpdated: unexpected object=" +
                     JSON.stringify(jsonObj));
@@ -1391,21 +1418,21 @@ function gotUpdated(jsonObj)
         else
         {
             // let  msg = "";
-            // for(key in indiv)
-            //     msg      += key + "='" + indiv[key] + "',";
-            // alert("editIndivid.js: gotUpdated: indiv={" + msg + "} ");
+            // for(key in person)
+            //     msg      += key + "='" + person[key] + "',";
+            // alert("editIndivid.js: gotUpdated: person={" + msg + "} ");
     
             // get the IDIR value from the response
-            idir        = indiv.idir;
+            idir        = person.idir;
             if (typeof(idir) === "undefined")
             {
-                console.log("editIndivid.js: gotUpdated: 1362 idir=" + idir +
+                console.log("editIndivid.js: gotUpdated: 1429 idir=" + idir +
                       " jsonObj=" + JSON.stringify(jsonObj));
             }
             else
-                console.log("editIndivid.js: gotUpdated: 1366 jsonObj=" + JSON.stringify(jsonObj));
+                console.log("editIndivid.js: gotUpdated: 1433 jsonObj=" + JSON.stringify(jsonObj));
             if ((idir - 0) == 0)
-                console.log("editIndivid.js: gotUpdated: 1368: idir=" + idir + ": " +
+                console.log("editIndivid.js: gotUpdated: 1435: idir=" + idir + ": " +
                             JSON.stringify(jsonObj));
             // update IDIR value in form
             srcform.idir.value  = idir;
@@ -1416,11 +1443,13 @@ function gotUpdated(jsonObj)
             if (childr)
                 idcr            = childr.idcr;
     
-            // if invoker has requested to be notified of key information about
-            // the individual to update a specific individual in the invoking page
+            // if invoking page has requested to be notified of key 
+            // information about the individual to update
+            // a specific individual in the invoking page
             if (feedbackRow !== null &&
                 typeof(feedbackRow.changePerson) == 'function')
             {       // updating a family member
+                console.log("editIndivid.js: gotUpdated: 1452: feedbackRow=" + feedbackRow.outerHTML);
                 let gender      = srcform.Gender.value;
                 if (gender == 0)
                     genderClass = 'male';
@@ -1469,6 +1498,7 @@ function gotUpdated(jsonObj)
                 if (parentsIdmr !== null)
                     parms.idcr  = idcr;
     
+                console.log("editIndivid.js: gotUpdated: 1501: feedbackRow.changePerson(" + JSON.stringify(parms) + ")");
                 feedbackRow.changePerson(parms);
             }       // updating a family member
             else
@@ -1477,29 +1507,29 @@ function gotUpdated(jsonObj)
                 // Now that the individual is updated in the database
                 // if adding a child, notify invoker to add the child to the list
                 // of children
-                let childTable  = opener.document.getElementById('children');
-                let genderSel   = srcform.Gender;
-                let index       = genderSel.selectedIndex;
-                let gender      = genderSel.options[index].value;
+                let childTable      = opener.document.getElementById('children');
+                let genderSel       = srcform.Gender;
+                let index           = genderSel.selectedIndex;
+                let gender          = genderSel.options[index].value;
                 if (gender == 0)
-                    indiv.gender    = 'male';
+                    person.gender   = 'male';
                 else
                 if (gender == 1)
-                    indiv.gender    = 'female';
+                    person.gender   = 'female';
                 else
-                    indiv.gender    = 'unknown';
+                    person.gender   = 'unknown';
     
                 // invoke the add method of the 'children' table
                 // now that the individual has been added into the database
                 if ((idir - 0) == 0)
                 {
-                    console.log("editIndivid.js: gotUpdated: 1483: call addChildToPage: idir=" +
+                    console.log("editIndivid.js: gotUpdated: 1526: call addChildToPage: idir=" +
                             idir );
-                    alert("editIndivid.js: gotUpdated: 1486 IDIR not set: " +
+                    alert("editIndivid.js: gotUpdated: 1528 IDIR not set: " +
                     JSON.stringify(jsonObj));
                 }
                 if (childTable)
-                    childTable.addChildToPage(indiv,
+                    childTable.addChildToPage(person,
                                               false);
             }       // adding new child
         }           // person present in object
@@ -1510,8 +1540,8 @@ function gotUpdated(jsonObj)
         {
             if ((idir - 0) == 0)
             {
-                console.log('editIndivid.js: gotUpdated: 1496 Person.php?idir=' + idir); 
-                alert("editIndivid.js: gotUpdated: 1501 IDIR not set: " +
+                console.log('editIndivid.js: gotUpdated: 1543 Person.php?idir=' + idir); 
+                alert("editIndivid.js: gotUpdated: 1544 IDIR not set: " +
                     JSON.stringify(jsonObj));
             }
             else
@@ -1521,9 +1551,9 @@ function gotUpdated(jsonObj)
     else
     {           // invalid response
         if (jsonObj && typeof(jsonObj) == "object")
-            console.log("editIndivid.js: gotUpdated: 1473: " + JSON.stringify(jsonObj));
+            console.log("editIndivid.js: gotUpdated: 1554: " + JSON.stringify(jsonObj));
         else
-            console.log("editIndivid.js: gotUpdated: 1475: '" + jsonObj + "'");
+            console.log("editIndivid.js: gotUpdated: 1556: '" + jsonObj + "'");
     }           // invalid response
 }       // function gotUpdated
 
@@ -1538,7 +1568,7 @@ function gotUpdated(jsonObj)
  ************************************************************************/
 function noUpdated(rstatus, statusText)
 {
-    console.log("editIndivid.js: 1460: noUpdated: script 'updatePersonJson.php' not found on server, status=" + rstatus + ", text=" + statusText);
+    console.log("editIndivid.js: 1566: noUpdated: script 'updatePersonJson.php' not found on server, status=" + rstatus + ", text=" + statusText);
 }       // function noUpdated
 
 /************************************************************************
@@ -1567,24 +1597,28 @@ function editName(ev)
     const idpatt    = /\d+$/;
 
     if (!ev)
-        ev          = window.event;
+        ev              = window.event;
     ev.stopPropagation();
 
-    let form        = this.form;
-    let idnx        = idpatt.exec(this.id)[0];
+    let form            = this.form;
+    let idnx            = idpatt.exec(this.id)[0];
     if (idnx == 0)
     {
-        newSearch   = this;     // identify button that was clicked
+        newSearch       = this;     // identify button that was clicked
         refresh();
         return;
     }
+    let surname         = form.Surname.value;
+    let givenname       = form.GivenName.value;
     let lang            = 'en';
     if ('lang' in args)
         lang            = args.lang;
 
     // open edit dialog in right half of window
     let url = "/FamilyTree/editName.php?idnx=" + idnx +
-                                      "&lang=" + lang;
+                                    "&surname=" + encodeURI(surname) +
+                                    "&givenname=" + encodeURI(givenname) +
+                                    "&lang=" + lang;
     if (debug.toLowerCase() == 'y')
         url             += "&debug=y";
     windowList.push(openFrame("event",
@@ -2247,7 +2281,7 @@ function clearEventChildr(ev)
         popupLoading(button);
     }   // have idcr value
     else
-        console.log("editIndivid.js: 2102: clearEventChildr: unable to get value of idcr from form");
+        console.log("editIndivid.js: 2279: clearEventChildr: unable to get value of idcr from form");
     return true;
 }   // function clearEventChildr
 
@@ -2268,10 +2302,10 @@ function gotClearedEvent(xmlDoc)
     else
     {
         if (topXml && typeof(topXml) == "object")
-            console.log("editIndivid.js: 2123: gotClearedEvent: " +
+            console.log("editIndivid.js: 2300: gotClearedEvent: " +
                         new XMLSerializer().serializeToString(topXml));
         else
-            console.log("editIndivid.js: 2126: gotClearedEvent: '" + xmlDoc + "'");
+            console.log("editIndivid.js: 2303: gotClearedEvent: '" + xmlDoc + "'");
     }
 }       // function gotClearedEvent
 
@@ -2283,7 +2317,7 @@ function gotClearedEvent(xmlDoc)
 function noClearedEvent()
 {
     hideLoading();      // hide the "loading..." popup
-    console.log("editIndivid.js: 2138: noClearedEvent: action script 'ClearIndivEvent.php' not found");
+    console.log("editIndivid.js: 2315: noClearedEvent: action script 'ClearIndivEvent.php' not found");
 }       // function noClearedEvent
 
 /************************************************************************
@@ -2493,7 +2527,7 @@ function eventDetail(ev)
 
                 default:
                 {
-                    console.log("editIndivid.js: 2347: eventDetail: idet=" + idet);
+                    console.log("editIndivid.js: eventDetail: 2525 idet=" + idet);
                     break;
                 }
             }
@@ -2739,7 +2773,7 @@ function confirmEventDel(ev)
             }       // act on IDET value
         }       // expected standard event row
         else
-            console.log("editIndivid.js: 2580: confirmEventDelete: " +
+            console.log("editIndivid.js: confirmEventDelete: 2771 " +
                   "Unexpected rowname='" + rowname + "'");
     }           // event is in tblIR
 }   // function confirmEventDelete
@@ -2786,7 +2820,7 @@ function gotDeleteEvent(xmlDoc)
                     let dateElt = document.getElementById(name + "Date");
                     if (dateElt  === null)
                     {
-                        console.log("editIndivid.js: 2626 could not find element id='" + name + "Date'");
+                        console.log("editIndivid.js: gotDeleteEvent: 2818 could not find element id='" + name + "Date'");
                     }
                     else
                     {
@@ -2797,7 +2831,7 @@ function gotDeleteEvent(xmlDoc)
                     let locnElt = document.getElementById(name + "Location");
                     if (locnElt  === null)
                     {
-                        console.log("editIndivid.js: 2636 could not find element id='" + name + "Location'");
+                        console.log("editIndivid.js: gotDeleteEvent: 2829 could not find element id='" + name + "Location'");
                     }
                     else
                     {
@@ -2819,7 +2853,7 @@ function gotDeleteEvent(xmlDoc)
         }
         else
         {
-            console.log("editIndivid.js: 2518: gotDeleteEvent: " +
+            console.log("editIndivid.js: gotDeleteEvent: 2851: " +
                   new XMLSerializer().serializeToString(msglist.item(0)));
         }
     }
@@ -2844,8 +2878,8 @@ function gotDeleteEvent(xmlDoc)
 function noDeleteEvent()
 {
     hideLoading();      // hide the "loading..." popup
-    console.log("editIndivid.js: 2543: noDeleteEvent: " +
-          "server script deleteEventXml.php not found");
+    console.log("editIndivid.js: noDeleteEvent: 2876: " +
+                    "server script deleteEventXml.php not found");
 }   // function noDeleteEvent
 
 /************************************************************************
@@ -2868,7 +2902,7 @@ function gotDeleteCitations(xmlDoc)
         let parmslist   = root.getElementsByTagName('parms');
         if (msglist.length > 0)
         {
-            console.log("editIndivid.js: 2567: gotDeleteCitations: " +
+            console.log("editIndivid.js: gotDeleteCitations: 2900: " +
                   new XMLSerializer().serializeToString(msglist.item(0)));
         }
     }
@@ -2891,7 +2925,7 @@ function gotDeleteCitations(xmlDoc)
  ************************************************************************/
 function noDeleteCitations()
 {
-    console.log("editIndivid.js: 2590: noDeleteCitations: " +
+    console.log("editIndivid.js: noDeleteCitations: 2923: " +
           "server script deleteCitationsXml.php not found");
 }   // function noDeleteCitations
 
@@ -2980,9 +3014,10 @@ function eventChanged(ev)
     if (changeElement)
         changeElement.value = "1";
     else
-        console.log("editIndivid.js: 2814: eventChanged: " +
+        console.log("editIndivid.js: eventChanged: 3012: " +
                 "cannot find EventChanged element " +
-                "for <input name='"+ name + "'> row=" + row.outerHTML + " elementids=" + elementids);
+                "for <input name='"+ name + "'> row=" + row.outerHTML +
+                " elementids=" + elementids);
 }   // function eventChanged
 
 /************************************************************************
@@ -3370,7 +3405,7 @@ function editAddress(ev)
                               "right"));
     }   // idar present
     else
-        console.log("editIndivid.js: 3074: editAddress: " +
+        console.log("editIndivid.js: editAddress: 3403: " +
                 "unable to get value of idar from form");
     return true;
 }   // function editAddress
@@ -3473,7 +3508,7 @@ function delIndivid(ev)
             location    = 'nominalIndex.php?name=&lang=' + args['lang'];
     }       // idir field present
     else
-        console.log("editIndivid.js: 3157: delIndivid: " +
+        console.log("editIndivid.js: delIndivid: 3506: " +
                 "unable to get value of idir from form");
     return true;    // continue
 }       // function delIndivid
@@ -4330,7 +4365,9 @@ function eventFeedback(parms)
                 sdElt           = child;
                 if (dateElt  === null)
                 {
-                    console.log("editIndivid.js: 4260 dateElt is null for " + name + ', trace=' + dateTrace);
+                    console.log("editIndivid.js: eventFeedback: 4363 " +
+                                    "dateElt is null for " + name + 
+                                    ', trace=' + dateTrace);
                 }
                 else
                 {
@@ -4394,7 +4431,8 @@ function eventFeedback(parms)
         }           // act on specific fields
         }
         catch (e) {
-            console.log("editIndivid.js: 4324 " + ex + ", trace=" + dateTrace);
+            console.log("editIndivid.js: eventFeedback: 4429 " +
+                                ex + ", trace=" + dateTrace);
         }
     }               // loop through children
 

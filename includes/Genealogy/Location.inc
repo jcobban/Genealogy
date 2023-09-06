@@ -152,8 +152,12 @@ use \Iterator;
  *      2021/02/18      add information to error log                    *
  *      2021/07/22      support style prefix on boundary                *
  *      2021/10/25      support setLatitude/setLongitude to null        *
+ *      2022/10/31      ensure location name is trimmed in constructor  *
+ *      2023/03/08      correctly initialize shortname and              *
+ *                      sortedlocation when constructing new location   *
+ *      2023/07/30      abbreviate long country codes                   *
  *                                                                      *
- *  Copyright &copy; 2021 James A. Cobban                               *
+ *  Copyright &copy; 2023 James A. Cobban                               *
  ************************************************************************/
 require_once __NAMESPACE__ . '/RecordPic.inc';
 require_once __NAMESPACE__ . '/CountySet.inc';
@@ -286,7 +290,7 @@ class Location extends RecordPic
         else
         if (is_string($idlr))
         {
-            $name               = $idlr;
+            $name               = trim($idlr);
             if (array_key_exists($name, self::$locationNames))
                 $location       = self::$locationNames[$name];
             else
@@ -351,7 +355,7 @@ class Location extends RecordPic
             }
             else
             {
-                $id         = htmlspecialchars_decode($id);
+                $id         = htmlspecialchars_decode(trim($id));
                 $parms      = array(array('location'        => $id,
                                           'shortname'       => $id));
             }
@@ -428,23 +432,20 @@ class Location extends RecordPic
                 switch($fldnameLc)
                 {                   // act on specific field names
                     case 'idlr':
-                    {
                         $where          .= "$and`$fldname`=?";
                         $sqlParms[]     = $value;
                         $idlr           = $value;
                         $and            = ' AND ';
                         break;
-                    }
 
                     case 'location':
-                    {
-                        $value          = htmlspecialchars_decode($value);
+                        $value          = trim(htmlspecialchars_decode($value));
                         $where          .= "$and`$fldname`=?";
                         $sqlParms[]     = $value;
                         $location       = $value;
                         $and            = ' AND ';
                         break;
-                    }
+
                 }                   // act on specific field names
             }                       // loop through parameters
 
@@ -464,17 +465,17 @@ class Location extends RecordPic
 
                     if (count($result) == 0)
                     {               // no location matches parameters
-                        $dbrow          = self::$initRow;   // defaults
-                        $needInsert     = true;
+                        $dbrow                      = self::$initRow;   
+                        $needInsert                 = true;
 
                         if (is_string($location))
                         {           // update fields
-                            $dbrow['location']  = $location;
+                            $dbrow['location']      = $location;
                         }           // update fields 
                         else
                         if ($idlr)
                         {           // update fields based upon IDLR
-                            $tempname               = 'Lost Location ' . $idlr;
+                            $tempname               = "Lost Location $idlr";
                             $dbrow['location']      = $tempname;
                             $dbrow['sortedlocation']= $tempname;
                             $dbrow['shortname']     = $tempname;
@@ -482,8 +483,8 @@ class Location extends RecordPic
                     }               // no location matches parameters
                     else
                     {               // existing row
-                        $dbrow              = $result[0];
-                        $needInsert         = false;
+                        $dbrow                      = $result[0];
+                        $needInsert                 = false;
                     }               // existing row
                 }                   // successful query
                 else
@@ -508,7 +509,9 @@ class Location extends RecordPic
         if ($needInsert)
         {                           // new record
             if (is_string($location))
+            {
                 $this->setName($location);  // side effects of name
+            }
         }                           // new record
         else
         {                           // existing record
@@ -581,7 +584,10 @@ class Location extends RecordPic
             $county     = trim($results[2]);    // county or city name
             $province   = $results[3];          // province code
             $cc         = $results[4];          // country
-            if (strlen($province) > 2)
+            if (strlen($cc) > 2)
+                $cc     = substr($cc, 0, 2);
+            $cc         = strtoupper($cc);
+            if (strlen($province) >= 2)
             {
                 $domains        = new DomainSet(array('cc'      => $cc,
                                                       'name'    => $province));
@@ -603,9 +609,9 @@ class Location extends RecordPic
             $res2   = preg_match("/\b(lot|lots|con|cons)\b[^,]*,(.*)$/",
                                  $part1,
                                  $results);
-            $getParms   = array('domain'    => $cc . $province,
-                                'name'      => $county);
-            $counties   = new CountySet($getParms);
+            $getParms       = array('domain'    => $cc . $province,
+                                    'name'      => $county);
+            $counties       = new CountySet($getParms);
             if (count($counties) > 0)
             {           // $county is a valid county name
                 $countyObj  = $counties->rewind();  // get first County
@@ -826,21 +832,21 @@ class Location extends RecordPic
      ********************************************************************/
     function getLatitude()
     {
-        $value      = $this->row['latitude'];
-        $negative   = $value < 0;
-        $uvalue     = abs($value);
+        $value          = $this->row['latitude'];
+        $negative       = $value < 0;
+        $uvalue         = abs($value);
         if ($uvalue > 900000.0)
             throw new Exception("Location:getLatitude: " .
-                        "internal logic error value $value out of range");
-        $ddd        = floor($uvalue/10000); // degrees
-        $uvalue     = $uvalue - ($ddd * 10000);
-        $mm     = floor($uvalue/100);   // minutes
-        $ss     = $uvalue - ($mm * 100);
-        $uvalue     = $ddd + ($mm / 60) + ($ss / 3600);
+                    "internal logic error value $value out of range");
+        $ddd            = floor($uvalue/10000); // degrees
+        $uvalue         = $uvalue - ($ddd * 10000);
+        $mm             = floor($uvalue/100);   // minutes
+        $ss             = $uvalue - ($mm * 100);
+        $uvalue         = $ddd + ($mm / 60) + ($ss / 3600);
         if ($negative)
-            $value  = -$uvalue;
+            $value      = -$uvalue;
         else
-            $value  = $uvalue;
+            $value      = $uvalue;
         return $value;
     }       // Location::getLatitude
 
@@ -859,20 +865,21 @@ class Location extends RecordPic
      ********************************************************************/
     function getLongitude()
     {
-        $value      = $this->row['longitude'];
-        $negative   = $value < 0;
-        $uvalue     = abs($value);
+        $value          = $this->row['longitude'];
+        $negative       = $value < 0;
+        $uvalue         = abs($value);
         if ($uvalue > 1800000.0)
-            throw new Exception("Location:getLongitude: internal logic error value $value out of range");
-        $ddd        = floor($uvalue/10000); // degrees
-        $uvalue     = $uvalue - ($ddd * 10000);
-        $mm     = floor($uvalue/100);   // minutes
-        $ss     = $uvalue - ($mm * 100);
-        $uvalue     = $ddd + ($mm / 60) + ($ss / 3600);
+            throw new Exception("Location:getLongitude: ".
+                    "internal logic error value $value out of range");
+        $ddd            = floor($uvalue/10000); // degrees
+        $uvalue         = $uvalue - ($ddd * 10000);
+        $mm             = floor($uvalue/100);   // minutes
+        $ss             = $uvalue - ($mm * 100);
+        $uvalue         = $ddd + ($mm / 60) + ($ss / 3600);
         if ($negative)
-            $value  = -$uvalue;
+            $value      = -$uvalue;
         else
-            $value  = $uvalue;
+            $value      = $uvalue;
         return $value;
     }       // Location::getLongitude
 
@@ -1003,7 +1010,8 @@ class Location extends RecordPic
         }
         // if the short name has not been set to a different value
         // make it the same as the new location value
-        if ($this->row['shortname'] == $this->row['location'])
+        $shortname          = $this->row['shortname'];
+        if ($shortname == '' || $shortname == $this->row['location'])
             parent::set('shortname', $newName);
 
         // determine appropriate sort value
@@ -1021,7 +1029,7 @@ class Location extends RecordPic
             else
                 $lot6       = '';
             $con            = $matches[4];
-            if (preg_match('/^con\s+[0-9]\s/', $con))
+            if (preg_match('/^con [0-9][, ]/', $con))
                 $con        = 'con 0' . substr($con, 4);
             if (preg_match('/^lot\s+([0-9]+)(\s.*|)$/', $lotnum, $lmatch))
             {       // rural lot < 10
@@ -1034,9 +1042,8 @@ class Location extends RecordPic
             if (ctype_digit($lotnum) && strlen($lotnum) < 3)
                 $lotnum     = substr('000' . $lotnum, strlen($lotnum));
 
-            $sortedlocation = $con . $matches[5] . ', ' .
-                                $lotnum . ' ' . $matches[1];
-            parent::set('sortedlocation',$sortedlocation);
+            $sortedLocation = "$con$matches[5], $lotnum $matches[1]";
+            parent::set('sortedlocation',$sortedLocation);
         }       // street address
         else
             parent::set('sortedlocation', $newName);

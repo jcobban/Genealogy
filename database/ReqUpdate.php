@@ -39,8 +39,10 @@ use \Exception;
  *		2017/09/12		use get( and set(								*
  *		2020/03/13      use FtTemplate::validateLang                    *
  *		2022/03/30      improve diagnostics                             *
+ *		2023/06/12      add support for display vs update               *
+ *		                move warn texts to template                     *
  *																		*
- *  Copyright &copy; 2022 James A. Cobban								*
+ *  Copyright &copy; 2023 James A. Cobban								*
  ************************************************************************/
 require_once __NAMESPACE__ . "/Census.inc";
 require_once __NAMESPACE__ . "/Country.inc";
@@ -97,16 +99,21 @@ if (count($_GET) > 0)
         $warn           .= $parmsText . "</table>\n";
 }	                // invoked by URL
 
-$tempBase		        = $document_root . '/templates/';
-if (file_exists($tempBase . "CensusReqUpdate$cc" . "en.html"))
-    $template           = new FtTemplate("CensusReqUpdate$cc$lang.html");
+// initialize template
+if (canUser('edit'))
+    $action             = 'Update';
 else
-    $template           = new FtTemplate("CensusReqUpdate__$lang.html");
+    $action             = 'Display';
+$tempBase		        = $document_root . '/templates/';
+if (file_exists($tempBase . "CensusReq$action$cc"."en.html"))
+    $template           = new FtTemplate("CensusReq$action$cc$lang.html");
+else
+    $template           = new FtTemplate("CensusReq$action"."__$lang.html");
 
 if (is_string($censusText))
-    $warn               .= "<p>Census='$censusText' invalid, defaults to 'CA1881'</p>\n";
+    $warn       .= $template['censusInvalid']->replace('$censusText', $censusText);
 if (is_string($langtext))
-    $warn           .= "<p>Invalid language identifier '$langtext', English assumed.</p>\n";
+    $warn       .= $template['langInvalid']->replace('$langtext', $langtext);
 
 $census	                = new Census(array('censusid'	=> $censusId));
 $censusYear		        = $census['year'];

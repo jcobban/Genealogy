@@ -40,8 +40,9 @@ if (count($_GET) > 0)
                               "<th class='colhead'>value</th></tr>\n";
     foreach($_GET as $key => $value)
     {           // loop through parameters
+        $safevalue                  = htmlspecialchars($value);
         $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
-                        "<td class='white left'>$value</td></tr>\n";
+                        "<td class='white left'>$safevalue</td></tr>\n";
         $value                      = trim($value); 
         switch($key)
         {       // take action based upon key
@@ -85,8 +86,9 @@ if (count($_POST) > 0)
                       "<th class='colhead'>value</th></tr>\n";
     foreach($_POST as $key => $value)
     {           // loop through parameters
+        $safevalue                  = htmlspecialchars($value);
         $parmsText      .= "<tr><th class='detlabel'>$key</th>" .
-                            "<td class='white left'>$value</td></tr>\n"; 
+                            "<td class='white left'>$safevalue</td></tr>\n";
         $matches                        = array();
         if (preg_match('/^([a-zA-Z]+)(\d+)$/', $key, $matches))
         {
@@ -202,10 +204,10 @@ if ($nicknames)
     $template->set('FIRST',         $offset + 1);
     $template->set('PREVOFFSET',    $prevoffset);
     if ($prevoffset < 0)
-        $template['topPrev']->update(null);
+        $template['topPrev']->update('&nbsp;');
     $template->set('NEXTOFFSET',    $nextoffset);
     if ($nextoffset >= $count)
-        $template['topNext']->update(null);
+        $template['topNext']->update('&nbsp;');
     $template->set('LAST',          $last);
     $template->set('COUNT',         $count);
     $template->set('LANG',          $lang);

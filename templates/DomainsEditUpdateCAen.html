@@ -31,26 +31,24 @@
         <a href="/Canada/DomainsEditHelpen.html" target="help">? Help</a>
         </span>
         $COUNTRYNAME: $DOMAINTYPE Table Update
-        <div style="clear: both;"></div>
       </h1>
     $TRACE
     $MSG
-      <!--- Put out a line with links to previous and next section of table -->
-      <div class="center" id="topBrowse">
-        <span class="left" id="topPrev">
-        <a href="/Canada/DomainsEdit.php?lang=$lang&amp;cc=$cc&amp;partof=$partof&amp;offset=$offset&amp;limit=$limit" id="prenpprev">
-        &lt;---
-        </a>
+      <!--- Put out a line with links to previous and next section -->
+      <div class="spaceBetween" id="topBrowse">
+        <span  id="topPrev">
+          <a href="/Canada/DomainsEdit.php?lang=$lang&amp;cc=$cc&amp;partof=$partof&amp;offset=$offset&amp;limit=$limit" id="prenpprev">
+          <img src="/Images/ArrowLeft.svg">
+          </a>
         </span>
-        <span class="right" id="topNext">
-        <a href="/Canada/DomainsEdit.php?lang=$lang&amp;cc=$cc&amp;partof=$partof&amp;offset=$offset&amp;limit=$limit" id="prenpnext">
-            ---&gt;
-        </a>
+        <span id="respdescrows">
+            showing rows $first to $last of $totalrows
         </span>
-          <span id="respdescrows">
-        showing rows $first to $last of $totalrows
-          </span>
-        <div style="clear: both;"></div>
+        <span  id="topNext">
+          <a href="/Canada/DomainsEdit.php?lang=$lang&amp;cc=$cc&amp;partof=$partof&amp;offset=$offset&amp;limit=$limit" id="prenpnext">
+              <img src="/Images/ArrowRight.svg">
+          </a>
+        </span>
       </div> <!-- left and right arrow links -->
       <!--- Put out the response as a table -->
       <form name="domainForm" id="domainForm"
@@ -71,7 +69,6 @@
               $name
             </option>
           </select>
-          <div style="clear: both;"></div>
         </div>
         <table class="form" id="dataTable">
           <!--- Put out the column headers -->

@@ -10,7 +10,7 @@
  *  Copyright &copy; 2019 James A. Cobban								*
  **********************************************************************-->
     <div id="breadcrumbs" class="hidden">
-	  <a href="/index.html">Home</a>:
+	  <a href="/home.html">Home</a>:
       <a href="/genealogy.php?lang=$LANG">
 			Genealogy
       </a>:
@@ -39,7 +39,6 @@
           <span style="flow: left" id="title">
             Edit $NAME<span id="inTree">: in tree '$TREENAME'</span>
           </span>
-          <div style="clear: both;"></div>
         </h1>
         $TRACE
         $MSG
@@ -127,7 +126,6 @@
 		        </label>
 		        <input type="text" name="idir" id="idir" value="$IDIR"
 		                class="ina rightnc" style="width: 4em;" readonly="readonly">
-		        <div style="clear: both;"></div>
 		      </div>
 		      <div class="row">
 		        <label class="column1" for="Surname">
@@ -137,7 +135,6 @@
 		                placeholder="Supply Surname of new Individual"
 		                class="leftname" maxlength="120"
 		                value="$SURNAME">
-		        <div style="clear: both;"></div>
 		      </div>
 		      <div class="row">
 		        <label class="column1" for="GivenName">
@@ -151,7 +148,6 @@
                         id="editName$IDNX">
 		            Details
 		        </button>
-		        <div style="clear: both;"></div>
 		      </div>
               <div class="row" id="altNameRow">
 		        <div class="column1">
@@ -164,7 +160,6 @@
                             id="altName$IDNX">
                       Details
                 </button>
-		        <div style="clear: both;"></div>
               </div>
               <div class="row" id="addNameRow">
 		        <div class="column1">
@@ -175,7 +170,6 @@
                       Add Name
                   </button>
                 </div>
-		        <div style="clear: both;"></div>
               </div>
 		      <div class="row">
 		        <div class="column1">
@@ -195,7 +189,6 @@
 		                Unknown
 		            </option>
 		          </select>
-		          <div style="clear: both;"></div>
 		        </div>
 		      </div>
 		      </fieldset>
@@ -222,7 +215,6 @@
  		Illegitimate
             </option>
           </select>
-        <div style="clear: both;"></div>
       </div>
       <div class="row" id="fatherRow">
         <div class="column1">
@@ -280,7 +272,6 @@
                 value="1"
                 $dadPrivatechecked>
         </div>
-        <div style="clear: both;"></div>
       </div>
       <div class="row">
       <div class="row" id="motherRow">
@@ -337,7 +328,6 @@
           <input type="checkbox" name="CPMomPrivate" id="CPMomPrivate" value="1"
                 $momPrivatechecked>
         </div>
-        <div style="clear: both;"></div>
       </div>
       <div class="row" id="SealingRow">
         <div class="column1">
@@ -363,7 +353,6 @@
         <button type="button" class="button" id="Clear17">
                 Delete
         </button>
-        <div style="clear: both;"></div>
       </div>
       </fieldset>
       <fieldset id="EventFields" class="other">
@@ -409,7 +398,6 @@
           <span class="labelSmall">
                 Preferred:
           </span>
-          <div style="clear: both;"></div>
         </div>
         <div id="EventBody">
             $EVENTS
@@ -424,7 +412,6 @@
           <button type="button" class="button" id="Order">
                 <u>O</u>rder Events by Date
           </button>
-          <div style="clear: both;"></div>
         </div>
       </fieldset>
       <fieldset id="OtherFields" class="other">
@@ -458,7 +445,6 @@
                 value="1"
                 $NEVERMARRIEDRO $NEVERMARRIEDCHECKED>  
           </div>
-          <div style="clear: both;"></div>
         </div>
         <div class="row" id="RefRow">
           <div class="column1">
@@ -479,7 +465,6 @@
                 class="white left"
                 value="$ANCESTRALREF">
           </div>
-          <div style="clear: both;"></div>
         </div>
         <div class="row" id="InterestRow">
           <div class="column1">
@@ -522,7 +507,6 @@
               </option>
             </select>
           </div>
-          <div style="clear: both;"></div>
         </div>
       </fieldset>
       <fieldset id="ButtonFields" class="other">
@@ -535,7 +519,6 @@
                 Edit General   <u>N</u>otes
           </button>
           </div>
-          <div style="clear: both;"></div>
         </div>
         <div class="row">
           <button type="button" class="buttonCol1" id="Parents">
@@ -556,7 +539,6 @@
           </button>
           <input type="hidden" name="IDMRPref" id="IDMRPref" 
                 value="$IDMRPREF">
-          <div style="clear: both;"></div>
         </div>
         <div class="row" id="PicturesRow">
             <button type="button" class="buttonCol1" id="Pictures">
@@ -570,7 +552,6 @@
                   Add <u>A</u>ddress
               </span>
             </button>
-          <div style="clear: both;"></div>
         </div>
           <!-- row allowing edit of some notes fields -->
         <div class="row" id="NotesRow">
@@ -580,7 +561,6 @@
             <button type="button" class="buttonCol2" id="Detail8">
                 Edit Medical Notes
             </button>
-          <div style="clear: both;"></div>
         </div>
       </fieldset>
   </form>
@@ -702,7 +682,6 @@
                           id="EventDelete$rownum">
                   Delete
           </button>
-          <div style="clear: both;"></div>
         </div>
         <div class="row" id="ChristeningRow">
         <input type="hidden" id="ChristeningRowAlwaysShow">
@@ -761,7 +740,6 @@
                           id="EventDelete$rownum">
                   Delete
           </button>
-          <div style="clear: both;"></div>
         </div><!-- id="ChristeningRow" -->
         <div class="row" id="BaptismRow">
           <input type="text" readonly="readonly" class="ina rightnc"
@@ -827,7 +805,6 @@
                           id="EventDelete$rownum">
                   Delete
           </button>
-          <div style="clear: both;"></div>
         </div><!-- id="BaptismRow" -->
         <div class="row" id="EndowmentRow">
           <input type="text" readonly="readonly" class="ina rightnc"
@@ -887,7 +864,6 @@
                           id="EventDelete$rownum">
                   Delete
           </button>
-          <div style="clear: both;"></div>
         </div><!-- id="EndowmentRow" -->
         <div class="row" id="ConfirmationRow">
           <input type="text" readonly="readonly" class="ina rightnc"
@@ -948,7 +924,6 @@
                           id="EventDelete$rownum">
                   Delete
           </button>
-          <div style="clear: both;"></div>
         </div><!-- id="ConfirmationRow" -->
         <div class="row" id="InitiatoryRow">
           <input type="text" readonly="readonly" class="ina rightnc"
@@ -1010,7 +985,6 @@
                           id="EventDelete$rownum">
                   Delete
           </button>
-          <div style="clear: both;"></div>
         </div><!-- id="InitiatoryRow" -->
         <div class="row" id="DeathRow">
         <input type="hidden" id="DeathRowAlwaysShow">
@@ -1068,7 +1042,6 @@
                           id="EventDelete$rownum">
                   Delete
           </button>
-          <div style="clear: both;"></div>
         </div><!-- id="DeathRow" -->
         <div id="DeathCauseRow" class="row">
           <label class="column1" for="DeathCause">
@@ -1083,7 +1056,6 @@
           <button type="button" class="button" id="Clear9">
                   Delete
           </button>
-          <div style="clear: both;"></div>
         </div> <!-- id="DeathCauseRow" -->
         <div class="row" id="BuriedRow">
         <input type="hidden" id="BuriedRowAlwaysShow">
@@ -1141,7 +1113,6 @@
                           id="EventDelete$rownum">
                   Delete
           </button>
-          <div style="clear: both;"></div>
         </div><!-- id="BuriedRow" -->
         <div class="row" id="EventRow$rownum">
           <input type="text" readonly="readonly" class="ina rightnc"
@@ -1211,7 +1182,6 @@
                           id="EventDelete$rownum">
                   Delete
           </button>
-          <div style="clear: both;"></div>
         </div><!-- id="EventRow" -->
 	  <!-- template for confirming the deletion of an event-->
 	  <form name="ClrInd$template" id="ClrInd$template">

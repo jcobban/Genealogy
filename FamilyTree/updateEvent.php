@@ -117,8 +117,9 @@ use \Exception;
  *      2017/09/28      change class LegacyEvent to class Event         *
  *      2017/10/13      class LegacyIndiv renamed to class Person       *
  *      2017/11/29      use RecordSet to get default event Order        *
+ *      2022/08/11      deathCause was not set                          *
  *                                                                      *
- *  Copyright &copy; 2017 James A. Cobban                               *
+ *  Copyright &copy; 2022 James A. Cobban                               *
  ************************************************************************/
 header("Content-Type: text/xml");
 require_once __NAMESPACE__ . '/Person.inc';
@@ -173,50 +174,46 @@ try {
 foreach($_POST as $key => $value)
 {       // loop through all parameters
     $xmlkey         = str_replace("$","_",$key);
-    print "\t<$xmlkey>" . htmlspecialchars($value,ENT_XML1) . "</$xmlkey>\n";
-    error_log("updateEvent.php: " . __LINE__ . " $xmlkey='$value'");
+    print "\t<$xmlkey>" . htmlspecialchars($value,ENT_XML1) . 
+            "</$xmlkey>\n";
 
-    switch($key)
-    {   // act on specific keys
+    $column         = strtolower($key);
+    $rownum         = '';
+    if (preg_match('/^([a-zA-Z_$]+)(\d+)/', $column, $matches))
+    {
+        $column     = $matches[1];
+        $rownum     = $matches[2];
+    }
+    switch($column)
+    {                       // act on specific keys
         case 'idir':
-        {       // idir of individual to be updated
-            $idir                       = $value;
-            if (ctype_digit($idir))
+            if (strlen($value) > 0 && ctype_digit($value))
             {
-                $person                 = new Person(array('idir' => $idir));
+                $idir               = $value;
+                $person             = new Person(array('idir' => $idir));
                 if (!$person->isOwner())
                     $msg    .= "User not authorized to update individual $idir. ";
             }
-            else
-                error_log("updateEvent.php: " . __LINE__ . " idir not numeric");
-            break;
-        }       // idir of individual to be updated
+            break;          // idir of individual to be updated
 
         case 'idmr':
-        {       // idmr of family to be updated
-            $idmr                       = $value;
-            if (ctype_digit($idmr))
-                $family                 = new Family(array('idmr' => $idmr));
-            else
-                error_log("updateEvent.php: " . __LINE__ . " idmr not numeric");
-            break;
-        }       // idmr of family to be updated
+            if (strlen($value) > 0 && ctype_digit($value))
+            {
+                $idmr               = $value;
+                $family             = new Family(array('idmr' => $idmr));
+            }
+            break;          // idmr of family to be updated
 
         case 'ider':
-        {       // ider to be updated
-            $ider                       = $value;
-            if (ctype_digit($ider))
+            if (strlen($value) > 0 && ctype_digit($value))
             {
-                $event                  = new Event(array('ider' => $ider));
+                $ider               = $value;
+                $event              = new Event(array('ider' => $ider));
             }
-            else
-                error_log("updateEvent.php: " . __LINE__ . " ider not numeric");
-            break;
-        }       // ider to be updated
+            break;          // ider to be updated
 
         case 'idcr':
-        {       // idcr to be updated
-            if (ctype_digit($value))
+            if (strlen($value) > 0 && ctype_digit($value))
             {
                 $idcr               = $value;
                 $child              = new Child(array('idcr' => $idcr));
@@ -228,16 +225,12 @@ foreach($_POST as $key => $value)
                 $idmr               = $child->getIdmr();
                 $family             = new Family(array('idmr' => $idmr));
             }
-            else
-                error_log("updateEvent.php: " . __LINE__ . "idcr not numeric");
-            break;
-        }       // idcr to be updated
+            break;          // idcr to be updated
 
         case 'type':
-        {       // type to be updated
-            $type                       = $value;
-            if (strlen($type) > 0)
+            if (strlen($value) > 0 && ctype_digit($value))
             {
+                $type               = $value;
                 if ($type == Citation::STYPE_LDSE ||
                     $type == Citation::STYPE_LDSI ||
                     $type == Citation::STYPE_LDSP ||
@@ -248,34 +241,26 @@ foreach($_POST as $key => $value)
                 else
                     $kind               = 0;    // location is a location
             }
-            break;
-        }       // type to be updated
+            break;              // type to be updated
 
         case 'etype':
-        {       // etype to be updated
             $etype                      = $value;
-            break;
-        }       // etype to be updated
+            break;              // etype to be updated
 
         case 'date':
-        {       // date to be updated
             $date                       = trim($value);
-            break;
-        }       // date to be updated
+            break;              // date to be updated
 
         case 'kind':
-        {       // location kind to be updated
             $kind                       = $value;
-            break;
-        }       // location kind to be updated
+            break;              // location kind to be updated
 
         case 'location':
         case 'temple':
-        {       // location to be updated
             if (strlen($value) > 0)
-            {       // find/create location by name
+            {                   // find/create location by name
                 if ($kind == 1)
-                    $location           = new Temple(array('idtr' => $value));
+                    $location       = new Temple(array('idtr' => $value));
                 else
                 {
                     if (is_int($value) || ctype_digit($value))
@@ -288,154 +273,116 @@ foreach($_POST as $key => $value)
                         $location->save();
                 }
                 $idlr                   = $location->getId();
-            }       // find/create location by name
+            }                   // find/create location by name
             else        
-            {       // empty location
+            {                   // empty location
                 if ($kind == 1)
                     $location           = new Temple(array('idtr' => 1));
                 else
                     $location           = new Location(array('idlr' => 1));
                 $idlr                   = 1;
-            }       // empty location
-            break;
-        }       // location to be updated
+            }                   // empty location
+            break;              // location to be updated
 
         case 'note':
-        {       // note to be updated
             $note                       = $value;
-            break;
-        }       // note to be updated
+            break;              // note to be updated
 
-        case 'deathCause':
-        {       // deathCause to be updated
+        case 'deathcause':
             $deathCause                 = $value;
             $deathCauseSet              = true;
-            break;
-        }       // deathCause to be updated
+            break;              // deathCause to be updated
 
         case 'desc':
-        {       // note to be updated
             $note                       = $value;
-            break;
-        }       // note to be updated
+            break;              // note to be updated
 
         case 'description':
         case 'occupation':
-        {       // description of event
             $description                = $value;
-            break;
-        }       // descriptions of event
+            break;              // descriptions of event
 
         case 'order':
-        {       // order to be updated
             $order                      = $value;
-            break;
-        }       // order to be updated
+            break;              // order to be updated
 
         case 'prefix':
-        {       // prefix to be updated
             $prefix                     = $value;
-            break;
-        }       // prefix to be updated
+            break;              // prefix to be updated
 
         case 'title':
-        {       // title to be updated
             $title                      = $value;
-            break;
-        }       // title to be updated
+            break;              // title to be updated
 
         case 'notmarried':
-        {       // value of not married indicator
             $notmar                     = $value;
-            break;
-        }       // value of not married indicator
+            break;              // value of not married indicator
 
         case 'nochildren':
-        {       // value of no children indicator
             $nokids                     = $value;
-            break;
-        }       // value of no children indicator
+            break;              // value of no children indicator
 
-        case 'templeReady':
-        {       // value of temple ready submission indicator
+        case 'templeready':
             $templeReady                = $value;
-            break;
-        }       // value of temple ready submission indicator
+            break;              // temple ready submission indicator
 
         case 'cremated':
-        {       // value of cremated indicator
             $cremated                   = $value;
-            break;
-        }       // value of cremated indicator
+            break;              // cremated indicator
 
-        case 'givenName':
-        {       // value of primary given name
+        case 'givenname':
             $givenName                  = $value;
-            break;
-        }       // value of primary given name
+            break;              // primary given name
 
         case 'surname':
-        {       // value of primary surname
             $surname                    = $value;
-            break;
-        }       // value of primary surname
+            break;              // primary surname
 
-        case 'newAltGivenName':
-        {       // value of given name portion of alternate name
+        case 'newaltgivenname':
             $altGivenName               = $value;
-            break;
-        }       // value of temple ready submission indicator
+            break;              // new alternate given name
 
-        case 'newAltSurname':
-        {       // value of temple ready submission indicator
+        case 'newaltsurname':
             $altSurname                 = $value;
-            break;
-        }       // value of temple ready submission indicator
+            break;              // new alternate surname
 
         case 'idime':
-        {       // citation IDIME
+        case 'dcidime':
             $citParms['idime']          = $value;
-            break;
-        }       // citation IDIME
+            break;              // citation IDIME
 
-        case 'citType':
-        {       // citation type
+        case 'cittype':
+        case 'dccittype':
             $citParms['type']           = $value;
-            break;
-        }       // citation type
+            break;              // citation type
 
-        default:
-        {       // other fields
-            if (substr($key, 0, 6) == 'Source')
-            {   // IDSR of source
-                $idsx                   = intval(substr($key, 6));
-                $citParms['idsr']       = $value;
-            }   // IDSR of source
+        case 'source':
+            $idsx                       = $rownum;
+            $citParms['idsr']           = $value;
+            break;              // IDSR of source
+
+        case 'idsr':
+            $idsx                       = $rownum;
+            $citParms['idsr']           = $value;
+            break;              // IDSR of source
+
+        case 'page':
+            $idsx                       = $rownum;
+            if ($idsx == 0)
+            {       // new citation
+                $citParms['srcdetail']  = $value;
+                $citation               = new Citation($citParms);
+            }       // new citation
             else
-            if (substr($key, 0, 6) == 'IDSR')
-            {   // IDSR of source
-                $idsx                   = intval(substr($key, 4));
-                $citParms['idsr']       = $value;
-            }   // IDSR of source
-            else
-            if (substr($key, 0, 4) == 'Page')
-            {
-                $idsx                   = intval(substr($key, 4));
-                if ($idsx == 0)
-                {       // new citation
-                    $citParms['srcdetail']  = $value;
-                    $citation           = new Citation($citParms);
-                }       // new citation
-                else
-                {       // update existing citation
-                    $citation           = new Citation(array('idsx' => $idsx));
-                    $citation->set('srcdetail', $value);
-                }       // update existing citation
-                $citations[]            = $citation;
-            }
-        }       // other fields
-    }   // act on specific keys
-}       // loop through all parameters
+            {       // update existing citation
+                $citation           = new Citation(array('idsx' => $idsx));
+                $citation['srcdetail']  = $value;
+            }       // update existing citation
+            $citations[]                = $citation;
+            break;              // citation page
+
+    }                           // act on specific keys
+}                               // loop through all parameters
 
 print "    </parms>\n";
 } catch (Exception $e) {
@@ -1035,37 +982,37 @@ switch($type)
     {
         if (is_null($idmr))
         {
-            $msg    .= "idmr value not specified. ";
+            $msg        .= "idmr value not specified. ";
         }
         if (is_null($ider))
         {
-            $msg    .= "ider value not specified. ";
+            $msg        .= "ider value not specified. ";
         }
         if (is_null($date))
         {
-            $msg    .= "date value not specified. ";
+            $msg        .= "date value not specified. ";
         }
         if (is_null($location))
         {
-            $msg    .= "location value not specified. ";
+            $msg        .= "location value not specified. ";
         }
         if (is_null($note))
         {
-            $msg    .= "desc value not specified. ";
+            $msg        .= "desc value not specified. ";
         }
         if (is_null($description))
         {
-            $msg    .= "description value not specified. ";
+            $msg        .= "description value not specified. ";
         }
         if (is_null($etype))
         {
-            $msg    .= "etype value not specified. ";
+            $msg        .= "etype value not specified. ";
         }
         if (is_null($order) || strlen($order) == 0) 
         {       // order not set
             $eventSet   = new RecordSet('tblER',
-                            array('idir'    => $idmr,
-                                  'idtype'  => Event::IDTYPE_MAR));
+                                    array('idir'    => $idmr,
+                                          'idtype'  => Event::IDTYPE_MAR));
             $order      = $eventSet->count();
         }       // order not set
 

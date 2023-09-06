@@ -4,6 +4,7 @@
     <title>
 	$TITLE
     </title>
+    <meta charset='utf-8'>
 <!--*********************************************************************
  *  pagede.html															*
  *																		*
@@ -18,12 +19,12 @@
  *		2020/02/16      add right hand notification column              *
  *      2020/03/31      change advert iframe to div                     *
  *      2021/03/19      drop support for alignment in tinyMCE           *
+ *      2023/01/13      add Aria support for page menu                  *
  *																		*
- *  Copyright &copy; 2021 James A. Cobban								*
+ *  Copyright &copy; 2023 James A. Cobban								*
  **********************************************************************-->
-    <meta charset='utf-8'>
     <meta name='author' content='James A. Cobban'>
-    <meta name='copyright' content='&copy; 2021 James A. Cobban'>
+    <meta name='copyright' content='&copy; 2023 James A. Cobban'>
     <meta name='keywords' content='genealogy, family, tree, ontario, canada $KEYWORDS'>
     <meta name="viewport" content="width=device-width; initial-scale=1.0">
     <link rel='stylesheet' type='text/css' href='/styles.css'>
@@ -48,22 +49,24 @@
 </script>
     <header id="headSection">
       <div class="topcrumbs"> <!-- start of page header -->
-    	<img src="/logo70.gif" id="logo" class="right"
-                height="70" width="70" alt="James Cobban Logo">
-          &nbsp;
-        <span class="advert" id="advertSpan">
-          <div id="advertFrame" class="advert" data-load="$ADURL">
-          </div>
-        </span>
-        <span id="menuButton" class="left">
+        <button id="menuButton" class="left"
+            title="Seitenmenü" 
+            aria-haspopup="menu"
+            aria-label="Öffnen Sie das Menü" aria-expanded="false">
           <div class="menuicon"></div>
           <div class="menuicon"></div>
           <div class="menuicon"></div>
-        </span>
+        </button>
         <div class="menu" id="menu">
             $BREADCRUMBS
         </div>
-        <div style='clear: both;'></div>
+        <div style="display: flex;">
+	        <div id="advertFrame" class="advert" data-load="$ADURL">
+            </div>
+	          &nbsp;
+	        <img src="/logo70.gif" id="logo"
+                    height="70" width="70" alt="James Cobban Logo">
+        </div>
       </div> <!-- end of page header -->
     </header>
     <main id="mainSection">
@@ -81,21 +84,12 @@
         <p id="userWelcome">
           <b>Willkommen $USERID</b>
         </p>
-        <p>Sie können Ihren Stammbaum auf dieser Website 
-        in einem Stil veröffentlichen, der wie ein traditionelles 
-        Buch aussieht, jedoch alle dynamischen Funktionen des Webs 
-        hinzufügt und Ihre Familie vor Identitätsdiebstahl schützt, 
-        indem sichergestellt wird, dass nur von Ihnen 
-        autorisierte Personen Details zu Personen sehen können, 
-        die kleiner als sind 105 Jahre alt.
-        </p>
-    </div>
+        $RIGHTCOL
     <footer id="footSection">
       <div class='botcrumbs'>
   	    <a href='/contactAuthor.php?lang=de&amp;idir=$CONTACTKEY&amp;tableName=$CONTACTTABLE&amp;subject=$CONTACTSUBJECT' target='_blank'>
   	      Autor kontaktieren</a>
   	    <br>
-        <div style='clear: both;'></div>
       </div> <!-- end of page footer -->
     </footer>
     <div class='hidden' id='UserInfo'>
@@ -130,14 +124,30 @@
       <span id="abbrMessage">
           Die folgenden Abkürzungen werden erweitert:
       </span>
+      <span id="displayTheMenu">
+          Öffnen Sie das Menü
+      </span>
+      <span id="closeTheMenu">
+          Schließen Sie das Menü
+      </span>
+      <p id="rightCol">
+        Sie können Ihren Stammbaum auf dieser Website 
+        in einem Stil veröffentlichen, der wie ein traditionelles 
+        Buch aussieht, jedoch alle dynamischen Funktionen des Webs 
+        hinzufügt und Ihre Familie vor Identitätsdiebstahl schützt, 
+        indem sichergestellt wird, dass nur von Ihnen 
+        autorisierte Personen Details zu Personen sehen können, 
+        die kleiner als sind 105 Jahre alt.
+        </p>
+    </div>
     </div>
                 
     <div id='hideMsgTemplate' class='hidden'>
       <!-- template for customized alerts -->
-      <form name='Msg\$template' id='Msg\$template'>
-	<p class='message'>\$msg</p>
+      <form name='Msg$template' id='Msg$template'>
+	<p class='message'>$msg</p>
 	<p>
-	  <button type='button' id='closeDlg\$template'>
+	  <button type='button' id='closeDlg$template'>
     	OK
 	  </button>
 	</p>

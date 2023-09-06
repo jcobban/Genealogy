@@ -9,7 +9,7 @@
  *  Copyright &copy; 2019 James A. Cobban								*
  **********************************************************************-->
     <div class="hidden" id="breadcrumbs">
-	  <a href="/index.html">Home</a>:
+	  <a href="/home.html">Home</a>:
       <a href="/genealogy.php?lang=$LANG">Genealogy</a>:
       <a href="/genCountry.php?cc=CA&amp;lang=$LANG">Canada</a>:
       <a href="/FamilyTree/Services.php?lang=$LANG">Services</a>:
@@ -22,7 +22,6 @@
 		  <a href="deleteLocationHelpen.html" target="help">? Help</a>
         </span>
 		Delete Location $NAME
-        <div style="clear: both;"></div>
       </h1>
       <p class="warning" id="referenced">
         Location '$NAME' not deleted because $COUNT events reference it
@@ -30,6 +29,17 @@
       $TRACE
       $MSG
 	  <p class="label" id="deleted">Location "$NAME" deleted</p>
+    </div>
+    <div class="hidden">
+        <span id="notAuthorized">
+            User not authorized to delete location. 
+        </span>
+        <span id="invalidIdlr">
+            Invalid value of idlr='$idlrtext'.
+        </span>
+        <span id="missingIdlr">
+            Missing value of idlr.
+        </span>
     </div>
     <script src="/jscripts/util.js" type="application/javascript">
     </script>

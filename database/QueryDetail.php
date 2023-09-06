@@ -21,8 +21,12 @@ use \Exception;
  *      2019/07/30      use Record->selected                            *
  *      2019/11/17      move CSS to <head>                              *
  *		2021/04/04      escape CONTACTSUBJECT                           *
+ *		2023/01/23      protect against XSS                             *
+ *		2023/08/23      improve parameter checking                      *
+ *		                use JSON                                        *
+ *		                include province parameter for initial dists    *
  *                                                                      *
- *  Copyright &copy; 2021 James A. Cobban                               *
+ *  Copyright &copy; 2023 James A. Cobban                               *
  ************************************************************************/
 require_once __NAMESPACE__ . '/FtTemplate.inc';
 require_once __NAMESPACE__ . '/Census.inc';
@@ -37,10 +41,13 @@ require_once __NAMESPACE__ . '/common.inc';
 
 $censusYear         = 1881;         // default census year
 $censusId           = 'CA1881';     // default census year
+$censusIdText       = null;         // invalid censusID
 $cc                 = 'CA';         // default country code
 $countryName        = 'Canada';     // default country name
 $lang               = 'en';         // default language
-$province           = 'CW';         // default selected province
+$langtext           = null;
+$province           = '';           // default selected province
+$provincetext       = null;
 $states             = 'ABBCMBNBNSNTONPIQCSKYT';
 $censusRec          = null;         // instance of Census
 
@@ -55,33 +62,45 @@ if (count($_GET) > 0)
                       "<th class='colhead'>value</th></tr>\n";
     foreach ($_GET as $key => $value)
     {               // loop through all parameters
+        $safevalue          = htmlspecialchars($value);
         if (is_array($value))
             $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
                             "<td class='white left'>array</td></tr>\n";
         else
             $parmsText  .= "<tr><th class='detlabel'>$key</th>" .
-                            "<td class='white left'>$value</td></tr>\n";
+                            "<td class='white left'>$safevalue</td></tr>\n";
 
         switch(strtolower($key))
         {           // switch on parameter name
             case 'census':
             {           // Census identifier
-                if (strlen($value) > 4)
-                    $censusId               = $value;
+                if (preg_match('/^\d\d\d\d$/', $value))
+                    $censusId           = "CA$value";
+                else
+                if (preg_match('/^[a-zA-Z]{2}\d\d\d\d$/', $value))
+                    $censusId           = strtoupper($value);
+                else
+                if (preg_match('/^[a-zA-Z]{5,6}$/', $value))
+                    $censusId           = strtoupper($value);
+                else
+                    $censusIdText       = $safevalue;
                 break;
             }           // Census identifier
 
             case 'province':
             case 'state':
             {           // province identifier
-                if (strlen($value) >= 2)
-                    $province               = strtoupper(substr($value, 0, 2));
+                if (preg_match('/^[a-zA-Z]{2,3}$/', $value))
+                    $province           = strtoupper($value);
+                else
+                    $provincetext       = $safevalue;
                 break;
             }           // province identifier
 
             case 'lang':
             {           // language code
-                $lang       = FtTemplate::validateLang($value);
+                $lang       = FtTemplate::validateLang($value,
+                                                       $langtext);
                 break;
             }           // language code
 
@@ -93,13 +112,13 @@ if (count($_GET) > 0)
 
 // interpret census identifier
 if (strtoupper($censusId) == 'CAALL')
-{       // special census identifier to search all
+{                   // special census identifier to search all
     $cc                 = substr($censusId, 0, 2);
-    $censusYear         = substr($censusId, 2);
+    $censusYear         = "All";
     $province           = 'CW'; // for pre-confederation
-}       // special census identifier
+}                   // special census identifier
 else
-{       // full census identifier
+{                   // full census identifier
     $censusRec          = new Census(array('censusid'   => $censusId));
     if ($censusRec->isExisting())
     {
@@ -118,18 +137,44 @@ else
     }
     else
     {
-        $msg            .= "Census value '$censusId' invalid. ";
         $cc             = substr($censusId, 0, 2);
         $censusYear     = substr($censusId, 2);
     }
-}       // full census identifier
+    if ($province == '' && $censusYear < 1867)
+        $province       = 'CW';
+}                   // full census identifier
+
+// create template
+if (strtoupper($censusYear) == 'ALL')
+    $censusYear         = 'All';
+
+$tempBase               = $document_root . '/templates/';
+if (file_exists($tempBase . "Query$cc$censusYear$lang.html"))
+    $templateName       = "Query$cc$censusYear$lang.html";
+else
+if (file_exists($tempBase . "Query$cc$censusYear" . "en.html"))
+    $templateName       = "Query$cc$censusYear" . "en.html";
+else
+    $templateName       = "QueryUnsupported$lang.html";
+$template               = new FtTemplate($templateName);
+
+$includePop             = "CensusQueryPopups$lang.html";
+
+$template->includeSub($includePop,
+                      'POPUPS');
+
+// warn for undefined census
+if (is_string($censusIdText))
+    $msg                .= $template['censusInvalid']->replace('$censusId', $censusIdText);
+if (!$censusRec->isExisting())
+    $msg                .= $template['censusUndefined']->replace('$censusId', $censusId);
+
+if (is_string($provincetext))
+    $msg                .= $template['stateInvalid']->replace('$province', $provincetext);
 
 // support for countries other than Canada
-if ($cc != 'CA')
-{
-    $countryObj         = new Country(array('code'=> $cc));
-    $countryName        = $countryObj->getName($lang);
-}
+$countryObj             = new Country(array('code'=> $cc));
+$countryName            = $countryObj->getName($lang);
 
 // determine contents of province/state selection list
 $stateArray             = array();
@@ -144,24 +189,18 @@ if ($stateList->count() == 0)
                                 'lang'      => 'en');
     $stateList          = new DomainSet($getParms);
 }                   // no names for the requested language
-$state                  = $stateList[$cc . $province];
-if ($state)
+if ($stateList->offsetExists($cc . $province))
+{
+    $state              = $stateList[$cc . $province];
     $state->selected    = true;
-
-// create template
-if (strtoupper($censusYear) == 'ALL')
-    $censusYear         = 'All';
-
-$tempBase               = $document_root . '/templates/';
-if (file_exists($tempBase . "Query$cc$censusYear" . "en.html"))
-    $template           = new FtTemplate("Query$cc$censusYear$lang.html");
+}
 else
-    $template           = new FtTemplate("QueryUnsupported$lang.html");
+{
+    $state              = null;
+    if ($province != '')
+    $msg    .= $template['stateUndefined']->replace('$province', $province);
+}
 
-$includePop             = "CensusQueryPopups$lang.html";
-
-$template->includeSub($includePop,
-                      'POPUPS');
 $template->updateTag('otherStylesheets',
                      array('filename'   => 'QueryDetail'));
 $template->set('CENSUSYEAR',        $censusYear);

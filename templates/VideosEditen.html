@@ -33,15 +33,14 @@
         <input name="lang" id="lang" type="hidden" 
   			value="$LANG"> <!-- pass language to update -->
       </p>
-      <div class="center" id="linksfront">
-        <div class="left" id="npprev">
-          <a href="/Videos.php?pattern=$pattern&amp;lang=$lang&amp;limit=$limit&amp;offset=$offset">&lt;---</a>
-        </div>
-        <div class="right" id="npnext"> 
-        <a href="/Videos.php?pattern=$pattern&amp;lang=$lang&amp;limit=$limit&amp;offset=$offset">---&gt;</a>
+      <div class="spaceBetween" id="topBrowse">
+        <div id="topPrev">
+          <a href="/Videos.php?pattern=$pattern&amp;lang=$lang&amp;limit=$limit&amp;offset=$offset"><img src="/Images/ArrowLeft.svg"></a>
         </div>
   		  rows $OFFSET to $LAST of $COUNT 
-        <div style="clear: both;"></div>
+        <div id="topNext"> 
+        <a href="/Videos.php?pattern=$pattern&amp;lang=$lang&amp;limit=$limit&amp;offset=$offset"><img src="/Images/ArrowRight.svg"></a>
+        </div>
       </div>
       <!--- Put out the response as a table -->
       <table class="details" id="dataTable">
@@ -157,12 +156,12 @@
   </p>
   </div>
   <!-- balloons to pop up when mouse moves over forward and back links -->
-  <div class="popup" id="mousenpprev">
+  <div class="popup" id="mousetopPrev">
     <p class="label">
 		Go to Row $prevoffset&nbsp;
     </p>
   </div>
-  <div class="popup" id="mousenpnext">
+  <div class="popup" id="mousetopNext">
     <p class="label">
 		Go to Row $nextoffset&nbsp;
     </p>

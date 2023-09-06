@@ -127,9 +127,8 @@ $template->set('LANG',		$lang);
 
 if ($user)
 {			// valid user
-    $newPassword	= randomPassword(10);
-    $user->set('password', null);
-    $user->set('shapassword', hash('sha512', $newPassword));
+    $newPassword	= randomPassword(12);
+    $user->setPassword($newPassword);
     $user->save();
 
     // bcc the e-mail to the administrators

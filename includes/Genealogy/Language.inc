@@ -14,6 +14,7 @@ use \Iterator;
  *                                                                      *
  *      CREATE TABLE `Languages` (                                      *
  *          `Code639_1`     CHAR(2) NOT NULL,                           *
+ *          `Code639_2`     CHAR(3) NOT NULL DEFAULT '',                *
  *          `Name`          VARCHAR(255) NOT NULL DEFAULT '',           *
  *          `NativeName`    VARCHAR(255) NOT NULL DEFAULT '',           *
  *          `Article`       VARCHAR(32) NOT NULL DEFAULT '',            *
@@ -21,8 +22,9 @@ use \Iterator;
  *          `Conjunction`   VARCHAR(32) NOT NULL DEFAULT 'and',         *
  *          `DatePrefix`    VARCHAR(32) NOT NULL DEFAULT 'on',          *
  *          `Sorry`         VARCHAR(256) NOT NULL DEFAULT '...',        *
- *          PRIMARY KEY (`Code639_1`) )                                 *
- *      ENGINE=InnoDb DEFAULT CHARSET=utf8;                             *
+ *          PRIMARY KEY (`Code639_1`),                                  *
+ *          PRIMARY KEY (`Code639_2`) )                                 *
+ *      ENGINE=InnoDb DEFAULT CHARSET=utf8mb3;                          *
  *                                                                      *
  *  History:                                                            *
  *      2017/10/24      created                                         *
@@ -30,8 +32,9 @@ use \Iterator;
  *      2018/10/13      add support for language specific `Sorry`       *
  *      2019/07/17      add support for country-qualified languages     *
  *      2019/12/19      replace xmlentities with htmlentities           *
+ *      2022/09/25      add column `Code639_2`                          *
  *                                                                      *
- *  Copyright &copy; 2018 James A. Cobban                               *
+ *  Copyright &copy; 2022 James A. Cobban                               *
  ************************************************************************/
 require_once __NAMESPACE__ . '/Record.inc';
 require_once __NAMESPACE__ . '/Country.inc';
@@ -52,6 +55,7 @@ class Language extends Record
      ********************************************************************/
     protected static $initRow   = array(
                         'code639_1'         => '',
+                        'code639_2'         => '',
                         'name'              => '',
                         'nativename'        => '',
                         'article'           => '',
@@ -81,6 +85,7 @@ class Language extends Record
      ********************************************************************/
     protected static $translate = array(
                         'code'              => 'code639_1',
+                        'code3'             => 'code639_2',
                         'the'               => 'article',
                         'of'                => 'possessive');
 
@@ -183,14 +188,26 @@ class Language extends Record
                             break;
                         }       // language code
 
+                        case 'code639_2':
+                        {       // 3 character language code
+                            if (strlen($value) > 3)
+                                $code3          = substr($value, 0, 3);
+                            else
+                                $code3          = $value;
+                            $where              .= $and . "`Code639_2`=:code3";
+                            $sqlParms['code3']   = $code3;
+                            $and                = ' AND ';
+                            break;
+                        }       // language code
+
                     }           // act on key fields
                 }               // loop through parameters
 
                 if (strlen($where) == 0)
-                {
+                {               // get English
                     $where              .= "WHERE Code639_1=:code";
                     $sqlParms['code']   = $code;
-                }
+                }               // getEnglish
 
                 $query                  = "SELECT * FROM Languages $where";
 

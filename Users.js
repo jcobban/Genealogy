@@ -19,11 +19,17 @@
  *      2019/04/11      use common table pagination                     *
  *      2021/01/16      use XMLSerializer for diagnostic output         *
  *      2021/05/24      change implementation of confirmUserXml.php     *
+ *      2022/06/26      add support for ES2015                          *
  *                                                                      *
- *  Copyright &copy; 2021 James A. Cobban                               *
+ *  Copyright &copy; 2022 James A. Cobban                               *
  ************************************************************************/
+import {HTTP} from "../jscripts6/js20/http.js";
+import {keyDown, debug, popupAlert}
+            from "../jscripts6/util.js";
+import {change}
+            from "../jscripts6/CommonForm.js";
 
-window.onload   = onLoadUsers;
+window.addEventListener("load", onLoadUsers);
 
 /************************************************************************
  *  function onLoadUsers                                                *
@@ -35,42 +41,37 @@ function onLoadUsers()
 {
     // activate handling of key strokes in text input fields
     // including support for context specific help
-    for (var fi = 0; fi < document.forms.length; fi++)
-    {       // loop through all forms
-        var form    = document.forms[fi];
+    for (let fi = 0; fi < document.forms.length; fi++)
+    {                   // loop through all forms
+        let form            = document.forms[fi];
 
-        var formElts    = form.elements;
-        for (var i = 0; i < formElts.length; ++i)
-        {   // loop through all elements
-            var elt = formElts[i];
-            var name;
-            if (elt.name && elt.name.length > 0)
-            name    = elt.name;
-            else
-            name    = elt.id;
+        let formElts        = form.elements;
+        for (let i = 0; i < formElts.length; ++i)
+        {               // loop through all elements
+            let elt         = formElts[i];
 
-            elt.onkeydown   = keyDown;
-            elt.onchange    = change;   // default handler
+            elt.addEventListener('keydown',     keyDown);
+            elt.addEventListener('change',      change); 
 
             if (elt.id.substring(0,'delete'.length) == 'delete')
-                elt.onclick = deleteUserid;
+                elt.addEventListener('click',	deleteUserid);
             else
             if (elt.id.substring(0,'reset'.length) == 'reset')
-                elt.onclick = resetUserid;
+                elt.addEventListener('click',	resetUserid);
             else
             if (elt.id.substring(0,'confirm'.length) == 'confirm')
-                elt.onclick = confirmUserid;
+                elt.addEventListener('click',	confirmUserid);
         }   // loop through all elements
     }       // loop through all forms
 
-    var dataTable           = document.getElementById('dataTable');
-    var dataWidth           = dataTable.offsetWidth;
-    var windowWidth         = document.body.clientWidth - 8;
+    let dataTable               = document.getElementById('dataTable');
+    let dataWidth               = dataTable.offsetWidth;
+    let windowWidth             = document.body.clientWidth - 8;
     if (dataWidth > windowWidth)
-        dataWidth           = windowWidth;
-    var topBrowse           = document.getElementById('topBrowse');
+        dataWidth               = windowWidth;
+    let topBrowse               = document.getElementById('topBrowse');
         topBrowse.style.width   = dataWidth + "px";
-    var botBrowse           = document.getElementById('botBrowse');
+    let botBrowse               = document.getElementById('botBrowse');
     if (botBrowse)
         botBrowse.style.width   = dataWidth + "px";
 }       // function onLoadNames
@@ -86,22 +87,22 @@ function onLoadUsers()
  ************************************************************************/
 function deleteUserid(ev)
 {
-    var iu                  = this.id.substring("delete".length);
-    var userid              = document.getElementById('User' + iu).value;
+    let iu                  = this.id.substring("delete".length);
+    let userid              = document.getElementById('User' + iu).value;
     if (debug.toLowerCase() == 'y')
     {
         alert("Users.js: deleteUserid: {\"user name\"=" + userid + "}");
     }
-    var cell                = this.parentNode;
-    var row                 = cell.parentNode;
-    var inputs              = row.getElementsByTagName('input');
-    for (var i = 0; i < inputs.length; i++)
+    let cell                = this.parentNode;
+    let row                 = cell.parentNode;
+    let inputs              = row.getElementsByTagName('input');
+    for (let i = 0; i < inputs.length; i++)
     {
-        var elt             = inputs[i];
-        var name            = elt.name;
-        var matches         = /^([a-zA-Z_$@#]*)(\d*)$/.exec(name);
-        var column          = matches[1].toLowerCase();
-        var id              = matches[2];
+        let elt             = inputs[i];
+        let name            = elt.name;
+        let matches         = /^([a-zA-Z_$@#]*)(\d*)$/.exec(name);
+        let column          = matches[1].toLowerCase();
+        //let id              = matches[2];
         elt.type            = 'hidden';
         if (column == 'auth')
         {
@@ -109,6 +110,8 @@ function deleteUserid(ev)
         }
     }
     this.form.submit();
+    ev.stopPropagation();
+    return false;
 }       // function deleteUserid
 
 /************************************************************************
@@ -118,13 +121,14 @@ function deleteUserid(ev)
  *                                                                      *
  *  Input:                                                              *
  *      this        <button type='button' id='reset...'>                *
+ *      ev          instance of click Event                             *
  ************************************************************************/
-function resetUserid()
+function resetUserid(ev)
 {
-    var iu              = this.id.substring("reset".length);
-    var newPassword     = randomPassword(10);
-    var userid          = document.getElementById('User' + iu).value;
-    var parms           = { "username" : userid,
+    let iu              = this.id.substring("reset".length);
+    let newPassword     = randomPassword(10);
+    let userid          = document.getElementById('User' + iu).value;
+    let parms           = { "username" : userid,
                             "password" : newPassword};
     if (debug.toLowerCase() == 'y')
     {
@@ -139,6 +143,8 @@ function resetUserid()
               gotReset,
               noReset);
     
+    ev.stopPropagation();
+    return false;
 }       // function resetUserid
 
 /************************************************************************
@@ -151,17 +157,18 @@ function resetUserid()
  *  Input:                                                              *
  *      len     number of characters in the resulting password          *
  ************************************************************************/
-var passwordAlphabet    =
+let passwordAlphabet    =
             "ABCDEFGHJKLMNPQRSTUVWXYZ" +
             "abcdefghjkmnpqrstuvwxyz" +
             "23456789" +
             "!_-+^$@#!~%";
+
 function randomPassword(len)
 {
-    var newPassword = '';
-    for (var i = 0; i < len; i++)
+    let newPassword = '';
+    for (let i = 0; i < len; i++)
     {
-        var index   = Math.floor(Math.random()*passwordAlphabet.length);
+        let index   = Math.floor(Math.random()*passwordAlphabet.length);
         newPassword += passwordAlphabet.charAt(index);
     }
     return newPassword;
@@ -178,39 +185,40 @@ function randomPassword(len)
  ************************************************************************/
 function gotReset(xmlDoc)
 {
-    var evtForm = document.evtForm;
-    var root    = xmlDoc.documentElement;
+    //let evtForm                 = document.evtForm;
+    let root                    = xmlDoc.documentElement;
     if (root && root.nodeName && root.nodeName == 'update')
     {
         if (debug.toLowerCase() == 'y')
         {
-            alert("Users.js:gotReset: xmlDoc=" + new XMLSerializer().serializeToString(root));
+            alert("Users.js:gotReset: xmlDoc=" +
+                    new XMLSerializer().serializeToString(root));
         }
 
-        var username            = '';
-        var password            = '';
-        var id                  = '';
-        for (var i = 0; i < root.childNodes.length; i++)
-        {               // loop through all children
-            var child           = root.childNodes[i];
+        let username                = '';
+        let password                = '';
+        let id                      = '';
+        for (let i = 0; i < root.childNodes.length; i++)
+        {                       // loop through all children
+            let child               = root.childNodes[i];
             if (child.nodeName == 'parms')
             {
-                for (var j = 0; j < child.childNodes.length; j++)
-                {       // loop through all children
-                    var elt = child.childNodes[j];
+                for (let j = 0; j < child.childNodes.length; j++)
+                {               // loop through all children
+                    let elt         = child.childNodes[j];
                     if (elt.nodeName == 'username')
                         username    = elt.textContent;
                     else
                     if (elt.nodeName == 'password')
                         password    = elt.textContent;
-                }       // loop through all children
+                }               // loop through all children
             }
             else
             if (child.nodeName == 'id')
             {
                 id              = child.textContent;
             }
-        }               // loop through all children
+        }                       // loop through all children
         if (id.length > 0)
             popupAlert("Password for user '" + username +
                     "' reset to '" + password + "'",
@@ -221,7 +229,7 @@ function gotReset(xmlDoc)
     }
     else
     {       // error
-        var msg = "Error: ";
+        let msg = "Error: ";
         if (root && root.childNodes)
             msg += new XMLSerializer().serializeToString(root)
         else
@@ -249,17 +257,21 @@ function noReset()
  *                                                                      *
  *  Input:                                                              *
  *      this        <button type='button' id='confirm...'>              *
+ *      ev          instance of click Event                             *
  ************************************************************************/
-function confirmUserid()
+function confirmUserid(ev)
 {
-    var iu  = this.id.substring("confirm".length);
-    var userid  = document.getElementById('User' + iu).value;
-    var parms       = { "clientid" : userid };
+    let iu  = this.id.substring("confirm".length);
+    let userid  = document.getElementById('User' + iu).value;
+    let parms       = { "clientid" : userid };
     // update the database
     HTTP.post("confirmUserXml.php",
               parms,
               gotConfirm,
               noConfirm);
+
+    ev.stopPropagation();
+    return false;
 }       // function confirmUserid
 
 /************************************************************************
@@ -273,8 +285,8 @@ function confirmUserid()
  ************************************************************************/
 function gotConfirm(xmlDoc)
 {
-    var evtForm         = document.evtForm;
-    var root            = xmlDoc.documentElement;
+    //let evtForm         = document.evtForm;
+    let root            = xmlDoc.documentElement;
     if (root && root.nodeName && root.nodeName == 'confirmed')
     {
         let children    = root.childNodes;
@@ -293,7 +305,7 @@ function gotConfirm(xmlDoc)
     }
     else
     {       // error
-        var msg = "Error: ";
+        let msg = "Error: ";
         if (root && root.childNodes)
             msg += new XMLSerializer().serializeToString(root)
         else

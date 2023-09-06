@@ -38,6 +38,7 @@ use \Iterator;
  ************************************************************************/
 require_once __NAMESPACE__ . '/RecordSet.inc';
 require_once __NAMESPACE__ . '/Domain.inc';
+require_once __NAMESPACE__ . '/County.inc';
 
 /************************************************************************
  *  class CountySet                                                     *
@@ -70,6 +71,27 @@ class CountySet extends RecordSet
     function __construct($parms     = null,
                          $order     = "`Name`")
     {
+        foreach($parms as $fldname => $value)
+        {                   // loop through all parameters
+            $fieldLc        = County::getRealFieldName($fldname);
+            if ($fieldLc == 'domain')
+            {               // domain identifier
+                $this->domainObj    =
+                        new Domain(array('domain'   => $value,
+                            'language' => 'en'));
+                if (!$this->domainObj->isExisting())
+                {           // invalid domain id
+                    error_log("CountySet::__construct: Invalid domain code '$value', \$parms=" .
+                        var_export($parms, true) . ", " .
+                        $this->debugBacktrace());
+                    $this->msg  .= "CountySet::__construct: Invalid domain code '$value'.\n";
+                    return;
+                }           // invalid domain id
+            }               // domain identifier
+            else
+            if ($fieldLc == 'order')
+                $order          = $value;
+        }                   // loop through all parameters
         $parms['order']     = $order;
         parent::__construct('Counties', $parms);
     }       // CountySet::__construct

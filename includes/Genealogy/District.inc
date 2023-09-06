@@ -1246,9 +1246,10 @@ class District extends Record
     
                 $popCmd     = "SELECT SUM(SD_Population) as pop " .
                                 "FROM SubDistricts " .
-                                "WHERE SD_Census='$censusId' AND SD_DistId=$id";
+                                "WHERE SD_Census=:censusId AND " . 
+                                      "SD_DistId=:id";
                 $sqlParms       = array('censusId'  => $censusId,
-                                    'id'        => $this->row['d_id']);
+                                        'id'        => $this->row['d_id']);
                 $popCmdText     = debugPrepQuery($popCmd, $sqlParms);
                 $stmt           = $connection->prepare($popCmd);
                 if ($stmt->execute($sqlParms))
@@ -1274,7 +1275,7 @@ class District extends Record
         }
         else
         {
-            error_log("District::synchPopulation: censusId='$censusId'\n");
+            error_log("District::synchPopulation: censusYear='$censusYear' is not numeric, \$censusId='$censusId'\n");
         }
     }       // function District::synchPopulation
 

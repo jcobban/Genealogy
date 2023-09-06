@@ -37,18 +37,19 @@
    </h1>
    $TRACE
    $MSG
-    <div class="center" id="topBrowse">
-      <span class="left" id="topPrev">
-		<a href="CensusDetails.php?Census=$CENSUSID&amp;District=$DISTRICT&amp;SubDistrict=$SUBDISTRICT&amp;Division=$DIVISION&amp;Page=$PAGE&amp;Line=$PREVLINE&amp;lang=$LANG">&lt;---</a>
+    <div class="spaceBetween" id="topBrowse">
+      <span id="topPrev">
+		<a href="CensusDetails.php?Census=$CENSUSID&amp;District=$DISTRICT&amp;SubDistrict=$SUBDISTRICT&amp;Division=$DIVISION&amp;Page=$PAGE&amp;Line=$PREVLINE&amp;lang=$LANG"><img src="/Images/ArrowLeft.svg"></a>
       </span>
-      <span class="right" id="topNext">
-		<a href="CensusDetails.php?Census=$CENSUSID&amp;District=$DISTRICT&amp;SubDistrict=$SUBDISTRICT&amp;Division=$DIVISION&amp;Page=$PAGE&amp;Line=$NEXTLINE&amp;lang=$LANG">---&gt;</a>
-      </span>
+      <span>
 		dist $DISTRICT $DISTNAME, 
         subdist $SUBDISTRICT $SUBDISTNAME, 
         <span id="division">div $DIVISION</span>
 		 page $PAGE
-      <div style="clear: both;"></div>
+      </span>
+      <span id="topNext">
+		<a href="CensusDetails.php?Census=$CENSUSID&amp;District=$DISTRICT&amp;SubDistrict=$SUBDISTRICT&amp;Division=$DIVISION&amp;Page=$PAGE&amp;Line=$NEXTLINE&amp;lang=$LANG"><img src="/Images/ArrowRight.svg"></a>
+      </span>
     </div>
     <table class="details" id="dataTable">
      <thead>

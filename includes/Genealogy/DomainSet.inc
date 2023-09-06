@@ -17,8 +17,9 @@ use \Iterator;
  *      2019/12/02      if partof is not specified only return top level*
  *      2020/03/24      correct handling of domain list containing      *
  *                      empty parameters                                *
+ *      2023/07/30      truncate long country codes                     *
  *                                                                      *
- *  Copyright &copy; 2019 James A. Cobban                               *
+ *  Copyright &copy; 2023 James A. Cobban                               *
  ************************************************************************/
 require_once __NAMESPACE__ . '/RecordSet.inc';
 
@@ -92,6 +93,8 @@ class DomainSet extends RecordSet
                     if (is_string($cc) && strlen($cc) >= 2)
                     {
                         $cc                 = strtoupper($value);
+                        if (strlen($cc) > 2)
+                            $cc             = substr($cc, 0, 2);
                         if ($cc == 'UK')
                             $cc             = 'GB';
                         $where              .= "$and$fieldExpr=:cc";

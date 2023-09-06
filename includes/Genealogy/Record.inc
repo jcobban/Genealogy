@@ -5,6 +5,7 @@ use \Exception;
 use \ArrayAccess;
 use \Countable;
 use \Iterator;
+use \JsonSerializable;
 /************************************************************************
  *  Record.inc                                                          *
  *                                                                      *
@@ -224,8 +225,12 @@ use \Iterator;
  *      2021/12/11      insert spaces into some SqlLog fields so they   *
  *                      display more compactly in a query               *
  *      2022/04/17      improve method debugBacktrace                   *
+ *      2022/06/19      correct handling of updating of primary key     *
+ *      2022/09/12      report errors in writing SqlLog to the PHP      *
+ *                      error_log                                       *
+ *      2023/01/14      do not pass non-numeric value to SqlLog SL_ID   *
  *                                                                      *
- *  Copyright &copy; 2022 James A. Cobban                               *
+ *  Copyright &copy; 2023 James A. Cobban                               *
  ************************************************************************/
 
 /************************************************************************
@@ -235,7 +240,7 @@ use \Iterator;
  *  record within a genealogy database.                                 *
  ************************************************************************/
 
-class Record implements Iterator, ArrayAccess
+class Record implements Iterator, ArrayAccess, JsonSerializable
 {
     /********************************************************************
      *  Constants                                                       *
@@ -475,9 +480,9 @@ class Record implements Iterator, ArrayAccess
 // Legacy database structure, even though it logically              *
 // should not be, and the server is not permitted to manage         *
 // this key by Record.                                              *
-        'tblNR'         => array('prime'        => 'idnr',
-                                'srvmg'         => true,
-                                'fldcount'      => 5,
+        'tblNR'         => array('prime'        => 'surname',
+                                'srvmg'         => false,
+                                'fldcount'      => 8,
                                 'classname'     => 'Surname'),
         'tblNX'         => array('prime'        => 'idnx',
                                 'srvmg'         => true,
@@ -551,7 +556,7 @@ class Record implements Iterator, ArrayAccess
                                                          'm_role'),
                                 'srvmg'         => false,
                                 'fldcount'      => 20,
-                                'classname'     => ''),
+                                'classname'     => 'MarriageParticipant'),
         'CountyMarriageReports' => array('prime'=> array('m_regdomain',
                                                          'm_volume',
                                                          'm_reportno'),
@@ -854,7 +859,9 @@ class Record implements Iterator, ArrayAccess
         $prime                          = $this->prime;
         $this->changed                  = array();
         if (is_array($this->row))
+        {
             return;         // already constructed by derived class
+        }
 
         // interpret first parameter
         if (is_array($dbrow))
@@ -867,12 +874,25 @@ class Record implements Iterator, ArrayAccess
                 foreach($dbrow as $fldname  => $value)
                 {           // process each parameter
                     $fieldLc                = strtolower($fldname);
-                    $query                  .= "$and$fldname=:$fieldLc";
-                    $sqlparms[$fieldLc]     = $value;
-                    $and                    = ' AND ';
+                    if (is_string($this->prime))
+                    {
+                        if ($fldname == $this->prime)
+                        {
+                            $query          .= "$and$fldname=:$fieldLc";
+                            $sqlparms[$fieldLc] = $value;
+                            $and            = ' AND ';
+                        }
+                    }
+                    else
+                    if (array_key_exists($fldname, $this->prime))
+                    {
+                        $query              .= "$and$fldname=:$fieldLc";
+                        $sqlparms[$fieldLc] = $value;
+                        $and                = ' AND ';
+                    }
                 }           // process each parameter
                 $stmt                       = $connection->prepare($query);
-                $queryText                  = debugPrepQuery($query, $sqlparms);
+                $queryText          = debugPrepQuery($query, $sqlparms);
                 $this->lastSqlCmd           = $queryText;
                 if ($stmt->execute($sqlparms))
                 {           // successful
@@ -1413,6 +1433,7 @@ class Record implements Iterator, ArrayAccess
                         " record ignored because of errors detected when the record was created. '" .
                         $this->msg .
                         "' length=" . strlen($this->msg) . "</p>\n";
+            $this->msg  .= "<p>Record::save: " . __LINE__ . "</p>\n";
             return 0;
         }                       // errors detected by constructor
 
@@ -1618,8 +1639,10 @@ class Record implements Iterator, ArrayAccess
                 }       // primary key is multiple fields
                 else
                 {       // primary key is single field
-                    $key            = $this->former[$prime];
-                    if ($key == 0)
+                    if (is_array($this->former) &&
+                        array_key_exists($prime, $this->former))
+                        $key        = $this->former[$prime];
+                    else
                         $key        = $this->row[$prime];
                     $update         = "UPDATE $table SET $set" .
                                               " WHERE $prime=:prime";
@@ -1672,6 +1695,7 @@ class Record implements Iterator, ArrayAccess
         $this->former               = null;     // reset
 
         // successful, return count of number of records updated
+        $countDisplay   = ($count === false)?'false':$count;
         return $count;
     }       // function Record::save
 
@@ -2105,6 +2129,19 @@ class Record implements Iterator, ArrayAccess
             print $retval;
         return $retval;
     }       // function Record::toJson
+
+    /********************************************************************
+     *  function Record::jsonSerialize                                  *
+     *                                                                  *
+     *  Customize how json_encode presents an instance of Record.       *
+     *                                                                  *
+     *  Returns:                                                        *
+     *      object which will be interpreted by json_encode             *
+     ********************************************************************/
+    function jsonSerialize()
+    {
+        return $this->row;
+    }       // function Record::jsonSerialize
 
     /********************************************************************
      *  function Record::setTemplate                                    *
@@ -2595,6 +2632,9 @@ class Record implements Iterator, ArrayAccess
 
         if (array_key_exists($tableName, self::$externalTableNames))
         {
+            if ($debug)
+                $warn   .= "<p>Record::getInformation: " . __LINE__ .
+                    " '$tableName' is defined in self::\$externalTableNames</p>\n";
             $table                  = self::$externalTableNames[$tableName];
             $externalName           = $tableName;
         }
@@ -2606,6 +2646,9 @@ class Record implements Iterator, ArrayAccess
             else
                 $externalName       = $table;
         }
+        if ($debug)
+            $warn   .= "<p>Record::getInformation: " . __LINE__ .
+                    " '$tableName' is defined as '$externalName'</p>\n";
 
         // get information about the selected table
         $information                = array();
@@ -2664,31 +2707,37 @@ class Record implements Iterator, ArrayAccess
             if ($debug)
                 $warn   .= "<p>Record::getInformation: " . __LINE__ .
         " array_key_exists('$table', self::\$primeKey) is false</p>\n";
+
+            // external name is an English plural, handle special cases
+            $namelen            = strlen($externalName);
             if (substr($externalName, -3) == 'ies')
-                $className          = substr($externalName, 0, strlen($externalName) - 3) . 'y';
+                $className      = substr($externalName, 0, $namelen - 3) .
+                                    'y';
             else
             if (substr($externalName, -4) == 'sses' ||
                 substr($externalName, -4) == 'uses')
-                $className          = substr($externalName, 0, strlen($externalName) - 2);
+                $className      = substr($externalName, 0, $namelen - 2);
             else
             if (substr($externalName, -1) == 's')
-                $className          = substr($externalName, 0, strlen($externalName) - 1);
+                $className      = substr($externalName, 0, $namelen - 1);
             else
             if (substr($externalName, -3) == 'ren')
-                $className          = substr($externalName, 0, strlen($externalName) - 3);
+                $className      = substr($externalName, 0, $namelen - 3);
             else
-                $className          = $externalName;
+                $className      = $externalName;
 
-            $nsclass                = __NAMESPACE__ . "\\" . $className;
-        }                   // use table name to locate class
+            if (preg_match('/^Census\d\d\d\d$/', $className))
+                $className      = "CensusLine";
+            $nsclass            = __NAMESPACE__ . "\\" . $className;
+            if ($debug)
+                $warn   .= "<p>Record::getInformation: " . __LINE__ .
+        " resolved to className=$className, nsClass=$nsclass</p>\n";
+        }                   // use external name to locate class
 
         if (!class_exists($nsclass))
         {                   // ensure the class is loaded
-            if (preg_match('/^Census\d\d\d\d$/', $className))
-                $incname            = __NAMESPACE__ . "/CensusLine.inc";
-            else
-                $incname                = __NAMESPACE__ . "/$className.inc";
-            $filepath               = stream_resolve_include_path($incname);
+            $incname            = __NAMESPACE__ . "/$className.inc";
+            $filepath           = stream_resolve_include_path($incname);
             if ($filepath && file_exists($filepath))
                 include $incname;
             else
@@ -2696,7 +2745,7 @@ class Record implements Iterator, ArrayAccess
                 error_log("Record::getInformation: " . __LINE__ .
             " returns null because unable to load class $className");
                 error_log("Record::getInformation: " . __LINE__ . ' ' .
-                            self::staticBacktrace());
+                            self::staticBacktrace(7));
                 if ($debug)
                     $warn   .= "<p>Record::getInformation: " . __LINE__ .
                                 " returns null because unable to load class $className</p>\n";
@@ -2801,17 +2850,23 @@ class Record implements Iterator, ArrayAccess
                 $initrow                = CensusLine::getInitRow($table);
             else
                 $initrow                = $nsclass::$initRow;
-            if (count($initrow) == 0)
-            {               // no class specific init row
-                // get the very first record in the table
-                $query                  = "SELECT * FROM $table LIMIT 1";
-                $stmt                   = $connection->query($query);
-                if ($stmt)
-                    $row                = $stmt->fetch(PDO::FETCH_ASSOC);
-                if (is_array($row))
-                    $initrow            = $row;
-            }               // no class specific init row
-            $information['initrow']     = $initrow;
+            if ($initrow)
+            {
+                if (count($initrow) == 0)
+                {               // no class specific init row
+                    // get the very first record in the table
+                    $query              = "SELECT * FROM $table LIMIT 1";
+                    $stmt               = $connection->query($query);
+                    if ($stmt)
+                        $row            = $stmt->fetch(PDO::FETCH_ASSOC);
+                    if (is_array($row))
+                        $initrow        = $row;
+                }               // no class specific init row
+                $information['initrow'] = $initrow;
+            }
+            else
+                error_log("Record::getInformation: " . __LINE__ .
+                            " \$initRow undefined, tableName=$tableName, className=$className");
 
             $information['maxsetsize']  = 1000;
             if ($debug)
@@ -3176,6 +3231,13 @@ class Record implements Iterator, ArrayAccess
             $command    = substr($command, 0, strlen($command) - 1);
 
         $id             = $this->getId();
+        if (is_null($id))
+            $id         = 0;
+        else
+        if (!(is_int($id) || ctype_digit($id)))
+            $id         = 0;
+        if (is_null($userid))
+            $userid     = '';
 
         if ($this->former)
             $oldJson    = str_replace(',',', ',json_encode($this->former));
@@ -3188,20 +3250,31 @@ class Record implements Iterator, ArrayAccess
             $newJson    = str_replace(',',', ',json_encode($this->row));
 
         // prepare the insert
+        if (is_string($id) && !ctype_digit($id))
+            $id         = 0;
         $logCmd = 'INSERT INTO SqlLog ' .
                             '(SL_DateTime, SL_Command, SL_Parms, SL_ID, SL_UserName, SL_OldJson, SL_NewJson) ' .
                             'VALUES (NOW(), ?, ?, ?, ?, ?, ?)';
         $parms  = array($command,
-                        str_replace(',',', ',json_encode($parms)),
+                        str_replace(',', ', ', var_export($parms,true)),
                         $id,
                         $userid,
                         $oldJson,
                         $newJson);
-        $stmt   = $connection->prepare($logCmd);
-
-        // perform the update
-        $stmt->execute($parms);
-
+        $stmt                   = $connection->prepare($logCmd);
+        $logText                = debugPrepQuery($logCmd, $parms);
+        if ($stmt->execute($parms))
+        {                   // successful
+            $count              = $stmt->rowCount();
+            return true;
+        }                   // successful
+        else
+        {                   // error inserting record
+            error_log("Record::log: " . htmlspecialchars_decode($logText) .
+                ": " .  print_r($stmt->errorInfo(), true) .
+                "\n" . $this->debugBacktrace());
+            return false;
+        }                   // error inserting record
     }       // function Record::log
 
     /********************************************************************
@@ -3253,15 +3326,26 @@ class Record implements Iterator, ArrayAccess
                             '(SL_DateTime, SL_Command, SL_Parms, SL_ID, SL_UserName, SL_OldJson, SL_NewJson) ' .
                             'VALUES (NOW(), ?, ?, ?, ?, ?, ?)';
         $parms  = array($command,
-                        json_encode($parms),
+                        str_replace(',', ', ', var_export($parms,true)),
                         $id,
                         $userid,
                         $oldJson,
                         $newJson);
-        $stmt   = $connection->prepare($logCmd);
+        $stmt                   = $connection->prepare($logCmd);
+        $logText                = debugPrepQuery($logCmd, $parms);
 
         // perform the update
-        $stmt->execute($parms);
+        if ($stmt->execute($parms))
+        {                   // successful
+            $count              = $stmt->rowCount();
+            return true;
+        }                   // successful
+        else
+        {                   // error inserting record
+            error_log("Record::log: $logText: " .
+                            print_r($stmt->errorInfo(), true));
+            return false;
+        }                   // error inserting record
 
     }       // static function Record::slog
 
